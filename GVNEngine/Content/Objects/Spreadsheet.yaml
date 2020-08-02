@@ -1,0 +1,4 @@
+name: "Spreadsheet"
+sprite: "Content/Sprites/Objects/Spreadsheet.png"
+sprite_hover: "Content/Sprites/Objects/Spreadsheet.png"
+sprite_clicked: "Content/Sprites/Objects/Spreadsheet.png"

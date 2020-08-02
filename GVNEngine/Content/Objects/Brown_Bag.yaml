@@ -1,0 +1,8 @@
+name: "Brown Bag"
+sprite: "Content/Sprites/Objects/Brown_Bag.png"
+sprite_hover: "Content/Sprites/Objects/Brown_Bag_Hover.png"
+sprite_clicked: "Content/Sprites/Objects/Brown_Bag.png"
+action:
+  action: "load_scene"
+  scene_file: "Content/Scenes/Test_Dialogue_Scene_02.yaml"
+  scene_type: "Dialogue"

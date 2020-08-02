@@ -1,0 +1,68 @@
+# A test monologue with Rei
+
+dialogue:
+  - action: "load_dialogue_interface"
+    wait_for_input: True
+
+  - action: "load_sprite"
+    key: "Speaker_02"
+    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
+    position:
+      x: 0.7
+      y: 0.7
+    flip: false
+    zOrder: 0
+    wait_for_input: False
+
+  - action: "dialogue"
+    speaker_text: "Unknown"
+    speaker_text_size: 32
+    speaker_text_color: [100, 150, 50]
+    speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    dialogue_text: "Well well well..."
+    dialogue_text_size: 32
+    dialogue_text_color: [255,51,128]
+    dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    wait_for_input: True
+
+  - action: "dialogue"
+    speaker_text: "Unknown"
+    speaker_text_size: 32
+    speaker_text_color: [100, 150, 50]
+    speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    dialogue_text: "This place looks spiffy"
+    dialogue_text_size: 32
+    dialogue_text_color: [255,51,128]
+    dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    wait_for_input: True
+
+  - action: "unload_sprite"
+    key: "Speaker_02"
+    wait_for_input: False
+
+  - action: "load_sprite"
+    key: "Speaker_02"
+    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
+    position:
+      x: 0.7
+      y: 0.7
+    flip: false
+    zOrder: 0
+    wait_for_input: False
+
+  - action: "dialogue"
+    speaker_text: "Unknown"
+    speaker_text_size: 32
+    speaker_text_color: [100, 150, 50]
+    speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    dialogue_text: "I look forward to seeing what comes next"
+    dialogue_text_size: 32
+    dialogue_text_color: [255,51,128]
+    dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    wait_for_input: True
+
+  - action: "load_scene"
+    scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
+    scene_type: "PointAndClick"
+
+

@@ -1,0 +1,18 @@
+type: 'PointAndClick'
+background: "Content/Sprites/Backgrounds/Classroom_01.jpg"
+
+interactables:
+  - data: "Content/Objects/Brown_Bag.yaml"
+    position:
+      x: 0.65
+      y: 0.70
+    z_order: 0
+    key: "BrownBag"
+
+objects:
+  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
+    position:
+      x: 0.20
+      y: 0.70
+    z_order: 0
+    key: "SpreadSheet"
