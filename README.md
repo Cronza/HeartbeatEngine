@@ -10,8 +10,8 @@ The GVNEngine is a visual novel / dating simulator game engine created in Python
 
 # How to Use the 'GVNEngine'?
 Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, please contact the developer Garrett Fredley at:<br/>
-https://twitter.com/SomeCronzaGuy (Professional Twitter) <br/>
-https://twitter.com/Nixenneth (Private Twitter)
+https://twitter.com/SomeCronzaGuy (Professional Twitter) :shipit: <br/>
+https://twitter.com/Nixenneth (Private Twitter) :underage:
 
 # License
 The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
@@ -68,7 +68,7 @@ The above is an example of an action that loads a sprite into the game. The acti
 Additionally, each action is fed the entire data block of that action. In the example above, we see that various parameters such as 'flip' are provided. Actions are capable of acting on any data provided. For the above `load_sprite` action which is one of the provided engine default actions, flip is used in the action function to flip the sprite when it is drawn to the screen.
 
 # GVNEditor
-*This feature is heavily in development, and will most like be a while before its release
+:warning: *This feature is heavily in development, and will most like be a while before its release
 ![ScreenShot](Progress_Examples/GVNEditor_v01_Interface.png?raw=true "GVNEditor Main Interface")
 
 The GVNEditor is an editing tool for designing the YAML files used by the GVNEngine. It is built using python and the PyQt5 binding for the Qt framework. 
