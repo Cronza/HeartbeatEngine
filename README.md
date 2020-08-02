@@ -68,7 +68,7 @@ The above is an example of an action that loads a sprite into the game. The acti
 Additionally, each action is fed the entire data block of that action. In the example above, we see that various parameters such as 'flip' are provided. Actions are capable of acting on any data provided. For the above `load_sprite` action which is one of the provided engine default actions, flip is used in the action function to flip the sprite when it is drawn to the screen.
 
 # GVNEditor
-:warning: *This feature is heavily in development, and will most like be a while before its release
+:warning: *This feature is heavily in development, and will most likely be a while before its release
 ![ScreenShot](Progress_Examples/GVNEditor_v01_Interface.png?raw=true "GVNEditor Main Interface")
 
 The GVNEditor is an editing tool for designing the YAML files used by the GVNEngine. It is built using python and the PyQt5 binding for the Qt framework. 
