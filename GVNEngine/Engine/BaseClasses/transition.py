@@ -1,9 +1,10 @@
-class Action():
-    def __init__(self, scene, action_data, a_manager):
-        print("Init")
+class Transition:
+    def __init__(self, scene, a_manager, renderable, transition_speed=5):
         self.scene = scene
-        self.action_data = action_data
         self.a_manager = a_manager
+        self.renderable = renderable
+        self.transition_speed = transition_speed
+
         self.complete = False
 
     def Start(self):

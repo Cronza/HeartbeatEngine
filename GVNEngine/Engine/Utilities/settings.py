@@ -8,7 +8,6 @@ class Settings:
         self.resolution_options = [(1280, 720)]
         self.main_resolution = (1280, 720)
         self.starting_scene = 'Test_Dialogue_Scene_01.yaml'
-        self.starting_scene_type = 'Dialogue'
 
         self.dialogue_frame_sprite = ""
         self.dialogue_speaker_frame_sprite = ""
@@ -19,7 +18,6 @@ class Settings:
         parser.read(ini_path)
         self.title = parser['Game']['Title']
         self.starting_scene = parser['Game']['starting_scene']
-        self.starting_scene_type = parser['Game']['starting_scene_type']
 
         # Index value for a given resolution
         self.resolution = int(parser['Window.Settings']['resolution'])

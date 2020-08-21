@@ -24,9 +24,10 @@ class Scene:
 
     def Update(self, input_events):
         self.renderables_group.Update()
+        self.a_manager.Update()
 
     def Draw(self, base_screen_size, new_screen_size):
-        print("*** REDRAWING SCENE ***")
+        #print("*** REDRAWING SCENE ***")
 
         # Get a sprite scale multiplier in case the screen resolution has changed
         multiplier = self.CalculateScreenSizeMultiplier(base_screen_size, new_screen_size)
@@ -58,7 +59,6 @@ class Scene:
 
     def SwitchScene(self, scene_file, scene_type):
         self.renderables_group.Clear()
-        self.a_manager = None
 
         self.scene_manager.LoadScene(scene_file, scene_type)
 

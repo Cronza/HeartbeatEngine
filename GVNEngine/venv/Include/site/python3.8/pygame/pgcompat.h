@@ -1,8 +1,9 @@
-/* Python 2.x/3.x compitibility tools
+/* Python 2.x/3.x compatibility tools (internal)
  */
+#ifndef PGCOMPAT_INTERNAL_H
+#define PGCOMPAT_INTERNAL_H
 
-#if !defined(PGCOMPAT_H)
-#define PGCOMPAT_H
+#include "include/pgcompat.h"
 
 #if PY_MAJOR_VERSION >= 3
 
@@ -21,6 +22,8 @@
 #define PyInt_AsUnsignedLongLongMask PyLong_AsUnsignedLongLongMask
 #define PyInt_AS_LONG PyLong_AS_LONG
 #define PyNumber_Int PyNumber_Long
+/* Int and Long are identical in Py3 so only check one */
+#define INT_CHECK(op) PyLong_Check(op)
 
 /* Weakrefs flags changed in 3.x */
 #define Py_TPFLAGS_HAVE_WEAKREFS 0
@@ -82,6 +85,9 @@
 #else /* #if PY_MAJOR_VERSION >= 3 */
 
 #define PY3 0
+
+/* Check both Int and Long in PY2 */
+#define INT_CHECK(op) (PyInt_Check(op) || PyLong_Check(op))
 
 /* Module init function returns nothing. */
 #define MODINIT_RETURN(x) return
@@ -190,6 +196,31 @@
 #else
 #define PG_ENABLE_NEWBUF 0
 #endif
+#endif /* !defined(PG_ENABLE_NEWBUF) */
+
+
+#if defined(SDL_VERSION_ATLEAST)
+#if (SDL_VERSION_ATLEAST(2, 0, 0)) && !(SDL_VERSION_ATLEAST(2, 0, 5))
+/* These functions require SDL 2.0.5 or greater.
+
+  https://wiki.libsdl.org/SDL_SetWindowResizable
+*/
+void SDL_SetWindowResizable(SDL_Window *window, SDL_bool resizable);
+int SDL_GetWindowOpacity(SDL_Window *window, float *opacity);
+int SDL_SetWindowOpacity(SDL_Window *window, float opacity);
+int SDL_SetWindowModalFor(SDL_Window *modal_window, SDL_Window *parent_window);
+int SDL_SetWindowInputFocus(SDL_Window *window);
+SDL_Surface * SDL_CreateRGBSurfaceWithFormat(Uint32 flags, int width, int height, int depth,
+                               Uint32 format);
+#endif
+#endif /* defined(SDL_VERSION_ATLEAST) */
+
+// Currently needed to build scrap.c, event.c, display.c
+// with Windows SDK 10.0.18362.0 and SDL1 build
+#ifdef _MSC_VER
+    #ifndef WINDOWS_IGNORE_PACKING_MISMATCH
+        #define WINDOWS_IGNORE_PACKING_MISMATCH
+    #endif
 #endif
 
-#endif /* #if !defined(PGCOMPAT_H) */
+#endif /* ~PGCOMPAT_INTERNAL_H */

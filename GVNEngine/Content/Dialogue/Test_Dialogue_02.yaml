@@ -46,6 +46,9 @@ dialogue:
     flip: True
     zOrder: 0
     wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 10
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -67,6 +70,9 @@ dialogue:
     flip: false
     zOrder: 0
     wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 5
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -84,7 +90,7 @@ dialogue:
     speaker_text_size: 32
     speaker_text_color: [199, 192, 194]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    dialogue_text: "A woman stood before me, clad in security gear starkly contrasted by her vibrant hair color"
+    dialogue_text: "A woman stood before me, her vibrant hair contrasting her security uniform"
     dialogue_text_size: 24
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
@@ -104,6 +110,9 @@ dialogue:
   - action: "unload_sprite"
     key: "Speaker_02"
     wait_for_input: False
+    transition:
+      transition_type: 'fade_out'
+      transition_speed: 50
 
   - action: "load_sprite"
     key: "Speaker_02"
@@ -114,13 +123,16 @@ dialogue:
     flip: false
     zOrder: 0
     wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 10
 
   - action: "dialogue"
     speaker_text: "Rei"
     speaker_text_size: 32
-    speaker_text_color: [199, 192, 194]
+    speaker_text_color: [199, 34, 67]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    dialogue_text: "The name's Rei. Im a security officer here on ship colony Aion. Welcome to your new home"
+    dialogue_text: "Rei. I work security here aboard Aion. Welcome to your new home"
     dialogue_text_size: 24
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'

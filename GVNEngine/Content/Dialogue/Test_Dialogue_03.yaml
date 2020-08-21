@@ -40,7 +40,7 @@ dialogue:
     speaker_text_size: 32
     speaker_text_color: [199, 34, 67]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    dialogue_text: "Ah, just head towards city hall. It's tower building with the 'Ventro' sign"
+    dialogue_text: "Ah. Just head down the hall. Take the elevator to the 5th floor"
     dialogue_text_size: 24
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
