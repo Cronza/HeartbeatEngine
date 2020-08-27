@@ -15,6 +15,8 @@ class GVNEngine():
 
         self.scene_manager = None
 
+        self.delta_time = 0
+
     def Main(self):
         pygame.init()
 
@@ -30,23 +32,28 @@ class GVNEngine():
             input_events = pygame.event.get()
 
             self.scene_manager.active_scene.Update(input_events)
-            print(clock.get_fps())
+
+            #print(clock.get_fps())
             for event in input_events:
                 if event.type == pygame.QUIT:
                     is_running = False
                 if event.type == VIDEORESIZE:  # Resolution Change
                     print("New Size")
                     print(event.dict['size'])
-                    self.scene_manager.active_scene.Draw(self.settings.main_resolution, event.dict['size'])
+                    #self.scene_manager.active_scene.Draw(self.settings.main_resolution, event.dict['size'])
+                    #self.scene_manager.ResizeScene()
                     print("Resize Triggered")
                 if event.type == pygame.KEYDOWN:
                     # Maximize
                     if event.key == pygame.K_1:
                         window = self.UpdateResolution(1, pygame.FULLSCREEN)
-                        print(window)
+                        print("AWWWWWWWWWWWWWWWWWWWWWWW SHIT")
+                        self.scene_manager.ResizeScene()
                     # Minimize
                     if event.key == pygame.K_2:
                         window = self.UpdateResolution(0)
+                        print("AWWWWWWWWWWWWWWWWWWWWWWW SHIT")
+                        self.scene_manager.ResizeScene()
                     # Exit
                     if event.key == pygame.K_ESCAPE:
                         is_running = False
@@ -54,17 +61,16 @@ class GVNEngine():
             # Refresh any changes
             pygame.display.update()
 
-            clock.tick(60)
+            # Ge the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
+            # on actions
+            self.scene_manager.active_scene.delta_time = clock.tick(60) / 1000
 
     def UpdateResolution(self, new_size_index, flag=0):
         #Use the given, but always add HWSURFACE and DOUBLEBUF
         self.settings.resolution = new_size_index
         pygame.display.set_mode(self.settings.resolution_options[new_size_index], flag)
 
-        self.scene_manager.active_scene.Draw(
-            self.settings.main_resolution,
-            self.settings.resolution_options[new_size_index]
-        )
+        self.scene_manager.active_scene.Draw()
 
 if __name__ == "__main__":
     engine = GVNEngine()

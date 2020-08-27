@@ -23,7 +23,7 @@ class ActionManager:
             # We can't edit the dict size while iterating, so if any actions are complete, store them and delete them
             # afterwards
             for action in self.active_actions:
-                print(action.complete)
+                #print(action.complete)
                 if action.complete is True:
                     pending_completion.append(action)
                 else:

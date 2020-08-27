@@ -5,8 +5,8 @@ from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 
 
 class Interactable(SpriteRenderable):
-    def __init__(self, data_path, pos):
-        super().__init__(data_path, pos)
+    def __init__(self, scene, data_path, pos):
+        super().__init__(scene, data_path, pos)
 
         # We need to be able to talk to the scene object for render calls
         self.scene = None
@@ -27,10 +27,7 @@ class Interactable(SpriteRenderable):
             if self.state is State.normal:
                 self.surface = pygame.image.load(self.renderable_data['sprite_hover']).convert_alpha()
                 self.state = State.hover
-                self.scene.Draw(
-                    self.scene.settings.main_resolution,
-                    self.scene.settings.resolution_options[self.scene.settings.resolution]
-                )
+                self.scene.Draw()
             else:  # Track whether the user has release their cursor over the sprite
                 if pygame.mouse.get_pressed()[0] == 1:
                     # Begin the click
@@ -47,10 +44,7 @@ class Interactable(SpriteRenderable):
         elif self.state is State.hover:
             self.surface = pygame.image.load(self.renderable_data['sprite']).convert_alpha()
             self.state = State.normal
-            self.scene.Draw(
-                self.scene.settings.main_resolution,
-                self.scene.settings.resolution_options[self.scene.settings.resolution]
-            )
+            self.scene.Draw()
 
     def Interact(self):
         # Check if any actions are defined in the data file

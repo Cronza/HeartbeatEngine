@@ -38,7 +38,7 @@ dialogue:
     wait_for_input: True
 
   - action: "load_sprite"
-    key: "Speaker_01"
+    key: "Isea_Idle_Concerned"
     sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
     position:
       x: 0.2
@@ -48,7 +48,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 10
+      transition_speed: 400
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -62,7 +62,7 @@ dialogue:
     wait_for_input: True
 
   - action: "load_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Straight_Face"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
     position:
       x: 0.8
@@ -72,7 +72,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 5
+      transition_speed: 400
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -108,14 +108,12 @@ dialogue:
     wait_for_input: True
 
   - action: "unload_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Straight_Face"
     wait_for_input: False
-    transition:
-      transition_type: 'fade_out'
-      transition_speed: 50
+
 
   - action: "load_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Smiling"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
     position:
       x: 0.8
@@ -125,7 +123,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 10
+      transition_speed: 400
 
   - action: "dialogue"
     speaker_text: "Rei"

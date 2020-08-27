@@ -26,6 +26,7 @@ class load_sprite(Action):
     """
     def Start(self):
         new_sprite = SpriteRenderable(
+            self.scene,
             self.action_data['sprite'],
             tuple([self.action_data['position']['x'], self.action_data['position']['y']])
         )
@@ -38,21 +39,18 @@ class load_sprite(Action):
 
         # If the user requested a flip action, do so
         if 'flip' in self.action_data:
-            if self.action_data['flip'] is not False:
-                new_sprite.surface = self.scene.pygame_lib.transform.flip(new_sprite.surface, True, False)
+            if self.action_data['flip']:
+                new_sprite.Flip()
 
         self.scene.renderables_group.Add(new_sprite)
-
-        self.scene.Draw(
-            self.scene.settings.main_resolution,
-            self.scene.settings.resolution_options[self.scene.settings.resolution]
-        )
 
         # Any transitions are applied to the sprite post-load
         if 'transition' in self.action_data:
             self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_sprite)
+            self.active_transition.Start()
         else:
-            self.complete
+            self.scene.Draw()
+            self.complete = True
 
     def Update(self):
         if self.active_transition.complete is True:
@@ -61,26 +59,47 @@ class load_sprite(Action):
         else:
             self.active_transition.Update()
 
+class unload_sprite(Action):
+    """ Based on a given key, remove the associated sprite from the renderable stack """
+    def Start(self):
+        if 'key' in self.action_data:
+            sprite = self.scene.renderables_group.renderables[self.action_data['key']]
+
+            # Any transitions are applied to the sprite pre-unload
+            if 'transition' in self.action_data:
+                print(sprite)
+                self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], sprite)
+                self.active_transition.Start()
+            else:
+                self.scene.renderables_group.Remove(self.action_data['key'])
+                self.scene.Draw()
+                self.complete = True
+        else:
+            print("Unload Sprite action Failed - Key not specified")
+
+    def Update(self):
+        if self.active_transition.complete is True:
+            print("Transition Complete")
+            self.scene.renderables_group.Remove(self.action_data['key'])
+            self.complete = True
+        else:
+            self.active_transition.Update()
 
 class load_background(Action):
     def Start(self):
         """ Create a background renderable with pre-set settings"""
         new_sprite = SpriteRenderable(
+            self.scene,
             self.action_data['sprite'],
-            (0,0)
+            (0,0),
+            False
         )
-
         new_sprite.key = "Background"
         new_sprite.z_order = -9999
-        new_sprite.center_align = False
 
         self.scene.renderables_group.Add(new_sprite)
 
-        self.scene.Draw(
-            self.scene.settings.main_resolution,
-            self.scene.settings.resolution_options[self.scene.settings.resolution]
-        )
-
+        self.scene.Draw()
         self.complete = True
 
 class load_dialogue_interface(Action):
@@ -90,12 +109,14 @@ class load_dialogue_interface(Action):
     """
     def Start(self):
         dialogue_frame = SpriteRenderable(
+            self.scene,
             self.scene.settings.dialogue_frame_sprite,
             (0.5, 0.85)
         )
         dialogue_frame.z_order = 100
         dialogue_frame.key = 'DialogueFrame'
         speaker_frame = SpriteRenderable(
+            self.scene,
             self.scene.settings.dialogue_speaker_frame_sprite,
             (0.2, 0.7)
         )
@@ -106,16 +127,14 @@ class load_dialogue_interface(Action):
         self.scene.renderables_group.Add(dialogue_frame)
         self.scene.renderables_group.Add(speaker_frame)
 
-        self.scene.Draw(
-            self.scene.settings.main_resolution,
-            self.scene.settings.resolution_options[self.scene.settings.resolution]
-        )
-
+        self.scene.Draw()
         self.complete = True
 
 class create_interactable(Action):
+    """ Creates an interactable renderable, and adds it to the renderable stack"""
     def Start(self):
         new_renderable = Interactable(
+            self.scene,
             self.action_data['data'],
             tuple(self.action_data['position'].values())
         )
@@ -123,34 +142,9 @@ class create_interactable(Action):
         new_renderable.scene = self.scene
         new_renderable.key = self.action_data['key']
 
-        self.scene.Draw(
-            self.scene.settings.main_resolution,
-            self.scene.settings.resolution_options[self.scene.settings.resolution]
-        )
-
         self.scene.renderables_group.Add(new_renderable)
 
-        self.complete = True
-
-class unload_sprite(Action):
-    """ Based on a given key, remove the associated sprite from the renderable stack """
-    def Start(self):
-        if 'key' in self.action_data:
-            sprite = self.scene.renderables_group.renderables[self.action_data['key']]
-
-            # Any transitions are applied to the sprite pre-unload
-            #if 'transition' in action_data:
-            #    print("Unload Transition")
-            #    a_manager.StartTransition(action_data, sprite)
-            #scene.renderables_group.Remove(action_data['key'])
-
-            self.scene.Draw(
-                self.scene.settings.main_resolution,
-                self.scene.settings.resolution_options[self.scene.settings.resolution]
-            )
-        else:
-            print("Unload Sprite action Failed - Key not specified")
-
+        self.scene.Draw()
         self.complete = True
 
 class dialogue(Action):
@@ -159,6 +153,7 @@ class dialogue(Action):
     """
     def Start(self):
         new_speaker_text = TextRenderable(
+            self.scene,
             (0.08, 0.675),
             self.action_data['speaker_text'],
             self.action_data['speaker_font'],
@@ -169,6 +164,7 @@ class dialogue(Action):
         new_speaker_text.key = "SpeakerText"
 
         new_dialogue_text = TextRenderable(
+            self.scene,
             (0.08, 0.77),
             self.action_data['dialogue_text'],
             self.action_data['dialogue_font'],
@@ -184,18 +180,23 @@ class dialogue(Action):
         self.scene.renderables_group.Add(new_dialogue_text)
 
         # By default, text fades in. However, allow the user to override this behaviour
-        #if 'transition' in action_data:
-        #    a_manager.StartTransition(action_data, new_dialogue_text)
-        #else:
-        #    action_data['transition'] = {'transition_type': 'fade_in'}
-        #    a_manager.StartTransition(action_data, new_dialogue_text)
+        if 'transition' in self.action_data:
+            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_dialogue_text)
+            self.active_transition.Start()
+        else:
+            self.action_data['transition'] = {
+                'transition_type': 'fade_in',
+                'transition_speed': 700
+            }
+            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_dialogue_text)
+            self.active_transition.Start()
 
-        self.scene.Draw(
-            self.scene.settings.main_resolution,
-            self.scene.settings.resolution_options[self.scene.settings.resolution]
-        )
-
-        self.complete = True
+    def Update(self):
+        if self.active_transition.complete is True:
+            print("Transition Complete")
+            self.complete = True
+        else:
+            self.active_transition.Update()
 
 class load_scene(Action):
     """ Switches scenes to the one specified in the action data. Requires an applicable scene type be provided """

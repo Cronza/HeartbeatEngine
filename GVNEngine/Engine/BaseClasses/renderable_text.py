@@ -13,13 +13,15 @@ class TextRenderable(Renderable):
         - Pop-up text
         - etc
     """
-    def __init__(self, pos, text, font, font_size, color):
-        super().__init__(pos)
+    def __init__(self, scene, pos, text, font, font_size, color, center_align = False):
+        super().__init__(scene, pos, center_align)
 
         self.font_obj = pygame.font.Font(font, font_size)
         self.surface = self.font_obj.render(text, True, tuple(color))
         self.rect = self.surface.get_rect()
-        self.center_align = False
+
+        # For new objects, resize initially in case we're already using a scaled resolution
+        self.RecalculateSize(self.scene.resolution_multiplier)
 
 
 

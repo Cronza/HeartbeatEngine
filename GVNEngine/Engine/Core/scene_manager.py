@@ -37,12 +37,10 @@ class SceneManager():
                 self
             )
 
-            self.active_scene.Draw(
-                self.settings.main_resolution,
-                self.settings.resolution_options[self.settings.resolution]
-            )
+            self.active_scene.Draw()
         else:
             print(f"Failed to Load Scene - Specified scene type does not exist: {scene_type}")
 
-
-
+    def ResizeScene(self):
+        """ Inform the scene object o resize to support a resolution change """
+        self.active_scene.Resize()

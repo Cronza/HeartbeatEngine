@@ -6,10 +6,10 @@ class PointAndClickScene(Scene):
 
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
 
-    def Draw(self, base_screen_size, new_screen_size):
+    def Draw(self):
 
         # Draw both generics and interactive specifics using the parent's method
-        super().Draw(base_screen_size, new_screen_size)
+        super().Draw()
 
     def LoadSceneData(self):
         super().LoadSceneData()
