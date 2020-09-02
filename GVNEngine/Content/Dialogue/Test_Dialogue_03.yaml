@@ -36,7 +36,7 @@ dialogue:
     wait_for_input: True
 
   - action: "dialogue"
-    speaker_text: "Unknown"
+    speaker_text: "Rei"
     speaker_text_size: 32
     speaker_text_color: [199, 34, 67]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'

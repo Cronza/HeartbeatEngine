@@ -6,10 +6,14 @@ from Engine.Utilities.yaml_reader import Reader
 class SceneManager():
     def __init__(self, window, pygame_lib, settings):
 
+        # Objects
         self.settings = settings
         self.pygame_lib = pygame_lib
         self.window = window
         self.active_scene = None
+
+        # Cached Values (Scene agnostic)
+        self.resolution_multiplier = None  # Null be default to allow the starting scene to generate a starting value
 
         self.scene_types = {
             'Dialogue': DialogueScene,

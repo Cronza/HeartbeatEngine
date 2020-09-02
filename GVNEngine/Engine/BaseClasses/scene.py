@@ -1,7 +1,6 @@
 from Engine.Utilities.yaml_reader import Reader
-from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 from Engine.BaseClasses.renderable_group import RenderableGroup
-from Engine.Actions.action_manager import ActionManager
+from Engine.Core.action_manager import ActionManager
 
 class Scene:
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
@@ -13,11 +12,18 @@ class Scene:
         self.renderables_group = RenderableGroup()
         self.a_manager = ActionManager(self, settings)
 
-        self.resolution_multiplier = 1
         self.delta_time = 0
 
         # Read in the active scene data
         self.scene_data = Reader.ReadAll(scene_data_file)
+
+
+        # Load any cached data on the scene manager
+        if not self.scene_manager.resolution_multiplier:
+            self.resolution_multiplier = 1
+        else:
+            self.resolution_multiplier = self.scene_manager.resolution_multiplier
+
 
         self.LoadSceneData()
 
@@ -33,27 +39,6 @@ class Scene:
 
         # Draw any renderables using the screen space multiplier to fit the new resolution
         for renderable in renderables:
-            #print("Hello")
-            # TODO: Figure out a way to cache the rescale upon initial screen update so we don't recalculate every draw
-
-            # Calculate the new sprite size and position based on the screen size multiplier
-            #new_size = self.CalculateSpriteSize(sprite.surface, self.size_multiplier)
-            #new_position = self.ConvertNormToScreen(tuple(sprite.position))
-
-            # Allow the user to specify center coordinates, then convert them to the top-left coordinates
-            # used by the renderer
-            #if sprite.center_align:
-                #new_position = sprite.GetCenterOffset()
-
-            # The rect and surface are independent of eachother's location and position, so update the rect to match
-            # the surface location and position
-            #sprite.UpdateRect(new_position)
-            #sprite.rect.w = new_size[0]
-            #sprite.rect.h = new_size[1]
-
-            # Blit the renderable, upscaling or downscaling to the new size
-            #self.window.blit(self.pygame_lib.transform.smoothscale(sprite.surface, new_size), new_position)
-
             self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
 
     def SwitchScene(self, scene_file, scene_type):
@@ -64,8 +49,10 @@ class Scene:
     def Resize(self):
         """ Determines a new sprite size based on the difference between the main resolution and the new resolution """
 
+        # Generate the new screen size scale multiplier, then cache it in the scene manager in case scenes change
         new_resolution = self.settings.resolution_options[self.settings.resolution]
         self.resolution_multiplier = self.CalculateScreenSizeMultiplier(self.settings.main_resolution, new_resolution)
+        self.scene_manager.resolution_multiplier = self.resolution_multiplier
 
         # Inform each renderable of the resolution change so they can update their respective elements
         for renderable in self.renderables_group.Get():

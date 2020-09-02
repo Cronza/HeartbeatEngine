@@ -17,13 +17,14 @@ class Renderable(pygame.sprite.Sprite):
         self.scene = scene
 
         self.position = pos
-        self.surface = None  # The original, unscaled surface
-        self.scaled_surface = None  # Used in resolutions different from the main resolution
         self.rect = None
 
-        # Allow renderables to opt out of center aligning (Generally used for things like background sprites, or
-        # screen-width sprites
+        self.surface = None  # The active surface
+        self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
+
+        # Transform conditions
         self.center_align = center_align
+        self.flipped = False
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned a unique
         # identifier
@@ -33,23 +34,35 @@ class Renderable(pygame.sprite.Sprite):
         self.z_order = 0
 
     def RecalculateSize(self, multiplier):
-        """ Based on the provided multiplier, resize the image accordingly """
+        """ Resize the renderable and it's surfaces based on the size provided multiplier """
 
-        # A multiplier of 1 means this is the main resolution. Load the unscaled sprite to avoid continuous scaling
+        # Recalculate the main surface
         if multiplier == 1:
-            print("Multiplier provided is 1, using unscaled sprite")
+            self.surface = self.RecalculateSurfaceSize(multiplier, self.surface)
             self.scaled_surface = None
+        else:
+            self.scaled_surface = self.RecalculateSurfaceSize(multiplier, self.surface)
 
+    def RecalculateSurfaceSize(self, multiplier, surface):
+        """ Based on the provided multiplier, resize the provided surface accordingly """
+
+        # A multiplier of 1 means this is the main resolution. Update the renderable using the unscaled surface
+        if multiplier == 1:
+            print("Multiplier provided is 1, updating using the provided surface without scaling")
+
+            # Generate a new absolute position using this renderables normalized screen position
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
             if self.center_align:
-                new_position = self.GetCenterOffset(new_position, self.surface.get_size())
+                new_position = self.GetCenterOffset(new_position, surface.get_size())
 
-            print(new_position)
-            self.UpdateRect(new_position, self.surface.get_size())
-        else:  # We're using a different resolution. We need to use a scaled version of our surface
-            width = self.surface.get_width()
-            height = self.surface.get_height()
+            self.UpdateRect(new_position, surface.get_size())
+
+            return surface
+
+        else:  # We're using a different resolution. We need to use a scaled version of the provided surface
+            width = surface.get_width()
+            height = surface.get_height()
 
             # Round each value as blitting doesn't support floats
             new_size = tuple(
@@ -59,14 +72,16 @@ class Renderable(pygame.sprite.Sprite):
                 ]
             )
             # Generate the scaled surface
-            self.scaled_surface = self.scene.pygame_lib.transform.smoothscale(self.surface, new_size)
+            scaled_surface = self.scene.pygame_lib.transform.smoothscale(surface, new_size)
 
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
             if self.center_align:
-                new_position = self.GetCenterOffset(new_position, self.scaled_surface.get_size())
+                new_position = self.GetCenterOffset(new_position, scaled_surface.get_size())
 
-            self.UpdateRect(new_position, self.scaled_surface.get_size())
+            self.UpdateRect(new_position, scaled_surface.get_size())
+
+            return scaled_surface
 
     def GetSurface(self):
         """
@@ -95,6 +110,13 @@ class Renderable(pygame.sprite.Sprite):
         else:
             return self.surface
 
+    def SetActiveSurface(self, surface):
+        """ Updates the active surface using the provided surface """
+        if self.scaled_surface:
+            self.scaled_surface = surface
+        else:
+            self.surface = surface
+
     def ConvertNormToScreen(self, norm_value):
         """ Take the normalized object pos and convert it to relative screen space coordinates """
         screen_size = self.scene.pygame_lib.display.get_surface().get_size()
@@ -122,3 +144,4 @@ class Renderable(pygame.sprite.Sprite):
             self.scaled_surface = self.scene.pygame_lib.transform.flip(self.scaled_surface, True, False)
         else:
             self.surface = self.scene.pygame_lib.transform.flip(self.surface, True, False)
+

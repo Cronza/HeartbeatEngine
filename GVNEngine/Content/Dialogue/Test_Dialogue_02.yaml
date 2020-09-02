@@ -48,7 +48,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 400
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -72,7 +72,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 400
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -111,7 +111,6 @@ dialogue:
     key: "Rei_Idle_Straight_Face"
     wait_for_input: False
 
-
   - action: "load_sprite"
     key: "Rei_Idle_Smiling"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
@@ -123,7 +122,7 @@ dialogue:
     wait_for_input: False
     transition:
       transition_type: 'fade_in'
-      transition_speed: 400
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Rei"

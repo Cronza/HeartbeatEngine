@@ -142,6 +142,11 @@ class create_interactable(Action):
         new_renderable.scene = self.scene
         new_renderable.key = self.action_data['key']
 
+        # If the user requested a flip action, do so
+        if 'flip' in self.action_data:
+            if self.action_data['flip']:
+                new_renderable.Flip()
+
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
@@ -186,7 +191,7 @@ class dialogue(Action):
         else:
             self.action_data['transition'] = {
                 'transition_type': 'fade_in',
-                'transition_speed': 700
+                'transition_speed': 1000
             }
             self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_dialogue_text)
             self.active_transition.Start()

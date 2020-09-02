@@ -37,22 +37,14 @@ class GVNEngine():
             for event in input_events:
                 if event.type == pygame.QUIT:
                     is_running = False
-                if event.type == VIDEORESIZE:  # Resolution Change
-                    print("New Size")
-                    print(event.dict['size'])
-                    #self.scene_manager.active_scene.Draw(self.settings.main_resolution, event.dict['size'])
-                    #self.scene_manager.ResizeScene()
-                    print("Resize Triggered")
                 if event.type == pygame.KEYDOWN:
                     # Maximize
                     if event.key == pygame.K_1:
                         window = self.UpdateResolution(1, pygame.FULLSCREEN)
-                        print("AWWWWWWWWWWWWWWWWWWWWWWW SHIT")
                         self.scene_manager.ResizeScene()
                     # Minimize
                     if event.key == pygame.K_2:
                         window = self.UpdateResolution(0)
-                        print("AWWWWWWWWWWWWWWWWWWWWWWW SHIT")
                         self.scene_manager.ResizeScene()
                     # Exit
                     if event.key == pygame.K_ESCAPE:

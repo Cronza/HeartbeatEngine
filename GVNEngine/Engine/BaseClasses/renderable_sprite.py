@@ -18,7 +18,7 @@ class SpriteRenderable(Renderable):
         - If a path to a object .yaml file is provided, it will load the corresponding .yaml file, and use its
           defined position value
     """
-    def __init__(self, scene, data_path, pos, center_align = True):
+    def __init__(self, scene, data_path, pos, center_align = True, initial_rescale = True):
         super().__init__(scene, pos, center_align)
 
         self.renderable_data = {}
@@ -38,4 +38,5 @@ class SpriteRenderable(Renderable):
                       f"supported file type:\n{exc}\n")
 
         # For new objects, resize initially in case we're already using a scaled resolution
-        self.RecalculateSize(self.scene.resolution_multiplier)
+        if initial_rescale:
+            self.RecalculateSize(self.scene.resolution_multiplier)
