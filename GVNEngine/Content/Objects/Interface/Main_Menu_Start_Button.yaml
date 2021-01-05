@@ -1,5 +1,5 @@
 name: "Main_Menu_Start_Button"
-sprite: "Content/Sprites/Interface/Buttons/Button_01.png"
+sprite: "Content/Sprites/Interface/Buttons/Button_01_Normal.png"
 sprite_hover: ""
 sprite_clicked: ""
 action:
