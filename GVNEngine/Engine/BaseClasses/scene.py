@@ -12,18 +12,17 @@ class Scene:
         self.renderables_group = RenderableGroup()
         self.a_manager = ActionManager(self, settings)
 
+        # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
 
         # Read in the active scene data
         self.scene_data = Reader.ReadAll(scene_data_file)
-
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:
             self.resolution_multiplier = 1
         else:
             self.resolution_multiplier = self.scene_manager.resolution_multiplier
-
 
         self.LoadSceneData()
 
@@ -43,7 +42,6 @@ class Scene:
 
     def SwitchScene(self, scene_file, scene_type):
         self.renderables_group.Clear()
-
         self.scene_manager.LoadScene(scene_file, scene_type)
 
     def Resize(self):
@@ -99,41 +97,3 @@ class Scene:
             final_resolution.append(old_resolution[1] / new_resolution[1])
 
         return tuple(final_resolution)
-
-
-    #def CalculateSpriteSize(self, sprite_surface, screen_multiplier):
-    #    """ Based on a given surface and multiplier for the current resolution, return the resulting size tuple"""
-    """
-        width = sprite_surface.get_width()
-        height = sprite_surface.get_height()
-
-        # Round each value as blitting doesn't support floats
-        return tuple(
-            [
-                round(width * screen_multiplier[0]),
-                round(height * screen_multiplier[1])
-            ]
-        )
-    """
-    #def ConvertNormToScreen(self, norm_value):
-    #    """ Take the normalized object pos and convert it to relative screen space coordinates """
-    """
-        screen_size = self.pygame_lib.display.get_surface().get_size()
-
-        return (
-            norm_value[0] * screen_size[0],
-            norm_value[1] * screen_size[1]
-        )
-    """
-
-    #def GetCenterOffset(self, pos, size):
-    #    """
-    #    Given size and position tuples representing the center point of a sprite,
-    #    return the offset position for the top-left corner
-    #    """
-    """
-        return (
-            round(pos[0] - size[0] / 2),
-            round(pos[1] - size[1] / 2)
-        )
-    """

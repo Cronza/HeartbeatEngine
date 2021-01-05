@@ -13,7 +13,7 @@ class SceneManager():
         self.active_scene = None
 
         # Cached Values (Scene agnostic)
-        self.resolution_multiplier = None  # Null be default to allow the starting scene to generate a starting value
+        self.resolution_multiplier = None  # Null by default to allow the starting scene to generate a starting value
 
         self.scene_types = {
             'Dialogue': DialogueScene,
@@ -30,7 +30,6 @@ class SceneManager():
 
     def LoadScene(self, scene_file, scene_type):
         print(" *** LOADING NEW SCENE ***")
-        print(scene_type)
         if scene_type in self.scene_types:
             del self.active_scene
             self.active_scene = self.scene_types[scene_type](
@@ -40,8 +39,6 @@ class SceneManager():
                 self.settings,
                 self
             )
-
-            self.active_scene.Draw()
         else:
             print(f"Failed to Load Scene - Specified scene type does not exist: {scene_type}")
 

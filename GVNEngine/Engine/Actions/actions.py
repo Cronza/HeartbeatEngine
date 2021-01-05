@@ -87,7 +87,7 @@ class unload_sprite(Action):
 
 class load_background(Action):
     def Start(self):
-        """ Create a background renderable with pre-set settings"""
+        """ Create a background renderable with pre-set settings """
         new_sprite = SpriteRenderable(
             self.scene,
             self.action_data['sprite'],

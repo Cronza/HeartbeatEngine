@@ -34,7 +34,7 @@ class Renderable(pygame.sprite.Sprite):
         self.z_order = 0
 
     def RecalculateSize(self, multiplier):
-        """ Resize the renderable and it's surfaces based on the size provided multiplier """
+        """ Resize the renderable and it's surfaces based on the provided size multiplier """
 
         # Recalculate the main surface
         if multiplier == 1:

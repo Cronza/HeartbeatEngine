@@ -22,7 +22,7 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
-        print(self.dialogue_index)
+        #print(self.dialogue_index)
         if len(self.dialogue_data['dialogue']) > self.dialogue_index:
             recurse = False
 
@@ -37,16 +37,6 @@ class DialogueScene(PointAndClickScene):
 
             if recurse:
                 self.LoadAction()
-            """
-            else:
-                # If we're changing the scene, forgo the draw update as data will no longer be available
-                if action_data['action'] != "load_scene":
-                    self.Draw(
-                        self.scene.settings.main_resolution,
-                        self.scene.settings.resolution_options[self.scene.settings.resolution]
-                    )
-            """
-
         else:
             print('The end of available dialogue actions has been reached')
 
