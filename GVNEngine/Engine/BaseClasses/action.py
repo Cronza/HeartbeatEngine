@@ -4,6 +4,7 @@ class Action():
         self.action_data = action_data
         self.a_manager = a_manager
         self.active_transition = None
+        self.transition_speed = 5
         self.complete = False
 
     def Start(self):

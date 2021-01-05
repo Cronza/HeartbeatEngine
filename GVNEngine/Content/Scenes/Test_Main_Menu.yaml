@@ -5,14 +5,18 @@ interactables:
   - data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
     position:
       x: 0.5
-      y: 0.4
+      y: 0.5
     z_order: 0
     key: "Main_Menu_Start_Button"
 
-objects:
-  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
+text:
+  - text: "To Infinity"
+    text_size: 72
+    text_color: [199, 192, 194]
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    center_align: True
     position:
-      x: 0.20
-      y: 0.70
-    z_order: 0
-    key: "SpreadSheet"
+      x: 0.5
+      y: 0.3
+    z_order: 500
+    key: "Title"

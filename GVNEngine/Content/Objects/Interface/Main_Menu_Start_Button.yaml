@@ -1,7 +1,7 @@
 name: "Main_Menu_Start_Button"
 sprite: "Content/Sprites/Interface/Buttons/Button_01_Normal.png"
-sprite_hover: ""
-sprite_clicked: ""
+sprite_hover: "Content/Sprites/Interface/Buttons/Button_01_Hover.png"
+sprite_clicked: "Content/Sprites/Interface/Buttons/Button_01_Clicked.png"
 action:
   action: "load_scene"
   scene_file: "Content/Scenes/Test_Dialogue_Scene_01.yaml"

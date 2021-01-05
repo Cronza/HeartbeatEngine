@@ -203,6 +203,57 @@ class dialogue(Action):
         else:
             self.active_transition.Update()
 
+class create_text(Action):
+    """
+    Create a TextRenderable at the target location, with the given settings
+    """
+    def Start(self):
+        # Allow the user to override the alignment default. This is needed before we create the renderable
+        center_align = False
+        if "center_align" in self.action_data:
+            center_align = self.action_data['center_align']
+        else:
+            print("'center_align' not provided - Using default value of 'False'")
+
+        new_text_renderable = TextRenderable(
+            self.scene,
+            tuple(self.action_data['position'].values()),
+            self.action_data['text'],
+            self.action_data['font'],
+            self.action_data['text_size'],
+            self.action_data['text_color'],
+            center_align
+        )
+        # Allow the user to override the z_order
+        if "z_order" in self.action_data:
+            new_text_renderable.z_order = self.action_data['z_order']
+        else:
+            print("'z_order' not found in data for text renderable - Using default")
+
+        # Assign the key to the sprite so it can be unloaded in the future
+        if 'key' in self.action_data:
+            new_text_renderable.key = self.action_data['key']
+        else:
+            print('Create Text action has no defined key. This will cause unload attempts to fail')
+
+        # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
+        # meant to be drawn over
+        self.scene.renderables_group.Add(new_text_renderable)
+
+        if 'transition' in self.action_data:
+            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_text_renderable)
+            self.active_transition.Start()
+        else:
+            self.scene.Draw()
+            self.complete = True
+
+    def Update(self):
+        if self.active_transition.complete is True:
+            print("Transition Complete")
+            self.complete = True
+        else:
+            self.active_transition.Update()
+
 class load_scene(Action):
     """ Switches scenes to the one specified in the action data. Requires an applicable scene type be provided """
     def Start(self):
@@ -212,3 +263,64 @@ class load_scene(Action):
             print('Load Scene Failed - No scene file provided, or a scene type was not provided')
 
         self.complete = True
+
+# -------------- Transition Actions --------------
+""" 
+These actions function as transitions in their own right, but are not modifiers on existing actions like
+those listed in the 'transitions' file
+"""
+
+class fade_scene_from_black(Action):
+    """ Creates a black texture covering the entire screen, then slowly fades it out """
+    def Start(self):
+        if "transition_speed" in self.action_data:
+            print("Custom transition provided - Overriding default")
+            self.transition_speed = self.action_data['transition_speed']
+        else:
+            print(f"No custom transition provided - Using default of {self.transition_speed}")
+
+        new_sprite = SpriteRenderable(
+            self.scene,
+            "Engine/Content/Sprites/transition_fade_black.png",
+            (0, 0),
+            False
+        )
+        new_sprite.key = "Transition"
+        new_sprite.z_order = 9999
+
+        self.scene.renderables_group.Add(new_sprite)
+
+        self.scene.Draw()
+
+        self.renderable = new_sprite
+        self.progress = self.renderable.GetSurface().get_alpha()
+        self.goal = 0
+
+    def Update(self):
+        self.progress -= (self.transition_speed * self.scene.delta_time)
+        self.renderable.GetSurface().set_alpha(self.progress)
+
+        self.scene.Draw()
+
+        if self.progress <= self.goal:
+            print("Transition Complete")
+            self.complete = True
+
+"""
+    def __init__(self, scene, a_manager, renderable, transition_speed=5):
+        super().__init__(scene, a_manager, renderable, transition_speed)
+
+        self.progress = self.renderable.GetSurface().get_alpha()
+        self.goal = 0
+
+    def Update(self):
+        self.progress -= (self.transition_speed * self.scene.delta_time)
+        self.renderable.GetSurface().set_alpha(self.progress)
+
+        self.scene.Draw()
+
+        if self.progress <= self.goal:
+            print("Transition Complete")
+            self.complete = True
+"""
+

@@ -1,6 +1,10 @@
 # The player awakens from cryosleep, and is greeted by the security guard Rei
 
 dialogue:
+  - action: "fade_scene_from_black"
+    transition_speed: 150
+    wait_for_input: False
+
   - action: "load_dialogue_interface"
     wait_for_input: False
 

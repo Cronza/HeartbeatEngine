@@ -113,8 +113,10 @@ class Interactable(SpriteRenderable):
         """ Based on the provided state, return the corresponding surface (Either scaled of unscaled) """
         if state == State.hover:
             if self.scaled_hover_surface:
+                print("Scaled Hover Surface")
                 return self.scaled_hover_surface
             else:
+                print("Non-Scaled Hover Surface")
                 return self.hover_surface
         elif state == State.pressed:
             if self.scaled_clicked_surface:

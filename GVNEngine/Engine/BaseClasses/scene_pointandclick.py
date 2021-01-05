@@ -33,3 +33,13 @@ class PointAndClickScene(Scene):
                 self.a_manager.PerformAction(f_interactable)
         else:
             print('Scene file does not specify any objects')
+
+        # Load any specified text
+        if 'text' in self.scene_data:
+            f_texts = self.scene_data['text']
+
+            for f_text in f_texts:
+                f_text['action'] = 'create_text'
+                self.a_manager.PerformAction(f_text)
+        else:
+            print('Scene file does not specify any text')
