@@ -3,11 +3,9 @@ from Engine.BaseClasses.interactable import Interactable
 
 class PointAndClickScene(Scene):
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
-
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
 
     def Draw(self):
-
         # Draw both generics and interactive specifics using the parent's method
         super().Draw()
 
@@ -28,8 +26,14 @@ class PointAndClickScene(Scene):
         if 'interactables' in self.scene_data:
             f_interactables = self.scene_data['interactables']
 
+            # Interactables can come in many types, so allow the user to specify a unique type. If they don't,
+            # use the generic interactable renderable
             for f_interactable in f_interactables:
-                f_interactable['action'] = 'create_interactable'
+                if "type" in f_interactable:
+                    f_interactable['action'] = f"create_{f_interactable['type'].lower()}"
+                else:
+                    f_interactable['action'] = 'create_interactable'
+
                 self.a_manager.PerformAction(f_interactable)
         else:
             print('Scene file does not specify any objects')

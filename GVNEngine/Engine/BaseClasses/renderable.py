@@ -10,7 +10,7 @@ class Renderable(pygame.sprite.Sprite):
 
     This class is not meant to be used directly, but to be subclassed into more specialized objects
     """
-    def __init__(self, scene, pos, center_align = False):
+    def __init__(self, scene, pos, center_align=False, z_order=0):
         super().__init__()
 
         # Renderables require access to the owning scene so that they can keep track of resolution updates
@@ -31,7 +31,11 @@ class Renderable(pygame.sprite.Sprite):
         self.key = None
 
         # Control render order
-        self.z_order = 0
+        self.z_order = z_order
+
+        # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
+        # a group. Since the children are drawn like regular renderables, they're independent of the rect of the parent
+        self.children = []
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and it's surfaces based on the provided size multiplier """

@@ -17,6 +17,7 @@ provided actions
 from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 from Engine.BaseClasses.renderable_text import TextRenderable
 from Engine.BaseClasses.interactable import Interactable
+from Engine.BaseClasses.button import Button
 from Engine.BaseClasses.action import Action
 from Engine.BaseClasses.transition import Transition
 
@@ -92,10 +93,10 @@ class load_background(Action):
             self.scene,
             self.action_data['sprite'],
             (0,0),
-            False
+            False,
+            -9999
         )
         new_sprite.key = "Background"
-        new_sprite.z_order = -9999
 
         self.scene.renderables_group.Add(new_sprite)
 
@@ -111,16 +112,19 @@ class load_dialogue_interface(Action):
         dialogue_frame = SpriteRenderable(
             self.scene,
             self.scene.settings.dialogue_frame_sprite,
-            (0.5, 0.85)
+            (0.5, 0.85),
+            True,
+            100
         )
-        dialogue_frame.z_order = 100
         dialogue_frame.key = 'DialogueFrame'
+
         speaker_frame = SpriteRenderable(
             self.scene,
             self.scene.settings.dialogue_speaker_frame_sprite,
-            (0.2, 0.7)
+            (0.2, 0.7),
+            True,
+            100
         )
-        speaker_frame.z_order = 100
         speaker_frame.key = 'SpeakerFrame'
 
         # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
@@ -131,12 +135,68 @@ class load_dialogue_interface(Action):
         self.complete = True
 
 class create_interactable(Action):
-    """ Creates an interactable renderable, and adds it to the renderable stack"""
+    """ Creates an interactable renderable, and adds it to the renderable stack """
     def Start(self):
+        # Allow optional overrides
+        center_align = False
+        z_order = 0
+
+        if "center_align" in self.action_data:
+            center_align = self.action_data['center_align']
+        if "z_order" in self.action_data:
+            z_order = self.action_data['z_order']
+
         new_renderable = Interactable(
             self.scene,
             self.action_data['data'],
-            tuple(self.action_data['position'].values())
+            tuple(self.action_data['position'].values()),
+            center_align,
+            z_order
+        )
+        new_renderable.scene = self.scene
+        new_renderable.key = self.action_data['key']
+
+        # If the user requested a flip action, do so
+        if 'flip' in self.action_data:
+            if self.action_data['flip']:
+                new_renderable.Flip()
+
+        self.scene.renderables_group.Add(new_renderable)
+
+        self.scene.Draw()
+        self.complete = True
+
+class create_button(Action):
+    """ Creates a button interactable, and adds it to the renderable stack """
+    def Start(self):
+        # Allow optional overrides
+        center_align = False
+        z_order = 0
+        text_z_order=0
+        text_center_align = True
+
+        if "center_align" in self.action_data:
+            center_align = self.action_data['center_align']
+        if "z_order" in self.action_data:
+            z_order = self.action_data['z_order']
+        if "text_z_order" in self.action_data:
+            text_z_order = self.action_data['text_z_order']
+        if "text_center_align" in self.action_data:
+            text_center_align = self.action_data['text_center_align']
+
+        new_renderable = Button(
+            self.scene,
+            self.action_data['data'],
+            tuple(self.action_data['position'].values()),
+            tuple(self.action_data['text_position'].values()),
+            self.action_data['text'],
+            self.action_data['font'],
+            self.action_data['font_size'],
+            self.action_data['text_color'],
+            text_z_order,
+            text_center_align,
+            center_align,
+            z_order
         )
 
         new_renderable.scene = self.scene
@@ -163,9 +223,10 @@ class dialogue(Action):
             self.action_data['speaker_text'],
             self.action_data['speaker_font'],
             self.action_data['speaker_text_size'],
-            self.action_data['speaker_text_color']
+            self.action_data['speaker_text_color'],
+            False,
+            200
         )
-        new_speaker_text.z_order = 200
         new_speaker_text.key = "SpeakerText"
 
         new_dialogue_text = TextRenderable(
@@ -174,9 +235,10 @@ class dialogue(Action):
             self.action_data['dialogue_text'],
             self.action_data['dialogue_font'],
             self.action_data['dialogue_text_size'],
-            self.action_data['dialogue_text_color']
+            self.action_data['dialogue_text_color'],
+            False,
+            200
         )
-        new_dialogue_text.z_order = 200
         new_dialogue_text.key = "DialogueText"
 
         # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
@@ -208,12 +270,14 @@ class create_text(Action):
     Create a TextRenderable at the target location, with the given settings
     """
     def Start(self):
-        # Allow the user to override the alignment default. This is needed before we create the renderable
+        # Allow optional overrides
         center_align = False
+        z_order = 0
+
         if "center_align" in self.action_data:
             center_align = self.action_data['center_align']
-        else:
-            print("'center_align' not provided - Using default value of 'False'")
+        if "z_order" in self.action_data:
+            z_order = self.action_data['z_order']
 
         new_text_renderable = TextRenderable(
             self.scene,
@@ -222,13 +286,9 @@ class create_text(Action):
             self.action_data['font'],
             self.action_data['text_size'],
             self.action_data['text_color'],
-            center_align
+            center_align,
+            z_order
         )
-        # Allow the user to override the z_order
-        if "z_order" in self.action_data:
-            new_text_renderable.z_order = self.action_data['z_order']
-        else:
-            print("'z_order' not found in data for text renderable - Using default")
 
         # Assign the key to the sprite so it can be unloaded in the future
         if 'key' in self.action_data:
@@ -264,6 +324,12 @@ class load_scene(Action):
 
         self.complete = True
 
+class quit_game(Action):
+    """ Immediately closes the game """
+    def Start(self):
+        self.scene.pygame_lib.quit()
+        exit()
+
 # -------------- Transition Actions --------------
 """ 
 These actions function as transitions in their own right, but are not modifiers on existing actions like
@@ -274,22 +340,18 @@ class fade_scene_from_black(Action):
     """ Creates a black texture covering the entire screen, then slowly fades it out """
     def Start(self):
         if "transition_speed" in self.action_data:
-            print("Custom transition provided - Overriding default")
             self.transition_speed = self.action_data['transition_speed']
-        else:
-            print(f"No custom transition provided - Using default of {self.transition_speed}")
 
         new_sprite = SpriteRenderable(
             self.scene,
             "Engine/Content/Sprites/transition_fade_black.png",
             (0, 0),
-            False
+            False,
+            9999
         )
         new_sprite.key = "Transition"
-        new_sprite.z_order = 9999
 
         self.scene.renderables_group.Add(new_sprite)
-
         self.scene.Draw()
 
         self.renderable = new_sprite

@@ -29,6 +29,9 @@ class ActionManager:
                     action.Update()
             if pending_completion:
                 for action in pending_completion:
+                    # Use the complete delegate if its available
+                    if action.complete_delegate:
+                        action.complete_delegate()
                     del self.active_actions[action]
 
     """
@@ -44,15 +47,18 @@ class ActionManager:
                     del self.active_transitions[transition]
     """
 
-    def PerformAction(self, action_data):
+    def PerformAction(self, action_data, complete_delegate = None):
         """ Loads the next action in the dialogue sequence, then increments the dialogue index"""
 
         # Fetch the action function corresponding to the next action index
         action = self.GetAction(action_data['action'])
         new_action = action(self.scene, action_data, self)
 
-        self.active_actions[new_action] = None
+        # If the calling function wishes to be informed when the action is completed, opt in here
+        if complete_delegate:
+            new_action.complete_delegate = complete_delegate
 
+        self.active_actions[new_action] = None
         new_action.Start()
 
     def GetAction(self, action_name):

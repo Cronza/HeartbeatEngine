@@ -4,8 +4,8 @@ from Engine.Utilities.data_classes import State
 from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 
 class Interactable(SpriteRenderable):
-    def __init__(self, scene, data_path, pos, center_align = True, initial_rescale = False):
-        super().__init__(scene, data_path, pos, center_align, initial_rescale)
+    def __init__(self, scene, data_path, pos, center_align=False, z_order=0, initial_rescale=False):
+        super().__init__(scene, data_path, pos, center_align, z_order, initial_rescale)
 
         self.state = State.normal
 

@@ -55,6 +55,8 @@ class GVNEngine():
                     # Exit
                     if event.key == pygame.K_ESCAPE:
                         is_running = False
+                    if event.type == pygame.QUIT:
+                        is_running = False
                     # Debug - FPS
                     if event.key == pygame.K_F3:
                         self.show_fps = not self.show_fps
@@ -75,10 +77,11 @@ class GVNEngine():
 
     def UpdateResolution(self, new_size_index, flag=0):
         # Use the given, but always add HWSURFACE and DOUBLEBUF
-        self.settings.resolution = new_size_index
-        pygame.display.set_mode(self.settings.resolution_options[new_size_index], flag)
+        if not self.settings.resolution == new_size_index:
+            self.settings.resolution = new_size_index
+            pygame.display.set_mode(self.settings.resolution_options[new_size_index], flag)
 
-        self.scene_manager.active_scene.Draw()
+            self.scene_manager.active_scene.Draw()
 
 if __name__ == "__main__":
     engine = GVNEngine()

@@ -6,6 +6,7 @@ class Action():
         self.active_transition = None
         self.transition_speed = 5
         self.complete = False
+        self.complete_delegate = None  # Allow actions to call something when they finish
 
     def Start(self):
         pass

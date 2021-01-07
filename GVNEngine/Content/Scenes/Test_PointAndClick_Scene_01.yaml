@@ -6,15 +6,9 @@ interactables:
     position:
       x: 0.8
       y: 0.55
+    center_align: True
     z_order: 0
     key: "Rei_First_Meet"
-  - data: "Content/Objects/Rei.yaml"
-    flip: True
-    position:
-      x: 0.5
-      y: 0.55
-    z_order: 0
-    key: "Rei_Flip_Test"
 
 # objects:
 #  - sprite: "Content/Sprites/Objects/Spreadsheet.png"

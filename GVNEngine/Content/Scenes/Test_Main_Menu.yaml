@@ -2,17 +2,45 @@ type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
 interactables:
-  - data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
+  - type: "button"
+    data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
     position:
       x: 0.5
       y: 0.5
+    center_align: True
     z_order: 0
+    text: "Start Game"
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    font_size: 16
+    text_color: [255, 255, 255]
+    text_position:
+      x: 0.5
+      y: 0.5
+    text_center_align: True
+    text_z_order: 100
     key: "Main_Menu_Start_Button"
+  - type: "button"
+    data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
+    position:
+      x: 0.5
+      y: 0.65
+    center_align: True
+    z_order: 0
+    text: "Quit Game"
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    font_size: 16
+    text_color: [255, 255, 255]
+    text_position:
+      x: 0.5
+      y: 0.65
+    text_center_align: True
+    text_z_order: 100
+    key: "Main_Menu_Exit_Button"
 
 text:
   - text: "To Infinity"
     text_size: 72
-    text_color: [199, 192, 194]
+    text_color: [240, 240, 240]
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     center_align: True
     position:
@@ -20,3 +48,13 @@ text:
       y: 0.3
     z_order: 500
     key: "Title"
+  - text: "GVNEngine v0.1 - 'To Infinity' Project Example"
+    text_size: 16
+    text_color: [255, 255, 255]
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    center_align: False
+    position:
+      x: 0.01
+      y: 0.95
+    z_order: 9999
+    key: "VersionIdentity"

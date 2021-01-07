@@ -39,6 +39,10 @@ class Scene:
         # Draw any renderables using the screen space multiplier to fit the new resolution
         for renderable in renderables:
             self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
+            # Draw any child renderables after drawing the parent
+            if renderable.children:
+                for child in renderable.children:
+                    self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
     def SwitchScene(self, scene_file, scene_type):
         self.renderables_group.Clear()
@@ -55,6 +59,10 @@ class Scene:
         # Inform each renderable of the resolution change so they can update their respective elements
         for renderable in self.renderables_group.Get():
             renderable.RecalculateSize(self.resolution_multiplier)
+            # Resize any child renderables after resizing the parent
+            if renderable.children:
+                for child in renderable.children:
+                    child.RecalculateSize(self.resolution_multiplier)
 
         # Redraw the scaled sprites
         self.Draw()
