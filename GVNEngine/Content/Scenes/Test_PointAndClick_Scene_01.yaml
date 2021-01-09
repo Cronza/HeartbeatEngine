@@ -1,18 +1,19 @@
 type: 'PointAndClick'
-background: "Content/Sprites/Backgrounds/Classroom_01.jpg"
+background: "Content/Sprites/Backgrounds/Background_Labs2_1280.jpg"
 
 interactables:
-  - data: "Content/Objects/Brown_Bag.yaml"
+  - data: "Content/Objects/Rei.yaml"
     position:
-      x: 0.65
-      y: 0.70
+      x: 0.8
+      y: 0.55
+    center_align: True
     z_order: 0
-    key: "BrownBag"
+    key: "Rei_First_Meet"
 
-objects:
-  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
-    position:
-      x: 0.20
-      y: 0.70
-    z_order: 0
-    key: "SpreadSheet"
+# objects:
+#  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
+#    position:
+#      x: 0.20
+#      y: 0.70
+#    z_order: 0
+#    key: "SpreadSheet"

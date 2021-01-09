@@ -1,6 +1,10 @@
 # The player awakens from cryosleep, and is greeted by the security guard Rei
 
 dialogue:
+  - action: "fade_scene_from_black"
+    transition_speed: 150
+    wait: True
+
   - action: "load_dialogue_interface"
     wait_for_input: False
 
@@ -38,7 +42,7 @@ dialogue:
     wait_for_input: True
 
   - action: "load_sprite"
-    key: "Speaker_01"
+    key: "Isea_Idle_Concerned"
     sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
     position:
       x: 0.2
@@ -46,6 +50,9 @@ dialogue:
     flip: True
     zOrder: 0
     wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -59,7 +66,7 @@ dialogue:
     wait_for_input: True
 
   - action: "load_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Straight_Face"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
     position:
       x: 0.8
@@ -67,6 +74,9 @@ dialogue:
     flip: false
     zOrder: 0
     wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Unknown"
@@ -84,7 +94,7 @@ dialogue:
     speaker_text_size: 32
     speaker_text_color: [199, 192, 194]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    dialogue_text: "A woman stood before me, clad in security gear starkly contrasted by her vibrant hair color"
+    dialogue_text: "A woman stood before me, her vibrant hair contrasting her security uniform"
     dialogue_text_size: 24
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
@@ -102,25 +112,31 @@ dialogue:
     wait_for_input: True
 
   - action: "unload_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Straight_Face"
     wait_for_input: False
+    transition:
+      transition_type: 'fade_out'
+      transition_speed: 3000
 
   - action: "load_sprite"
-    key: "Speaker_02"
+    key: "Rei_Idle_Smiling"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
     position:
       x: 0.8
       y: 1.3
     flip: false
     zOrder: 0
-    wait_for_input: False
+    wait: True
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: "Rei"
     speaker_text_size: 32
-    speaker_text_color: [199, 192, 194]
+    speaker_text_color: [199, 34, 67]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    dialogue_text: "The name's Rei. Im a security officer here on ship colony Aion. Welcome to your new home"
+    dialogue_text: "Rei. I work security here aboard Aion. Welcome to your new home"
     dialogue_text_size: 24
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
