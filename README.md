@@ -1,5 +1,5 @@
 # GVNEngine
-**Version: 0.1**
+**Version: 0.2**
 
 # What is the 'GVNEngine'?
 ![ScreenShot](Progress_Examples/GVNEngine_v01_Dialogue_Scene.png?raw=true "GVNEngine Dialogue Scene")
