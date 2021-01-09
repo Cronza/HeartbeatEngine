@@ -6,12 +6,12 @@
 *I do not own the background in the above photo, and am merely using it as a placeholder. The rightful owner is the talented:*<br/>
 *https://www.deviantart.com/aikosanartist*
 
-The GVNEngine is a visual novel / dating simulator game engine created in Python, using the PyGame framework. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow that gets developers right into the action.
+The GVNEngine is a visual novel / dating simulator game engine created in Python, using the PyGame framework. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow that lets developers focus more on making games, and less on worrying about coding them.
 
 # How to Use the 'GVNEngine'?
 Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, please contact the developer Garrett Fredley at:<br/>
 https://twitter.com/SomeCronzaGuy (Professional Twitter) :shipit: <br/>
-https://twitter.com/Nixenneth (Private Twitter) :underage:
+https://twitter.com/Nixenneth (Artist Twitter) :art:
 
 # License
 The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
@@ -19,38 +19,86 @@ The GVNEngine is licensed under the Open-Source MIT license. Details can be foun
 # Features
 
 ## Content-Driven Workflow
-The GVNEngine uses YAML for many of it's content files. YAML is a powerful data language built around the concept of human readability. In the engine, YAML is used for all of the following things:
+The GVNEngine is designed to allow developers to focus more on developing games without worrying about knowing how to code. It makes use of a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
+
+YAML is used to allow developers to design and implement the following types of content:
 - Scenes
 - Dialogue sequences
-- Renderables (Objects, interactables, etc)
+- Renderables (Objects, interactables, buttons, etc)
+- Effects (Fades, scene transitions, etc)
 
-The GVNEngine is designed to allow users to stick primarily to authoring content in these YAML files without having to deal with much python code. Here is an example of a Point & Click scene YAML file:
+Here is an example of a 'Point & Click' scene created using YAML:
+![ScreenShot](Progress_Examples/GVNEngine_v02_Main_Menu_Scene_01.png?raw=true "GVNEngine Main Menu Scene")
 ```
 type: 'PointAndClick'
-background: "Content/Sprites/Backgrounds/Classroom_01.jpg"
+background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
 interactables:
-  - data: "Content/Objects/Brown_Bag.yaml"
+  - type: "button"
+    data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
     position:
-      x: 0.65
-      y: 0.70
+      x: 0.5
+      y: 0.5
+    center_align: True
     z_order: 0
-    key: "BrownBag"
+    text: "Start Game"
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    font_size: 16
+    text_color: [255, 255, 255]
+    text_position:
+      x: 0.5
+      y: 0.5
+    text_center_align: True
+    text_z_order: 100
+    key: "Main_Menu_Start_Button"
+    
+  - type: "button"
+    data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
+    position:
+      x: 0.5
+      y: 0.65
+    center_align: True
+    z_order: 0
+    text: "Quit Game"
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    font_size: 16
+    text_color: [255, 255, 255]
+    text_position:
+      x: 0.5
+      y: 0.65
+    text_center_align: True
+    text_z_order: 100
+    key: "Main_Menu_Exit_Button"
 
-objects:
-  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
+text:
+  - text: "To Infinity"
+    text_size: 72
+    text_color: [240, 240, 240]
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    center_align: True
     position:
-      x: 0.20
-      y: 0.70
-    z_order: 0
-    key: "SpreadSheet"
+      x: 0.5
+      y: 0.3
+    z_order: 500
+    key: "Title"
+
+  - text: "GVNEngine v0.1 - 'To Infinity' Project Example"
+    text_size: 16
+    text_color: [255, 255, 255]
+    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+    center_align: False
+    position:
+      x: 0.01
+      y: 0.95
+    z_order: 9999
+    key: "VersionIdentity"
 ```
 Additional examples of how to create the various YAML files for the engine are provided as a part of the repo.
 
 ## Action Manager
-The Action Manager system is a flexible system used by the GVNEngine in order to scale to meet any potential number of possible actions the developer may want to perform. Actions are defined as functions in the `actions.py` file. When an action is requested by anything in the engine (Scenes, interactables, etc), it looks to this file for the corresponding action.
+In order to allow developers (and the engine) to access any number of possible in-game actions in a flexible, YAML-accessible manner, the Action Manager was developed.
 
-Consider the following:
+'Actions' are defined as classes in the `actions.py` file. When an action is requested, such as by a YAML file (Dialogue, clicking interactables, etc), it looks to this file for the corresponding action class. For example: `class load_scene(Action)`. Once found, it calls it, passing it any additional pieces of information provided. An example of a dialogue YAML block:
 
 ```
 - action: "load_sprite"
@@ -63,9 +111,9 @@ Consider the following:
   zOrder: 0
   wait_for_input: False
 ```
-The above is an example of an action that loads a sprite into the game. The action name is called 'load_sprite'. In the `actions.py` file, there is a corresponding `def load_sprite` function. The engine is capable of correlating these strings to the functions found in the `actions.py` file. 
+The above is an example of an action that loads and adds a sprite to be rendered. The action name is called 'load_sprite'. In the `actions.py` file, there is a corresponding `class load_sprite(Action)` class. The engine is capable of correlating these strings to the classes found in the `actions.py` file. 
 
-Additionally, each action is fed the entire data block of that action. In the example above, we see that various parameters such as 'flip' are provided. Actions are capable of acting on any data provided. For the above `load_sprite` action which is one of the provided engine default actions, flip is used in the action function to flip the sprite when it is drawn to the screen.
+Additionally, each action is fed the entire data block that was provided when it was called. In the example above, we see that various parameters such as 'flip' are provided. For the above `load_sprite` action, which is one of the provided engine default actions, flip is used to flip the sprite when it is drawn to the screen.
 
 # GVNEditor
 :warning: *This feature is heavily in development, and will most likely be a while before its release
