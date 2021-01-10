@@ -12,3 +12,6 @@ class Transition:
 
     def Update(self):
         pass
+
+    def Skip(self):
+        pass

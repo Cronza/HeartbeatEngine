@@ -19,7 +19,6 @@ from Engine.BaseClasses.renderable_text import TextRenderable
 from Engine.BaseClasses.interactable import Interactable
 from Engine.BaseClasses.button import Button
 from Engine.BaseClasses.action import Action
-from Engine.BaseClasses.transition import Transition
 
 class load_sprite(Action):
     """
@@ -60,6 +59,11 @@ class load_sprite(Action):
         else:
             self.active_transition.Update()
 
+    def Skip(self):
+        if self.active_transition:
+            self.active_transition.Skip()
+        self.complete = True
+
 class unload_sprite(Action):
     """ Based on a given key, remove the associated sprite from the renderable stack """
     def Start(self):
@@ -86,8 +90,15 @@ class unload_sprite(Action):
         else:
             self.active_transition.Update()
 
+    def Skip(self):
+        if self.active_transition:
+            self.active_transition.Skip()
+        self.complete = True
+
 class load_background(Action):
     def Start(self):
+        self.skippable = False
+
         """ Create a background renderable with pre-set settings """
         new_sprite = SpriteRenderable(
             self.scene,
@@ -109,6 +120,8 @@ class load_dialogue_interface(Action):
     pre-configured settings
     """
     def Start(self):
+        self.skippable = False
+
         dialogue_frame = SpriteRenderable(
             self.scene,
             self.scene.settings.dialogue_frame_sprite,
@@ -137,6 +150,8 @@ class load_dialogue_interface(Action):
 class create_interactable(Action):
     """ Creates an interactable renderable, and adds it to the renderable stack """
     def Start(self):
+        self.skippable = False
+
         # Allow optional overrides
         center_align = False
         z_order = 0
@@ -166,9 +181,65 @@ class create_interactable(Action):
         self.scene.Draw()
         self.complete = True
 
+class create_text(Action):
+    """
+    Create a TextRenderable at the target location, with the given settings
+    """
+    def Start(self):
+        # Allow optional overrides
+        center_align = False
+        z_order = 0
+
+        if "center_align" in self.action_data:
+            center_align = self.action_data['center_align']
+        if "z_order" in self.action_data:
+            z_order = self.action_data['z_order']
+
+        new_text_renderable = TextRenderable(
+            self.scene,
+            tuple(self.action_data['position'].values()),
+            self.action_data['text'],
+            self.action_data['font'],
+            self.action_data['text_size'],
+            self.action_data['text_color'],
+            center_align,
+            z_order
+        )
+
+        # Assign the key to the sprite so it can be unloaded in the future
+        if 'key' in self.action_data:
+            new_text_renderable.key = self.action_data['key']
+        else:
+            print('Create Text action has no defined key. This will cause unload attempts to fail')
+
+        # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
+        # meant to be drawn over
+        self.scene.renderables_group.Add(new_text_renderable)
+
+        if 'transition' in self.action_data:
+            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_text_renderable)
+            self.active_transition.Start()
+        else:
+            self.scene.Draw()
+            self.complete = True
+
+    def Update(self):
+        if self.active_transition.complete is True:
+            print("Transition Complete")
+            self.complete = True
+        else:
+            self.active_transition.Update()
+
+    def Skip(self):
+        if self.active_transition:
+            self.active_transition.Skip()
+        self.complete = True
+
 class create_button(Action):
     """ Creates a button interactable, and adds it to the renderable stack """
     def Start(self):
+        self.skippable = False
+
         # Allow optional overrides
         center_align = False
         z_order = 0
@@ -265,58 +336,16 @@ class dialogue(Action):
         else:
             self.active_transition.Update()
 
-class create_text(Action):
-    """
-    Create a TextRenderable at the target location, with the given settings
-    """
-    def Start(self):
-        # Allow optional overrides
-        center_align = False
-        z_order = 0
-
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
-
-        new_text_renderable = TextRenderable(
-            self.scene,
-            tuple(self.action_data['position'].values()),
-            self.action_data['text'],
-            self.action_data['font'],
-            self.action_data['text_size'],
-            self.action_data['text_color'],
-            center_align,
-            z_order
-        )
-
-        # Assign the key to the sprite so it can be unloaded in the future
-        if 'key' in self.action_data:
-            new_text_renderable.key = self.action_data['key']
-        else:
-            print('Create Text action has no defined key. This will cause unload attempts to fail')
-
-        # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
-        # meant to be drawn over
-        self.scene.renderables_group.Add(new_text_renderable)
-
-        if 'transition' in self.action_data:
-            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_text_renderable)
-            self.active_transition.Start()
-        else:
-            self.scene.Draw()
-            self.complete = True
-
-    def Update(self):
-        if self.active_transition.complete is True:
-            print("Transition Complete")
-            self.complete = True
-        else:
-            self.active_transition.Update()
+    def Skip(self):
+        if self.active_transition:
+            self.active_transition.Skip()
+        self.complete = True
 
 class load_scene(Action):
     """ Switches scenes to the one specified in the action data. Requires an applicable scene type be provided """
     def Start(self):
+        self.skippable = False
+
         if 'scene_file' in self.action_data and 'scene_type' in self.action_data:
             self.scene.SwitchScene(self.action_data['scene_file'], self.action_data['scene_type'])
         else:
@@ -327,6 +356,8 @@ class load_scene(Action):
 class quit_game(Action):
     """ Immediately closes the game """
     def Start(self):
+        self.skippable = False
+
         self.scene.pygame_lib.quit()
         exit()
 
@@ -367,6 +398,10 @@ class fade_scene_from_black(Action):
         if self.progress <= self.goal:
             print("Transition Complete")
             self.complete = True
+
+    def Skip(self):
+        self.renderable.GetSurface().set_alpha(self.goal)
+        self.complete = True
 
 """
     def __init__(self, scene, a_manager, renderable, transition_speed=5):

@@ -5,6 +5,7 @@ class Action():
         self.a_manager = a_manager
         self.active_transition = None
         self.transition_speed = 5
+        self.skippable = True
         self.complete = False
         self.complete_delegate = None  # Allow actions to call something when they finish
 
@@ -12,4 +13,7 @@ class Action():
         pass
 
     def Update(self):
+        pass
+
+    def Skip(self):
         pass

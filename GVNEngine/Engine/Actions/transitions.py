@@ -26,7 +26,9 @@ class fade_in(Transition):
         # TODO: "wait_for_input"
 
     def Skip(self):
-        pass
+        self.renderable.GetSurface().set_alpha(self.goal)
+        self.scene.Draw()
+        self.complete = True
 
 class fade_out(Transition):
     def __init__(self, scene, a_manager, renderable, transition_speed=5):
@@ -46,5 +48,7 @@ class fade_out(Transition):
             self.complete = True
 
     def Skip(self):
-        pass
+        self.renderable.GetSurface().set_alpha(self.goal)
+        self.scene.Draw()
+        self.complete = True
 

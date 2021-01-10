@@ -12,7 +12,7 @@ interactables:
 
 # objects:
 #  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
-#    position:
+#    position:2
 #      x: 0.20
 #      y: 0.70
 #    z_order: 0

@@ -16,7 +16,15 @@ class DialogueScene(PointAndClickScene):
         for event in input_events:
             if event.type == self.pygame_lib.KEYUP:
                 if event.key == self.pygame_lib.K_SPACE:
-                    self.LoadAction()
+                    # Skip the running action if its able to be skipped
+                    if self.a_manager.active_actions:
+                        for action in self.a_manager.active_actions:
+                            if action.skippable:
+                                action.Skip()
+
+                    # No actions active. Go to next
+                    else:
+                        self.LoadAction()
 
 
     def LoadAction(self):
@@ -54,6 +62,7 @@ class DialogueScene(PointAndClickScene):
         super().LoadSceneData()
         self.dialogue_data = Reader.ReadAll(self.scene_data['dialogue'])
         self.LoadAction()
+
 
     def ActionComplete(self):
         """ When an action specifies 'wait', use this function as the completion delegate """

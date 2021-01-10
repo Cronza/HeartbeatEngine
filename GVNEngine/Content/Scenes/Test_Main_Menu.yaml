@@ -48,7 +48,7 @@ text:
       y: 0.3
     z_order: 500
     key: "Title"
-  - text: "GVNEngine v0.1 - 'To Infinity' Project Example"
+  - text: "GVNEngine v0.2 - 'To Infinity' Project Example"
     text_size: 16
     text_color: [255, 255, 255]
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'

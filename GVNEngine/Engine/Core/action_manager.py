@@ -7,14 +7,8 @@ from Engine.BaseClasses.transition import Transition
 class ActionManager:
     def __init__(self, scene, settings):
 
-        # Allow actions to disable user input
-        self.canProceed = False
-
-        # The currently active scene
         self.scene = scene
-
         self.active_actions = {}
-
         self.scene.settings = settings
 
     def Update(self):
