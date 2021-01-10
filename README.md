@@ -3,8 +3,6 @@
 
 # What is the 'GVNEngine'?
 ![ScreenShot](Progress_Examples/GVNEngine_v01_Dialogue_Scene.png?raw=true "GVNEngine Dialogue Scene")
-*I do not own the background in the above photo, and am merely using it as a placeholder. The rightful owner is the talented:*<br/>
-*https://www.deviantart.com/aikosanartist*
 
 The GVNEngine is a visual novel / dating simulator game engine created in Python, using the PyGame framework. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow that lets developers focus more on making games, and less on worrying about coding them.
 
