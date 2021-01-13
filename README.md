@@ -19,7 +19,6 @@ The GVNEngine is licensed under the Open-Source MIT license. Details can be foun
 ## Content-Driven Workflow
 The GVNEngine is designed to allow developers to focus more on developing games without worrying about knowing how to code. It makes use of a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
 
-YAML is used to allow developers to design and implement the following types of content:
 - Scenes
 - Dialogue sequences
 - Renderables (Objects, interactables, buttons, etc)
