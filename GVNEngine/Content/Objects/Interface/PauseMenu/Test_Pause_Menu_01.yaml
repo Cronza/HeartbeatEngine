@@ -41,7 +41,7 @@ buttons:
     text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Settings_Button"
-  - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml"
+  - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Quit_Button.yaml"
     position:
       x: 0.5
       y: 0.64

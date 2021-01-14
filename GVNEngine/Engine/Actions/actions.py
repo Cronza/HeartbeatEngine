@@ -471,7 +471,6 @@ class quit_game(Action):
     """ Immediately closes the game """
     def Start(self):
         self.skippable = False
-
         self.scene.pygame_lib.quit()
         exit()
 
