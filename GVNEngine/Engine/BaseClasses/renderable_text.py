@@ -1,6 +1,5 @@
 import pygame
 
-from Engine.Utilities.yaml_reader import Reader
 from Engine.BaseClasses.renderable import Renderable
 
 
@@ -13,8 +12,8 @@ class TextRenderable(Renderable):
         - Pop-up text
         - etc
     """
-    def __init__(self, scene, pos, text, font, font_size, color, center_align=False, z_order=0):
-        super().__init__(scene, pos, center_align, z_order)
+    def __init__(self, scene, pos, text, font, font_size, color, center_align=False, z_order=0, key=None):
+        super().__init__(scene, pos, center_align, z_order, key)
 
         self.font_obj = pygame.font.Font(font, font_size)
         self.text = text

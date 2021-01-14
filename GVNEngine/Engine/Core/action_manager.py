@@ -28,19 +28,6 @@ class ActionManager:
                         action.complete_delegate()
                     del self.active_actions[action]
 
-    """
-        
-        
-        if self.active_transitions:
-            for transition in self.active_transitions:
-                if transition.Update():
-                    pending_completion.append(transition)
-
-            if pending_completion:
-                for transition in pending_completion:
-                    del self.active_transitions[transition]
-    """
-
     def PerformAction(self, action_data, complete_delegate = None):
         """ Loads the next action in the dialogue sequence, then increments the dialogue index"""
 
@@ -53,7 +40,9 @@ class ActionManager:
             new_action.complete_delegate = complete_delegate
 
         self.active_actions[new_action] = None
-        new_action.Start()
+
+        # Actions can opt in to return data. Return whatever is returned from the underlying action
+        return new_action.Start()
 
     def GetAction(self, action_name):
         """

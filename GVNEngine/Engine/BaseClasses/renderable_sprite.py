@@ -18,8 +18,8 @@ class SpriteRenderable(Renderable):
         - If a path to a object .yaml file is provided, it will load the corresponding .yaml file, and use its
           defined position value
     """
-    def __init__(self, scene, data_path, pos, center_align=True, z_order=0, initial_rescale=True):
-        super().__init__(scene, pos, center_align, z_order)
+    def __init__(self, scene, data_path, pos, center_align=True, z_order=0, key=None, initial_rescale=True):
+        super().__init__(scene, pos, center_align, z_order, key)
 
         self.renderable_data = {}
 

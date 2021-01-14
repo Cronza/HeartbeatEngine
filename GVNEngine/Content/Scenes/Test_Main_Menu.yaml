@@ -1,9 +1,8 @@
 type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
-interactables:
-  - type: "button"
-    data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
+buttons:
+  - data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
     position:
       x: 0.5
       y: 0.5
@@ -19,8 +18,7 @@ interactables:
     text_center_align: True
     text_z_order: 100
     key: "Main_Menu_Start_Button"
-  - type: "button"
-    data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
+  - data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
     position:
       x: 0.5
       y: 0.65

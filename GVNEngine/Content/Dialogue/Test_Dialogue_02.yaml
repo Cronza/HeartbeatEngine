@@ -5,7 +5,7 @@ dialogue:
     transition_speed: 150
     wait: True
 
-  - action: "load_dialogue_interface"
+  - action: "create_dialogue_interface"
     wait_for_input: False
 
   - action: "dialogue"
@@ -41,7 +41,7 @@ dialogue:
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     wait_for_input: True
 
-  - action: "load_sprite"
+  - action: "create_sprite"
     key: "Isea_Idle_Concerned"
     sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
     position:
@@ -65,7 +65,7 @@ dialogue:
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     wait_for_input: True
 
-  - action: "load_sprite"
+  - action: "create_sprite"
     key: "Rei_Idle_Straight_Face"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
     position:
@@ -111,14 +111,14 @@ dialogue:
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     wait_for_input: True
 
-  - action: "unload_sprite"
+  - action: "remove_renderable"
     key: "Rei_Idle_Straight_Face"
     wait_for_input: False
     transition:
       transition_type: 'fade_out'
       transition_speed: 3000
 
-  - action: "load_sprite"
+  - action: "create_sprite"
     key: "Rei_Idle_Smiling"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
     position:

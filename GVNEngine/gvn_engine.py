@@ -46,11 +46,11 @@ class GVNEngine():
                 if event.type == pygame.KEYDOWN:
                     # Maximize
                     if event.key == pygame.K_1:
-                        window = self.UpdateResolution(1, pygame.FULLSCREEN)
+                        self.UpdateResolution(1, pygame.FULLSCREEN)
                         self.scene_manager.ResizeScene()
                     # Minimize
                     if event.key == pygame.K_2:
-                        window = self.UpdateResolution(0)
+                        self.UpdateResolution(0)
                         self.scene_manager.ResizeScene()
                     # Exit
                     if event.key == pygame.K_ESCAPE:
@@ -82,6 +82,7 @@ class GVNEngine():
             pygame.display.set_mode(self.settings.resolution_options[new_size_index], flag)
 
             self.scene_manager.active_scene.Draw()
+
 
 if __name__ == "__main__":
     engine = GVNEngine()

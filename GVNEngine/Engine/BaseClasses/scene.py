@@ -12,6 +12,8 @@ class Scene:
         self.renderables_group = RenderableGroup()
         self.a_manager = ActionManager(self, settings)
 
+        self.pause_menu = None
+
         # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
 
@@ -30,6 +32,17 @@ class Scene:
         self.renderables_group.Update()
         self.a_manager.Update()
 
+        # Pause Menu
+        for event in input_events:
+            if event.type == self.pygame_lib.KEYDOWN:
+                if event.key == self.pygame_lib.K_p:
+                    #@TODO: TEMP HACK
+                    if self.renderables_group.Exists('Pause_Menu'):
+                        print("Pause Menu Open")
+                    else:
+                        print(self.settings.pause_menu_data)
+                        self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data)
+
     def Draw(self):
         #print("*** REDRAWING SCENE ***")
 
@@ -38,11 +51,14 @@ class Scene:
 
         # Draw any renderables using the screen space multiplier to fit the new resolution
         for renderable in renderables:
-            self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
+            if renderable.visible:
+                self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
+
             # Draw any child renderables after drawing the parent
             if renderable.children:
                 for child in renderable.children:
-                    self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+                    if child.visible:
+                        self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
     def SwitchScene(self, scene_file, scene_type):
         self.renderables_group.Clear()
@@ -80,7 +96,7 @@ class Scene:
             print(f"Background specified -  Loading: {bg_path}")
 
             action_data = {
-                'action': 'load_background',
+                'action': 'create_background',
                 'sprite': bg_path
             }
 

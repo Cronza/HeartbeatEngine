@@ -4,8 +4,14 @@ from Engine.Utilities.data_classes import State
 from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 
 class Interactable(SpriteRenderable):
-    def __init__(self, scene, data_path, pos, center_align=False, z_order=0, initial_rescale=False):
-        super().__init__(scene, data_path, pos, center_align, z_order, initial_rescale)
+    """
+    The Interactable class extends the 'SpriteRenderable' class, and provides additional logic for
+    interactivity, including:
+    - Normal, hover, and clicked input states
+    - A 'click' action
+    """
+    def __init__(self, scene, data_path, pos, center_align=False, z_order=0, key=None, initial_rescale=False):
+        super().__init__(scene, data_path, pos, center_align, z_order, key, initial_rescale)
 
         self.state = State.normal
 

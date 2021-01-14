@@ -10,7 +10,7 @@ class Renderable(pygame.sprite.Sprite):
 
     This class is not meant to be used directly, but to be subclassed into more specialized objects
     """
-    def __init__(self, scene, pos, center_align=False, z_order=0):
+    def __init__(self, scene, pos, center_align=False, z_order=0, key=None):
         super().__init__()
 
         # Renderables require access to the owning scene so that they can keep track of resolution updates
@@ -19,6 +19,7 @@ class Renderable(pygame.sprite.Sprite):
         self.position = pos
         self.rect = None
 
+        self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
         self.surface = None  # The active surface
         self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
 
@@ -28,7 +29,12 @@ class Renderable(pygame.sprite.Sprite):
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned a unique
         # identifier
-        self.key = None
+        self.key = key
+
+        # Due to the importance of having a key, inform the user if its missing
+        if not key:
+            print(f"No key was assigned to {self}. This will cause unload attempts to fail")
+
 
         # Control render order
         self.z_order = z_order
@@ -36,6 +42,9 @@ class Renderable(pygame.sprite.Sprite):
         # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
         # a group. Since the children are drawn like regular renderables, they're independent of the rect of the parent
         self.children = []
+
+        # @TODO: Only containers should be capable of having children. Type checking is expensive, so draw loop
+        # needs special consideration
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and it's surfaces based on the provided size multiplier """

@@ -13,6 +13,9 @@ class Settings:
         self.dialogue_speaker_frame_sprite = ""
         self.text_speed = 5
 
+        self.pause_menu_data = None
+        self.pause_menu_type = "container"
+
     def EvaluateGameINI(self, ini_path):
         parser = configparser.ConfigParser()
         parser.read(ini_path)
@@ -34,7 +37,11 @@ class Settings:
             int(parser['Window.Settings']['main_resolution'])
         ]
 
-        # Load all settings related to the dialogue system
+        # Load DIALOGUE settings
         self.dialogue_frame_sprite = parser['Dialogue.Settings']['dialogue_frame_sprite']
         self.dialogue_speaker_frame_sprite = parser['Dialogue.Settings']['dialogue_speaker_frame_sprite']
         self.text_speed = parser['Dialogue.Settings']['text_speed']
+
+        # Load PAUSE MENU settings
+        self.pause_menu_data = parser['PauseMenu.Settings']['data_file']
+        self.pause_menu_type = parser['PauseMenu.Settings']['type']

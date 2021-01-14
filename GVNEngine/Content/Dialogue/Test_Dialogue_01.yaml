@@ -1,10 +1,10 @@
 # A test monologue with Rei
 
 dialogue:
-  - action: "load_dialogue_interface"
+  - action: "create_dialogue_interface"
     wait_for_input: True
 
-  - action: "load_sprite"
+  - action: "create_sprite"
     key: "Speaker_02"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
     position:
@@ -36,11 +36,11 @@ dialogue:
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     wait_for_input: True
 
-  - action: "unload_sprite"
+  - action: "remove_renderable"
     key: "Speaker_02"
     wait_for_input: False
 
-  - action: "load_sprite"
+  - action: "create_sprite"
     key: "Speaker_02"
     sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
     position:

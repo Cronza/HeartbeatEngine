@@ -33,10 +33,15 @@ class RenderableGroup():
     def Clear(self):
         pass
 
-    def Get(self):
+    def Exists(self, key) -> bool:
+        """ Returns a boolean for whether the provided key exists in the renderables list """
+        return key in self.renderables
+
+    def Get(self) -> list:
         """ Returns the list of renderables inside this group"""
         return self.renderables.values()
 
     def Update(self):
-        for renderable in self.renderables.values():
+        #@TODO: Is there a safer way of parsing these lists that avoid issues with size changing?
+        for renderable in list(self.renderables.values()):
             renderable.update()

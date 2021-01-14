@@ -17,7 +17,7 @@ class PointAndClickScene(Scene):
             f_objects = self.scene_data['objects']
 
             for f_object in f_objects:
-                f_object['action'] = 'load_sprite'
+                f_object['action'] = 'create_sprite'
                 self.a_manager.PerformAction(f_object)
         else:
             print('Scene file does not specify any objects')
@@ -26,17 +26,21 @@ class PointAndClickScene(Scene):
         if 'interactables' in self.scene_data:
             f_interactables = self.scene_data['interactables']
 
-            # Interactables can come in many types, so allow the user to specify a unique type. If they don't,
-            # use the generic interactable renderable
             for f_interactable in f_interactables:
-                if "type" in f_interactable:
-                    f_interactable['action'] = f"create_{f_interactable['type'].lower()}"
-                else:
-                    f_interactable['action'] = 'create_interactable'
-
+                f_interactable['action'] = 'create_interactable'
                 self.a_manager.PerformAction(f_interactable)
         else:
-            print('Scene file does not specify any objects')
+            print('Scene file does not specify any interactables')
+
+        # Load any specified buttons
+        if 'buttons' in self.scene_data:
+            f_buttons = self.scene_data['buttons']
+
+            for f_button in f_buttons:
+                f_button['action'] = 'create_button'
+                self.a_manager.PerformAction(f_button)
+        else:
+            print('Scene file does not specify any buttons')
 
         # Load any specified text
         if 'text' in self.scene_data:
