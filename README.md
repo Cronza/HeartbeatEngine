@@ -8,8 +8,7 @@ The GVNEngine is a visual novel / dating simulator game engine created in Python
 
 # How to Use the 'GVNEngine'?
 Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, please contact the developer Garrett Fredley at:<br/>
-https://twitter.com/SomeCronzaGuy (Professional Twitter) :shipit: <br/>
-https://twitter.com/Nixenneth (Artist Twitter) :art:
+https://twitter.com/SomeCronzaGuy :shipit: <br/>
 
 # License
 The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
