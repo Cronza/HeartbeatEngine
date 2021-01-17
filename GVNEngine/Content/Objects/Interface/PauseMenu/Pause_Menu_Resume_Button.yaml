@@ -1,7 +1,7 @@
 name: "Pause_Menu_Start_Button"
-sprite: "Content/Sprites/Interface/Buttons/Button_01_Normal.png"
-sprite_hover: "Content/Sprites/Interface/Buttons/Button_01_Hover.png"
-sprite_clicked: "Content/Sprites/Interface/Buttons/Button_01_Clicked.png"
+sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
+sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
 action:
   action: "remove_container"
   key: "Pause_Menu"

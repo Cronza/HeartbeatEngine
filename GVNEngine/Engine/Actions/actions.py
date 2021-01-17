@@ -133,24 +133,14 @@ class create_dialogue_interface(Action):
         dialogue_frame = SpriteRenderable(
             self.scene,
             self.scene.settings.dialogue_frame_sprite,
-            (0.5, 0.85),
+            (0.5, 0.80),
             True,
             100,
             "DialogueFrame"
         )
 
-        speaker_frame = SpriteRenderable(
-            self.scene,
-            self.scene.settings.dialogue_speaker_frame_sprite,
-            (0.2, 0.7),
-            True,
-            100,
-            "SpeakerFrame"
-        )
-
         # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
         self.scene.renderables_group.Add(dialogue_frame)
-        self.scene.renderables_group.Add(speaker_frame)
 
         self.scene.Draw()
         self.complete = True
@@ -400,18 +390,18 @@ class dialogue(Action):
     def Start(self):
         new_speaker_text = TextRenderable(
             self.scene,
-            (0.08, 0.675),
+            (0.25, 0.705),
             self.action_data['speaker_text'],
             self.action_data['speaker_font'],
             self.action_data['speaker_text_size'],
             self.action_data['speaker_text_color'],
-            False,
+            True,
             200,
             "SpeakerText"
         )
         new_dialogue_text = TextRenderable(
             self.scene,
-            (0.08, 0.77),
+            (0.1, 0.77),
             self.action_data['dialogue_text'],
             self.action_data['dialogue_font'],
             self.action_data['dialogue_text_size'],

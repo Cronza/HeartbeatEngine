@@ -39,7 +39,6 @@ class Settings:
 
         # Load DIALOGUE settings
         self.dialogue_frame_sprite = parser['Dialogue.Settings']['dialogue_frame_sprite']
-        self.dialogue_speaker_frame_sprite = parser['Dialogue.Settings']['dialogue_speaker_frame_sprite']
         self.text_speed = parser['Dialogue.Settings']['text_speed']
 
         # Load PAUSE MENU settings

@@ -1,4 +1,4 @@
-key: "Pause_Menu"
+key: "Settings_Menu"
 
 objects:
   - sprite: "Content/Sprites/Interface/Menus/Pause_Menu_Background.png"
@@ -28,7 +28,7 @@ buttons:
   - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml"
     position:
       x: 0.5
-      y: 0.54
+      y: 0.52
     center_align: True
     z_order: 5001
     text: "Settings"
@@ -37,14 +37,14 @@ buttons:
     text_color: [255, 255, 255]
     text_position:
       x: 0.5
-      y: 0.54
+      y: 0.52
     text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Settings_Button"
   - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Quit_Button.yaml"
     position:
       x: 0.5
-      y: 0.68
+      y: 0.64
     center_align: True
     z_order: 5001
     text: "Quit Game"
@@ -53,18 +53,18 @@ buttons:
     text_color: [255, 255, 255]
     text_position:
       x: 0.5
-      y: 0.68
+      y: 0.64
     text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Quit_Button"
 text:
   - text: "Paused"
-    text_size: 38
+    text_size: 48
     text_color: [240, 240, 240]
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     center_align: True
     position:
       x: 0.5
-      y: 0.238
+      y: 0.3
     z_order: 5003
     key: "Pause_Menu_Title"

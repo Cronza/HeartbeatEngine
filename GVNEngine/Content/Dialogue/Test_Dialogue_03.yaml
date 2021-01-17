@@ -5,12 +5,12 @@ dialogue:
     wait_for_input: False
 
   - action: "create_sprite"
-    key: "Speaker_01"
-    sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
+    key: "Isea_Idle_Straight_Face"
+    sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Straight_Face.png"
     position:
       x: 0.2
-      y: 1.4
-    flip: True
+      y: 1.25
+    flip: false
     zOrder: 0
     wait_for_input: False
 

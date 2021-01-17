@@ -9,7 +9,7 @@ dialogue:
     wait_for_input: False
 
   - action: "dialogue"
-    speaker_text: "Unknown"
+    speaker_text: "Isea"
     speaker_text_size: 32
     speaker_text_color: [199, 192, 194]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
@@ -20,7 +20,7 @@ dialogue:
     wait_for_input: True
 
   - action: "dialogue"
-    speaker_text: "Unknown"
+    speaker_text: "Isea"
     speaker_text_size: 32
     speaker_text_color: [199, 192, 194]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
@@ -46,8 +46,7 @@ dialogue:
     sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
     position:
       x: 0.2
-      y: 1.4
-    flip: True
+      y: 1.25
     zOrder: 0
     wait_for_input: False
     transition:
@@ -55,7 +54,7 @@ dialogue:
       transition_speed: 700
 
   - action: "dialogue"
-    speaker_text: "Unknown"
+    speaker_text: "Isea"
     speaker_text_size: 32
     speaker_text_color: [199, 192, 194]
     speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
@@ -88,6 +87,26 @@ dialogue:
     dialogue_text_color: [253,253,253]
     dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     wait_for_input: True
+
+  - action: "remove_renderable"
+    key: "Isea_Idle_Concerned"
+    wait_for_input: False
+    transition:
+      transition_type: 'fade_out'
+      transition_speed: 3000
+
+  - action: "create_sprite"
+    key: "Isea_Idle_Straight_Face"
+    sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Straight_Face.png"
+    position:
+      x: 0.2
+      y: 1.25
+    flip: false
+    zOrder: 0
+    wait: True
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
 
   - action: "dialogue"
     speaker_text: ""
