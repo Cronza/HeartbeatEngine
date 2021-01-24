@@ -50,3 +50,7 @@ DialogueSettings:
 
 PauseMenuSettings:
   data_file: 'Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml'
+
+SceneTransitionsSettings:
+  transition_speed: 150
+  z_order: 9999

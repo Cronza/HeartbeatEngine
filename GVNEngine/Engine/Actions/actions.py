@@ -165,18 +165,13 @@ class create_sprite(Action):
         z_order = self.scene.settings.projectSettings['SpriteSettings']['z_order']
         if 'z_order' in self.action_data: z_order = self.action_data['z_order']
 
-        # Keys don't support a global setting, but allow sprites to be created without one
-        key = None
-        if "key" in self.action_data:
-            key = self.action_data['key']
-
         new_sprite = SpriteRenderable(
             self.scene,
             self.action_data['sprite'],
             tuple([self.action_data['position']['x'], self.action_data['position']['y']]),
             center_align,
             z_order,
-            key
+            self.action_data['key']
         )
 
         # If the user requested a flip action, do so
@@ -220,18 +215,13 @@ class create_interactable(Action):
         z_order = self.scene.settings.projectSettings['SpriteSettings']['z_order']
         if 'z_order' in self.action_data: z_order = self.action_data['z_order']
 
-        # Keys don't support a global setting, but allow sprites to be created without one
-        key = None
-        if "key" in self.action_data:
-            key = self.action_data['key']
-
         new_renderable = Interactable(
             self.scene,
             self.action_data['data'],
             tuple(self.action_data['position'].values()),
             center_align,
             z_order,
-            key
+            self.action_data['key']
         )
 
         # If the user requested a flip action, do so
@@ -251,10 +241,6 @@ class create_text(Action):
     Create a TextRenderable at the target location, with the given settings. Returns a 'TextRenderable'
     """
     def Start(self):
-        key = None
-        if "key" in self.action_data:
-            key = self.action_data['key']
-
         # Text element settings
         z_order = self.scene.settings.projectSettings['TextSettings']['z_order']
         if 'z_order' in self.action_data: z_order = self.action_data['z_order']
@@ -280,7 +266,7 @@ class create_text(Action):
             text_color,
             center_align,
             z_order,
-            key
+            self.action_data['key']
         )
 
         # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
@@ -313,10 +299,6 @@ class create_button(Action):
     def Start(self):
         self.skippable = False
 
-        key = None
-        if "key" in self.action_data:
-            key = self.action_data['key']
-
         # Text element settings
         text_z_order = self.scene.settings.projectSettings['ButtonSettings']['text_z_order']
         if 'text_z_order' in self.action_data: text_z_order = self.action_data['text_z_order']
@@ -340,11 +322,7 @@ class create_button(Action):
         z_order = self.scene.settings.projectSettings['ButtonSettings']['button_z_order']
         if 'z_order' in self.action_data: z_order = self.action_data['z_order']
 
-        # Keys don't support a global setting, but allow sprites to be created without one
-        key = None
-        if "key" in self.action_data:
-            key = self.action_data['key']
-
+        print("Key")
         new_renderable = Button(
             self.scene,
             self.action_data['data'],
@@ -358,7 +336,7 @@ class create_button(Action):
             text_center_align,
             center_align,
             z_order,
-            key
+            self.action_data['key']
         )
 
         # If the user requested a flip action, do so
@@ -381,14 +359,11 @@ class create_container(Action):
         # Allow optional overrides
         center_align = True
         z_order = 0
-        key = None
 
         if "center_align" in self.action_data:
             center_align = self.action_data['center_align']
         if "z_order" in self.action_data:
             z_order = self.action_data['z_order']
-        if "key" in self.action_data:
-            key = self.action_data['key']
 
         # Containers aren't rendered, so use defaults
         new_renderable = Container(
@@ -397,7 +372,7 @@ class create_container(Action):
             (0,0),
             center_align,
             z_order,
-            key
+            self.action_data['key']
         )
 
         # If the user requested a flip action, do so
@@ -529,18 +504,21 @@ those listed in the 'transitions' file
 class fade_scene_from_black(Action):
     """ Creates a black texture covering the entire screen, then slowly fades it out. Returns 'SpriteRenderable'"""
     def Start(self):
-        if "transition_speed" in self.action_data:
-            self.transition_speed = self.action_data['transition_speed']
+        # Use global default settings, but allow overrides
+        self.transition_speed = self.scene.settings.projectSettings['SceneTransitionsSettings']['transition_speed']
+        if 'transition_speed' in self.action_data: self.transition_speed = self.action_data['transition_speed']
+
+        z_order = self.scene.settings.projectSettings['SceneTransitionsSettings']['z_order']
+        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
 
         new_sprite = SpriteRenderable(
             self.scene,
             "Engine/Content/Sprites/transition_fade_black.png",
             (0, 0),
             False,
-            9999
+            z_order,
+            'Transition'
         )
-        new_sprite.key = "Transition"
-
         self.scene.renderables_group.Add(new_sprite)
         self.scene.Draw()
 

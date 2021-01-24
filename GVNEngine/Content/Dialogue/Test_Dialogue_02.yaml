@@ -2,7 +2,6 @@
 
 dialogue:
   - action: "fade_scene_from_black"
-    transition_speed: 150
     wait: True
 
   - action: "create_dialogue_interface"

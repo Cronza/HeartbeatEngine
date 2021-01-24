@@ -27,14 +27,10 @@ class Renderable(pygame.sprite.Sprite):
         self.center_align = center_align
         self.flipped = False
 
-        # For indentification in the rendering stack, allow all renderables the ability be to assigned a unique
-        # identifier
+        # For indentification in the rendering stack, allow all renderables the ability be to assigned
+        # a unique identifier
+        assert key != None, print(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
         self.key = key
-
-        # Due to the importance of having a key, inform the user if its missing
-        if not key:
-            print(f"No key was assigned to {self}. This will cause unload attempts to fail")
-
 
         # Control render order
         self.z_order = z_order
@@ -42,9 +38,6 @@ class Renderable(pygame.sprite.Sprite):
         # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
         # a group. Since the children are drawn like regular renderables, they're independent of the rect of the parent
         self.children = []
-
-        # @TODO: Only containers should be capable of having children. Type checking is expensive, so draw loop
-        # needs special consideration
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and it's surfaces based on the provided size multiplier """
