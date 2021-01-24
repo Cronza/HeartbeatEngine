@@ -40,7 +40,7 @@ class Scene:
                     if self.renderables_group.Exists('Pause_Menu'):
                         print("Pause Menu Open")
                     else:
-                        print(self.settings.pause_menu_data)
+                        print(self.scene_manager.pause_menu_data)
                         self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data)
 
     def Draw(self):

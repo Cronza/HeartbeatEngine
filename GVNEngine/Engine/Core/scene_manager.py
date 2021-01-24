@@ -14,7 +14,7 @@ class SceneManager():
 
         # Cached Values (Scene agnostic)
         self.resolution_multiplier = None  # Null by default to allow the starting scene to generate a starting value
-        self.pause_menu_data = None # Menu data is stored in the manager, but the menu is owned by a scene
+        self.pause_menu_data = None  # Menu data is stored in the manager, but the menu is owned by a scene
 
         self.scene_types = {
             'Dialogue': DialogueScene,
@@ -23,15 +23,17 @@ class SceneManager():
         }
 
         # Do a special read and load for the initial scene
-        scene_data = Reader.ReadAll(self.settings.starting_scene)
+        starting_scene_data = self.settings.projectSettings['Game']['starting_scene']
+        scene_data = Reader.ReadAll(starting_scene_data)
+
         if 'type' in scene_data:
-            self.LoadScene(self.settings.starting_scene, scene_data['type'])
+            self.LoadScene(starting_scene_data, scene_data['type'])
         else:
             print("'type' was not specified in the starting file .yaml. Unable to initialize first scene")
 
         # Read in the yaml data for the pause menu
-        self.pause_menu_data = Reader.ReadAll(self.settings.pause_menu_data)
-        self.pause_menu_data['action'] = f"create_{self.settings.pause_menu_type}"
+        self.pause_menu_data = Reader.ReadAll(self.settings.projectSettings['PauseMenuSettings']['data_file'])
+        self.pause_menu_data['action'] = "create_container"
 
     def LoadScene(self, scene_file, scene_type):
         print(" *** LOADING NEW SCENE ***")

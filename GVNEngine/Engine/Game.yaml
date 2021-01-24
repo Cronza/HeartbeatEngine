@@ -1,0 +1,52 @@
+# Project Configuration
+
+Game:
+  title: 'To Infinity'
+  author: 'Garrett Fredley'
+  company: 'Garrett Fredley'
+  starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
+
+WindowSettings:
+  resolution: 0
+  resolution_options:
+   0: [1280, 720]
+   1: [1920, 1080]
+
+# Feature Configurations - Defaults
+
+SpriteSettings:
+  background_z_order: -9999
+  z_order: 0
+  center_align: True
+
+TextSettings:
+  size: 25
+  color: [255,255,255]
+  font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+  z_order: 100
+  center_align: True
+
+ButtonSettings:
+  text_size: 16
+  text_color: [255,255,255]
+  text_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+  text_z_order: 101
+  text_center_align: True
+  button_z_order: 100
+  button_center_align: True
+
+DialogueSettings:
+  text_speed: 5
+  speaker_text_size: 32
+  speaker_text_color: [253,253,253]
+  speaker_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+  speaker_z_order: 200
+  dialogue_text_size: 24
+  dialogue_text_color: [253,253,253]
+  dialogue_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+  dialogue_frame_sprite: 'Content/Sprites/Interface/Dialogue/Dialogue_Frame.png'
+  dialogue_wait_for_input: True
+  dialogue_z_order: 200
+
+PauseMenuSettings:
+  data_file: 'Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml'

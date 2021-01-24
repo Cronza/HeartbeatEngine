@@ -28,22 +28,6 @@ class Button(Interactable):
         self.children.append(button_text_renderable)
         self.scene.renderables_group.Add(button_text_renderable)
 
-        # Instead of building the text renderale here, let's ue the action manager. That way, the button class ends up
-        # acting more like an interactable container
-        # ^ won't work, as containers have a special removal process that isn't support by normal renderables
-
-        """
-        # Load any specified text
-        if 'text' in self.renderable_data:
-            f_texts = self.renderable_data['text']
-
-            for f_text in f_texts:
-                f_text['action'] = 'create_text'
-                self.children.append(self.scene.a_manager.PerformAction(f_text))
-        else:
-            print('Data file does not specify any text')
-        """
-
     def GetText(self):
         pass
 

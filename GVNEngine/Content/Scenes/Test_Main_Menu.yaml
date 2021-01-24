@@ -2,37 +2,24 @@ type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
 buttons:
-  - data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
+  - data: "Content/Objects/Interface/MainMenu/Main_Menu_Start_Button.yaml"
     position:
       x: 0.5
       y: 0.5
-    center_align: True
-    z_order: 0
     text: "Start Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
     text_position:
       x: 0.5
       y: 0.5
-    text_center_align: True
-    text_z_order: 100
     key: "Main_Menu_Start_Button"
-  - data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
+
+  - data: "Content/Objects/Interface/MainMenu/Main_Menu_Exit_Button.yaml"
     position:
       x: 0.5
       y: 0.65
-    center_align: True
-    z_order: 0
     text: "Quit Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
     text_position:
       x: 0.5
       y: 0.65
-    text_center_align: True
-    text_z_order: 100
     key: "Main_Menu_Exit_Button"
 
 text:

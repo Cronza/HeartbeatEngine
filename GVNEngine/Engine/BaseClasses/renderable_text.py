@@ -14,7 +14,6 @@ class TextRenderable(Renderable):
     """
     def __init__(self, scene, pos, text, font, font_size, color, center_align=False, z_order=0, key=None):
         super().__init__(scene, pos, center_align, z_order, key)
-
         self.font_obj = pygame.font.Font(font, font_size)
         self.text = text
         self.surface = self.font_obj.render(self.text, True, tuple(color))

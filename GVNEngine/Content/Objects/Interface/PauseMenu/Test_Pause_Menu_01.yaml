@@ -13,48 +13,35 @@ buttons:
     position:
       x: 0.5
       y: 0.4
-    center_align: True
     z_order: 5001
     text: "Resume"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
     text_position:
       x: 0.5
       y: 0.4
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Resume_Button"
+
   - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml"
     position:
       x: 0.5
       y: 0.54
-    center_align: True
     z_order: 5001
     text: "Settings"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
     text_position:
       x: 0.5
       y: 0.54
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Settings_Button"
+
   - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Quit_Button.yaml"
     position:
       x: 0.5
       y: 0.68
-    center_align: True
     z_order: 5001
     text: "Quit Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
     text_position:
       x: 0.5
       y: 0.68
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Quit_Button"
 text:

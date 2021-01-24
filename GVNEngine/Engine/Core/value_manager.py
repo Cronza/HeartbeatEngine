@@ -12,7 +12,8 @@ class ValueManager:
         self.scene.settings = settings
 
 
-    def Request
+    def Request(self):
+        pass
 
 
 

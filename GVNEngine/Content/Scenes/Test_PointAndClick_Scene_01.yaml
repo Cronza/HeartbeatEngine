@@ -6,8 +6,6 @@ interactables:
     position:
       x: 0.8
       y: 0.55
-    center_align: True
-    z_order: 0
     key: "Rei_First_Meet"
 
 # objects:

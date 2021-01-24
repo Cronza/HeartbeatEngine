@@ -1,20 +1,17 @@
 import pygame
 from pygame.locals import VIDEORESIZE
 from Engine.Core.scene_manager import SceneManager
-
-from Engine.Utilities.yaml_reader import Reader
 from Engine.Utilities.settings import Settings
 
 class GVNEngine():
     def __init__(self):
-        self.yaml_reader = Reader()
-
-        # Build a settings object to house engine settings
-        self.settings = Settings(self.yaml_reader)
-        self.settings.EvaluateGameINI("Engine/Game.ini")
+        # Build a settings object to house engine & project settings
+        self.settings = Settings()
+        self.settings.EvaluateProjectSettings("Engine/Game.yaml")
+        print(self.settings.projectSettings)
 
         # Configure the game based on project settings
-        pygame.display.set_caption(self.settings.title)
+        pygame.display.set_caption(self.settings.projectSettings['Game']['title'])
 
         # Declare the scene manager, but we'll initialize it during the game loop
         self.scene_manager = None
@@ -26,9 +23,8 @@ class GVNEngine():
 
         pygame.init()
 
-
         # Initialize the game window and clock
-        window = pygame.display.set_mode(self.settings.resolution_options[self.settings.resolution])
+        window = pygame.display.set_mode(self.settings.active_resolution)
         clock = pygame.time.Clock()
 
         # Initialize the scene manager

@@ -106,13 +106,17 @@ class create_background(Action):
     def Start(self):
         self.skippable = False
 
+        # Use project defaults by default, but use instance overrides if provided
+        background_z_order = self.scene.settings.projectSettings['SpriteSettings']['background_z_order']
+        if 'z_order' in self.action_data: background_z_order = self.action_data['z_order']
+
         """ Create a background renderable with pre-set settings """
         new_sprite = SpriteRenderable(
             self.scene,
             self.action_data['sprite'],
             (0,0),
             False,
-            -9999,
+            background_z_order,
             "Background"
         )
         self.scene.renderables_group.Add(new_sprite)
@@ -130,9 +134,13 @@ class create_dialogue_interface(Action):
     def Start(self):
         self.skippable = False
 
+        # Use project defaults by default, but use instance overrides if provided
+        dialogue_frame_sprite = self.scene.settings.projectSettings['DialogueSettings']['dialogue_frame_sprite']
+        if 'dialogue_frame_sprite' in self.action_data: dialogue_frame_sprite = self.action_data['dialogue_frame_sprite']
+
         dialogue_frame = SpriteRenderable(
             self.scene,
-            self.scene.settings.dialogue_frame_sprite,
+            dialogue_frame_sprite,
             (0.5, 0.80),
             True,
             100,
@@ -150,15 +158,15 @@ class create_sprite(Action):
     Create a sprite renderable using passed in settings. Returns a 'SpriteRenderable'
     """
     def Start(self):
-        # Allow optional overrides
-        center_align = True
-        z_order = 0
-        key = None
+        # Use project defaults by default, but use instance overrides if provided
+        center_align = self.scene.settings.projectSettings['SpriteSettings']['center_align']
+        if 'center_align' in self.action_data: center_align = self.action_data['center_align']
 
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
+        z_order = self.scene.settings.projectSettings['SpriteSettings']['z_order']
+        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
+
+        # Keys don't support a global setting, but allow sprites to be created without one
+        key = None
         if "key" in self.action_data:
             key = self.action_data['key']
 
@@ -205,15 +213,15 @@ class create_interactable(Action):
     def Start(self):
         self.skippable = False
 
-        # Allow optional overrides
-        center_align = False
-        z_order = 0
-        key = None
+        # Use project defaults by default, but use instance overrides if provided
+        center_align = self.scene.settings.projectSettings['SpriteSettings']['center_align']
+        if 'center_align' in self.action_data: center_align = self.action_data['center_align']
 
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
+        z_order = self.scene.settings.projectSettings['SpriteSettings']['z_order']
+        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
+
+        # Keys don't support a global setting, but allow sprites to be created without one
+        key = None
         if "key" in self.action_data:
             key = self.action_data['key']
 
@@ -243,25 +251,33 @@ class create_text(Action):
     Create a TextRenderable at the target location, with the given settings. Returns a 'TextRenderable'
     """
     def Start(self):
-        # Allow optional overrides
-        center_align = False
-        z_order = 0
         key = None
-
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
         if "key" in self.action_data:
             key = self.action_data['key']
+
+        # Text element settings
+        z_order = self.scene.settings.projectSettings['TextSettings']['z_order']
+        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
+
+        center_align = self.scene.settings.projectSettings['TextSettings']['center_align']
+        if 'center_align' in self.action_data: center_align = self.action_data['center_align']
+
+        font = self.scene.settings.projectSettings['TextSettings']['font']
+        if 'font' in self.action_data: font = self.action_data['font']
+
+        text_size = self.scene.settings.projectSettings['TextSettings']['size']
+        if 'text_size' in self.action_data: text_size = self.action_data['text_size']
+
+        text_color = self.scene.settings.projectSettings['TextSettings']['color']
+        if 'text_color' in self.action_data: text_color = self.action_data['text_color']
 
         new_text_renderable = TextRenderable(
             self.scene,
             tuple(self.action_data['position'].values()),
             self.action_data['text'],
-            self.action_data['font'],
-            self.action_data['text_size'],
-            self.action_data['text_color'],
+            font,
+            text_size,
+            text_color,
             center_align,
             z_order,
             key
@@ -297,23 +313,37 @@ class create_button(Action):
     def Start(self):
         self.skippable = False
 
-        # Allow optional overrides
-        center_align = False
-        z_order = 0
         key = None
-        text_z_order=0
-        text_center_align = True
-
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
         if "key" in self.action_data:
             key = self.action_data['key']
-        if "text_z_order" in self.action_data:
-            text_z_order = self.action_data['text_z_order']
-        if "text_center_align" in self.action_data:
-            text_center_align = self.action_data['text_center_align']
+
+        # Text element settings
+        text_z_order = self.scene.settings.projectSettings['ButtonSettings']['text_z_order']
+        if 'text_z_order' in self.action_data: text_z_order = self.action_data['text_z_order']
+
+        text_center_align = self.scene.settings.projectSettings['ButtonSettings']['text_center_align']
+        if 'text_center_align' in self.action_data: text_center_align = self.action_data['text_center_align']
+
+        text_font = self.scene.settings.projectSettings['ButtonSettings']['text_font']
+        if 'text_font' in self.action_data: font = self.action_data['text_font']
+
+        text_size = self.scene.settings.projectSettings['ButtonSettings']['text_size']
+        if 'text_size' in self.action_data: text_size = self.action_data['text_size']
+
+        text_color = self.scene.settings.projectSettings['ButtonSettings']['text_color']
+        if 'text_color' in self.action_data: text_color = self.action_data['text_color']
+
+        # Button sprite settings
+        center_align = self.scene.settings.projectSettings['ButtonSettings']['button_center_align']
+        if 'center_align' in self.action_data: center_align = self.action_data['center_align']
+
+        z_order = self.scene.settings.projectSettings['ButtonSettings']['button_z_order']
+        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
+
+        # Keys don't support a global setting, but allow sprites to be created without one
+        key = None
+        if "key" in self.action_data:
+            key = self.action_data['key']
 
         new_renderable = Button(
             self.scene,
@@ -321,9 +351,9 @@ class create_button(Action):
             tuple(self.action_data['position'].values()),
             tuple(self.action_data['text_position'].values()),
             self.action_data['text'],
-            self.action_data['font'],
-            self.action_data['font_size'],
-            self.action_data['text_color'],
+            text_font,
+            text_size,
+            text_color,
             text_z_order,
             text_center_align,
             center_align,
@@ -387,27 +417,53 @@ class dialogue(Action):
     Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings
     Returns None
     """
+
     def Start(self):
+        # Use project defaults by default, but use instance overrides if provided
+        speaker_text_size = self.scene.settings.projectSettings['DialogueSettings']['speaker_text_size']
+        if 'speaker_text_size' in self.action_data: speaker_text_size = self.action_data['speaker_text_size']
+
+        speaker_text_color = self.scene.settings.projectSettings['DialogueSettings']['speaker_text_color']
+        if 'speaker_text_color' in self.action_data: speaker_text_color = self.action_data['speaker_text_color']
+
+        speaker_font = self.scene.settings.projectSettings['DialogueSettings']['speaker_font']
+        if 'speaker_font' in self.action_data: speaker_font = self.action_data['speaker_font']
+
+        speaker_z_order = self.scene.settings.projectSettings['DialogueSettings']['speaker_z_order']
+        if 'speaker_z_order' in self.action_data: speaker_z_order = self.action_data['speaker_z_order']
+
+        dialogue_text_size = self.scene.settings.projectSettings['DialogueSettings']['dialogue_text_size']
+        if 'dialogue_text_size' in self.action_data: dialogue_text_size = self.action_data['dialogue_text_size']
+
+        dialogue_text_color = self.scene.settings.projectSettings['DialogueSettings']['dialogue_text_color']
+        if 'dialogue_text_color' in self.action_data: dialogue_text_color = self.action_data['dialogue_text_color']
+
+        dialogue_font = self.scene.settings.projectSettings['DialogueSettings']['dialogue_font']
+        if 'dialogue_font' in self.action_data: dialogue_font = self.action_data['dialogue_font']
+
+        dialogue_z_order = self.scene.settings.projectSettings['DialogueSettings']['dialogue_z_order']
+        if 'dialogue_z_order' in self.action_data: dialogue_z_order = self.action_data['dialogue_z_order']
+
         new_speaker_text = TextRenderable(
             self.scene,
             (0.25, 0.705),
             self.action_data['speaker_text'],
-            self.action_data['speaker_font'],
-            self.action_data['speaker_text_size'],
-            self.action_data['speaker_text_color'],
+            speaker_font,
+            speaker_text_size,
+            speaker_text_color,
             True,
-            200,
+            speaker_z_order,
             "SpeakerText"
         )
         new_dialogue_text = TextRenderable(
             self.scene,
             (0.1, 0.77),
             self.action_data['dialogue_text'],
-            self.action_data['dialogue_font'],
-            self.action_data['dialogue_text_size'],
-            self.action_data['dialogue_text_color'],
+            dialogue_font,
+            dialogue_text_size,
+            dialogue_text_color,
             False,
-            200,
+            dialogue_z_order,
             "DialogueText"
         )
 

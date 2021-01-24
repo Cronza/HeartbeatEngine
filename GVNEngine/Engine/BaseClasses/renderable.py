@@ -61,7 +61,7 @@ class Renderable(pygame.sprite.Sprite):
 
         # A multiplier of 1 means this is the main resolution. Update the renderable using the unscaled surface
         if multiplier == 1:
-            print("Multiplier provided is 1, updating using the provided surface without scaling")
+            #print("Multiplier provided is 1, updating using the provided surface without scaling")
 
             # Generate a new absolute position using this renderables normalized screen position
             new_position = self.ConvertNormToScreen(tuple(self.position))
