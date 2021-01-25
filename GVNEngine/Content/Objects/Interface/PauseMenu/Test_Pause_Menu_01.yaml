@@ -15,9 +15,6 @@ buttons:
       y: 0.4
     z_order: 5001
     text: "Resume"
-    text_position:
-      x: 0.5
-      y: 0.4
     text_z_order: 5002
     key: "Pause_Menu_Resume_Button"
 
@@ -27,9 +24,6 @@ buttons:
       y: 0.54
     z_order: 5001
     text: "Settings"
-    text_position:
-      x: 0.5
-      y: 0.54
     text_z_order: 5002
     key: "Pause_Menu_Settings_Button"
 
@@ -39,9 +33,6 @@ buttons:
       y: 0.68
     z_order: 5001
     text: "Quit Game"
-    text_position:
-      x: 0.5
-      y: 0.68
     text_z_order: 5002
     key: "Pause_Menu_Quit_Button"
 text:

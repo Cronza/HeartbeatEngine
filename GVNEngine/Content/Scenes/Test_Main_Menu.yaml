@@ -2,24 +2,30 @@ type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
 buttons:
-  - data: "Content/Objects/Interface/MainMenu/Main_Menu_Start_Button.yaml"
+  - name: "Main_Menu_Start_Button"
+    sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+    sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
+    sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
+    action:
+      action: "load_scene"
+      scene_file: "Content/Scenes/Test_Dialogue_Scene_01.yaml"
+      scene_type: "Dialogue"
     position:
       x: 0.5
       y: 0.5
     text: "Start Game"
-    text_position:
-      x: 0.5
-      y: 0.5
     key: "Main_Menu_Start_Button"
 
-  - data: "Content/Objects/Interface/MainMenu/Main_Menu_Exit_Button.yaml"
+  - name: "Main_Menu_Exit_Button"
+    sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+    sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
+    sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
+    action:
+      action: "quit_game"
     position:
       x: 0.5
       y: 0.65
     text: "Quit Game"
-    text_position:
-      x: 0.5
-      y: 0.65
     key: "Main_Menu_Exit_Button"
 
 text:

@@ -299,6 +299,11 @@ class create_button(Action):
     def Start(self):
         self.skippable = False
 
+        # By default, make the button text centered within the button itself
+        if 'text_position' not in self.action_data:
+            self.action_data['text_position'] = self.action_data['position']
+
+
         # Text element settings
         text_z_order = self.scene.settings.projectSettings['ButtonSettings']['text_z_order']
         if 'text_z_order' in self.action_data: text_z_order = self.action_data['text_z_order']
@@ -322,7 +327,6 @@ class create_button(Action):
         z_order = self.scene.settings.projectSettings['ButtonSettings']['button_z_order']
         if 'z_order' in self.action_data: z_order = self.action_data['z_order']
 
-        print("Key")
         new_renderable = Button(
             self.scene,
             self.action_data['data'],
@@ -473,6 +477,12 @@ class dialogue(Action):
             self.active_transition.Skip()
         self.complete = True
 
+class choice(Action):
+    def Start(self):
+        pass
+
+
+
 class load_scene(Action):
     """
     Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
@@ -540,4 +550,5 @@ class fade_scene_from_black(Action):
 
     def Skip(self):
         self.renderable.GetSurface().set_alpha(self.goal)
+        self.scene.Draw()
         self.complete = True

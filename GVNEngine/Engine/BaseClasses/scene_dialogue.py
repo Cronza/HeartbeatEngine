@@ -5,7 +5,6 @@ class DialogueScene(PointAndClickScene):
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
         self.dialogue_index = 0
         self.dialogue_data = ""
-        self.waiting_for_action = False
 
         #Update the generic data using the parent's init
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
@@ -32,22 +31,25 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
-        #print(self.dialogue_index)
         if len(self.dialogue_data['dialogue']) > self.dialogue_index:
             action_data = self.dialogue_data['dialogue'][self.dialogue_index]
-            #if 'wait_for_input' in action_data and 'wait' in action_data:
-            #    print("Please only specify one wait value per yaml block (IE. 'wait' or 'wait_for_input')")
 
-            if 'wait' in action_data:
-                if action_data['wait'] is True:
-                    self.waiting_for_action = True
-                    self.a_manager.PerformAction(action_data, self.ActionComplete)
-            elif 'wait_for_input' in action_data:
-                if action_data['wait_for_input'] is False:
+            #@TODO: Review how the wait mechanism works, and how its communicate to the user
+
+            # Should we automatically load the next action, or wait until the next input?
+            if 'wait_for_input' in action_data:
+                if action_data['wait_for_input'] is True:
+                    self.a_manager.PerformAction(action_data)
+                    self.dialogue_index += 1
+                else:
                     # Don't wait for input on this action. Run it, and move to the next
                     self.a_manager.PerformAction(action_data)
                     self.dialogue_index += 1
                     self.LoadAction()
+            # Should we let the action load the next action when it's complete?
+            elif 'wait_until_complete' in action_data:
+                if action_data['wait_until_complete'] is True:
+                    self.a_manager.PerformAction(action_data, self.ActionComplete)
                 else:
                     self.a_manager.PerformAction(action_data)
                     self.dialogue_index += 1
@@ -66,6 +68,7 @@ class DialogueScene(PointAndClickScene):
 
     def ActionComplete(self):
         """ When an action specifies 'wait', use this function as the completion delegate """
+        #self.Draw()
         self.dialogue_index += 1
         self.LoadAction()
 
