@@ -5,10 +5,6 @@ class PointAndClickScene(Scene):
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
 
-    def Draw(self):
-        # Draw both generics and interactive specifics using the parent's method
-        super().Draw()
-
     def LoadSceneData(self):
         super().LoadSceneData()
 

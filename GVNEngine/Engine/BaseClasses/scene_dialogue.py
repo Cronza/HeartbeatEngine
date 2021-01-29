@@ -31,7 +31,6 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
-        print("Load")
         if len(self.dialogue_data['dialogue']) > self.dialogue_index:
             action_data = self.dialogue_data['dialogue'][self.dialogue_index]
 
@@ -69,8 +68,6 @@ class DialogueScene(PointAndClickScene):
 
     def ActionComplete(self):
         """ When an action specifies 'wait', use this function as the completion delegate """
-        #self.Draw()
-        print("Action Delegate Complete+")
         self.dialogue_index += 1
         self.LoadAction()
 

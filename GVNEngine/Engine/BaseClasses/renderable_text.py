@@ -17,12 +17,11 @@ class TextRenderable(Renderable):
 
         # YAML Parameters
         font = self.renderable_data['font']
-        text = self.renderable_data['text']
+        self.text = self.renderable_data['text']
         text_size = self.renderable_data['text_size']
-        text_color = tuple(self.renderable_data['text_color'])
+        text_color = self.renderable_data['text_color']
 
         self.font_obj = pygame.font.Font(font, text_size)
-        self.text = text
         self.surface = self.font_obj.render(self.text, True, text_color)
         self.rect = self.surface.get_rect()
 

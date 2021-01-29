@@ -11,8 +11,8 @@ buttons:
       scene_file: "Content/Scenes/Test_Dialogue_Scene_01.yaml"
       scene_type: "Dialogue"
     position:
-      x: 0.5
-      y: 0.5
+      - 0.5
+      - 0.5
     text: "Start Game"
     key: "Main_Menu_Start_Button"
 
@@ -23,8 +23,8 @@ buttons:
     action:
       action: "quit_game"
     position:
-      x: 0.5
-      y: 0.65
+      - 0.5
+      - 0.65
     text: "Quit Game"
     key: "Main_Menu_Exit_Button"
 
@@ -35,8 +35,8 @@ text:
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     center_align: True
     position:
-      x: 0.5
-      y: 0.3
+      - 0.5
+      - 0.3
     z_order: 500
     key: "Title"
   - text: "GVNEngine v0.2 - 'To Infinity' Project Example"
@@ -45,7 +45,7 @@ text:
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     center_align: False
     position:
-      x: 0.01
-      y: 0.95
+      - 0.01
+      - 0.95
     z_order: 9999
     key: "VersionIdentity"

@@ -28,11 +28,13 @@ class ActionManager:
                         action.complete_delegate()
                     del self.active_actions[action]
 
-    def PerformAction(self, action_data, complete_delegate = None):
-        """ Loads the next action in the dialogue sequence, then increments the dialogue index"""
+    def PerformAction(self, action_data, action_name, complete_delegate = None):
+        """
+        Given an action_data YAML block and an action name, create and run the associated action
+        """
 
         # Fetch the action function corresponding to the next action index
-        action = self.GetAction(action_data['action'])
+        action = self.GetAction(action_name)
         new_action = action(self.scene, action_data, self)
 
         # If the calling function wishes to be informed when the action is completed, opt in here

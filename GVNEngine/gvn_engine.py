@@ -8,7 +8,6 @@ class GVNEngine():
         # Build a settings object to house engine & project settings
         self.settings = Settings()
         self.settings.EvaluateProjectSettings("Engine/Game.yaml")
-        print(self.settings.projectSettings)
 
         # Configure the game based on project settings
         pygame.display.set_caption(self.settings.projectSettings['Game']['title'])
