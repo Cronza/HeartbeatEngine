@@ -17,8 +17,7 @@ class Container(Renderable):
             f_objects = data['objects']
 
             for f_object in f_objects:
-                f_object['action'] = 'create_sprite'
-                self.children.append(self.scene.a_manager.PerformAction(f_object))
+                self.children.append(self.scene.a_manager.PerformAction(f_object, 'create_sprite'))
         else:
             print('Data file does not specify any objects')
 
@@ -27,8 +26,7 @@ class Container(Renderable):
             f_interactables = data['interactables']
 
             for f_interactable in f_interactables:
-                f_interactable['action'] = 'create_interactable'
-                self.children.append(self.scene.a_manager.PerformAction(f_interactable))
+                self.children.append(self.scene.a_manager.PerformAction(f_interactable, 'create_interactable'))
         else:
             print('Data file does not specify any interactables')
 
@@ -37,8 +35,7 @@ class Container(Renderable):
             f_buttons = data['buttons']
 
             for f_button in f_buttons:
-                f_button['action'] = 'create_button'
-                self.children.append(self.scene.a_manager.PerformAction(f_button))
+                self.children.append(self.scene.a_manager.PerformAction(f_button, 'create_button'))
         else:
             print('Data file does not specify any buttons')
 
@@ -47,8 +44,7 @@ class Container(Renderable):
             f_texts = data['text']
 
             for f_text in f_texts:
-                f_text['action'] = 'create_text'
-                self.children.append(self.scene.a_manager.PerformAction(f_text))
+                self.children.append(self.scene.a_manager.PerformAction(f_text, 'create_text'))
         else:
             print('Data file does not specify any text')
 

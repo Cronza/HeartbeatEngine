@@ -10,8 +10,13 @@ class Interactable(SpriteRenderable):
     - Normal, hover, and clicked input states
     - A 'click' action
     """
-    def __init__(self, scene, data_path, pos, center_align=False, z_order=0, key=None, initial_rescale=False):
-        super().__init__(scene, data_path, pos, center_align, z_order, key, initial_rescale)
+    def __init__(self, scene, renderable_data):
+        super().__init__(scene, renderable_data, False)
+
+        # YAML Parameters
+        #sprite_hover = self.renderable_data['sprite_hover']
+        #sprite_clicked = self.renderable_data['sprite_clicked']
+        #action = self.renderable_data['action']
 
         self.state = State.normal
 
@@ -84,7 +89,11 @@ class Interactable(SpriteRenderable):
     def Interact(self):
         # Check if any actions are defined in the data file
         if 'action' in self.renderable_data:
-            self.scene.a_manager.PerformAction(self.renderable_data['action'])
+
+            # Interactables use a child 'action' block which acts as its own independent 'renderable_data'. Pass that
+            # instead of this object's data
+            action_data = self.renderable_data['action']
+            self.scene.a_manager.PerformAction(action_data, action_data['action'])
         else:
             print("No actions defined for this object - Clicking does nothing")
 
@@ -94,7 +103,6 @@ class Interactable(SpriteRenderable):
         due to the speed at which they are requested when the user spams the hover or click events
         """
         state_missing_warning = " - Defaulting the state to use the 'Normal' sprite"
-
         if 'sprite_hover' in self.renderable_data:
             if self.renderable_data['sprite_hover'] != "":
                 self.hover_surface = pygame.image.load(self.renderable_data['sprite_hover']).convert_alpha()

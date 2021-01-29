@@ -10,33 +10,21 @@ class SpriteRenderable(Renderable):
         - Non-Interactables
         - Backgrounds
         - etc
-
-    The Sprite Renderable class has two accepted values for 'data_path':
-        - If a path to an image asset is provided, the renderable will not attempt to load any data, and simply render
-          that sprite at position (0,0)
-
-        - If a path to a object .yaml file is provided, it will load the corresponding .yaml file, and use its
-          defined position value
     """
-    def __init__(self, scene, data_path, pos, center_align=True, z_order=0, key=None, initial_rescale=True):
-        super().__init__(scene, pos, center_align, z_order, key)
+    def __init__(self, scene, renderable_data, initial_rescale=True):
+        super().__init__(scene, renderable_data)
 
-        self.renderable_data = {}
+        # YAML Parameters
+        sprite = self.renderable_data['sprite']
 
-        if ".yaml" in data_path:
-            # Read in the object data from the associated yaml file
-            self.renderable_data = Reader.ReadAll(data_path)
-            self.surface = pygame.image.load(self.renderable_data['sprite']).convert_alpha()
+        try:
+            self.surface = pygame.image.load(sprite).convert_alpha()
             self.rect = self.surface.get_rect()
-        else:
-            # Provided file was not a data file. Try and load it directly as the image
-            try:
-                self.surface = pygame.image.load(data_path).convert_alpha()
-                self.rect = self.surface.get_rect()
-            except Exception as exc:
-                print("Failed to load data file for Renderable - Either the file was not found, or it is not a "
-                      f"supported file type:\n{exc}\n")
+        except Exception as exc:
+            print("Failed to load data file for Renderable - Either the file was not found, or it is not a "
+                  f"supported file type:\n{exc}\n")
 
-        # For new objects, resize initially in case we're already using a scaled resolution
+        # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
+        # to defer this though if they need to do any additional work beforehand
         if initial_rescale:
             self.RecalculateSize(self.scene.resolution_multiplier)

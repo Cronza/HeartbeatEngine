@@ -17,8 +17,7 @@ class PointAndClickScene(Scene):
             f_objects = self.scene_data['objects']
 
             for f_object in f_objects:
-                f_object['action'] = 'create_sprite'
-                self.a_manager.PerformAction(f_object)
+                self.a_manager.PerformAction(f_object, 'create_sprite')
         else:
             print('Scene file does not specify any objects')
 
@@ -27,8 +26,7 @@ class PointAndClickScene(Scene):
             f_interactables = self.scene_data['interactables']
 
             for f_interactable in f_interactables:
-                f_interactable['action'] = 'create_interactable'
-                self.a_manager.PerformAction(f_interactable)
+                self.a_manager.PerformAction(f_interactable, 'create_interactable')
         else:
             print('Scene file does not specify any interactables')
 
@@ -37,8 +35,7 @@ class PointAndClickScene(Scene):
             f_buttons = self.scene_data['buttons']
 
             for f_button in f_buttons:
-                f_button['action'] = 'create_button'
-                self.a_manager.PerformAction(f_button)
+                self.a_manager.PerformAction(f_button, 'create_button')
         else:
             print('Scene file does not specify any buttons')
 
@@ -47,7 +44,6 @@ class PointAndClickScene(Scene):
             f_texts = self.scene_data['text']
 
             for f_text in f_texts:
-                f_text['action'] = 'create_text'
-                self.a_manager.PerformAction(f_text)
+                self.a_manager.PerformAction(f_text, 'create_text')
         else:
             print('Scene file does not specify any text')

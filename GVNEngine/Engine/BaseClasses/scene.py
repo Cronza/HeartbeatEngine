@@ -99,7 +99,7 @@ class Scene:
                 'sprite': bg_path
             }
 
-        self.a_manager.PerformAction(action_data)
+        self.a_manager.PerformAction(action_data, action_data['action'])
 
     def CalculateScreenSizeMultiplier(self, old_resolution, new_resolution):
         """

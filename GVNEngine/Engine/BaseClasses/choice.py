@@ -19,7 +19,6 @@ class Choice(Container):
             f_buttons = data['buttons']
 
             for f_button in f_buttons:
-                f_button['action'] = 'create_button'
-                self.children.append(self.scene.a_manager.PerformAction(f_button))
+                self.children.append(self.scene.a_manager.PerformAction(f_button, 'create_button'))
         else:
             print('Data file does not specify any buttons')

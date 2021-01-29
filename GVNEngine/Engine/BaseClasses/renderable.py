@@ -10,30 +10,28 @@ class Renderable(pygame.sprite.Sprite):
 
     This class is not meant to be used directly, but to be subclassed into more specialized objects
     """
-    def __init__(self, scene, pos, center_align=False, z_order=0, key=None):
+    def __init__(self, scene, renderable_data):
         super().__init__()
 
         # Renderables require access to the owning scene so that they can keep track of resolution updates
         self.scene = scene
 
-        self.position = pos
         self.rect = None
-
         self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
         self.surface = None  # The active surface
         self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
 
-        # Transform conditions
-        self.center_align = center_align
-        self.flipped = False
+        # YAML Parameters
+        self.renderable_data = renderable_data
+        self.position = tuple(self.renderable_data['position'])
+        self.center_align = self.renderable_data['center_align']
+        self.z_order = self.renderable_data['z_order']
+        # self.flipped = False
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned
-        # a unique identifier
-        assert key != None, print(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
-        self.key = key
-
-        # Control render order
-        self.z_order = z_order
+        # a unique identifier. This parameter is mandatory, and is considered an exception if not provided
+        assert 'key' in self.renderable_data, print(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
+        self.key = self.renderable_data['key']
 
         # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
         # a group. Since the children are drawn like regular renderables, they're independent of the rect of the parent
