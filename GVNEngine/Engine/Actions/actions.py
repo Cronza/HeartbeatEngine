@@ -222,21 +222,23 @@ class create_interactable(Action):
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
     def Start(self):
         self.skippable = False
-        #@TODO: Update to new workflow
-        # Use project defaults by default, but use instance overrides if provided
-        center_align = self.scene.settings.projectSettings['SpriteSettings']['center_align']
-        if 'center_align' in self.action_data: center_align = self.action_data['center_align']
 
-        z_order = self.scene.settings.projectSettings['SpriteSettings']['z_order']
-        if 'z_order' in self.action_data: z_order = self.action_data['z_order']
+        # OVERRIDES WITH NO PROJECT DEFAULTS
+        if 'position' not in self.action_data:
+            self.action_data['position'] = (0, 0)
+
+        # PROJECT DEFAULTS OVERRIDE
+        if 'z_order' not in self.action_data:
+            self.action_data['z_order'] = self.scene.settings.projectSettings['InteractableSettings'][
+                'z_order']
+
+        if 'center_align' not in self.action_data:
+            self.action_data['center_align'] = self.scene.settings.projectSettings['InteractableSettings'][
+                'center_align']
 
         new_renderable = Interactable(
             self.scene,
-            self.action_data['data'],
-            tuple(self.action_data['position'].values()),
-            center_align,
-            z_order,
-            self.action_data['key']
+            self.action_data,
         )
 
         # If the user requested a flip action, do so
@@ -320,6 +322,15 @@ class create_button(Action):
             self.action_data['text_position'] = self.action_data['position']
 
         # PROJECT DEFAULTS OVERRIDE
+        if 'sprite' not in self.action_data:
+            self.action_data['sprite'] = self.scene.settings.projectSettings['ButtonSettings']['sprite']
+
+        if 'sprite_hover' not in self.action_data:
+            self.action_data['sprite_hover'] = self.scene.settings.projectSettings['ButtonSettings']['sprite_hover']
+
+        if 'sprite_clicked' not in self.action_data:
+            self.action_data['sprite_clicked'] = self.scene.settings.projectSettings['ButtonSettings']['sprite_clicked']
+
         if 'z_order' not in self.action_data:
             self.action_data['z_order'] = self.scene.settings.projectSettings['ButtonSettings']['button_z_order']
 
@@ -365,23 +376,15 @@ class create_container(Action):
     def Start(self):
         self.skippable = False
 
-        # Allow optional overrides
-        center_align = True
-        z_order = 0
-
-        if "center_align" in self.action_data:
-            center_align = self.action_data['center_align']
-        if "z_order" in self.action_data:
-            z_order = self.action_data['z_order']
+        # Container-specific adjustments
+        self.action_data['position'] = (0, 0)
+        self.action_data['z_order'] = 0
+        self.action_data['center_align'] = False
 
         # Containers aren't rendered, so use defaults
         new_renderable = Container(
             self.scene,
             self.action_data,
-            (0,0),
-            center_align,
-            z_order,
-            self.action_data['key']
         )
 
         # If the user requested a flip action, do so
@@ -395,6 +398,30 @@ class create_container(Action):
         self.complete = True
 
         return new_renderable
+
+class load_scene(Action):
+    """
+    Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
+    nothing
+    """
+    def Start(self):
+        self.skippable = False
+
+        if 'scene_file' in self.action_data and 'scene_type' in self.action_data:
+            self.scene.SwitchScene(self.action_data['scene_file'], self.action_data['scene_type'])
+        else:
+            print('Load Scene Failed - No scene file provided, or a scene type was not provided')
+
+        self.complete = True
+
+class quit_game(Action):
+    """ Immediately closes the game """
+    def Start(self):
+        self.skippable = False
+        self.scene.pygame_lib.quit()
+        exit()
+
+# -------------- DIALOGUE ACTIONS --------------
 
 class dialogue(Action):
     """
@@ -506,35 +533,16 @@ class dialogue(Action):
             self.active_transition.Skip()
         self.complete = True
 
+#@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
     def Start(self):
         pass
 
-
-
-class load_scene(Action):
-    """
-    Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
-    nothing
-    """
+class choose_branch(Action):
     def Start(self):
-        self.skippable = False
+        pass
 
-        if 'scene_file' in self.action_data and 'scene_type' in self.action_data:
-            self.scene.SwitchScene(self.action_data['scene_file'], self.action_data['scene_type'])
-        else:
-            print('Load Scene Failed - No scene file provided, or a scene type was not provided')
-
-        self.complete = True
-
-class quit_game(Action):
-    """ Immediately closes the game """
-    def Start(self):
-        self.skippable = False
-        self.scene.pygame_lib.quit()
-        exit()
-
-# -------------- Transition Actions --------------
+# -------------- TRANSITION ACTIONS --------------
 """ 
 These actions function as transitions in their own right, but are not modifiers on existing actions like
 those listed in the 'transitions' file

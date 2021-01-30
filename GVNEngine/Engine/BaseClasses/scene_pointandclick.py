@@ -9,13 +9,13 @@ class PointAndClickScene(Scene):
         super().LoadSceneData()
 
         # Load any specified objects (Non-interactables)
-        if 'objects' in self.scene_data:
-            f_objects = self.scene_data['objects']
+        if 'sprites' in self.scene_data:
+            f_objects = self.scene_data['sprites']
 
             for f_object in f_objects:
                 self.a_manager.PerformAction(f_object, 'create_sprite')
         else:
-            print('Scene file does not specify any objects')
+            print('Scene file does not specify any sprites')
 
         # Load any specified interactables
         if 'interactables' in self.scene_data:

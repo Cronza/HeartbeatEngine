@@ -7,23 +7,23 @@ from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 from Engine.BaseClasses.renderable_text import TextRenderable
 
 class Container(Renderable):
-    def __init__(self, scene, data, pos, center_align=True, z_order=0, key=None):
-        super().__init__(scene, pos, center_align, z_order, key)
+    def __init__(self, scene, renderable_data):
+        super().__init__(scene, renderable_data)
         self.visible = False
 
         #@TODO: Minimize the specific references to objects here so that containers can be more generalized
         # Load any specified objects (Non-interactables)
-        if 'objects' in data:
-            f_objects = data['objects']
+        if 'sprites' in renderable_data:
+            f_objects = renderable_data['sprites']
 
             for f_object in f_objects:
                 self.children.append(self.scene.a_manager.PerformAction(f_object, 'create_sprite'))
         else:
-            print('Data file does not specify any objects')
+            print('Data file does not specify any sprites')
 
         # Load any specified interactables
-        if 'interactables' in data:
-            f_interactables = data['interactables']
+        if 'interactables' in renderable_data:
+            f_interactables = renderable_data['interactables']
 
             for f_interactable in f_interactables:
                 self.children.append(self.scene.a_manager.PerformAction(f_interactable, 'create_interactable'))
@@ -31,8 +31,8 @@ class Container(Renderable):
             print('Data file does not specify any interactables')
 
         # Load any specified buttons
-        if 'buttons' in data:
-            f_buttons = data['buttons']
+        if 'buttons' in renderable_data:
+            f_buttons = renderable_data['buttons']
 
             for f_button in f_buttons:
                 self.children.append(self.scene.a_manager.PerformAction(f_button, 'create_button'))
@@ -40,8 +40,8 @@ class Container(Renderable):
             print('Data file does not specify any buttons')
 
         # Load any specified text
-        if 'text' in data:
-            f_texts = data['text']
+        if 'text' in renderable_data:
+            f_texts = renderable_data['text']
 
             for f_text in f_texts:
                 self.children.append(self.scene.a_manager.PerformAction(f_text, 'create_text'))

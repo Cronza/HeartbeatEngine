@@ -1,70 +1,53 @@
-key: "Settings_Menu"
+key: "Pause_Menu"
 
-objects:
+sprites:
   - sprite: "Content/Sprites/Interface/Menus/Pause_Menu_Background.png"
     position:
-      x: 0.5
-      y: 0.5
+      - 0.5
+      - 0.5
     z_order: 5000
     key: "Pause_Menu_Background"
 
 buttons:
-  - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml"
+  - action:
+      action: "remove_container"
+      key: "Pause_Menu"
     position:
-      x: 0.5
-      y: 0.4
-    center_align: True
+      - 0.5
+      - 0.4
     z_order: 5001
     text: "Resume"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
-    text_position:
-      x: 0.5
-      y: 0.4
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Resume_Button"
-  - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml"
+
+  - action:
+      action: "quit_game"
     position:
-      x: 0.5
-      y: 0.52
-    center_align: True
+      - 0.5
+      - 0.54
     z_order: 5001
     text: "Settings"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
-    text_position:
-      x: 0.5
-      y: 0.52
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Settings_Button"
-  - data: "Content/Objects/Interface/PauseMenu/Pause_Menu_Quit_Button.yaml"
+
+  - action:
+      action: "quit_game"
     position:
-      x: 0.5
-      y: 0.64
-    center_align: True
+      - 0.5
+      - 0.68
     z_order: 5001
     text: "Quit Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
-    text_position:
-      x: 0.5
-      y: 0.64
-    text_center_align: True
     text_z_order: 5002
     key: "Pause_Menu_Quit_Button"
+
 text:
   - text: "Paused"
-    text_size: 48
+    text_size: 38
     text_color: [240, 240, 240]
     font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
     center_align: True
     position:
-      x: 0.5
-      y: 0.3
+      - 0.5
+      - 0.238
     z_order: 5003
     key: "Pause_Menu_Title"

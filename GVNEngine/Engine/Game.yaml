@@ -19,6 +19,10 @@ SpriteSettings:
   z_order: 0
   center_align: True
 
+InteractableSettings:
+  z_order: 100
+  center_align: True
+
 TextSettings:
   size: 25
   color: [255,255,255]
@@ -27,6 +31,9 @@ TextSettings:
   center_align: True
 
 ButtonSettings:
+  sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+  sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
+  sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
   text_size: 16
   text_color: [255,255,255]
   font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'

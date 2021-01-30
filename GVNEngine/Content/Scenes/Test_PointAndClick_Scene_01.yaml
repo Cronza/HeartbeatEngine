@@ -2,16 +2,14 @@ type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Labs2_1280.jpg"
 
 interactables:
-  - data: "Content/Objects/Rei.yaml"
+  - sprite: "Content/Sprites/Characters/Rei/Rei_Uniform_Interactable.png"
+    sprite_hover: "Content/Sprites/Characters/Rei/Rei_Uniform_Interactable_Hover.png"
+    sprite_clicked: ""
+    action:
+      action: "load_scene"
+      scene_file: "Content/Scenes/Test_Dialogue_Scene_02.yaml"
+      scene_type: "Dialogue"
     position:
-      x: 0.8
-      y: 0.55
+      - 0.8
+      - 0.55
     key: "Rei_First_Meet"
-
-# objects:
-#  - sprite: "Content/Sprites/Objects/Spreadsheet.png"
-#    position:2
-#      x: 0.20
-#      y: 0.70
-#    z_order: 0
-#    key: "SpreadSheet"

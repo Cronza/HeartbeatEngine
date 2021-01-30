@@ -1,6 +1,0 @@
-name: "Main_Menu_Exit_Button"
-sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
-sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
-sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
-action:
-  action: "quit_game"

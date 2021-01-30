@@ -23,7 +23,7 @@ class Renderable(pygame.sprite.Sprite):
 
         # YAML Parameters
         self.renderable_data = renderable_data
-        self.position = tuple(self.renderable_data['position'])
+        self.position = self.renderable_data['position']
         self.center_align = self.renderable_data['center_align']
         self.z_order = self.renderable_data['z_order']
         # self.flipped = False

@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9402385f-9736-49d5-b352-ce6e408b00be" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/GVNEngine.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/.idea/GVNEngine_Python.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/Editor/GVNEditor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/Editor/Main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/QTUI/GVNEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/QTUI/GVNEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/QTUI/GVNEditor.ui" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/QTUI/GVNEditor.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5-5.13.2.dist-info/INSTALLER" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5-5.13.2.dist-info/METADATA" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5-5.13.2.dist-info/RECORD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5-5.13.2.dist-info/WHEEL" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5-5.13.2.dist-info/entry_points.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Core.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Core.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Designer.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Designer.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Gui.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Gui.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Qml.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Qml.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Quick.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Quick.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Widgets.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/Qt5Widgets.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/d3dcompiler_47.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/d3dcompiler_47.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/libGLESv2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/libGLESv2.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/opengl32sw.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/bin/opengl32sw.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/plugins/sceneparsers/assimpsceneimport.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/calendar/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/calendar/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/folderlistmodel/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/folderlistmodel/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/location/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/location/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/platform/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/platform/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/qmlmodels/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/qmlmodels/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/settings/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/settings/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/sharedimage/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/sharedimage/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/wavefrontmesh/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/Qt/labs/wavefrontmesh/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtBluetooth/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtBluetooth/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/BrightnessContrast.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/BrightnessContrast.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/ColorOverlay.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/ColorOverlay.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/Colorize.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/Colorize.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/Desaturate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/Desaturate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/GammaAdjust.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/GammaAdjust.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/GaussianBlur.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/GaussianBlur.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/HueSaturation.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/HueSaturation.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/LevelAdjust.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/LevelAdjust.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtGraphicalEffects/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtLocation/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtLocation/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtMultimedia/Video.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtMultimedia/Video.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtMultimedia/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtMultimedia/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtNfc/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtNfc/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtPositioning/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtPositioning/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/Models.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/Models.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/StateMachine/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/StateMachine/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQml/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick.2/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick.2/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/CheckBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/CheckBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Dial.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Dial.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ButtonPanel.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ButtonPanel.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/CheckBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/CheckBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/CheckIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/CheckIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Dial.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Dial.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Menu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Menu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Page.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Page.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Pane.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Pane.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/RadioButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/RadioButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/RadioIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/RadioIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ScrollBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ScrollBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SliderGroove.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SliderGroove.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SpinBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SpinBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Switch.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Switch.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SwitchDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SwitchDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SwitchIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/SwitchIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ToolTip.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/ToolTip.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Fusion/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Dial.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Dial.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Menu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Menu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/RadioButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/RadioButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ScrollBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ScrollBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ScrollIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ScrollIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/SwipeView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/SwipeView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Switch.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Switch.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/SwitchDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/SwitchDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ToolTip.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/ToolTip.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Imagine/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CheckIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CursorDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/CursorDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Dial.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Dial.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ElevationEffect.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ElevationEffect.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Menu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Menu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/MenuItem.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/MenuItem.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RadioIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RangeSlider.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RangeSlider.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RectangularGlow.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/RectangularGlow.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ScrollBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ScrollBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Slider.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Slider.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SliderHandle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SliderHandle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwipeView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwipeView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwitchDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwitchDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwitchIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/SwitchIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ToolTip.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/ToolTip.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Material/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Menu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Menu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/RadioButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/RadioButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ScrollBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ScrollBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SpinBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SpinBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SwipeView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SwipeView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Switch.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Switch.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SwitchDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/SwitchDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/TabButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/TabButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ToolTip.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/ToolTip.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/CheckIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Dial.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Dial.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Menu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Menu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/RadioIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ScrollBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ScrollBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Switch.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Switch.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/SwitchDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/SwitchDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/SwitchIndicator.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/SwitchIndicator.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/TabBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/TabBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ToolTip.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/ToolTip.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/Universal/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/ControlSection.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/ControlSection.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/DialSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/DialSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/LabelSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/LabelSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/PageIndicatorSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/PageIndicatorSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/RangeSliderSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/RangeSliderSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/RoundButtonSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/RoundButtonSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/SliderSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/SliderSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/SpinBoxSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/SpinBoxSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/TextAreaSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/TextAreaSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/TextFieldSpecifics.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/TextFieldSpecifics.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/qtquickcontrols2.metainfo" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/designer/qtquickcontrols2.metainfo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ApplicationWindow.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ApplicationWindow.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Button.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Button.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Calendar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Calendar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ComboBox.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ComboBox.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/MenuBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/MenuBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/BasicButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/BasicButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/BasicTableView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/BasicTableView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ColumnMenuContent.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ColumnMenuContent.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/EditMenu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/EditMenu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/EditMenu_base.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/EditMenu_base.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/MenuContentItem.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/MenuContentItem.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ScrollViewHelper.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ScrollViewHelper.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/TabBar.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/TabBar.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ToolMenuButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Private/ToolMenuButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ScrollView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/ScrollView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Slider.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Slider.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/SplitView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/SplitView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/StackView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/StackView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/StackViewDelegate.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/StackViewDelegate.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CalendarStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CalendarStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CircularButtonStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CircularButtonStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CircularTickmarkLabelStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/CircularTickmarkLabelStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/DelayButtonStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/DelayButtonStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/MenuBarStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/MenuBarStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/MenuStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/MenuStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/PieMenuStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/PieMenuStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/StatusIndicatorStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/StatusIndicatorStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/ToggleButtonStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Base/ToggleButtonStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Desktop/MenuStyle.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Desktop/MenuStyle.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Flat/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/Styles/Flat/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TableViewColumn.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TableViewColumn.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TextArea.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TextArea.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TextField.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TextField.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TreeView.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/TreeView.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Controls/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/DefaultFileDialog.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/DefaultFileDialog.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/Private/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/Private/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Dialogs/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/DelayButton.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/DelayButton.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/PieMenu.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/PieMenu.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/Tumbler.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/Tumbler.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/TumblerColumn.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/TumblerColumn.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Extras/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Layouts/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Layouts/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/LocalStorage/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/LocalStorage/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Particles.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Particles.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Scene2D/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Scene2D/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Scene3D/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Scene3D/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Shapes/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Shapes/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Templates.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Templates.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Templates.2/qmldir" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Templates.2/qmldir" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Window.2/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/Window.2/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/XmlListModel/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtQuick/XmlListModel/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtSensors/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtSensors/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtTest/TestCase.qml" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtTest/TestCase.qml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtTest/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtTest/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtWebChannel/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtWebChannel/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtWebSockets/plugins.qmltypes" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/qml/QtWebSockets/plugins.qmltypes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_de.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_en.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_es.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_ko.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_pl.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_ru.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/Qt/translations/qtwebengine_uk.qm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/QtWidgets.pyd" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/QtWidgets.pyd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/pylupdate_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/pylupdate_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/pyrcc_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/pyrcc_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Compiler/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Compiler/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Compiler/qtproxies.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Compiler/qtproxies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Loader/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/Loader/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/driver.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/driver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/icon_cache.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/icon_cache.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/as_string.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/as_string.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/ascii_upper.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/ascii_upper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/proxy_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/proxy_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/string_io.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v2/string_io.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/as_string.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/as_string.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/ascii_upper.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/ascii_upper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/proxy_base.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/proxy_base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/string_io.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/port_v3/string_io.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/pyuic.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/pyuic.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qaxcontainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qaxcontainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qscintilla.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qscintilla.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtcharts.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtcharts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtprintsupport.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtprintsupport.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtquickwidgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtquickwidgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtwebenginewidgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/PyQt5/uic/widget-plugins/qtwebenginewidgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/D3Dcompiler_47.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/D3Dcompiler_47.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Core.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Core.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Designer.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Designer.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Gui.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Gui.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Qml.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Qml.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Quick.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Quick.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Widgets.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/Qt5Widgets.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/libGLESV2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/libGLESV2.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/opengl32sw.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../GVNEditor/venv/Lib/site-packages/QtDesigner/opengl32sw.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Dialogue/Test_Branching_Dialogue_01.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Dialogue/Test_Branching_Dialogue_01.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Dialogue/Test_Dialogue_03.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Dialogue/Test_Dialogue_03.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Brown_Bag.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/MainMenu/Main_Menu_Exit_Button.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/MainMenu/Main_Menu_Start_Button.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/PauseMenu/Pause_Menu_Quit_Button.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/PauseMenu/Pause_Menu_Resume_Button.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Interface/SettingsMenu/Test_Settings_Menu_01.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Objects/Interface/SettingsMenu/Test_Settings_Menu_01.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Magic_Stone.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Rei.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Objects/Spreadsheet.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Scenes/Test_Dialogue_Scene_01.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Scenes/Test_Dialogue_Scene_01.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Scenes/Test_Main_Menu.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Scenes/Test_Main_Menu.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Scenes/Test_PointAndClick_Scene_01.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Scenes/Test_PointAndClick_Scene_01.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/Actions/actions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Actions/actions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/BaseClasses/renderable.py" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/BaseClasses/renderable.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/BaseClasses/renderable_container.py" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/BaseClasses/renderable_container.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/BaseClasses/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/BaseClasses/scene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/BaseClasses/scene_pointandclick.py" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/BaseClasses/scene_pointandclick.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/Game.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Game.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Progress_Examples/GVNEngine_v01_Dialogue_Scene.png" beforeDir="false" afterPath="$PROJECT_DIR$/../Progress_Examples/GVNEngine_v01_Dialogue_Scene.png" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1nlBA93fvC0dkoHrrOC9f50Ink6" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="gvn_engine" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="GVNEngine" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gvn_engine.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.gvn_engine" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9402385f-9736-49d5-b352-ce6e408b00be" name="Default Changelist" comment="" />
+      <created>1611954650896</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1611954650896</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1506" y="175" width="1212" height="690" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611971709139">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1506" y="175" width="1212" height="690" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1611971709139" />
+    <state width="949" height="164" key="GridCell.Tab.0.bottom" timestamp="1612037093831">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state width="949" height="164" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1612037093831" />
+    <state width="949" height="164" key="GridCell.Tab.0.center" timestamp="1612037093831">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state width="949" height="164" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1612037093831" />
+    <state width="949" height="164" key="GridCell.Tab.0.left" timestamp="1612037093831">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state width="949" height="164" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1612037093831" />
+    <state width="949" height="164" key="GridCell.Tab.0.right" timestamp="1612037093831">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state width="949" height="164" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1612037093831" />
+    <state x="-1459" y="165" key="SettingsEditor" timestamp="1611971820369">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1459" y="165" key="SettingsEditor/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1611971820369" />
+    <state x="-1253" y="122" width="585" height="665" key="find.popup" timestamp="1611994046302">
+      <screen x="-1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="-1253" y="122" width="585" height="665" key="find.popup/-1920.0.1920.1040/0.0.1920.1040/1920.1.1920.1040@-1920.0.1920.1040" timestamp="1611994046302" />
+  </component>
+</project>

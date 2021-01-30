@@ -2,8 +2,7 @@ type: 'PointAndClick'
 background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
 
 buttons:
-  - name: "Main_Menu_Start_Button"
-    sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+  - sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
     sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
     sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
     action:
@@ -16,8 +15,7 @@ buttons:
     text: "Start Game"
     key: "Main_Menu_Start_Button"
 
-  - name: "Main_Menu_Exit_Button"
-    sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
+  - sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
     sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
     sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
     action:
