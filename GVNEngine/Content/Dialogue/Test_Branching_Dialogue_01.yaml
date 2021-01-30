@@ -1,8 +1,8 @@
 # The player awakens from cryosleep, and is greeted by the security guard Rei
 
-dialogue:
-  #- action: "fade_scene_from_black"
-  #  wait_until_complete: True
+Main:
+  - action: "fade_scene_from_black"
+    wait_until_complete: True
 
   - action: "create_dialogue_interface"
     wait_for_input: False
@@ -123,27 +123,29 @@ dialogue:
       text: "Rei"
       text_color: [250, 0, 88]
     dialogue:
-      text: "Rei. I work security here aboard Aion. Welcome to your new home"
+      text: "Rei. I work security here aboard Aion. How are you feeling?"
     wait_for_input: True
 
   - action: "choice"
     choices:
-      - 1:
-          branch: "Choice01_YesImGood"
-          text: "Im doing alright"
-          position:
-            - 0.4
-            - 0.5
-          key: "Choice01"
-      - 2:
-          branch: "Choice01_ICouldBeBetter"
-          text: "I could be better"
-          position:
-            - 0.6
-            - 0.5
-          key: "Choice02"
+      - branch: "Choice01_YesImGood"
+        text: "Im doing alright"
+        position:
+          - 0.35
+          - 0.5
+        key: "Choice01"
+      - branch: "Choice01_ICouldBeBetter"
+        text: "I could be better"
+        position:
+          - 0.65
+          - 0.5
+        key: "Choice02"
 
 Choice01_YesImGood:
+  - action: "remove_container"
+    key: "Choice"
+    wait_for_input: False
+
   - action: "dialogue"
     speaker:
       text: "Isea"
@@ -151,12 +153,60 @@ Choice01_YesImGood:
       text: "Yeah, im doing alright"
     wait_for_input: True
 
+  - action: "dialogue"
+    speaker:
+      text: "Rei"
+      text_color: [250, 0, 88]
+    dialogue:
+      text: "You've had a better awakening than most then. Aren't you special"
+    wait_for_input: True
+
+  - action: "load_scene"
+    scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
+    scene_type: "PointAndClick"
+
 Choice01_ICouldBeBetter:
+  - action: "remove_container"
+    key: "Choice"
+    wait_for_input: False
+
   - action: "dialogue"
     speaker:
       text: "Isea"
     dialogue:
       text: "Well, it feels like I just woke up from being frozen"
     wait_for_input: True
+
+  - action: "remove_renderable"
+    key: "Rei_Idle_Smiling"
+    wait_for_input: False
+    transition:
+      transition_type: 'fade_out'
+      transition_speed: 3000
+
+  - action: "create_sprite"
+    key: "Rei_Idle_Straight_Face"
+    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
+    position:
+      - 0.8
+      - 1.3
+    flip: false
+    wait_for_input: False
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
+
+  - action: "dialogue"
+    speaker:
+      text: "Rei"
+      text_color: [250, 0, 88]
+    dialogue:
+      text: "That's fairly normal. Take it slow and you'll recover in no time"
+    wait_for_input: True
+
+  - action: "load_scene"
+    scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
+    scene_type: "PointAndClick"
+
 
 

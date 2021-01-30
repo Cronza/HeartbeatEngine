@@ -17,3 +17,9 @@ class Action():
 
     def Skip(self):
         pass
+
+    #@TODO: Create 'ValidateParams' function to handle checking for parameters in action data, and using global default
+    #@TODO: if none are provided
+
+    def ValidateParams(self):
+        pass

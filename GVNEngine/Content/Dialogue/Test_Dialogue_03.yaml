@@ -1,6 +1,6 @@
 # The player returns to rei after the initial conversation about cryosleep, and asks for directions
 
-dialogue:
+Main:
   - action: "create_dialogue_interface"
     wait_for_input: False
 

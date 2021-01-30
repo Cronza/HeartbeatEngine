@@ -5,6 +5,7 @@ class DialogueScene(PointAndClickScene):
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
         self.dialogue_index = 0
         self.dialogue_data = ""
+        self.active_branch = "Main"
 
         #Update the generic data using the parent's init
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
@@ -31,8 +32,8 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
-        if len(self.dialogue_data['dialogue']) > self.dialogue_index:
-            action_data = self.dialogue_data['dialogue'][self.dialogue_index]
+        if len(self.dialogue_data[self.active_branch]) > self.dialogue_index:
+            action_data = self.dialogue_data[self.active_branch][self.dialogue_index]
 
             #@TODO: Review how the wait mechanism works, and how its communicated to the user
 
@@ -63,6 +64,13 @@ class DialogueScene(PointAndClickScene):
         """ Load the full dialogue structure, and load the first action """
         super().LoadSceneData()
         self.dialogue_data = Reader.ReadAll(self.scene_data['dialogue'])
+        self.LoadAction()
+
+    def SwitchDialogueBranch(self, branch):
+        """ Given a branch name within the active dialogue file, switch to using it """
+        #print("SWITCH DIALOGUE BRANCH")
+        self.active_branch = branch
+        self.dialogue_index = 0
         self.LoadAction()
 
 

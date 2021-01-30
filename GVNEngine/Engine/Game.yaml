@@ -24,7 +24,7 @@ InteractableSettings:
   center_align: True
 
 TextSettings:
-  size: 25
+  size: 24
   color: [255,255,255]
   font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
   z_order: 100
@@ -68,3 +68,15 @@ PauseMenuSettings:
 SceneTransitionsSettings:
   transition_speed: 150
   z_order: 9999
+
+ChoiceSettings:
+  button_sprite: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Normal.png"
+  button_sprite_hover: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Hover.png"
+  button_sprite_clicked: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Clicked.png"
+  button_text_size: 24
+  button_text_color: [204,255,255]
+  button_font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
+  button_text_z_order: 101
+  button_text_center_align: True
+  button_z_order: 100
+  button_center_align: True

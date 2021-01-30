@@ -14,10 +14,12 @@ All actions take in two parameters:
 All actions can be designed to accept and use a variety of different parameters. To learn more, review some of the
 provided actions
 """
+import Engine
 from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 from Engine.BaseClasses.renderable_text import TextRenderable
 from Engine.BaseClasses.interactable import Interactable
 from Engine.BaseClasses.button import Button
+from Engine.BaseClasses.choice import Choice
 from Engine.BaseClasses.renderable_container import Container
 from Engine.BaseClasses.action import Action
 
@@ -387,11 +389,6 @@ class create_container(Action):
             self.action_data,
         )
 
-        # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
-                new_renderable.Flip()
-
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
@@ -536,11 +533,127 @@ class dialogue(Action):
 #@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
     def Start(self):
-        pass
+        self.skippable = False
+
+        # Choice-specific adjustments
+        self.action_data['position'] = (0, 0)
+        self.action_data['z_order'] = 0
+        self.action_data['center_align'] = False
+        self.action_data['key'] = "Choice"
+
+        assert 'choices' in self.action_data, print(
+            f"No 'choices' block assigned to {self}. This makes for an impossible action!")
+
+        # All choice options use the same underlying action. Specify and enforce that here
+        # Additionally, apply all settings determined here to each choice button
+        for choice in self.action_data['choices']:
+            # Build the child dict that gets sent to the interact action
+            choice['action'] = {
+                'action': 'choose_branch',
+                'branch': choice['branch']
+            }
+
+            # If a choice has no specified branch, then technically its a dead end. Assert if this happens
+            assert 'branch' in choice, print(
+                f"No 'branch' specified in choice {choice}. This would lead to a dead selection")
+
+            # CHOICE BUTTONS - OVERRIDES WITH NO PROJECT DEFAULTS
+            if 'text_position' not in choice:
+                choice['text_position'] = self.action_data['position']
+
+            # CHOICE BUTTONS - PROJECT DEFAULTS OVERRIDE
+            if 'sprite' not in choice:
+                choice['sprite'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_sprite']
+
+            if 'sprite_hover' not in choice:
+                choice['sprite_hover'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_sprite_hover']
+
+            if 'sprite_clicked' not in choice:
+                choice['sprite_clicked'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_sprite_clicked']
+
+            if 'z_order' not in choice:
+                choice['z_order'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_z_order']
+
+            if 'center_align' not in choice:
+                choice['center_align'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_center_align']
+
+            if 'text_z_order' not in choice:
+                choice['text_z_order'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_text_z_order']
+
+            if 'text_center_align' not in choice:
+                choice['center_align'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_text_center_align']
+
+            if 'font' not in choice:
+                choice['font'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_font']
+
+            if 'text_size' not in choice:
+                choice['text_size'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_text_size']
+
+            if 'text_color' not in choice:
+                choice['text_color'] = self.scene.settings.projectSettings['ChoiceSettings'][
+                    'button_text_color']
+
+        # Choices provide blocks of options. Each one needs to be built
+        new_renderable = Choice(
+            self.scene,
+            self.action_data
+        )
+
+        self.scene.renderables_group.Add(new_renderable)
+
+        self.scene.Draw()
+        self.complete = True
+
+        return new_renderable
 
 class choose_branch(Action):
     def Start(self):
-        pass
+
+        # This action requires that the active scene is a dialogue scene. Assert if it is not
+        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
+        )
+
+
+
+        self.scene.SwitchDialogueBranch(self.action_data['branch'])
+
+        self.scene.Draw()
+        self.complete = True
+
+class create_choice_button(Action):
+    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable'"""
+    def Start(self):
+        self.skippable = False
+
+        # In order to avoid redundant setting scans and global setting validation, no default settings
+        # are applied for this action, as its expected that the choice system will provide those details
+
+        new_renderable = Button(
+            self.scene,
+            self.action_data
+        )
+
+        # If the user requested a flip action, do so
+        if 'flip' in self.action_data:
+            if self.action_data['flip']:
+                new_renderable.Flip()
+
+        self.scene.renderables_group.Add(new_renderable)
+
+        self.scene.Draw()
+        self.complete = True
+
+        return new_renderable
 
 # -------------- TRANSITION ACTIONS --------------
 """ 

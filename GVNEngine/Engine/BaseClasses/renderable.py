@@ -30,7 +30,8 @@ class Renderable(pygame.sprite.Sprite):
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned
         # a unique identifier. This parameter is mandatory, and is considered an exception if not provided
-        assert 'key' in self.renderable_data, print(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
+        assert 'key' in self.renderable_data, print(
+            f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
         self.key = self.renderable_data['key']
 
         # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
