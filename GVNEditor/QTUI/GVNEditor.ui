@@ -139,173 +139,6 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QWidget" name="DialogueEditingTableContainer" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>4</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>4</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="dialogueEditingTableTitle">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <italic>false</italic>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Dialogue Editing Table</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="DialogueEditingTableToolBar">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QFrame, QLabel, QToolTip {
-    border-radius: 4px;
-    background-color: rgb(44,53,57);
-}</string>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>2</number>
-          </property>
-          <property name="topMargin">
-           <number>2</number>
-          </property>
-          <property name="rightMargin">
-           <number>2</number>
-          </property>
-          <property name="bottomMargin">
-           <number>2</number>
-          </property>
-          <item>
-           <widget class="QToolButton" name="addEntryButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../EditorGraphics/Plus.png</normaloff>../EditorGraphics/Plus.png</iconset>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="removeEntryButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../EditorGraphics/Minus.png</normaloff>../EditorGraphics/Minus.png</iconset>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroup</string>
-            </attribute>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="moveEntryUpButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../EditorGraphics/Up.png</normaloff>../EditorGraphics/Up.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="moveEntryDownButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../EditorGraphics/Down.png</normaloff>../EditorGraphics/Down.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>534</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTableView" name="chapterTableView"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="0" column="2">
      <widget class="QWidget" name="LineDetailsContainer" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -526,6 +359,45 @@
       </layout>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="ManagerParentContainer" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
+       <item>
+        <widget class="QTabWidget" name="DataManagerContainer">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <widget class="QWidget" name="tab_01">
+          <attribute name="title">
+           <string>Dialogue</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="DEditorTabLayout"/>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Tab 2</string>
+          </attribute>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -551,8 +423,15 @@
     <addaction name="loadDialogueFileAction"/>
     <addaction name="saveDialogueFileAsAction"/>
    </widget>
+   <widget class="QMenu" name="menuData_Editors">
+    <property name="title">
+     <string>Edit Data</string>
+    </property>
+    <addaction name="dialogueEditor"/>
+   </widget>
    <addaction name="fileMenu"/>
    <addaction name="storyMenu"/>
+   <addaction name="menuData_Editors"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="exitAction">
@@ -602,6 +481,17 @@
   <action name="saveDialogueFileAsAction">
    <property name="text">
     <string>Save Dialogue File As...</string>
+   </property>
+  </action>
+  <action name="dialogueEditor">
+   <property name="text">
+    <string>Dialogue Editor</string>
+   </property>
+   <property name="toolTip">
+    <string>Opens the Dialogue Editor</string>
+   </property>
+   <property name="shortcut">
+    <string>2, D</string>
    </property>
   </action>
  </widget>

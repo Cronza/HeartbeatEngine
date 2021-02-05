@@ -422,14 +422,62 @@ class quit_game(Action):
 
 class dialogue(Action):
     """
-    Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings
+    Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings.
+    If the user specifies a 'character' block, create a speaker text using the character details instead
     Returns None
     """
 
     def Start(self):
 
-        # If the user has specified a 'speaker' block, build the speaker renderable
-        if 'speaker' in self.action_data:
+        # Dialogue-specific adjustments
+        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
+        )
+
+        #@TODO: Can we consolidate to avoid duplicated if checks for global settings?
+        # If the user provides a 'character' block, use details from the relevant character data file if it exists, as
+        # well as any applicable global settings
+        if 'character' in self.action_data:
+            character_data = self.scene.character_data[self.action_data['character']]
+
+            # Dialogue-specific adjustments
+            character_data['key'] = 'SpeakerText'
+
+            # OVERRIDES WITH NO PROJECT DEFAULTS
+            assert 'name' in character_data, print(
+                f"Character file '{self.action_data['character']}' does not have a 'name' param")
+            character_data['text'] = character_data['name']
+
+            assert 'color' in character_data, print(
+                f"Character file '{self.action_data['character']}' does not have a 'color' param")
+            character_data['text_color'] = character_data['color']
+
+            # PROJECT DEFAULTS
+            character_data['position'] = self.scene.settings.projectSettings['DialogueSettings'][
+                'speaker_text_position']
+
+            character_data['z_order'] = self.scene.settings.projectSettings['DialogueSettings'][
+                'speaker_z_order']
+
+            character_data['center_align'] = self.scene.settings.projectSettings['DialogueSettings'][
+                'speaker_center_align']
+
+            character_data['font'] = self.scene.settings.projectSettings['DialogueSettings'][
+                'speaker_font']
+
+            character_data['text_size'] = self.scene.settings.projectSettings['DialogueSettings'][
+                'speaker_text_size']
+
+            new_character_text = TextRenderable(
+                self.scene,
+                character_data
+            )
+            # Speaker text does not support transitions currently
+            self.scene.renderables_group.Add(new_character_text)
+
+        # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
+        # information, and / or any global settings
+        elif 'speaker' in self.action_data:
             # Dialogue-specific adjustments
             self.action_data['speaker']['key'] = 'SpeakerText'
 
@@ -530,6 +578,79 @@ class dialogue(Action):
             self.active_transition.Skip()
         self.complete = True
 
+class create_character(Action):
+    """
+    Creates a specialized 'SpriteRenderable' based on character data settings, allowing the developer to move
+    references to specific sprites to a character yaml file, leaving the dialogue sequence agnostic.
+    Returns a 'SpriteRenderable'.
+    This action is only available in DialogueScenes, and requires a 'character' block be provided
+    """
+    def Start(self):
+
+        # Character-specific adjustments
+        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+            "The active scene is not of the 'DialogueScene' type. This action can not be performed")
+        assert 'character' in self.action_data, print(
+            f"No 'character' block assigned to {self}. This makes for an impossible action!")
+        assert 'name' in self.action_data['character'], print(
+            f"No 'name' value assigned to {self} character block. This makes for an impossible action!")
+        assert 'mood' in self.action_data['character'], print(
+            f"No 'mood' value assigned to {self} character block. This makes for an impossible action!")
+
+        # Get the character data from the scene
+        character_data = self.scene.character_data[self.action_data['character']['name']]
+
+        assert 'moods' in character_data, print(
+            f"Character file '{self.action_data['character']['name']}' does not have a 'moods' block")
+        self.action_data['sprite'] = character_data['moods'][self.action_data['character']['mood']]
+
+        # OVERRIDES WITH NO PROJECT DEFAULTS
+        if 'position' not in self.action_data:
+            self.action_data['position'] = (0, 0)
+
+        # PROJECT DEFAULTS OVERRIDE
+        if 'z_order' not in self.action_data:
+            self.action_data['z_order'] = self.scene.settings.projectSettings['SpriteSettings'][
+                'z_order']
+
+        if 'center_align' not in self.action_data:
+            self.action_data['center_align'] = self.scene.settings.projectSettings['SpriteSettings'][
+                'center_align']
+
+        new_sprite = SpriteRenderable(
+            self.scene,
+            self.action_data
+        )
+
+        # If the user requested a flip action, do so
+        if 'flip' in self.action_data:
+            if self.action_data['flip']:
+                new_sprite.Flip()
+
+        self.scene.renderables_group.Add(new_sprite)
+
+        # Any transitions are applied to the sprite post-load
+        if 'transition' in self.action_data:
+            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_sprite)
+            self.active_transition.Start()
+        else:
+            self.scene.Draw()
+            self.complete = True
+
+        return new_sprite
+
+    def Update(self):
+        if self.active_transition.complete:
+            print("Transition Complete")
+            self.complete = True
+        else:
+            self.active_transition.Update()
+
+    def Skip(self):
+        if self.active_transition:
+            self.active_transition.Skip()
+        self.complete = True
+
 #@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
     def Start(self):
@@ -550,9 +671,10 @@ class choice(Action):
             # Build the child dict that gets sent to the interact action
             choice['action'] = {
                 'action': 'choose_branch',
-                'branch': choice['branch']
+                'branch': choice['branch'],
+                'key': choice['key']
             }
-
+            print(choice)
             # If a choice has no specified branch, then technically its a dead end. Assert if this happens
             assert 'branch' in choice, print(
                 f"No 'branch' specified in choice {choice}. This would lead to a dead selection")
@@ -622,8 +744,6 @@ class choose_branch(Action):
         assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed"
         )
-
-
 
         self.scene.SwitchDialogueBranch(self.action_data['branch'])
 

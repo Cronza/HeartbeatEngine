@@ -12,25 +12,6 @@ class Choice(Container):
         super().__init__(scene, renderable_data)
         self.visible = False
 
-        """
-        - action: "choice"
-            choices:
-              - 1:
-                  branch: "Choice01_YesImGood"
-                  text: "Im doing alright"
-                  position:
-                    - 0.4
-                    - 0.5
-                  key: "Choice01"
-              - 2:
-                  branch: "Choice01_ICouldBeBetter"
-                  text: "I could be better"
-                  position:
-                    - 0.6
-                    - 0.5
-                  key: "Choice02"
-        """
-
         #Pass in a button list, and generate buttons
         assert 'choices' in self.renderable_data, print(
             f"No 'choices' block assigned to {self}. This makes for an impossible action!")

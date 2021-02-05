@@ -1,3 +1,6 @@
 type: 'Dialogue'
 background: "Content/Sprites/Backgrounds/Background_Labs2_Cryo_1280.jpg"
 dialogue: 'Content/Dialogue/Test_Branching_Dialogue_01.yaml'
+characters:
+  Isea: "Content/Characters/Isea.yaml"
+  Rei: "Content/Characters/Rei.yaml"

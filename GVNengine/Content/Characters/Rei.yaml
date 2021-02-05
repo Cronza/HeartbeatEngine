@@ -1,0 +1,6 @@
+name: "Rei"
+color: [250, 0, 88]
+moods:
+  straight_face: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
+  smiling: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
+

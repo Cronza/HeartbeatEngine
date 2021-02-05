@@ -8,15 +8,13 @@ Main:
     wait_for_input: False
 
   - action: "dialogue"
-    speaker:
-      text: "Isea"
+    character: "Isea"
     dialogue:
       text: "Where am I..."
     wait_for_input: True
 
   - action: "dialogue"
-    speaker:
-      text: "Isea"
+    character: "Isea"
     dialogue:
       text: "It's so cold..."
     wait_for_input: True
@@ -28,9 +26,11 @@ Main:
       text: "[The sound of depressurization filled the air, and blinding light flooded my vision]"
     wait_for_input: True
 
-  - action: "create_sprite"
+  - action: "create_character"
     key: "Isea_Idle_Concerned"
-    sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
+    character:
+      name: "Isea"
+      mood: "concerned"
     position:
       - 0.2
       - 1.25
@@ -46,9 +46,11 @@ Main:
       text: "Ugh...my head is killing me..."
     wait_for_input: True
 
-  - action: "create_sprite"
+  - action: "create_character"
     key: "Rei_Idle_Straight_Face"
-    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
+    character:
+      name: "Rei"
+      mood: "straight_face"
     position:
       - 0.8
       - 1.3
@@ -59,9 +61,7 @@ Main:
       transition_speed: 700
 
   - action: "dialogue"
-    speaker:
-      text: "Unknown"
-      text_color: [250, 0, 88]
+    character: "Rei"
     dialogue:
       text: "Isea? I see you're enjoying the effects of Cryosleep"
     wait_for_input: True
@@ -73,9 +73,11 @@ Main:
       transition_type: 'fade_out'
       transition_speed: 3000
 
-  - action: "create_sprite"
+  - action: "create_character"
     key: "Isea_Idle_Straight_Face"
-    sprite: "Content/Sprites/Characters/Isea/Isea_Idle_Straight_Face.png"
+    character:
+      name: "Isea"
+      mood: "straight_face"
     position:
       - 0.2
       - 1.25
@@ -93,8 +95,7 @@ Main:
     wait_for_input: True
 
   - action: "dialogue"
-    speaker:
-      text: "Isea"
+    character: "Isea"
     dialogue:
       text: "Who are you?"
     wait_for_input: True
@@ -106,9 +107,11 @@ Main:
       transition_type: 'fade_out'
       transition_speed: 3000
 
-  - action: "create_sprite"
+  - action: "create_character"
     key: "Rei_Idle_Smiling"
-    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
+    character:
+      name: "Rei"
+      mood: "smiling"
     position:
       - 0.8
       - 1.3
@@ -119,9 +122,7 @@ Main:
       transition_speed: 700
 
   - action: "dialogue"
-    speaker:
-      text: "Rei"
-      text_color: [250, 0, 88]
+    character: "Rei"
     dialogue:
       text: "Rei. I work security here aboard Aion. How are you feeling?"
     wait_for_input: True
@@ -147,16 +148,13 @@ Choice01_YesImGood:
     wait_for_input: False
 
   - action: "dialogue"
-    speaker:
-      text: "Isea"
+    character: "Isea"
     dialogue:
       text: "Yeah, im doing alright"
     wait_for_input: True
 
   - action: "dialogue"
-    speaker:
-      text: "Rei"
-      text_color: [250, 0, 88]
+    character: "Rei"
     dialogue:
       text: "You've had a better awakening than most then. Aren't you special"
     wait_for_input: True
@@ -171,8 +169,7 @@ Choice01_ICouldBeBetter:
     wait_for_input: False
 
   - action: "dialogue"
-    speaker:
-      text: "Isea"
+    character: "Isea"
     dialogue:
       text: "Well, it feels like I just woke up from being frozen"
     wait_for_input: True
@@ -184,9 +181,11 @@ Choice01_ICouldBeBetter:
       transition_type: 'fade_out'
       transition_speed: 3000
 
-  - action: "create_sprite"
+  - action: "create_character"
     key: "Rei_Idle_Straight_Face"
-    sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Straight_Face.png"
+    character:
+      name: "Rei"
+      mood: "straight_face"
     position:
       - 0.8
       - 1.3
@@ -197,16 +196,96 @@ Choice01_ICouldBeBetter:
       transition_speed: 700
 
   - action: "dialogue"
-    speaker:
-      text: "Rei"
-      text_color: [250, 0, 88]
+    character: "Rei"
     dialogue:
-      text: "That's fairly normal. Take it slow and you'll recover in no time"
+      text: "That's fairly normal. Think you'll make it?"
+    wait_for_input: True
+
+  - action: "choice"
+    choices:
+    - branch: "Choice02_OfCourse"
+      text: "Absolutely!"
+      position:
+        - 0.25
+        - 0.5
+      key: "Choice01"
+    - branch: "Choice02_IGuessWellSee"
+      text: "We'll see..."
+      position:
+        - 0.5
+        - 0.5
+      key: "Choice02"
+    - branch: "Choice02_MyDeathAwaits"
+      text: "Death Awaits me"
+      position:
+        - 0.75
+        - 0.5
+      key: "Choice03"
+
+Choice02_OfCourse:
+  - action: "remove_container"
+    key: "Choice"
+    wait_for_input: False
+
+  - action: "dialogue"
+    character: "Isea"
+    dialogue:
+      text: "Absolutely! A bit of deep freeze won't keep me down"
     wait_for_input: True
 
   - action: "load_scene"
     scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
     scene_type: "PointAndClick"
 
+Choice02_IGuessWellSee:
+  - action: "remove_container"
+    key: "Choice"
+    wait_for_input: False
+
+  - action: "dialogue"
+    character: "Isea"
+    dialogue:
+      text: "We'll see...I think my earlobe might fall off"
+    wait_for_input: True
+
+  - action: "load_scene"
+    scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
+    scene_type: "PointAndClick"
+
+Choice02_MyDeathAwaits:
+  - action: "remove_container"
+    key: "Choice"
+    wait_for_input: False
+
+  - action: "remove_renderable"
+    key: "Isea_Idle_Straight_Face"
+    wait_for_input: False
+    transition:
+      transition_type: 'fade_out'
+      transition_speed: 3000
+
+  - action: "create_character"
+    key: "Isea_Idle_Concerned"
+    character:
+      name: "Isea"
+      mood: "concerned"
+    position:
+      - 0.2
+      - 1.25
+    flip: false
+    wait_until_complete: True
+    transition:
+      transition_type: 'fade_in'
+      transition_speed: 700
+
+  - action: "dialogue"
+    character: "Isea"
+    dialogue:
+      text: "Oh definitely not. Im so screwed"
+    wait_for_input: True
+
+  - action: "load_scene"
+    scene_file: "Content/Scenes/Test_PointAndClick_Scene_01.yaml"
+    scene_type: "PointAndClick"
 
 

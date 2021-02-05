@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/GVNEngine_Python.iml" filepath="$PROJECT_DIR$/.idea/GVNEngine_Python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/GVNEngine.iml" filepath="$PROJECT_DIR$/.idea/GVNEngine.iml" />
     </modules>
   </component>
 </project>

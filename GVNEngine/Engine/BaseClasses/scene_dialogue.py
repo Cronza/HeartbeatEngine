@@ -6,6 +6,7 @@ class DialogueScene(PointAndClickScene):
         self.dialogue_index = 0
         self.dialogue_data = ""
         self.active_branch = "Main"
+        self.character_data = {}
 
         #Update the generic data using the parent's init
         super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
@@ -64,6 +65,11 @@ class DialogueScene(PointAndClickScene):
         """ Load the full dialogue structure, and load the first action """
         super().LoadSceneData()
         self.dialogue_data = Reader.ReadAll(self.scene_data['dialogue'])
+
+        # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
+        if 'characters' in self.scene_data:
+            self.LoadCharacters()
+
         self.LoadAction()
 
     def SwitchDialogueBranch(self, branch):
@@ -73,6 +79,11 @@ class DialogueScene(PointAndClickScene):
         self.dialogue_index = 0
         self.LoadAction()
 
+    def LoadCharacters(self):
+        """ Reads in all character YAML files specified in the dialogue scene file, and stores them in the scene """
+        #print(self.scene_data['speakers'])
+        for char, data in self.scene_data['characters'].items():
+            self.character_data[char] = Reader.ReadAll(data)
 
     def ActionComplete(self):
         """ When an action specifies 'wait', use this function as the completion delegate """

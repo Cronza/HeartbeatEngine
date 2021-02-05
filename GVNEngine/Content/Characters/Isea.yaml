@@ -1,0 +1,6 @@
+name: "Isea"
+color: [255, 255, 255]
+moods:
+  straight_face: "Content/Sprites/Characters/Isea/Isea_Idle_Straight_Face.png"
+  concerned: "Content/Sprites/Characters/Isea/Isea_Idle_Concerned.png"
+
