@@ -1,6 +1,6 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
-from Editor.DataManagers.dialogue_creator import DialogueCreator
+
 
 class UI_DialogueCreator(QWidget):
     def __init__(self, parent, tab_manager):
@@ -49,7 +49,7 @@ class UI_DialogueCreator(QWidget):
         self.AddEntryButton.setSizePolicy(sizePolicy)
         self.AddEntryButton.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../../EditorGraphics/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../../Content/Icons/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.AddEntryButton.setIcon(icon)
         self.AddEntryButton.setObjectName("AddEntryButton")
         #self.DEditorToolbarButtons.addButton(self.AddEntryButton)
@@ -64,7 +64,7 @@ class UI_DialogueCreator(QWidget):
         self.RemoveEntryButton.setSizePolicy(sizePolicy)
         self.RemoveEntryButton.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("../../EditorGraphics/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("../../Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.RemoveEntryButton.setIcon(icon1)
         self.RemoveEntryButton.setObjectName("RemoveEntryButton")
         #self.DEditorToolbarButtons.addButton(self.RemoveEntryButton)
@@ -79,7 +79,7 @@ class UI_DialogueCreator(QWidget):
         self.MoveEntryUpButton.setSizePolicy(sizePolicy)
         self.MoveEntryUpButton.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("../../EditorGraphics/Up.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap("../../Content/Icons/Up.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.MoveEntryUpButton.setIcon(icon2)
         self.MoveEntryUpButton.setObjectName("MoveEntryUpButton")
         self.DEditorToolbarMainLayout.addWidget(self.MoveEntryUpButton)
@@ -93,7 +93,7 @@ class UI_DialogueCreator(QWidget):
         self.MoveEntryDownButton.setSizePolicy(sizePolicy)
         self.MoveEntryDownButton.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("../../EditorGraphics/Down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap("../../Content/Icons/Down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.MoveEntryDownButton.setIcon(icon3)
         self.MoveEntryDownButton.setObjectName("MoveEntryDownButton")
         self.DEditorToolbarMainLayout.addWidget(self.MoveEntryDownButton)

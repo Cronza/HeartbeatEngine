@@ -1,0 +1,10 @@
+EditorSettings:
+  max_tabs: 3
+
+EditorTextSettings:
+  header_font: "Helvetica"
+  header_text_size: 12
+  paragraph_font: "Helvetica"
+  paragraph_text_size: 8
+  button_font: "Helvetica"
+  button_text_size: 10

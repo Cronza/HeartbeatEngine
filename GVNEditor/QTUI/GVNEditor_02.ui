@@ -204,7 +204,7 @@
     </item>
     <item row="0" column="2">
      <widget class="QWidget" name="LineDetailsContainer" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="LineDetailsLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -256,7 +256,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <layout class="QHBoxLayout" name="lineDetailsToolbarLayout">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -315,7 +315,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="LoggerContainerLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -367,7 +367,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="LoggerToolbarLayout">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -424,7 +424,7 @@
     </item>
     <item row="0" column="0">
      <widget class="QWidget" name="SceneOutlinerContainer" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="SceneOutlinerLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -476,7 +476,7 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="SceneOutlinerToolbarLayout">
           <property name="spacing">
            <number>0</number>
           </property>
