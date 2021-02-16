@@ -1,0 +1,69 @@
+# Due to the way actions are designed, it's difficult to detect the data that they may require. In order to create
+# a common, central place for the editor to know the requirements of each action, this file serves to list them out
+#
+# <category>:
+#  - icon: <icon_path> (Icon in the editor content dir to use for the menu icon)
+#  - options:
+#    - <display_name> (Visible in Editor)
+#      <action_name> (Found in the engine actions)
+#      <requirements>:
+#       - <parameter_name>: (Parameter used by the action)
+#           type: <data_type>
+#           editable: <bool> (Whether the param is editable in the editor)
+#      <defaults>
+#       - <parameter_name>: <global_parameter_name> (Global parameter is found in the project's global settings file)
+#           category: <global_settings_category> (A given category in the globals settings file)
+#           global_parameter: <global_parameter> (The name of the parameter in the globals settings file)
+
+Renderables:
+  icon: "Content/Icons/Renderable.png"
+  options:
+  - display_name: "Create Sprite"
+    action_name: "create_sprite"
+    requirements:
+      - position:
+          type: "tuple"
+          editable: "True"
+      - center_align:
+          type: "bool"
+          editable: "True"
+      - key:
+          type: "str"
+          editable: "True"
+      - z_order:
+          type: "int"
+          editable: "True"
+    defaults:
+      - center_align:
+          category: "SpriteSettings"
+          global_parameter: "center_align"
+      - z_order:
+          category: "SpriteSettings"
+          global_parameter: "z_order"
+
+  - display_name: "Create Background"
+    action_name: "create_background"
+    requirements:
+      - position:
+          type: "tuple"
+          editable: "True"
+      - key:
+          type: "str"
+          editable: "True"
+      - z_order:
+          type: "int"
+          editable: "True"
+    defaults:
+      - z_order:
+          category: "SpriteSettings"
+          global_parameter: "background_z_order"
+Dialogue:
+  icon: "Content/Icons/Dialogue.png"
+  options:
+    - display_name: "Dialogue"
+      action_name: "dialogue"
+    - display_name: "Choice"
+      action_name: "choice"
+
+#- Sound: ""
+#- Effect: ""

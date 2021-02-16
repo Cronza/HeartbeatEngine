@@ -4,17 +4,16 @@ from Editor.Core.logger import Logger
 
 
 class GVNEditorUI():
-    def __init__(self, editor_core):
+    def __init__(self, e_core, settings):
         super().__init__()
-        self.e_core = editor_core
+
+        self.e_core = e_core
+        self.settings = settings
 
     def setupUi(self, MainWindow):
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-
-        # Load editor settings so objects can use shared values
-        self.load_settings()
 
         # Build the core window widget object
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -29,11 +28,11 @@ class GVNEditorUI():
         self.CreateMenuBar(MainWindow)
 
         # Initialize the Logger
-        self.logger = Logger(self)
+        self.logger = Logger(self, self.settings)
 
         # Build the Main Editor Window
         self.main_editor_container = QtWidgets.QTabWidget(self.central_widget)
-        self.main_editor_container.setFont(self.button_font)
+        self.main_editor_container.setFont(self.settings.button_font)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
@@ -60,11 +59,10 @@ class GVNEditorUI():
         # *** Build the Menu Bar ***
         self.menu_bar = QtWidgets.QMenuBar(main_window)
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1024, 21))
-        self.menu_bar.setFont(self.button_font)
+        self.menu_bar.setFont(self.settings.button_font)
 
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
-        self.file_menu.setFont(self.button_font)
-        self.file_menu.font
+        self.file_menu.setFont(self.settings.button_font)
         self.a_new_project = QtWidgets.QAction(main_window)
         self.a_new_project.triggered.connect(self.e_core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
@@ -75,7 +73,7 @@ class GVNEditorUI():
         self.file_menu.addAction(self.a_save)
 
         self.dialogue_menu = QtWidgets.QMenu(self.menu_bar)
-        self.dialogue_menu.setFont(self.button_font)
+        self.dialogue_menu.setFont(self.settings.button_font)
         self.a_open_dialogue_editor = QtWidgets.QAction(main_window)
         self.a_open_dialogue_editor.triggered.connect(self.e_core.OpenDialogueEditor)
         self.dialogue_menu.addAction(self.a_open_dialogue_editor)
@@ -90,7 +88,7 @@ class GVNEditorUI():
     def retranslateUi(self, MainWindow):
         """ Sets the text of all UI components using available translation """
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "GVNEditor"))
+        MainWindow.setWindowTitle(_translate("MainWindow", f"GVNEditor - {self.e_core.user_project_name}"))
 
         # *** Update Engine Menu Bar ***
         # Menu Headers
@@ -106,22 +104,6 @@ class GVNEditorUI():
         # 'Dialogue' Actions
         self.a_open_dialogue_editor.setText(_translate("MainWindow", "Open Editor"))
         self.a_open_dialogue_editor.setShortcut(_translate("MainWindow", "Ctrl+Alt+D"))
-
-    def load_settings(self):
-        """ Loads the editor settings, and reapplies any changes """
-        # Settings
-        self.header_font = QtGui.QFont(self.e_core.settings['EditorTextSettings']['header_font'],
-                                        self.e_core.settings['EditorTextSettings']['header_text_size'],
-                                        QtGui.QFont.Bold
-                                     )
-
-        self.paragraph_font = QtGui.QFont(self.e_core.settings['EditorTextSettings']['paragraph_font'],
-                                            self.e_core.settings['EditorTextSettings']['paragraph_text_size']
-                                        )
-
-        self.button_font = QtGui.QFont(self.e_core.settings['EditorTextSettings']['button_font'],
-                                          self.e_core.settings['EditorTextSettings']['button_text_size']
-                                      )
 
 #if __name__ == "__main__":
 #    import sys

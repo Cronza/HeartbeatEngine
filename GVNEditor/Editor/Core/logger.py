@@ -21,10 +21,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Logger:
-    def __init__(self, e_ui):
+    def __init__(self, e_ui, settings):
 
-        # Keep track of the main editor U.I in case we need access to shared settings
-        self.e_ui = e_ui
+        self.settings = settings
 
         # Build the Logger UI
         self.log_ui = LoggerUI(self)

@@ -1,14 +1,16 @@
 from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt
 from Editor.Interface.Generic.details import Details
+from Editor.Interface.Generic.action_menu import ActionMenu
 
 
 class EditorDialogueUI(QtWidgets.QWidget):
     def __init__(self, ed_core):
         super().__init__()
-        print("Initializing Dialogue Editor")
 
         self.ed_core = ed_core
+
+        # Create an action menu to be used later on
+        self.action_menu = ActionMenu(self.ed_core.settings, self.ed_core.AddEntry)
 
         # Build the core editor layout object
         self.central_grid_layout = QtWidgets.QGridLayout(self)
@@ -39,7 +41,7 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
         # Create the View title
         self.view_title = QtWidgets.QLabel(self.main_view)
-        self.view_title.setFont(self.ed_core.e_ui.header_font)
+        self.view_title.setFont(self.ed_core.settings.header_font)
         self.view_title.setText("Dialogue Sequence")
 
         # Create the toolbar
@@ -59,15 +61,16 @@ class EditorDialogueUI(QtWidgets.QWidget):
         # Generic button settings
         icon = QtGui.QIcon()
         button_style = (
-            "background-color: rgb(44,53,57);\n"
+            f"background-color: rgb({self.ed_core.settings.toolbar_button_background_color});\n"
         )
 
-        # Add Entry Button
+        # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.main_view_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_entry_button.setIcon(icon)
-        self.add_entry_button.clicked.connect(self.ed_core.AddAction)
+        self.add_entry_button.setMenu(self.action_menu)
+        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.main_view_toolbar_layout.addWidget(self.add_entry_button)
 
         # Remove Entry Button
@@ -75,13 +78,23 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.remove_entry_button.setIcon(icon)
+        self.remove_entry_button.clicked.connect(self.ed_core.RemoveEntry)
         self.main_view_toolbar_layout.addWidget(self.remove_entry_button)
+
+        # Copy Entry Button
+        self.copy_entry_button = QtWidgets.QToolButton(self.main_view_toolbar)
+        self.copy_entry_button.setStyleSheet(button_style)
+        icon.addPixmap(QtGui.QPixmap("Content/Icons/Copy.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.copy_entry_button.setIcon(icon)
+        self.copy_entry_button.clicked.connect(self.ed_core.CopyEntry)
+        self.main_view_toolbar_layout.addWidget(self.copy_entry_button)
 
         # Move Entry Up Button
         self.move_entry_up_button = QtWidgets.QToolButton(self.main_view_toolbar)
         self.move_entry_up_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Up.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.move_entry_up_button.setIcon(icon)
+        self.move_entry_up_button.clicked.connect(self.ed_core.MoveEntryUp)
         self.main_view_toolbar_layout.addWidget(self.move_entry_up_button)
 
         # Move Entry Down Button
@@ -89,6 +102,7 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.move_entry_down_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.move_entry_down_button.setIcon(icon)
+        self.move_entry_down_button.clicked.connect(self.ed_core.MoveEntryDown)
         self.main_view_toolbar_layout.addWidget(self.move_entry_down_button)
 
         # Empty Space Spacer
@@ -96,7 +110,13 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.main_view_toolbar_layout.addItem(spacer)
 
         # Build the Action Sequence
-        self.dialogue_sequence = QtWidgets.QListWidget(self.main_view)
+        self.dialogue_sequence = QtWidgets.QTableWidget(self.main_view)
+        self.dialogue_sequence.setColumnCount(1)
+        self.dialogue_sequence.horizontalHeader().hide()
+        self.dialogue_sequence.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.dialogue_sequence.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers) # Disable editing
+        self.dialogue_sequence.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection) # Disable multi-selection
+        self.dialogue_sequence.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # Disables cell selection
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_view_layout.addWidget(self.view_title)
@@ -111,22 +131,23 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
         # Create the outliner title
         self.outliner_title = QtWidgets.QLabel(self.outliner)
-        self.outliner_title.setFont(self.ed_core.e_ui.header_font)
+        self.outliner_title.setFont(self.ed_core.settings.header_font)
         self.outliner_title.setText("Branches")
 
         # Generic button settings
         icon = QtGui.QIcon()
         button_style = (
-            "background-color: rgb(44,53,57);\n"
+            f"background-color: rgb({self.ed_core.settings.toolbar_button_background_color});\n"
         )
 
         # Create the outliner toolbar
         self.outliner_toolbar = QtWidgets.QFrame(self)
-        self.outliner_toolbar.setStyleSheet("QFrame, QLabel, QToolTip {\n"
-                                                "    border-radius: 4px;\n"
-                                                "    background-color: rgb(44,53,57);\n"
-                                                "}"
-                                            )
+        self.outliner_toolbar.setStyleSheet(
+            "QFrame, QLabel, QToolTip {\n"
+            "    border-radius: 4px;\n"
+            f"   background-color: rgb({self.ed_core.settings.toolbar_background_color});\n"
+            "}"
+        )
         self.outliner_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.outliner_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.outliner_toolbar_layout = QtWidgets.QHBoxLayout(self.outliner_toolbar)
@@ -154,5 +175,5 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
     def CreateDetails(self):
         """ Create the details panel using the generic details object """
-        self.details = Details(self.ed_core.e_ui)
+        self.details = Details(self.ed_core.settings)
 

@@ -25,16 +25,17 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Header
         self.logger_title = QtWidgets.QLabel(self)
-        self.logger_title.setFont(self.l_core.e_ui.header_font)
+        self.logger_title.setFont(self.l_core.settings.header_font)
         self.logger_title.setText("Logger")
 
         # Toolbar
         self.logger_toolbar = QtWidgets.QFrame(self)
         self.logger_toolbar.setAutoFillBackground(False)
-        self.logger_toolbar.setStyleSheet("QFrame, QLabel, QToolTip {\n"
-                                         "    border-radius: 4px;\n"
-                                         "    background-color: rgb(44,53,57);\n"
-                                         "}")
+        self.logger_toolbar.setStyleSheet(
+            "QFrame, QLabel, QToolTip {\n"
+            "    border-radius: 4px;\n"
+            f"   background-color: rgb({self.l_core.settings.toolbar_background_color});\n"
+            "}")
         self.logger_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.logger_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.logger_toolbar_layout = QtWidgets.QHBoxLayout(self.logger_toolbar)
@@ -44,7 +45,7 @@ class LoggerUI(QtWidgets.QWidget):
         # Generic Button Settings
         icon = QtGui.QIcon()
         button_style = (
-            "background-color: rgb(44,53,57);\n"
+            f"background-color: rgb({self.l_core.settings.toolbar_button_background_color});\n"
         )
 
         # Clear Log Button
@@ -61,7 +62,7 @@ class LoggerUI(QtWidgets.QWidget):
 
         #Logger data list
         self.log_list = QtWidgets.QListWidget(self)
-        self.log_list.setFont(self.l_core.e_ui.paragraph_font)
+        self.log_list.setFont(self.l_core.settings.paragraph_font)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.logger_title)

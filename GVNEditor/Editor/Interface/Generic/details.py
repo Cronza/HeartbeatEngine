@@ -1,11 +1,12 @@
 from PyQt5 import QtWidgets, QtGui
 
+
 class Details(QtWidgets.QWidget):
-    def __init__(self, e_ui):
+    def __init__(self, settings):
         super().__init__()
 
         # Main editor ref
-        self.e_ui = e_ui
+        self.settings = settings
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -13,16 +14,18 @@ class Details(QtWidgets.QWidget):
         
         # Create title
         self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setFont(self.e_ui.header_font)
+        self.details_title.setFont(self.settings.header_font)
         self.details_title.setText("Details")
 
         # Create the toolbar
         self.details_toolbar = QtWidgets.QFrame(self)
         self.details_toolbar.setAutoFillBackground(False)
-        self.details_toolbar.setStyleSheet("QFrame, QLabel, QToolTip {\n"
-                                              "    border-radius: 4px;\n"
-                                              "    background-color: rgb(44,53,57);\n"
-                                              "}")
+        self.details_toolbar.setStyleSheet(
+            "QFrame, QLabel, QToolTip {\n"
+            "    border-radius: 4px;\n"
+            f"   background-color: rgb({self.settings.toolbar_background_color});\n"
+            "}"
+        )
         self.details_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.details_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.details_toolbar_layout = QtWidgets.QHBoxLayout(self.details_toolbar)
@@ -39,7 +42,7 @@ class Details(QtWidgets.QWidget):
         self.details_toolbar_layout.addItem(spacer)
 
         # Create Details List
-        self.details_list = QtWidgets.QListView(self)
+        self.details_list = QtWidgets.QListWidget(self)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)

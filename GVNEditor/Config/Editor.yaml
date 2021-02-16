@@ -1,6 +1,10 @@
 EditorSettings:
   max_tabs: 3
 
+EditorInterfaceSettings:
+  toolbar_background_color: 44, 53, 57
+  toolbar_button_background_color: 57, 67, 79
+
 EditorTextSettings:
   header_font: "Helvetica"
   header_text_size: 12
