@@ -27,17 +27,13 @@ class GVNEditor:
     }
     # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
     PROJECT_DEFAULT_FILES = {
-        "Config": os.path.dirname(__file__) + "../../../../GVNEngine/Config/Game.yaml"
+        "Config": r"Config\Game.yaml"
     }
 
     def __init__(self):
 
         # The core editor settings object
         self.settings = Settings()
-
-        # User Project Data
-        self.user_project_name = None
-        self.user_project_dir = None
 
         # Initialize the main window and editor interface
         self.app = QtWidgets.QApplication(sys.argv)
@@ -72,19 +68,19 @@ class GVNEditor:
         else:
             # Ask the user for a project name
             self.logger.Log("Requesting a name for the new project...'")
-            user_project_name = QtWidgets.QInputDialog.getText(self.e_ui.central_widget,
+            self.settings.user_project_name = QtWidgets.QInputDialog.getText(self.e_ui.central_widget,
                                                                "New Project",
                                                                "Please Enter a Project Name:")
 
             # Has the user provided a project name?
-            if user_project_name[0] == "":
+            if self.settings.user_project_name[0] == "":
                 self.logger.Log("Error: Project name was not provided - Cancelling 'New Project' action")
                 QtWidgets.QMessageBox.about(self.e_ui.central_widget, "No Value Provided!",
                                             "No project name was provided"
                                             )
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
-                if os.path.exists(os.path.join(new_project_dir, user_project_name[0])):
+                if os.path.exists(os.path.join(new_project_dir, self.settings.user_project_name[0])):
                     self.logger.Log("Error: Chosen project directory already exists - Cancelling 'New Project' action")
                     QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Project Already Exists!",
                                                 "The chosen directory already contains a project of the chosen name.\n"
@@ -94,7 +90,7 @@ class GVNEditor:
                 else:
                     self.logger.Log("Creating project folder structure...")
                     # Create the project directory
-                    project_path = os.path.join(new_project_dir, user_project_name[0])
+                    project_path = os.path.join(new_project_dir, self.settings.user_project_name[0])
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
@@ -121,7 +117,7 @@ class GVNEditor:
                     self.logger.Log(f"Project Created at: {project_path}")
 
                     # Set this as the active project
-                    self.SetActiveProject(user_project_name[0], new_project_dir)
+                    self.SetActiveProject(self.settings.user_project_name[0], new_project_dir)
 
     def OpenProject(self):
         self.logger.Log("Requesting path to project root...")
@@ -149,30 +145,46 @@ class GVNEditor:
                                             )
 
     def OpenDialogueEditor(self):
-        print("Open Dialogue Editor")
-        if not self.CheckTabLimit():
+        """ Creates a 'Dialogue Editor' tab """
 
-            # Initialize the Dialogue Editor
-            self.active_editor = EditorDialogue(self.settings, self.logger)
+        # Check if a project is actively open
+        if self.settings.user_project_name:
 
-            # Add it to the tab list (If we're not at the tab limit)
-            self.e_ui.main_editor_container.addTab(self.active_editor.ed_ui, "Dialogue Editor")
-        else:
-            QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Tab Limit Reached!",
-                                        "You have reached the maximum number of open tabs. Please close "
-                                        "a tab before attempting to open another"
-                                        )
+            if not self.CheckTabLimit():
+
+                # Initialize the Dialogue Editor
+                self.active_editor = EditorDialogue(self.settings, self.logger)
+
+                # Add it to the tab list (If we're not at the tab limit)
+                self.e_ui.main_tab_editor.addTab(self.active_editor.ed_ui, "Dialogue Editor")
+            else:
+                QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Tab Limit Reached!",
+                                            "You have reached the maximum number of open tabs. Please close "
+                                            "a tab before attempting to open another"
+                                            )
 
     # ****** UTILITY FUNCTIONS ******
 
     def CheckTabLimit(self):
         """ Returns true or false depending on whether we've reached the maximum number of tabs """
-        return self.settings.settings['EditorSettings']['max_tabs'] <= self.e_ui.main_editor_container.count()
+        return self.settings.settings['EditorSettings']['max_tabs'] <= self.e_ui.main_tab_editor.count()
 
     def SetActiveProject(self, project_name, project_dir):
         """ Sets the active project, pointing the editor to the new location, and refreshing the inteface """
-        self.user_project_name = project_name
-        self.user_project_dir = project_dir
+        self.settings.user_project_name = project_name
+        self.settings.user_project_dir = project_dir
+        self.settings.LoadProjectSettings(os.path.join(self.settings.user_project_dir,
+                                                       self.PROJECT_DEFAULT_FILES['Config']
+                                                       )
+                                          )
+
+        # If this is the first time a user is loading a project after opening the editor, delete the 'Getting Started'
+        # display
+        if self.e_ui.getting_started_container:
+            target = self.e_ui.main_resize_container.widget(0)
+            target.deleteLater()
+
+            self.e_ui.CreateTabEditor()
 
         # Refresh U.I text using any active translations
         self.e_ui.retranslateUi(self.main_window)

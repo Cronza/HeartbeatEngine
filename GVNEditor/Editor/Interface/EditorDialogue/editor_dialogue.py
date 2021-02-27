@@ -41,7 +41,8 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
         # Create the View title
         self.view_title = QtWidgets.QLabel(self.main_view)
-        self.view_title.setFont(self.ed_core.settings.header_font)
+        self.view_title.setFont(self.ed_core.settings.header_1_font)
+        self.view_title.setStyleSheet(self.ed_core.settings.header_1_color)
         self.view_title.setText("Dialogue Sequence")
 
         # Create the toolbar
@@ -117,6 +118,9 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.dialogue_sequence.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers) # Disable editing
         self.dialogue_sequence.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection) # Disable multi-selection
         self.dialogue_sequence.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # Disables cell selection
+        self.dialogue_sequence.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
+
+        #self.dialogue_sequence.cellChanged.connect(self.ed_core.UpdateActiveEntry)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_view_layout.addWidget(self.view_title)
@@ -131,7 +135,8 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
         # Create the outliner title
         self.outliner_title = QtWidgets.QLabel(self.outliner)
-        self.outliner_title.setFont(self.ed_core.settings.header_font)
+        self.outliner_title.setFont(self.ed_core.settings.header_1_font)
+        self.outliner_title.setStyleSheet(self.ed_core.settings.header_1_color)
         self.outliner_title.setText("Branches")
 
         # Generic button settings

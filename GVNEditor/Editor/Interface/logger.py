@@ -12,11 +12,11 @@ class LoggerUI(QtWidgets.QWidget):
         font.setWeight(75)
 
         # Main Container
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
-        self.setSizePolicy(sizePolicy)
+        #izePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        #sizePolicy.setHorizontalStretch(0)
+        #sizePolicy.setVerticalStretch(0)
+        #sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
+        #self.setSizePolicy(sizePolicy)
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -25,7 +25,8 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Header
         self.logger_title = QtWidgets.QLabel(self)
-        self.logger_title.setFont(self.l_core.settings.header_font)
+        self.logger_title.setFont(self.l_core.settings.header_1_font)
+        self.logger_title.setStyleSheet(self.l_core.settings.header_1_color)
         self.logger_title.setText("Logger")
 
         # Toolbar
@@ -63,6 +64,7 @@ class LoggerUI(QtWidgets.QWidget):
         #Logger data list
         self.log_list = QtWidgets.QListWidget(self)
         self.log_list.setFont(self.l_core.settings.paragraph_font)
+        self.log_list.setStyleSheet(self.l_core.settings.paragraph_color)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.logger_title)

@@ -1,0 +1,99 @@
+# Due to the way actions are designed, it's difficult to detect the data that they may require. In order to create
+# a common, central place for the editor to know the requirements of each action, this file serves to list them out
+#
+# <category>:
+#  - icon: <icon_path> (Icon in the editor content dir to use for the menu icon)
+#  - options:
+#    - <display_name> (Visible in Editor)
+#      <action_name> (Found in the engine actions)
+#      <requirements>:
+#       -  name: <str> (The name of the parameter)
+#          type: <data_type> (A python data type)
+#          default: <contextual_type> (The initial value)
+#          editable: <bool> (Whether the param is editable in the editor)
+#          preview: <bool> (Whether the param is editable in the editor)
+#          global: (OPTIONAL: A value in the project's Game.yaml file)
+#              category: <str> (The name of the category, IE. 'SpriteSettings')
+#              global_parameter: <str> (The name of the parameter in the category, IE. 'center_align')
+
+Renderables:
+  icon: "Content/Icons/Renderable.png"
+  options:
+  - display_name: "Create Sprite"
+    action_name: "create_sprite"
+    requirements:
+      - name: "key"
+        type: "str"
+        default: ""
+        editable: True
+        preview: True
+
+      - name: "sprite"
+        type: "file"
+        default: "None"
+        editable: True
+        preview: True
+
+      - name: "position"
+        type: "tuple"
+        default: 0,0
+        editable: True
+        preview: True
+
+      - name: "center_align"
+        type: "bool"
+        default: True
+        global:
+          category: "SpriteSettings"
+          global_parameter: "center_align"
+        editable: True
+        preview: True
+
+      - name: "z_order"
+        type: "int"
+        default: 0
+        global:
+          category: "SpriteSettings"
+          global_parameter: "z_order"
+        editable: True
+        preview: False
+
+  - display_name: "Create Background"
+    action_name: "create_background"
+    requirements:
+      - name: "key"
+        type: "str"
+        default: "Background"
+        editable: False
+        preview: True
+
+      - name: "sprite"
+        type: "file"
+        default: "None"
+        editable: True
+        preview: True
+
+      - name: "position"
+        type: "tuple"
+        default: 0,0
+        editable: True
+        preview: False
+
+      - name: "z_order"
+        type: "int"
+        default: -9999 #Replace with a reference to the global setting
+        global:
+          category: "SpriteSettings"
+          global_parameter: "background_z_order"
+        editable: False
+        preview: False
+Dialogue:
+  icon: "Content/Icons/Dialogue.png"
+  options:
+    - display_name: "Dialogue"
+      action_name: "dialogue"
+    - display_name: "Choice"
+      action_name: "choice"
+
+#- Sound: ""
+#- Effect: ""
