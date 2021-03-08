@@ -1,7 +1,0 @@
-[gui_scripts]
-designer = QtDesigner:designer
-linguist = QtDesigner:linguist
-
-[console_scripts]
-qmlview = QtDesigner:qmlview
-

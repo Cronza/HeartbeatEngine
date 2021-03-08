@@ -8,28 +8,6 @@ from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 
 
 class GVNEditor:
-    # Where does the editor store data needed to track and handle project directories?
-    PROJECT_ADMIN_DIR = ".gvn"
-    PROJECT_FOLDER_STRUCTURE = {
-        "Content": [
-            "Audio",
-            "Characters",
-            "Dialogue",
-            "Fonts",
-            "Objects",
-            "Scenes",
-            "Sprites",
-            "Styles",
-            "Values"
-        ],
-        "Config":
-            None
-    }
-    # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
-    PROJECT_DEFAULT_FILES = {
-        "Config": r"Config\Game.yaml"
-    }
-
     def __init__(self):
 
         # The core editor settings object
@@ -94,7 +72,7 @@ class GVNEditor:
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
-                    for main_dir in self.PROJECT_FOLDER_STRUCTURE.items():
+                    for main_dir in self.settings.PROJECT_FOLDER_STRUCTURE.items():
                         # Create the main dir (.../Content)
                         main_dir_path = os.path.join(project_path, main_dir[0])
                         os.mkdir(main_dir_path)
@@ -106,11 +84,11 @@ class GVNEditor:
                                 os.mkdir(sub_dir_path)
 
                     # Create the admin folder
-                    admin_dir_path = os.path.join(project_path, self.PROJECT_ADMIN_DIR)
+                    admin_dir_path = os.path.join(project_path, self.settings.PROJECT_ADMIN_DIR)
                     os.mkdir(admin_dir_path)
 
                     # Clone project default files
-                    for item_to_clone in self.PROJECT_DEFAULT_FILES.items():
+                    for item_to_clone in self.settings.PROJECT_DEFAULT_FILES.items():
                         print(os.path.dirname(__file__))
                         shutil.copy(item_to_clone[1], os.path.join(project_path, item_to_clone[0]))
 
@@ -130,7 +108,7 @@ class GVNEditor:
                                         "No project directory was provided"
                                         )
         else:
-            if os.path.exists(os.path.join(existing_project_dir, self.PROJECT_ADMIN_DIR)):
+            if os.path.exists(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR)):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
@@ -173,10 +151,7 @@ class GVNEditor:
         """ Sets the active project, pointing the editor to the new location, and refreshing the inteface """
         self.settings.user_project_name = project_name
         self.settings.user_project_dir = project_dir
-        self.settings.LoadProjectSettings(os.path.join(self.settings.user_project_dir,
-                                                       self.PROJECT_DEFAULT_FILES['Config']
-                                                       )
-                                          )
+        self.settings.LoadProjectSettings()
 
         # If this is the first time a user is loading a project after opening the editor, delete the 'Getting Started'
         # display

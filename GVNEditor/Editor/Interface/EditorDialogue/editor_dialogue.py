@@ -115,12 +115,12 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.dialogue_sequence.setColumnCount(1)
         self.dialogue_sequence.horizontalHeader().hide()
         self.dialogue_sequence.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.dialogue_sequence.verticalHeader().setStyleSheet(self.ed_core.settings.selection_color)
+        self.dialogue_sequence.setStyleSheet(self.ed_core.settings.selection_color)
         self.dialogue_sequence.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers) # Disable editing
         self.dialogue_sequence.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection) # Disable multi-selection
         self.dialogue_sequence.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows) # Disables cell selection
         self.dialogue_sequence.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
-
-        #self.dialogue_sequence.cellChanged.connect(self.ed_core.UpdateActiveEntry)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_view_layout.addWidget(self.view_title)

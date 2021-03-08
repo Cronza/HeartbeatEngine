@@ -51,3 +51,4 @@ EditorTextSettings:
 
 EditorStateSettings:
   read_only_background_color: 200, 200, 200
+  selection_color: 180, 218, 244

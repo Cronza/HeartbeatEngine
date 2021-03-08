@@ -5,6 +5,9 @@ from Editor.Interface.Generic.details_widget_bool import DetailsEntryBool
 from Editor.Interface.Generic.details_widget_tuple import DetailsEntryTuple
 from Editor.Interface.Generic.details_widget_int import DetailsEntryInt
 from Editor.Interface.Generic.details_widget_file_selector import DetailsEntryFileSelector
+from Editor.Interface.Generic.details_widget_dropdown import DetailsEntryDropdown
+from Editor.Interface.Generic.details_widget_container import DetailsEntryContainer
+
 
 class Details(QtWidgets.QWidget):
     def __init__(self, settings):
@@ -72,7 +75,6 @@ class Details(QtWidgets.QWidget):
 
         If this was called manually, skip the caching and just load from the existing cache
         """
-        print("Heh")
 
         # Cache any changes to details in the entry, so next time its selected, that data can be shown
         # Optionally, if this was called manually, then the selected entry will match our active one. In this case,
@@ -112,11 +114,12 @@ class Details(QtWidgets.QWidget):
         entry_name.setFlags(QtCore.Qt.ItemIsEnabled)
 
         # Populate the data column with the widget appropriate to the given type
-        data_widget = self.GetDataWidget(data['type'])
+        data_widget = self.GetDataWidget(data)
 
         # Make the option read-only if applicable
-        if not data['editable']:
-            data_widget.MakeUneditable()
+        if not data['type'] == 'container':
+            if not data['editable']:
+                data_widget.MakeUneditable()
 
         return entry_name, data_widget
 
@@ -127,11 +130,17 @@ class Details(QtWidgets.QWidget):
         self.details_table.insertRow(self.details_table.rowCount())
 
         # Populate the row with each element of this particular detail
-        self.details_table.setItem(self.details_table.rowCount() - 1, 0, entry[0])
-        self.details_table.setCellWidget(self.details_table.rowCount() - 1, 1, entry[1])
+        new_row = self.details_table.rowCount() - 1
+        self.details_table.setItem(new_row, 0, entry[0])
+        self.details_table.setCellWidget(new_row, 1, entry[1])
 
-    def GetDataWidget(self, data_type: str):
-        """ Given a data type, return the relevant object"""
+        self.details_table.resizeRowToContents(new_row)
+
+    def GetDataWidget(self, data: dict):
+        """ Given a data dict, return the relevant object"""
+        #@TODO: Can this be converted to use an enum?
+
+        data_type = data['type']
 
         if data_type == "str":
              return DetailsEntryText(self.settings)
@@ -146,7 +155,22 @@ class Details(QtWidgets.QWidget):
             return DetailsEntryInt(self.settings)
 
         elif data_type == "file":
-            return DetailsEntryFileSelector(self.settings)
+            return DetailsEntryFileSelector(self.settings, "")
+
+        elif data_type == "file_image":
+            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'])
+
+        elif data_type == "dropdown":
+            return DetailsEntryDropdown(self.settings, data['default'])
+
+        elif data_type == "container":
+            new_entry = DetailsEntryContainer(self.settings, data['children'])
+            for child in data['children']:
+                print(child)
+                child_entry = self.CreateEntry(child)
+                new_entry.AddEntry(child_entry)
+
+            return new_entry
 
     def Clear(self):
         """ Deletes all rows in the details table """

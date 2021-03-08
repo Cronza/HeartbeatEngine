@@ -1,8 +1,38 @@
+import os
 from PyQt5 import QtGui
 from Editor.Utilities.yaml_reader import Reader
 
 
-class Settings():
+class Settings:
+    # Where does the editor store data needed to track and handle project directories?
+    PROJECT_ADMIN_DIR = ".gvn"
+    PROJECT_FOLDER_STRUCTURE = {
+        "Content": [
+            "Audio",
+            "Characters",
+            "Dialogue",
+            "Fonts",
+            "Objects",
+            "Scenes",
+            "Sprites",
+            "Styles",
+            "Values"
+        ],
+        "Config":
+            None
+    }
+    # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
+    PROJECT_DEFAULT_FILES = {
+        "Config": r"Config\Game.yaml"
+    }
+
+    # A dict of types of files, and the individual formats which are supported in the engine / editor
+    SUPPORTED_CONTENT_TYPES = {
+        "Image": "Image Files (*.png *.jpg)",
+        "Data": "YAML Files (*.yaml)"
+    }
+
+
     def __init__(self):
         self.settings = None
         self.action_database = None
@@ -26,16 +56,23 @@ class Settings():
         self.GetActionDatabase("Config/ActionsDatabase.yaml")
 
     def LoadEditorSettings(self, data_path):
+        """ Loads the 'Editor.yaml' file for the editor """
         self.settings = Reader.ReadAll(data_path)
 
-    def LoadProjectSettings(self, project_data_path):
-        self.user_project_data = Reader.ReadAll(project_data_path)
-        print(self.user_project_data)
+    def LoadProjectSettings(self):
+        """ Reads the 'Game.yaml' file for the active project """
+        self.user_project_data = Reader.ReadAll(
+            os.path.join(
+                self.user_project_dir,
+                self.PROJECT_DEFAULT_FILES['Config']
+            )
+        )
+
+    def GetProjectContentDirectory(self):
+        """ Returns the 'Content' folder for the active project """
+        return os.path.join(self.user_project_dir, "Content")
 
     def GetActionDatabase(self, data_path):
-        # @TODO: Hook this up to the engine, so the data it gathers is dynamic
-        # @TODO: How does the editor know what actions are available, and the params for each action?
-
         self.action_database = Reader.ReadAll(data_path)
 
     def LoadStyleSettings(self):
@@ -122,3 +159,6 @@ class Settings():
         self.read_only_background_color = f"background-color: rgb(" \
                                           f"{self.settings['EditorStateSettings']['read_only_background_color']})"
 
+        self.selection_color = f"""
+            selection-background-color: rgb({self.settings['EditorStateSettings']['selection_color']})
+        """

@@ -66,14 +66,25 @@ class DialogueEntry(QtWidgets.QWidget):
         """ Updates the cache for this entry using whatever the default values are in the 'ActionsDatabase' file """
 
         for param in self.action_data['requirements']:
-            # If this param has a global param available, use it as the default instead
-            if 'global' in param:
-                req_global_data = param['global']
-                project_data_cat = self.settings.user_project_data[req_global_data['category']]
-                project_global_value = project_data_cat[req_global_data['global_parameter']]
 
-                self.cache_data[param['name']] = project_global_value
+            # Containers are special types that don't contain information. Instead of looking to them, look to their
+            # children
+            if param['type'] == "container":
+                # Start with adding the container as an entry in the cache before adding the children
+                self.cache_data[param['name']] = {}
 
-            # No global available - Use the 'default' value
+                for child in param['children']:
+                    self.cache_data[param['name']][child['name']] = child['default']
+
             else:
-                self.cache_data[param['name']] = param['default']
+                # If this param has a global param available, use it as the default instead
+                if 'global' in param:
+                    req_global_data = param['global']
+                    project_data_cat = self.settings.user_project_data[req_global_data['category']]
+                    project_global_value = project_data_cat[req_global_data['global_parameter']]
+
+                    self.cache_data[param['name']] = project_global_value
+
+                # No global available - Use the 'default' value
+                else:
+                    self.cache_data[param['name']] = param['default']
