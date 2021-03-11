@@ -45,20 +45,21 @@ class GVNEditor:
                                         )
         else:
             # Ask the user for a project name
+            # [0] = user_input: str, [1] = value_provided: bool
             self.logger.Log("Requesting a name for the new project...'")
-            self.settings.user_project_name = QtWidgets.QInputDialog.getText(self.e_ui.central_widget,
-                                                               "New Project",
-                                                               "Please Enter a Project Name:")
+            user_project_name = QtWidgets.QInputDialog.getText(self.e_ui.central_widget,
+                                                                             "New Project",
+                                                                             "Please Enter a Project Name:")[0]
 
             # Has the user provided a project name?
-            if self.settings.user_project_name[0] == "":
+            if user_project_name == "":
                 self.logger.Log("Error: Project name was not provided - Cancelling 'New Project' action")
                 QtWidgets.QMessageBox.about(self.e_ui.central_widget, "No Value Provided!",
                                             "No project name was provided"
                                             )
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
-                if os.path.exists(os.path.join(new_project_dir, self.settings.user_project_name[0])):
+                if os.path.exists(os.path.join(new_project_dir, user_project_name)):
                     self.logger.Log("Error: Chosen project directory already exists - Cancelling 'New Project' action")
                     QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Project Already Exists!",
                                                 "The chosen directory already contains a project of the chosen name.\n"
@@ -68,7 +69,7 @@ class GVNEditor:
                 else:
                     self.logger.Log("Creating project folder structure...")
                     # Create the project directory
-                    project_path = os.path.join(new_project_dir, self.settings.user_project_name[0])
+                    project_path = os.path.join(new_project_dir, user_project_name)
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
@@ -88,14 +89,15 @@ class GVNEditor:
                     os.mkdir(admin_dir_path)
 
                     # Clone project default files
-                    for item_to_clone in self.settings.PROJECT_DEFAULT_FILES.items():
-                        print(os.path.dirname(__file__))
-                        shutil.copy(item_to_clone[1], os.path.join(project_path, item_to_clone[0]))
+                    for key, rel_path in self.settings.PROJECT_DEFAULT_FILES.items():
+                        shutil.copy(
+                            os.path.join(self.settings.BASE_ENGINE_DIR, rel_path),
+                            os.path.join(project_path, rel_path))
 
                     self.logger.Log(f"Project Created at: {project_path}")
 
                     # Set this as the active project
-                    self.SetActiveProject(self.settings.user_project_name[0], new_project_dir)
+                    self.SetActiveProject(user_project_name, project_path)
 
     def OpenProject(self):
         self.logger.Log("Requesting path to project root...")
@@ -167,4 +169,3 @@ class GVNEditor:
 
 if __name__ == "__main__":
     editor = GVNEditor()
-

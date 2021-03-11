@@ -4,6 +4,9 @@ from Editor.Utilities.yaml_reader import Reader
 
 
 class Settings:
+    # Where is the base GVNEngine distro that comes with the editor?
+    BASE_ENGINE_DIR = "../GVNEngine"
+
     # Where does the editor store data needed to track and handle project directories?
     PROJECT_ADMIN_DIR = ".gvn"
     PROJECT_FOLDER_STRUCTURE = {
@@ -23,7 +26,7 @@ class Settings:
     }
     # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
     PROJECT_DEFAULT_FILES = {
-        "Config": r"Config\Game.yaml"
+        "Config": "Config/Game.yaml"
     }
 
     # A dict of types of files, and the individual formats which are supported in the engine / editor
@@ -31,7 +34,6 @@ class Settings:
         "Image": "Image Files (*.png *.jpg)",
         "Data": "YAML Files (*.yaml)"
     }
-
 
     def __init__(self):
         self.settings = None
