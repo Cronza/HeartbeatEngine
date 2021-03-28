@@ -5,17 +5,17 @@ from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 class DetailsEntryContainer(DetailsEntryBase):
     def __init__(self, settings, children: list):
         super().__init__(settings)
-
-        self.input_widget = QtWidgets.QTableWidget()
-        self.input_widget = QtWidgets.QTableWidget(self)
-        self.input_widget.setColumnCount(2)
-        self.input_widget.horizontalHeader().hide()
-        self.input_widget.verticalHeader().hide()
-        self.input_widget.horizontalHeader().setStretchLastSection(True)
-        self.input_widget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.input_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.input_widget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
-        self.input_widget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)      # <---
+        print("creating container")
+        #self.input_widget = QtWidgets.QTableWidget()
+        #self.input_widget = QtWidgets.QTableWidget(self)
+        #self.input_widget.setColumnCount(2)
+        #self.input_widget.horizontalHeader().hide()
+        #self.input_widget.verticalHeader().hide()
+        #self.input_widget.horizontalHeader().setStretchLastSection(True)
+        #self.input_widget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        #self.input_widget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
+        #self.input_widget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
+        #self.input_widget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)      # <---
         #self.input_widget.verticalScrollBar().hide()
         #self.input_widget.horizontalScrollBar().hide()
         #self.input_widget.adjustSize()
@@ -42,7 +42,7 @@ class DetailsEntryContainer(DetailsEntryBase):
         pass
 
     def AddEntry(self, entry):
-        """ Given a tuple of <entry_name>, <data_widget>, add them to the bottom of the table """
+        """ Given a tuple of <entry_name>, <data_widget>, add them to the container """
 
         # Add a new, empty row
         self.input_widget.insertRow(self.input_widget.rowCount())

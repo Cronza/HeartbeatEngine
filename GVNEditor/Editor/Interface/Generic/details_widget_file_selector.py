@@ -11,6 +11,7 @@ class DetailsEntryFileSelector(DetailsEntryBase):
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
+        self.input_widget.setReadOnly(True)
 
         # Create the file selector button, ands style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -40,7 +41,7 @@ class DetailsEntryFileSelector(DetailsEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-        file_path = QtWidgets.QFileDialog.getOpenFileName(self,
+        file_path = QtWidgets.QFileDialog.getOpenFileName(self.input_container,
                                                           "Open File",
                                                           self.settings.GetProjectContentDirectory(),
                                                           self.type_filter

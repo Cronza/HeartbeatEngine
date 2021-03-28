@@ -24,6 +24,9 @@ class GVNEditor:
         # State Tracking
         self.active_editor = None
 
+        # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
+        self.SetActiveProject("Testing", "D:/GVNENGINE_PROJECTS/Testing")
+
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
         self.main_window.show()
