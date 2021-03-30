@@ -9,6 +9,10 @@ from Editor.Interface.Generic.details_widget_dropdown import DetailsEntryDropdow
 from Editor.Interface.Generic.details_widget_container import DetailsEntryContainer
 
 
+# @TODO: Split this file up into a functions class & U.I class
+# @TODO: Make this class agnostic to the dialogue editor
+
+
 class Details(QtWidgets.QWidget):
     def __init__(self, settings):
         super().__init__()
@@ -54,13 +58,8 @@ class Details(QtWidgets.QWidget):
         self.details_toolbar_layout.addItem(spacer)
 
         # Create Details List
-        self.details_table = QtWidgets.QTableWidget(self)
-        self.details_table.setColumnCount(2)
-        self.details_table.horizontalHeader().hide()
-        self.details_table.verticalHeader().hide()
-        self.details_table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.details_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.details_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
+        self.details_table = QtWidgets.QTreeWidget(self)
+        self.details_table.setColumnCount(2)  # 2 columns: Name & input
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
@@ -70,108 +69,151 @@ class Details(QtWidgets.QWidget):
     def PopulateDetails(self, selected_entry):
         """
         Populates the details table with an entry for all relevant action_data parameters of the given entry.
-        If an entry is already selected, cache the values of all detail entries in the entry, and load the cache from
-        the new selection if applicable
+        If an entry is already selected, cache the values of all detail entries in the previously selected entry,
+        and load the cache from the new selection if applicable
 
-        If this was called manually, skip the caching and just load from the existing cache
+        If this was called manually (the previously selected and the newly selected entries are the same), skip
+        updating the caching and just load from the existing cache
         """
 
-        # Cache any changes to details in the entry, so next time its selected, that data can be shown
-        # Optionally, if this was called manually, then the selected entry will match our active one. In this case,
-        # skip caching the data, and treat this as a reload
         if selected_entry is not self.active_entry:
-            for row in range(0, self.details_table.rowCount()):
-                param_name = self.details_table.item(row, 0).text()
-                param_value = self.details_table.cellWidget(row, 1).Get()
-                self.active_entry.cache_data[param_name] = param_value
+            self.UpdateCache()
 
         # Clear the existing details
         self.Clear()
 
+        # Update the active entry
         self.active_entry = selected_entry
+
+        # Generate each entry
         for requirement in self.active_entry.action_data['requirements']:
 
             # Create a new entry, and add it to the details list
-            self.AddEntry(self.CreateEntry(requirement))
+            self.AddEntry(self.CreateEntryWidget(requirement))
 
-        # Adjust the rows to fit their contents
-        self.details_table.resizeRowsToContents()
+    def UpdateCache(self):
+        """
+        Cache any changes to details in the entry, so next time its selected, that data can be shown
+        """
+        # Instead of using the cache, just update the action data directly
+        if self.active_entry:
 
-        # If this entry has cached data in it, load it
-        if self.active_entry.cache_data:
-            for row in range(0, self.details_table.rowCount()):
-                param_name = self.details_table.item(row, 0).text()
+            details_entry_count = self.details_table.invisibleRootItem().childCount()
+            for details_entry_index in range(0, details_entry_count):
 
-                # The cache uses a dict model where keys are the param names. Use the param name to fetch any stored
-                # value
-                cached_value = self.active_entry.cache_data[param_name]
-                self.details_table.cellWidget(row, 1).Set(cached_value)
+                details_entry = self.details_table.invisibleRootItem().child(details_entry_index)
+                details_entry_name = details_entry.name_widget.text()
 
-    def CreateEntry(self, data) -> tuple:
-        """ Given an action_data dict, create a tuple of <entry_name>, <data_widget> and return it """
-        # Populate the name column for this row, making it non-editable
-        entry_name = QtWidgets.QTableWidgetItem(data['name'])
-        entry_name.setFlags(QtCore.Qt.ItemIsEnabled)
+                # Since the requirements list is a list, we need to parse through for specifically for the
+                # match for this entry
+                for requirement in self.active_entry.action_data['requirements']:
+                    if requirement['name'] == details_entry_name:
 
+                        # If this details_entry has children (IE. It's a container), consider it's children
+                        # Currently this does a depth search of 1. A future upgrade may involve using recursion to
+                        # achieve a depth search of n
+                        if details_entry.childCount() > 0:
+
+                            for child_entry_index in range(0, details_entry.childCount()):
+                                child_entry = details_entry.child(child_entry_index)
+                                child_entry_name = child_entry.name_widget.text()
+
+                                # Repeat the search process. If a child is found, cache a value
+                                for child_requirement in requirement['children']:
+                                    if child_requirement['name'] == child_entry_name:
+                                        child_requirement['cache'] = child_entry.Get()
+
+                        # Containers don't store values themselves, so the above code accounts solely for it's children
+                        # If this entry is not a container, lets cache normally
+                        else:
+                            requirement['cache'] = details_entry.Get()
+
+    def CreateEntryWidget(self, data):
+        """ Given an action_data dict, create a new details entry widget and return it """
         # Populate the data column with the widget appropriate to the given type
-        data_widget = self.GetDataWidget(data)
+        details_widget = self.GetDetailsWidget(data)
 
-        # Make the option read-only if applicable
-        if not data['type'] == 'container':
-            if not data['editable']:
-                data_widget.MakeUneditable()
+        # Set the name (Applicable for all widget types)
+        details_widget.name_widget.setText(data["name"])
 
-        return entry_name, data_widget
+        # Containers are special in that they don't hold data, so generally ignore them for certain actions
+        if not data["type"] == "container":
+            # Update the contents of the entry
+            if 'cache' in data:
+                details_widget.Set(data["cache"])
+            else:
+                details_widget.Set(data["default"])
 
-    def AddEntry(self, entry):
-        """ Given a tuple of <entry_name>, <data_widget>, add them to the bottom of the details list """
+            # Make the option read-only if applicable
+            if not data["editable"]:
+                details_widget.MakeUneditable()
 
-        # Add a new, empty row
-        self.details_table.insertRow(self.details_table.rowCount())
+        return details_widget
 
-        # Populate the row with each element of this particular detail
-        new_row = self.details_table.rowCount() - 1
-        self.details_table.setItem(new_row, 0, entry[0])
-        self.details_table.setCellWidget(new_row, 1, entry[1])
+    def AddEntry(self, entry, parent=None):
+        """
+        Given a details widget, add it to the bottom of the details tree
+        Optionally, if a parent is provided, the entry is assigned as a child to it
+        """
 
-        self.details_table.resizeRowToContents(new_row)
+        if parent:
+            parent.addChild(entry)
+        else:
+            self.details_table.addTopLevelItem(entry)
 
-    def GetDataWidget(self, data: dict):
-        """ Given a data dict, return the relevant object"""
+        self.details_table.setItemWidget(entry, 0, entry.name_widget)
+        self.details_table.setItemWidget(entry, 1, entry.input_container)
+
+        # If the entry has any children, add them all via recursion
+        if entry.childCount() > 0:
+            for childIndex in range(0, entry.childCount()):
+                self.AddEntry(entry.child(childIndex), entry)
+
+    def GetDetailsWidget(self, data: dict):
+        """ Given an action data dict, create and return the relevant details widget """
         #@TODO: Can this be converted to use an enum?
 
         data_type = data['type']
 
         if data_type == "str":
-             return DetailsEntryText(self.settings)
+             return DetailsEntryText(self.settings, self.DetailEntryUpdated)
 
         elif data_type == "tuple":
-            return DetailsEntryTuple(self.settings)
+            return DetailsEntryTuple(self.settings, self.DetailEntryUpdated)
 
         elif data_type == "bool":
-            return DetailsEntryBool(self.settings)
+            return DetailsEntryBool(self.settings, self.DetailEntryUpdated)
 
         elif data_type == "int":
-            return DetailsEntryInt(self.settings)
+            return DetailsEntryInt(self.settings, self.DetailEntryUpdated)
 
         elif data_type == "file":
-            return DetailsEntryFileSelector(self.settings, "")
+            return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated)
 
         elif data_type == "file_image":
-            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'])
+            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'], self.DetailEntryUpdated)
 
         elif data_type == "dropdown":
-            return DetailsEntryDropdown(self.settings, data['default'])
+            return DetailsEntryDropdown(self.settings, data['default'], self.DetailEntryUpdated)
 
         elif data_type == "container":
-            new_entry = DetailsEntryContainer(self.settings, data['children'])
+            new_entry = DetailsEntryContainer(self.settings, data['children'], self.DetailEntryUpdated)
             for child in data['children']:
-                print(child)
-                child_entry = self.CreateEntry(child)
-                new_entry.AddEntry(child_entry)
+                new_entry.addChild(self.CreateEntryWidget(child))
 
             return new_entry
 
     def Clear(self):
-        """ Deletes all rows in the details table """
-        self.details_table.setRowCount(0)
+        """ Deletes all data in the details table """
+        self.details_table.clear()
+
+    def DetailEntryUpdated(self):
+        """
+        Whenever a details entry is changed, we need to inform the active entry so it can refresh necessary elements
+        """
+        if self.active_entry:
+            # First update the cache so the active entry is updated to use the data from the detail entries
+            self.UpdateCache()
+
+            # Inform the active entry to refresh
+            self.active_entry.Refresh()

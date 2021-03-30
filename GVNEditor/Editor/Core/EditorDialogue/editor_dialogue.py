@@ -62,8 +62,6 @@ class EditorDialogue():
         # Resize the row to fit any contents it has
         self.ed_ui.dialogue_sequence.resizeRowToContents(new_entry_row)
 
-        self.logger.Log(f"Adding new dialogue sequence entry")
-
         return new_entry
 
     def RemoveEntry(self):
@@ -73,13 +71,12 @@ class EditorDialogue():
         if selection is not None:
             self.ed_ui.dialogue_sequence.removeRow(self.GetSelectedRow())
 
-
     def CopyEntry(self):
         """ If an entry is selected, clone it and add it to the sequence """
         selection = self.GetSelectedEntry()
 
         if selection:
-            self.AddEntry(selection.action_data)
+            self.AddEntry(copy.deepcopy(selection.action_data))
 
     def MoveEntryUp(self):
         """ If an entry is selected, move it up one row """
@@ -103,7 +100,7 @@ class EditorDialogue():
                 new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
 
                 # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.cache_data = taken_entry.cache_data
+                new_entry.action_data = taken_entry.action_data
                 self.UpdateActiveEntry()
 
     def MoveEntryDown(self):
@@ -128,7 +125,7 @@ class EditorDialogue():
                 new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
 
                 # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.cache_data = taken_entry.cache_data
+                new_entry.action_data = taken_entry.action_data
                 self.UpdateActiveEntry()
 
     def UpdateDetails(self, selected_entry):

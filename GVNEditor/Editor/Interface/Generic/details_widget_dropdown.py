@@ -2,10 +2,13 @@ from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 
+#@TODO: Finish this
+
+
 class DetailsEntryDropdown(DetailsEntryBase):
-    def __init__(self, settings, options: str):
+    def __init__(self, settings, options: str, refresh_func=None):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
-        super().__init__(settings)
+        super().__init__(settings, refresh_func)
 
         self.input_widget = QtWidgets.QComboBox()
         #self.input_widget.setText("None"

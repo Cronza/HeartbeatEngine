@@ -31,7 +31,7 @@ Renderables:
     - name: "sprite"
       type: "file_image"
       default: "None"
-      editable: True
+      editable: False
       preview: True
 
     - name: "position"
@@ -86,7 +86,7 @@ Renderables:
     - name: "sprite"
       type: "file_image"
       default: "None"
-      editable: True
+      editable: False
       preview: True
 
     - name: "position"

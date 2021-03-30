@@ -1,6 +1,8 @@
 from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.action_menu_option import ActionMenuOption
 
+#@TODO: Should this class be split into a function class & a U.I class?
+
 
 class ActionMenu(QtWidgets.QMenu):
     def __init__(self, settings, button_func):

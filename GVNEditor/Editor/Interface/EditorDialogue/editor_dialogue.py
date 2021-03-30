@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-#from Editor.Interface.Generic.details import Details
-from Editor.Interface.Generic.details_02 import Details
+from Editor.Interface.Generic.details import Details
 from Editor.Interface.Generic.action_menu import ActionMenu
 
 

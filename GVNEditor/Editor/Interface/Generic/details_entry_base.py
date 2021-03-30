@@ -2,10 +2,14 @@ from PyQt5 import QtWidgets
 
 
 class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
-    def __init__(self, settings):
+    def __init__(self, settings, refresh_func=None):
         super().__init__()
 
         self.settings = settings
+
+        # When the input widget is updated, in case another U.I element needs to refresh, allow us to execute an
+        # ambiguous function
+        self.refresh_func = refresh_func
 
         # Details entries have two main widgets: 'name_widget' and 'input_widget'. The former
         # is standalone, while the latter is kept inside 'input_container' as to allow multiple

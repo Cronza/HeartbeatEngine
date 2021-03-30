@@ -25,7 +25,7 @@ class GVNEditor:
         self.active_editor = None
 
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        self.SetActiveProject("Testing", "D:/GVNENGINE_PROJECTS/Testing")
+        self.SetActiveProject("To Infinity", "D:/Scripts/GVNEngine/PROJECTS/To Infinity")
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then

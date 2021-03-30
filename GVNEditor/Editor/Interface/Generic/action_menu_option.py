@@ -1,3 +1,4 @@
+import copy
 from PyQt5 import QtWidgets
 
 
@@ -9,4 +10,4 @@ class ActionMenuOption(QtWidgets.QWidgetAction):
         self.action_data = action_data
 
         # Hook this button up
-        self.triggered.connect(lambda button: func(self.action_data))
+        self.triggered.connect(lambda button: func(copy.deepcopy(self.action_data)))

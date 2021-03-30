@@ -3,15 +3,15 @@ from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryFileSelector(DetailsEntryBase):
-    def __init__(self, settings, type_filter):
-        super().__init__(settings)
+    def __init__(self, settings, type_filter, refresh_func=None):
+        super().__init__(settings, refresh_func)
 
         # Store a type filter to restrict what files can be chosen in the browser
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        self.input_widget.setReadOnly(True)
+        self.input_widget.textChanged.connect(refresh_func)
 
         # Create the file selector button, ands style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -35,6 +35,7 @@ class DetailsEntryFileSelector(DetailsEntryBase):
         self.input_widget.setText(data)
 
     def MakeUneditable(self):
+        print('dsfjdsfjk')
         self.input_widget.setReadOnly(True)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color);
 
@@ -51,6 +52,8 @@ class DetailsEntryFileSelector(DetailsEntryBase):
             selected_dir = file_path[0]
 
             # Is the path in the active project dir?
+            print(self.settings.user_project_dir)
+            print(selected_dir)
             if self.settings.user_project_dir in selected_dir:
 
                 # Remove the project dir from the path, so that the selected dir only contains a relative path
@@ -59,7 +62,7 @@ class DetailsEntryFileSelector(DetailsEntryBase):
             # It is not. This is not allowed
             else:
                 # @TODO: Can we present the user with an import prompt here
-                QtWidgets.QMessageBox.about(self, "Invalid Value Provided!",
+                QtWidgets.QMessageBox.about(self.parent(), "Invalid Value Provided!",
                                             "The chosen file exists outside the active project directory.\n"
                                             "Please either select a file that resides in the active project,\n"
                                             "or move the chosen file into the project's Content directory"

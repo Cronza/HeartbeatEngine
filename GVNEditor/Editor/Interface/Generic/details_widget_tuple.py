@@ -2,13 +2,15 @@ from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 class DetailsEntryTuple(DetailsEntryBase):
-    def __init__(self, settings):
-        super().__init__(settings)
+    def __init__(self, settings, refresh_func=None):
+        super().__init__(settings, refresh_func)
 
         self.input_widget_title = QtWidgets.QLabel('x')
         self.input_widget = QtWidgets.QLineEdit()
+        self.input_widget.textChanged.connect(refresh_func)
         self.input_widget_alt_title = QtWidgets.QLabel('y')
         self.input_widget_alt = QtWidgets.QLineEdit()
+        self.input_widget_alt.textChanged.connect(refresh_func)
 
         # Limit entered values to int only
         self.validator = QtGui.QIntValidator()

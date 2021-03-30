@@ -12,18 +12,6 @@ class DialogueEntry(QtWidgets.QWidget):
         # Store this entries action data
         self.action_data = action_data
 
-        # As we edit and make changes, store that in here for quick reloading
-        # Format:
-        # {
-        #   - <param>: <value>
-        #   - ...
-        # }
-        # @TODO: TEMP - REVIEW THE IMPLEMENTATION OF THIS
-        self.cache_data = {}
-
-        # Load any defaults for this entry
-        self.LoadDefaults()
-
         # ****** DISPLAY WIDGETS ******
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setSpacing(0)
@@ -51,40 +39,31 @@ class DialogueEntry(QtWidgets.QWidget):
         """ Updates the subtext displaying entry parameters """
         # Clear text
         self.subtext_widget.setText("")
-        print(self.cache_data)
-        # Populate the subtext with all params with preview enabled
+
+        # Populate the subtext with all params that have preview enabled
         for param in self.action_data['requirements']:
             if param['preview']:
+
+                # If cached data is available, use it. Otherwise display the default
+                param_name = param['name']
+                param_data = None
+                if 'cache' in param:
+                    param_data = param['cache']
+                else:
+                    param_data = param['default']
+
+                # If we've already started building the string, our concatenation will be a bit different
+
                 cur_text = self.subtext_widget.text()
-                name = param['name']
+                print(cur_text)
                 if cur_text:
-                    self.subtext_widget.setText(cur_text + f", {name}: {self.cache_data[name]}")
+                    self.subtext_widget.setText(cur_text + f", {param_name}: {param_data}")
                 else:
-                    self.subtext_widget.setText(cur_text + f"{name}: {self.cache_data[name]}")
+                    self.subtext_widget.setText(cur_text + f"{param_name}: {param_data}")
 
-    def LoadDefaults(self):
-        """ Updates the cache for this entry using whatever the default values are in the 'ActionsDatabase' file """
+    def Refresh(self):
+        """
+        Refresh is the common function used by elements that need refreshing when an important U.I change is made
+        """
 
-        for param in self.action_data['requirements']:
-
-            # Containers are special types that don't contain information. Instead of looking to them, look to their
-            # children
-            if param['type'] == "container":
-                # Start with adding the container as an entry in the cache before adding the children
-                self.cache_data[param['name']] = {}
-
-                for child in param['children']:
-                    self.cache_data[param['name']][child['name']] = child['default']
-
-            else:
-                # If this param has a global param available, use it as the default instead
-                if 'global' in param:
-                    req_global_data = param['global']
-                    project_data_cat = self.settings.user_project_data[req_global_data['category']]
-                    project_global_value = project_data_cat[req_global_data['global_parameter']]
-
-                    self.cache_data[param['name']] = project_global_value
-
-                # No global available - Use the 'default' value
-                else:
-                    self.cache_data[param['name']] = param['default']
+        self.UpdateSubtext()

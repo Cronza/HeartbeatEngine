@@ -2,14 +2,16 @@ from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 class DetailsEntryInt(DetailsEntryBase):
-    def __init__(self, settings):
-        super().__init__(settings)
+    def __init__(self, settings, refresh_func=None):
+        super().__init__(settings, refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
+        self.input_widget.textChanged.connect(refresh_func)
 
         # Limit entered values to int only
         self.validator = QtGui.QIntValidator()
         self.input_widget.setValidator(self.validator)
+
 
         # Assign default value
         self.input_widget.setText("0")
