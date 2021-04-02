@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.details import Details
+from Editor.Interface.Generic.details_panel import Details
+from Editor.Interface.EditorDialogue.dialogue_branches_panel import Branches
 from Editor.Interface.Generic.action_menu import ActionMenu
 
 
@@ -17,7 +18,8 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.CreateOutliner()
+        #self.CreateOutliner()
+        self.CreateBranches()
         self.CreateMainView()
         self.CreateDetails()
 
@@ -26,7 +28,7 @@ class EditorDialogueUI(QtWidgets.QWidget):
 
         # Add everything to the editor interface
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        self.main_resize_container.addWidget(self.outliner)
+        self.main_resize_container.addWidget(self.branches)
         self.main_resize_container.addWidget(self.main_view)
         self.main_resize_container.addWidget(self.details)
 
@@ -177,6 +179,10 @@ class EditorDialogueUI(QtWidgets.QWidget):
         self.outliner_layout.addWidget(self.outliner_title)
         self.outliner_layout.addWidget(self.outliner_toolbar)
         self.outliner_layout.addWidget(self.branch_list)
+
+    def CreateBranches(self):
+        """ Create the branches panel """
+        self.branches = Branches(self.ed_core.settings)
 
     def CreateDetails(self):
         """ Create the details panel using the generic details object """

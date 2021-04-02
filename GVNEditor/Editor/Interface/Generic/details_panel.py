@@ -17,7 +17,6 @@ class Details(QtWidgets.QWidget):
     def __init__(self, settings):
         super().__init__()
 
-        # Main editor ref
         self.settings = settings
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
