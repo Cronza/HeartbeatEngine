@@ -16,7 +16,7 @@
 """
 import copy
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
-from Editor.Interface.EditorDialogue.dialogue_entry import DialogueEntry
+from Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 from PyQt5 import QtWidgets
 
 class EditorDialogue():
@@ -45,22 +45,22 @@ class EditorDialogue():
         print("Adding new dialogue entry")
 
         # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
-        new_entry_row = self.ed_ui.dialogue_sequence.rowCount()
+        new_entry_row = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
         if specific_row is not None:
             new_entry_row = specific_row
-            self.ed_ui.dialogue_sequence.insertRow(new_entry_row)
+            self.ed_ui.dialogue_sequence.dialogue_table.insertRow(new_entry_row)
         else:
-            self.ed_ui.dialogue_sequence.insertRow(new_entry_row)
+            self.ed_ui.dialogue_sequence.dialogue_table.insertRow(new_entry_row)
 
         # Create a new dialogue entry object, and add it to the sequence widget
         new_entry = DialogueEntry(action_data, self.settings, self.UpdateActiveEntry)
 
         # Assign the entry widget to the row
-        self.ed_ui.dialogue_sequence.setCellWidget(new_entry_row, 0, new_entry)
-        self.ed_ui.dialogue_sequence.selectRow(new_entry_row)
+        self.ed_ui.dialogue_sequence.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
+        self.ed_ui.dialogue_sequence.dialogue_table.selectRow(new_entry_row)
 
         # Resize the row to fit any contents it has
-        self.ed_ui.dialogue_sequence.resizeRowToContents(new_entry_row)
+        self.ed_ui.dialogue_sequence.dialogue_table.resizeRowToContents(new_entry_row)
 
         return new_entry
 
@@ -69,7 +69,7 @@ class EditorDialogue():
         selection = self.GetSelectedRow()
 
         if selection is not None:
-            self.ed_ui.dialogue_sequence.removeRow(self.GetSelectedRow())
+            self.ed_ui.dialogue_sequence.dialogue_table.removeRow(self.GetSelectedRow())
 
     def CopyEntry(self):
         """ If an entry is selected, clone it and add it to the sequence """
@@ -81,7 +81,7 @@ class EditorDialogue():
     def MoveEntryUp(self):
         """ If an entry is selected, move it up one row """
 
-        if self.ed_ui.dialogue_sequence.rowCount():
+        if self.ed_ui.dialogue_sequence.dialogue_table.rowCount():
             selection = self.GetSelectedRow()
 
             # Only allow moving up if we're not already at the top of the sequence
@@ -90,10 +90,10 @@ class EditorDialogue():
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.ed_ui.dialogue_sequence.cellWidget(selection, 0)
+                taken_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(selection, 0)
 
                 # Delete the origin row
-                self.ed_ui.dialogue_sequence.removeRow(selection)
+                self.ed_ui.dialogue_sequence.dialogue_table.removeRow(selection)
 
                 # Add a new entry two rows above the initial row
                 new_row_num = selection - 1
@@ -106,19 +106,19 @@ class EditorDialogue():
     def MoveEntryDown(self):
         """ If an entry is selected, move it down one row """
 
-        if self.ed_ui.dialogue_sequence.rowCount():
+        if self.ed_ui.dialogue_sequence.dialogue_table.rowCount():
             selection = self.GetSelectedRow()
 
             # Only allow moving down if we're not already at the bottom of the sequence
-            if selection + 1 >= self.ed_ui.dialogue_sequence.rowCount():
+            if selection + 1 >= self.ed_ui.dialogue_sequence.dialogue_table.rowCount():
                 self.logger.Log("Warning: Can't move entry down as we're at the bottom of the sequence")
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.ed_ui.dialogue_sequence.cellWidget(selection, 0)
+                taken_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(selection, 0)
 
                 # Delete the origin row
-                self.ed_ui.dialogue_sequence.removeRow(selection)
+                self.ed_ui.dialogue_sequence.dialogue_table.removeRow(selection)
 
                 # Add a new entry two rows above the initial row
                 new_row_num = selection + 1
@@ -139,17 +139,17 @@ class EditorDialogue():
 
     def GetSelectedEntry(self) -> DialogueEntry:
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """
-        selected_entry = self.ed_ui.dialogue_sequence.selectedIndexes()
+        selected_entry = self.ed_ui.dialogue_sequence.dialogue_table.selectedIndexes()
 
         if selected_entry:
             selected_row = selected_entry[0].row()
-            return self.ed_ui.dialogue_sequence.cellWidget(selected_row, 0)
+            return self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(selected_row, 0)
         else:
             return None
 
     def GetSelectedRow(self) -> int:
         """ Returns the currently selected row. If there isn't one, returns None """
-        selected_row = self.ed_ui.dialogue_sequence.selectedIndexes()
+        selected_row = self.ed_ui.dialogue_sequence.dialogue_table.selectedIndexes()
 
         if selected_row:
             return selected_row[0].row()

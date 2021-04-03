@@ -13,7 +13,7 @@ from Editor.Interface.Generic.details_widget_container import DetailsEntryContai
 # @TODO: Make this class agnostic to the dialogue editor
 
 
-class Details(QtWidgets.QWidget):
+class DetailsPanel(QtWidgets.QWidget):
     def __init__(self, settings):
         super().__init__()
 
