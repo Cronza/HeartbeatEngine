@@ -13,7 +13,7 @@ class EditBranchPrompt(QtWidgets.QDialog):
 
         # Branch description
         self.branch_description_header = QtWidgets.QLabel("Branch Description:")
-        self.branch_description_input = QtWidgets.QLineEdit(branch_description)
+        self.branch_description_input = QtWidgets.QPlainTextEdit(branch_description)
 
         # Cancel & Accept
         self.button_layout = QtWidgets.QHBoxLayout()
@@ -48,4 +48,4 @@ class EditBranchPrompt(QtWidgets.QDialog):
 
     def Get(self):
         """ Returns the branch name and description as a tuple """
-        return self.branch_name_input.text(), self.branch_description_input.text()
+        return self.branch_name_input.text(), self.branch_description_input.toPlainText()

@@ -46,6 +46,7 @@ class BranchesPanel(QtWidgets.QWidget):
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.add_entry_button.clicked.connect(self.AddBranch)
         self.branches_toolbar_layout.addWidget(self.add_entry_button)
 
         # Remove Branch Button
@@ -53,7 +54,7 @@ class BranchesPanel(QtWidgets.QWidget):
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.remove_entry_button.setIcon(icon)
-        self.remove_entry_button.clicked.connect(self.ed_core.RemoveEntry)
+        self.remove_entry_button.clicked.connect(self.RemoveBranch)
         self.branches_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Create search filter
@@ -74,49 +75,97 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_layout.addWidget(self.branches_toolbar)
         self.branches_layout.addWidget(self.branches_list)
 
-        self.TestPopulate()
+        self.CreateBranch(("main", "This is the default, main branch. Consider this the root of your dialogue tree"))
 
-    def TestPopulate(self):
-        for i in range(0, 3):
-            # Create the list item container
-            list_item = QtWidgets.QListWidgetItem()
-            self.branches_list.addItem(list_item)
+    def CreateBranch(self, data):
+        """ Adds a new branch entry to the branch list """
+        # Create the list item container
+        list_item = QtWidgets.QListWidgetItem()
+        self.branches_list.addItem(list_item)
 
-            # Create the core part of the entry
-            new_entry = BranchesEntry("test", self.settings, None)
-            self.branches_list.setItemWidget(list_item, new_entry)
+        # Create the core part of the entry
+        new_entry = BranchesEntry("test", self.settings, None)
+        self.branches_list.setItemWidget(list_item, new_entry)
+        new_entry.Set(data)
 
-            # Adjust the size hint of the item container to match the contents
-            list_item.setSizeHint(new_entry.sizeHint())
+        # Adjust the size hint of the item container to match the contents
+        list_item.setSizeHint(new_entry.sizeHint())
+
+    def AddBranch(self):
+        """ Prompts the user for branch information, and creates a branch with that information """
+        # Create the prompt object, using the defaults for the params
+        new_data = self.ConfigurePrompt()
+
+        # If the data has been validated, then create the new branch
+        if new_data:
+            self.CreateBranch(new_data)
+
+    def RemoveBranch(self):
+        """ Deletes the selected branch if it is not the main branch """
+        # Don't allow the user to delete the main branch
+        if self.branches_list.currentRow() != 0:
+
+            selected_row = self.branches_list.currentRow()
+            self.branches_list.takeItem(selected_row)
 
     def EditBranch(self):
-        print('Oh yeah, its dev time')
         selection = self.branches_list.selectedItems()[0]
         branch_entry = self.branches_list.itemWidget(selection)
 
-        # Retrieves the tuple data of 'branch name' and 'branch description'
-        data = self.branches_list.itemWidget(selection).Get()
+        #Only allow editing for all entries other than the initial (main) entry
+        if self.branches_list.currentRow() != 0:
+            # Retrieves the tuple data of 'branch name' and 'branch description'
+            data = self.branches_list.itemWidget(selection).Get()
 
-        # Create the prompt object, providing the selected branch's data
-        prompt = EditBranchPrompt(data[0], data[1])
+            # Create the prompt object, providing the selected branch's data
+            new_data = self.ConfigurePrompt(data[0], data[1])
 
+            # If the user has changed anything, then update the entry. Otherwise, do nothing
+            if new_data:
+                # Set the data before resizing the entry to fit the new data
+                branch_entry.Set(new_data)
+                self.ResizeListEntry(selection, branch_entry)
+
+    def ConfigurePrompt(self, branch_name="New Branch Name", branch_description="New Branch Description") -> tuple:
+        """ Prompts the user with a branch configuration window. Returns the new data if provided, or None if not """
+        print('Configuration prompt')
+
+        # Create the prompt object
+        prompt = EditBranchPrompt(branch_name, branch_description)
+
+        # Use a loop here to allow the user to continually try again until they choose to cancel the process
+        # This is particularly useful in case they wrote a description they really don't want to lose
         # 0 = dialog was cancelled, 1 = dialogue was accepted
-        if prompt.exec() == 1:
+        while prompt.exec() == 1:
             new_data = prompt.Get()
-            branch_entry.Set(new_data)
 
-            self.ResizeListEntry(selection, branch_entry)
+            # Validate the branch name before we try creating the branch
+            if self.ValidateBranchName(new_data[0]):
 
+                # Name validated. Return the new data
+                return new_data
 
+            # The chosen name already exists. Inform the user
+            else:
+                QtWidgets.QMessageBox.about(self, "Branch Name in Use!",
+                                            "The chosen branch name is already in use!\nPlease choose a new name"
+                                            )
+                return None
 
+    def ValidateBranchName(self, name) -> bool:
+        """ Check if the provided branch name already exists """
 
-        # Resize the row to fit any contents it has
-        #self.branches_list.resizeRowToContents(new_entry_row)
-        #self.branches_list.updateGeometry()
-        #self.branches_list.setResizeMode(QtWidgets.QListWidget.Fixed)
-        #self.branches_list.resizeMode()
+        for entry_index in range(0, self.branches_list.count()):
+            entry = self.branches_list.item(entry_index)
+
+            if self.branches_list.itemWidget(entry).Get()[0] == name:
+                # Match found
+                return False
+
+        # No match found
+        return True
+
 
     def ResizeListEntry(self, list_item_container, list_item_object):
         """ Resize the provided list entry to match the size of it's contents """
-
         list_item_container.setSizeHint(list_item_object.sizeHint())

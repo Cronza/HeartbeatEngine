@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class BranchesEntry(QtWidgets.QWidget):
@@ -13,16 +14,27 @@ class BranchesEntry(QtWidgets.QWidget):
         self.branch_data = branch_data
 
         # ****** DISPLAY WIDGETS ******
+        # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use
+        # the minimum where possible
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum,
+                                           QtWidgets.QSizePolicy.Fixed)
+        #size_policy.setHorizontalStretch(0)
+        #size_policy.setVerticalStretch(0)
+
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
+        #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setFont(settings.header_2_font)
         self.name_widget.setStyleSheet(settings.header_2_color)
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
+        self.name_widget.setAlignment(Qt.AlignTop)
+        self.name_widget.setSizePolicy(size_policy)
+        self.name_widget.heightForWidth(0)
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
@@ -30,6 +42,8 @@ class BranchesEntry(QtWidgets.QWidget):
         self.subtext_widget.setStyleSheet(settings.subtext_color)
         self.subtext_widget.setWordWrap(True)
         self.subtext_widget.setText('Test Description')
+        self.subtext_widget.setAlignment(Qt.AlignTop)
+        self.subtext_widget.setSizePolicy(size_policy)
 
         # Add everything to the layout
         self.main_layout.addWidget(self.name_widget)

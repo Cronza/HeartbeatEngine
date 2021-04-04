@@ -59,6 +59,7 @@ class DetailsPanel(QtWidgets.QWidget):
         # Create Details List
         self.details_table = QtWidgets.QTreeWidget(self)
         self.details_table.setColumnCount(2)  # 2 columns: Name & input
+        self.details_table.setHeaderLabels(['Name', 'Input'])
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
