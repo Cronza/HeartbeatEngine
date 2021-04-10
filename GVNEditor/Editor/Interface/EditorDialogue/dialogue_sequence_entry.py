@@ -53,9 +53,7 @@ class DialogueEntry(QtWidgets.QWidget):
                     param_data = param['default']
 
                 # If we've already started building the string, our concatenation will be a bit different
-
                 cur_text = self.subtext_widget.text()
-                print(cur_text)
                 if cur_text:
                     self.subtext_widget.setText(cur_text + f", {param_name}: {param_data}")
                 else:

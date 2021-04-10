@@ -43,9 +43,9 @@ class EditorDialogue():
         # Refresh the details panel to reflect the newly chosen row
         self.UpdateDetails(selection)
 
-    # ****** TOOLBAR BUTTON FUNCTIONS ******
+    # ****** DIALOGUE SEQUENCE TOOLBAR BUTTON FUNCTIONS ******
 
-    def AddEntry(self, action_data: dict, specific_row: int = None) -> DialogueEntry:
+    def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False) -> DialogueEntry:
         """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
         print("Adding new dialogue entry")
 
@@ -62,7 +62,14 @@ class EditorDialogue():
 
         # Assign the entry widget to the row
         self.ed_ui.dialogue_sequence.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
-        self.ed_ui.dialogue_sequence.dialogue_table.selectRow(new_entry_row)
+
+        # Since selecting the new row will cause the details panel to refesh, allowing opting out in case
+        # batch entry creation is happening
+        if not skip_select:
+            print('DONT skip')
+            self.ed_ui.dialogue_sequence.dialogue_table.selectRow(new_entry_row)
+        else:
+            print("skip")
 
         # Resize the row to fit any contents it has
         self.ed_ui.dialogue_sequence.dialogue_table.resizeRowToContents(new_entry_row)
@@ -164,29 +171,25 @@ class EditorDialogue():
     # ****** BRANCH FUNCTIONS ******
     #@TODO: How to support the initial switch when 'main' is created?
     def SwitchBranches(self, cur_branch, new_branch):
-        print("Current Branch: ")
-        print(cur_branch)
-        print("New Branch: ")
-        print(new_branch)
-
+        """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
         # If there is no source branch, then there is nothing to store
         if cur_branch:
-            # Collect all the data from the dialogue sequence
-            num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
 
             # Clear the contents of the current branch since we're forcefully updating whats stored
             cur_branch.branch_data.clear()
 
             # Store the data from each entry in the branch
+            num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
             for entry_index in range(num_of_entries):
-                dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
 
+                # Store the data held by the entry
+                dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
                 cur_branch.branch_data.append(dialogue_entry.action_data)
 
-            # Clear the list of dialogue entries now that they're stored
+            # Clear the list of dialogue entries now that their data is stored
             self.ed_ui.dialogue_sequence.Clear()
 
         # Load any entries in the new branch (if applicable)
         if new_branch.branch_data:
             for entry in new_branch.branch_data:
-                self.AddEntry(entry)
+                self.AddEntry(entry, None, True)
