@@ -3,23 +3,21 @@ from PyQt5.QtCore import Qt
 
 
 class BranchesEntry(QtWidgets.QWidget):
-    def __init__(self, branch_data, settings, select_func):
+    def __init__(self, settings, select_func):
         super().__init__()
         self.settings = settings
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
 
-        # Store this entries action data
-        self.branch_data = branch_data
+        # Store all dialogue entries associated with this branch
+        self.branch_data = []
 
         # ****** DISPLAY WIDGETS ******
         # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use
         # the minimum where possible
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                                           QtWidgets.QSizePolicy.Fixed)
-        #size_policy.setHorizontalStretch(0)
-        #size_policy.setVerticalStretch(0)
+                                           QtWidgets.QSizePolicy.Minimum)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setSpacing(0)
@@ -32,7 +30,7 @@ class BranchesEntry(QtWidgets.QWidget):
         self.name_widget.setStyleSheet(settings.header_2_color)
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
-        self.name_widget.setAlignment(Qt.AlignTop)
+        #self.name_widget.setAlignment(Qt.AlignTop)
         self.name_widget.setSizePolicy(size_policy)
         self.name_widget.heightForWidth(0)
 
@@ -40,7 +38,7 @@ class BranchesEntry(QtWidgets.QWidget):
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setFont(settings.subtext_font)
         self.subtext_widget.setStyleSheet(settings.subtext_color)
-        self.subtext_widget.setWordWrap(True)
+        #self.subtext_widget.setWordWrap(True)
         self.subtext_widget.setText('Test Description')
         self.subtext_widget.setAlignment(Qt.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)

@@ -103,3 +103,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.main_layout.addWidget(self.title)
         self.main_layout.addWidget(self.main_toolbar)
         self.main_layout.addWidget(self.dialogue_table)
+
+    def Clear(self):
+        """ Deletes all data in the dialogue table """
+        for row in range(self.dialogue_table.rowCount(), 0, -1):
+            self.dialogue_table.removeRow(row - 1)

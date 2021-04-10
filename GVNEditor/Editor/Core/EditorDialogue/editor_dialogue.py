@@ -29,6 +29,11 @@ class EditorDialogue():
         # Build the Dialogue Editor UI
         self.ed_ui = EditorDialogueUI(self)
 
+        # Initialize a main branch
+        self.ed_ui.branches.CreateBranch(
+            ("main", "This is the default, main branch\nConsider this the root of your dialogue tree")
+        )
+
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
         print("Changing active entry")
@@ -156,5 +161,32 @@ class EditorDialogue():
         else:
             return None
 
+    # ****** BRANCH FUNCTIONS ******
+    #@TODO: How to support the initial switch when 'main' is created?
+    def SwitchBranches(self, cur_branch, new_branch):
+        print("Current Branch: ")
+        print(cur_branch)
+        print("New Branch: ")
+        print(new_branch)
 
+        # If there is no source branch, then there is nothing to store
+        if cur_branch:
+            # Collect all the data from the dialogue sequence
+            num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
 
+            # Clear the contents of the current branch since we're forcefully updating whats stored
+            cur_branch.branch_data.clear()
+
+            # Store the data from each entry in the branch
+            for entry_index in range(num_of_entries):
+                dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
+
+                cur_branch.branch_data.append(dialogue_entry.action_data)
+
+            # Clear the list of dialogue entries now that they're stored
+            self.ed_ui.dialogue_sequence.Clear()
+
+        # Load any entries in the new branch (if applicable)
+        if new_branch.branch_data:
+            for entry in new_branch.branch_data:
+                self.AddEntry(entry)

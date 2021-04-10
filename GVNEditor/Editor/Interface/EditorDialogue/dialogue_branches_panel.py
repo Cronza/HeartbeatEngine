@@ -9,6 +9,10 @@ class BranchesPanel(QtWidgets.QWidget):
         self.ed_core = ed_core
         self.settings = settings
 
+        # Keep track of the active branch as we're switching between entries so we know where
+        # to store dialogue entry data
+        self.active_branch = None
+
         self.branches_layout = QtWidgets.QVBoxLayout(self)
         self.branches_layout.setContentsMargins(0, 0, 0, 0)
         self.branches_layout.setSpacing(0)
@@ -69,13 +73,12 @@ class BranchesPanel(QtWidgets.QWidget):
         # Create Details List
         self.branches_list = QtWidgets.QListWidget(self)
         self.branches_list.itemDoubleClicked.connect(self.EditBranch)
+        self.branches_list.itemSelectionChanged.connect(self.ChangeBranch)
 
         # ********** Add All Major Pieces to details layout **********
         self.branches_layout.addWidget(self.branches_title)
         self.branches_layout.addWidget(self.branches_toolbar)
         self.branches_layout.addWidget(self.branches_list)
-
-        self.CreateBranch(("main", "This is the default, main branch. Consider this the root of your dialogue tree"))
 
     def CreateBranch(self, data):
         """ Adds a new branch entry to the branch list """
@@ -84,12 +87,22 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_list.addItem(list_item)
 
         # Create the core part of the entry
-        new_entry = BranchesEntry("test", self.settings, None)
+        new_entry = BranchesEntry(self.settings, None)
         self.branches_list.setItemWidget(list_item, new_entry)
         new_entry.Set(data)
 
         # Adjust the size hint of the item container to match the contents
         list_item.setSizeHint(new_entry.sizeHint())
+
+        # Collect the data of all existing dialogue entries
+        #self.ChangeBranch()
+        #self.ed_core.SwitchBranches(
+        #    self.branches_list.itemWidget(self.branches_list.currentItem()),
+        #    new_entry
+        #)
+
+        # Select the new entry
+        self.branches_list.setCurrentItem(list_item)
 
     def AddBranch(self):
         """ Prompts the user for branch information, and creates a branch with that information """
@@ -150,7 +163,6 @@ class BranchesPanel(QtWidgets.QWidget):
                 QtWidgets.QMessageBox.about(self, "Branch Name in Use!",
                                             "The chosen branch name is already in use!\nPlease choose a new name"
                                             )
-                return None
 
     def ValidateBranchName(self, name) -> bool:
         """ Check if the provided branch name already exists """
@@ -165,7 +177,18 @@ class BranchesPanel(QtWidgets.QWidget):
         # No match found
         return True
 
-
     def ResizeListEntry(self, list_item_container, list_item_object):
         """ Resize the provided list entry to match the size of it's contents """
         list_item_container.setSizeHint(list_item_object.sizeHint())
+
+    def ChangeBranch(self):
+        """ A wrapper for the real SwitchBranch function. This acquires and provides the right entry references """
+        selection = self.branches_list.itemWidget(self.branches_list.currentItem())
+
+        self.ed_core.SwitchBranches(
+            self.active_branch,
+            selection
+        )
+
+        # Update the active branch to point to the newly selected branch
+        self.active_branch = selection
