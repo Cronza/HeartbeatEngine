@@ -55,7 +55,7 @@ class Settings:
 
         self.LoadEditorSettings("Config/Editor.yaml")
         self.LoadStyleSettings()
-        self.GetActionDatabase("Config/ActionsDatabase.yaml")
+        self.LoadActionDatabase("Config/ActionsDatabase.yaml")
 
     def LoadEditorSettings(self, data_path):
         """ Loads the 'Editor.yaml' file for the editor """
@@ -70,12 +70,17 @@ class Settings:
             )
         )
 
+    def LoadActionDatabase(self, data_path):
+        """ Reads in the 'ActionsDatabase.yaml' file """
+        self.action_database = Reader.ReadAll(data_path)
+
     def GetProjectContentDirectory(self):
         """ Returns the 'Content' folder for the active project """
         return os.path.join(self.user_project_dir, "Content")
 
-    def GetActionDatabase(self, data_path):
-        self.action_database = Reader.ReadAll(data_path)
+    def GetGlobalSetting(self, category, name):
+        """ Returns a value from the open project file given a category and parameter name """
+        return self.user_project_data[category][name]
 
     def LoadStyleSettings(self):
         #@TODO: Switch to using QPalette

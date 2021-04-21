@@ -49,6 +49,12 @@ Renderables:
       editable: True
       preview: True
 
+    - name: "flip"
+      type: "bool"
+      default: False
+      editable: True
+      preview: True
+
     - name: "z_order"
       type: "int"
       default: 0
@@ -56,7 +62,7 @@ Renderables:
         category: "SpriteSettings"
         global_parameter: "z_order"
       editable: True
-      preview: False
+      preview: True
 
     - name: "transition"
       type: "container"
@@ -107,10 +113,56 @@ Renderables:
 Dialogue:
   icon: "Content/Icons/Dialogue.png"
   options:
-    - display_name: "Dialogue"
-      action_name: "dialogue"
-    - display_name: "Choice"
-      action_name: "choice"
+  - display_name: "Dialogue"
+    action_name: "dialogue"
+    requirements:
+      - name: "key"
+        type: "str"
+        default: ""
+        editable: True
+        preview: True
+
+      - name: "sprite"
+        type: "file_image"
+        default: "None"
+        editable: False
+        preview: True
+
+      - name: "position"
+        type: "tuple"
+        default: 0,0
+        editable: True
+        preview: True
+
+      - name: "center_align"
+        type: "bool"
+        default: True
+        global:
+          category: "SpriteSettings"
+          global_parameter: "center_align"
+        editable: True
+        preview: True
+
+      - name: "z_order"
+        type: "int"
+        default: 0
+        global:
+          category: "SpriteSettings"
+          global_parameter: "z_order"
+        editable: True
+        preview: False
+
+      - name: "transition"
+        type: "container"
+        preview: False
+        children:
+          - name: "transition_type"
+            type: "dropdown"
+            default: "None, fade_in"
+            editable: True
+            preview: True
+  - display_name: "Choice"
+    action_name: "choice"
 
 #- Sound: ""
 #- Effect: ""

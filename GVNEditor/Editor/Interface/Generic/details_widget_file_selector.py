@@ -3,15 +3,15 @@ from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryFileSelector(DetailsEntryBase):
-    def __init__(self, settings, type_filter, refresh_func=None):
-        super().__init__(settings, refresh_func)
+    def __init__(self, settings, type_filter, refresh_func=None, global_toggle_func=None):
+        super().__init__(settings, refresh_func, global_toggle_func)
 
         # Store a type filter to restrict what files can be chosen in the browser
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        self.input_widget.textChanged.connect(refresh_func)
+        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Create the file selector button, ands style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -32,7 +32,14 @@ class DetailsEntryFileSelector(DetailsEntryBase):
         return self.input_widget.text()
 
     def Set(self, data) -> None:
+        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
+        self.input_widget.disconnect()
+
+        # Change the data without causing any signal calls
         self.input_widget.setText(data)
+
+        # Now that the input is changed, reconnect
+        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def MakeUneditable(self):
         self.input_widget.setReadOnly(True)

@@ -94,13 +94,6 @@ class BranchesPanel(QtWidgets.QWidget):
         # Adjust the size hint of the item container to match the contents
         list_item.setSizeHint(new_entry.sizeHint())
 
-        # Collect the data of all existing dialogue entries
-        #self.ChangeBranch()
-        #self.ed_core.SwitchBranches(
-        #    self.branches_list.itemWidget(self.branches_list.currentItem()),
-        #    new_entry
-        #)
-
         # Select the new entry
         self.branches_list.setCurrentItem(list_item)
 

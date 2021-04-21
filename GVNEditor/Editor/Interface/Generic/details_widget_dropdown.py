@@ -6,9 +6,9 @@ from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryDropdown(DetailsEntryBase):
-    def __init__(self, settings, options: str, refresh_func=None):
+    def __init__(self, settings, options: str, refresh_func=None, global_toggle_func=None):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
-        super().__init__(settings, refresh_func)
+        super().__init__(settings, refresh_func, global_toggle_func)
 
         self.input_widget = QtWidgets.QComboBox()
         #self.input_widget.setText("None"

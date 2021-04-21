@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets
 class EditBranchPrompt(QtWidgets.QDialog):
     def __init__(self, branch_name, branch_description, parent=None):
         super().__init__(parent)
+        self.setWindowTitle("Branch Configuration")
 
         # Create layout and add widgets
         self.main_layout = QtWidgets.QVBoxLayout()

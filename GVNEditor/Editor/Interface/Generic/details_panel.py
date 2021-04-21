@@ -58,8 +58,25 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Create Details List
         self.details_table = QtWidgets.QTreeWidget(self)
-        self.details_table.setColumnCount(2)  # 2 columns: Name & input
-        self.details_table.setHeaderLabels(['Name', 'Input'])
+        self.details_table.setColumnCount(3)
+        self.details_table.setHeaderLabels(['Name', 'Input', 'G'])
+        self.details_table.setAutoScroll(False)
+        self.details_table.header().setFont(self.settings.button_font)
+        self.details_table.header().setStretchLastSection(False)  # Disable to allow custom sizing
+        self.details_table.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+        self.details_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.details_table.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
+        self.details_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        # --- Specialized Settings for the 'G' column ---
+        # 1. Allow columns to be significantly smaller than normal
+        self.details_table.header().setMinimumSectionSize(round(self.details_table.header().width() / 4))
+
+        # 2. Force the last column to be barely larger than a standard checkbox
+        self.details_table.setColumnWidth(2, round(self.details_table.header().width() / 5))
+
+        # 3. Align the column header text to match the alignment of the checkbox
+        self.details_table.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
@@ -138,6 +155,12 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Containers are special in that they don't hold data, so generally ignore them for certain actions
         if not data["type"] == "container":
+            # Only show the global toggle if this detail has a global setting. By default, all settings with global
+            # values use them by default
+            if 'global' in data:
+                details_widget.show_global_toggle = True
+                details_widget.global_toggle.Set(True)
+
             # Update the contents of the entry
             if 'cache' in data:
                 details_widget.Set(data["cache"])
@@ -163,6 +186,8 @@ class DetailsPanel(QtWidgets.QWidget):
 
         self.details_table.setItemWidget(entry, 0, entry.name_widget)
         self.details_table.setItemWidget(entry, 1, entry.input_container)
+        if entry.show_global_toggle:
+            self.details_table.setItemWidget(entry, 2, entry.global_toggle)
 
         # If the entry has any children, add them all via recursion
         if entry.childCount() > 0:
@@ -176,28 +201,28 @@ class DetailsPanel(QtWidgets.QWidget):
         data_type = data['type']
 
         if data_type == "str":
-             return DetailsEntryText(self.settings, self.DetailEntryUpdated)
+             return DetailsEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "tuple":
-            return DetailsEntryTuple(self.settings, self.DetailEntryUpdated)
+            return DetailsEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "bool":
-            return DetailsEntryBool(self.settings, self.DetailEntryUpdated)
+            return DetailsEntryBool(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "int":
-            return DetailsEntryInt(self.settings, self.DetailEntryUpdated)
+            return DetailsEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "file":
-            return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated)
+            return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "file_image":
-            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'], self.DetailEntryUpdated)
+            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "dropdown":
-            return DetailsEntryDropdown(self.settings, data['default'], self.DetailEntryUpdated)
+            return DetailsEntryDropdown(self.settings, data['default'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
 
         elif data_type == "container":
-            new_entry = DetailsEntryContainer(self.settings, data['children'], self.DetailEntryUpdated)
+            new_entry = DetailsEntryContainer(self.settings, data['children'])
             for child in data['children']:
                 new_entry.addChild(self.CreateEntryWidget(child))
 
@@ -207,7 +232,7 @@ class DetailsPanel(QtWidgets.QWidget):
         """ Deletes all data in the details table """
         self.details_table.clear()
 
-    def DetailEntryUpdated(self):
+    def DetailEntryUpdated(self, details_entry):
         """
         Whenever a details entry is changed, we need to inform the active entry so it can refresh necessary elements
         """
@@ -217,3 +242,24 @@ class DetailsPanel(QtWidgets.QWidget):
 
             # Inform the active entry to refresh
             self.active_entry.Refresh()
+
+    def GlobalToggleEnabled(self, details_entry):
+        """
+        Whenever a details entry's global checkbox is used, we need to refresh that entry with the relevant
+        global information stored in the active entry
+        """
+        key_name = details_entry.name_widget.text()
+        for requirement in self.active_entry.action_data['requirements']:
+            if requirement['name'] == key_name:
+                requirement['cache'] = self.settings.GetGlobalSetting(
+                    requirement['global']['category'],
+                    requirement['global']['global_parameter']
+                )
+
+                # Since we have the details entry reference, let's update it's input
+                details_entry.Set(requirement['cache'])
+
+                # Refresh the active entry
+                self.active_entry.Refresh()
+
+
