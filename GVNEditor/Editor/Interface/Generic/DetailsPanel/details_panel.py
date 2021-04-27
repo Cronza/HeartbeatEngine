@@ -1,12 +1,12 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
-from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
-from Editor.Interface.Generic.details_widget_text import DetailsEntryText
-from Editor.Interface.Generic.details_widget_bool import DetailsEntryBool
-from Editor.Interface.Generic.details_widget_tuple import DetailsEntryTuple
-from Editor.Interface.Generic.details_widget_int import DetailsEntryInt
-from Editor.Interface.Generic.details_widget_file_selector import DetailsEntryFileSelector
-from Editor.Interface.Generic.details_widget_dropdown import DetailsEntryDropdown
-from Editor.Interface.Generic.details_widget_container import DetailsEntryContainer
+from PyQt5 import QtWidgets, QtCore
+from Editor.Interface.Generic.DetailsPanel.details_entry_text import DetailsEntryText
+from Editor.Interface.Generic.DetailsPanel.details_entry_bool import DetailsEntryBool
+from Editor.Interface.Generic.DetailsPanel.details_entry_color import DetailsEntryColor
+from Editor.Interface.Generic.DetailsPanel.details_entry_tuple import DetailsEntryTuple
+from Editor.Interface.Generic.DetailsPanel.details_entry_int import DetailsEntryInt
+from Editor.Interface.Generic.DetailsPanel.details_entry_file_selector import DetailsEntryFileSelector
+from Editor.Interface.Generic.DetailsPanel.details_entry_dropdown import DetailsEntryDropdown
+from Editor.Interface.Generic.DetailsPanel.details_entry_container import DetailsEntryContainer
 
 
 # @TODO: Split this file up into a functions class & U.I class
@@ -25,7 +25,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
         self.details_layout.setSpacing(0)
-        
+
         # Create title
         self.details_title = QtWidgets.QLabel(self)
         self.details_title.setFont(self.settings.header_1_font)
@@ -178,7 +178,6 @@ class DetailsPanel(QtWidgets.QWidget):
         Given a details widget, add it to the bottom of the details tree
         Optionally, if a parent is provided, the entry is assigned as a child to it
         """
-
         if parent:
             parent.addChild(entry)
         else:
@@ -202,25 +201,22 @@ class DetailsPanel(QtWidgets.QWidget):
 
         if data_type == "str":
              return DetailsEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
         elif data_type == "tuple":
             return DetailsEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
         elif data_type == "bool":
             return DetailsEntryBool(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
+        elif data_type == "color":
+            return DetailsEntryColor(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "int":
             return DetailsEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
         elif data_type == "file":
             return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
         elif data_type == "file_image":
             return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
+        elif data_type == "file_font":
+            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "dropdown":
-            return DetailsEntryDropdown(self.settings, data['default'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
-
+            return DetailsEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "container":
             new_entry = DetailsEntryContainer(self.settings, data['children'])
             for child in data['children']:
@@ -243,13 +239,22 @@ class DetailsPanel(QtWidgets.QWidget):
             # Inform the active entry to refresh
             self.active_entry.Refresh()
 
-    def GlobalToggleEnabled(self, details_entry):
+    def GlobalToggleEnabled(self, details_entry, parent=None):
         """
-        Whenever a details entry's global checkbox is used, we need to refresh that entry with the relevant
+        Whenever a detail entry's global checkbox is used, we need to refresh that entry with the relevant
         global information stored in the active entry
         """
         key_name = details_entry.name_widget.text()
-        for requirement in self.active_entry.action_data['requirements']:
+
+        # The key changes depending if we're at root of parsing children ('requirements' vs 'children')
+        requirements_list = None
+        if parent:
+            requirements_list = parent['children']
+        else:
+            requirements_list = self.active_entry.action_data["requirements"]
+
+        # Search through the active entry's data, and try to find the corresponding entry for this
+        for requirement in requirements_list:
             if requirement['name'] == key_name:
                 requirement['cache'] = self.settings.GetGlobalSetting(
                     requirement['global']['category'],
@@ -262,4 +267,6 @@ class DetailsPanel(QtWidgets.QWidget):
                 # Refresh the active entry
                 self.active_entry.Refresh()
 
-
+            # Recurse if applicable
+            elif requirement['type'] == 'container':
+                self.GlobalToggleEnabled(details_entry, requirement)

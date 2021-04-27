@@ -21,7 +21,7 @@ class DialogueEntry(QtWidgets.QWidget):
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setFont(settings.header_2_font)
         self.name_widget.setStyleSheet(settings.header_2_color)
-        self.name_widget.setText(self.action_data['display_name'])
+        self.name_widget.setText(self.action_data["display_name"])
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
@@ -37,27 +37,35 @@ class DialogueEntry(QtWidgets.QWidget):
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
-        # Clear text
-        self.subtext_widget.setText("")
+        self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
 
-        # Populate the subtext with all params that have preview enabled
-        for param in self.action_data['requirements']:
-            if param['preview']:
+
+    def CompileSubtextString(self, data):
+        """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
+        cur_string = ""
+        for param in data:
+            if param["preview"]:
 
                 # If cached data is available, use it. Otherwise display the default
-                param_name = param['name']
+                param_name = param["name"]
                 param_data = None
-                if 'cache' in param:
-                    param_data = param['cache']
-                else:
-                    param_data = param['default']
 
-                # If we've already started building the string, our concatenation will be a bit different
-                cur_text = self.subtext_widget.text()
-                if cur_text:
-                    self.subtext_widget.setText(cur_text + f", {param_name}: {param_data}")
+                if param["type"] == "container":
+                    # Recurse, searching the children as well
+                    cur_string += f"{param_name}: ["
+                    cur_string += self.CompileSubtextString(param['children'])
+                    cur_string += "]"
+
                 else:
-                    self.subtext_widget.setText(cur_text + f"{param_name}: {param_data}")
+                    if "cache" in param:
+                        param_data = param["cache"]
+                    else:
+                        param_data = param["default"]
+
+                    cur_string += f"{param_name}: {param_data}, "
+
+        # Due to how the comma formatting is, strip it from the end of the string
+        return cur_string.strip(', ')
 
     def Refresh(self):
         """

@@ -1,15 +1,24 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
+from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
 
 class DetailsEntryTuple(DetailsEntryBase):
     def __init__(self, settings, refresh_func=None, global_toggle_func=None):
         super().__init__(settings, refresh_func, global_toggle_func)
 
-        self.input_widget_title = QtWidgets.QLabel('x')
+        self.input_widget_title = QtWidgets.QLabel('X')
+        self.input_widget_title.setFont(self.settings.paragraph_font)
+        self.input_widget_title.setStyleSheet(settings.paragraph_color)
         self.input_widget = QtWidgets.QLineEdit()
+        self.input_widget.setFont(self.settings.paragraph_font)
+        self.input_widget.setStyleSheet(settings.paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget_alt_title = QtWidgets.QLabel('y')
+
+        self.input_widget_alt_title = QtWidgets.QLabel('Y')
+        self.input_widget_alt_title.setFont(self.settings.paragraph_font)
+        self.input_widget_alt_title.setStyleSheet(settings.paragraph_color)
         self.input_widget_alt = QtWidgets.QLineEdit()
+        self.input_widget_alt.setFont(self.settings.paragraph_font)
+        self.input_widget_alt.setStyleSheet(settings.paragraph_color)
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
@@ -36,9 +45,8 @@ class DetailsEntryTuple(DetailsEntryBase):
         self.input_widget_alt.disconnect()
 
         # Change the data without causing any signal calls
-        tuple_data = data.split(',')
-        self.input_widget.setText(tuple_data[0])
-        self.input_widget_alt.setText(tuple_data[1])
+        self.input_widget.setText(str(data[0]))
+        self.input_widget_alt.setText(str(data[1]))
 
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)

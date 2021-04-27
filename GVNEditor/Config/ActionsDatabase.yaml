@@ -19,150 +19,328 @@
 Renderables:
   icon: "Content/Icons/Renderable.png"
   options:
-  - display_name: "Create Sprite"
-    action_name: "create_sprite"
-    requirements:
-    - name: "key"
-      type: "str"
-      default: ""
-      editable: True
-      preview: True
+    # Create Sprite
+    - display_name: "Create Sprite"
+      action_name: "create_sprite"
+      requirements:
+        - name: "key"
+          type: "str"
+          default: ""
+          editable: True
+          preview: True
 
-    - name: "sprite"
-      type: "file_image"
-      default: "None"
-      editable: False
-      preview: True
+        - name: "sprite"
+          type: "file_image"
+          default: "None"
+          editable: False
+          preview: True
 
-    - name: "position"
-      type: "tuple"
-      default: 0,0
-      editable: True
-      preview: True
+        - name: "position"
+          type: "tuple"
+          default: 0,0
+          editable: True
+          preview: True
 
-    - name: "center_align"
-      type: "bool"
-      default: True
-      global:
-        category: "SpriteSettings"
-        global_parameter: "center_align"
-      editable: True
-      preview: True
+        - name: "center_align"
+          type: "bool"
+          default: True
+          global:
+            category: "SpriteSettings"
+            global_parameter: "center_align"
+          editable: True
+          preview: True
 
-    - name: "flip"
-      type: "bool"
-      default: False
-      editable: True
-      preview: True
+        - name: "flip"
+          type: "bool"
+          default: False
+          editable: True
+          preview: False
 
-    - name: "z_order"
-      type: "int"
-      default: 0
-      global:
-        category: "SpriteSettings"
-        global_parameter: "z_order"
-      editable: True
-      preview: True
+        - name: "z_order"
+          type: "int"
+          default: 0
+          global:
+            category: "SpriteSettings"
+            global_parameter: "z_order"
+          editable: True
+          preview: True
 
-    - name: "transition"
-      type: "container"
-      preview: False
-      children:
-      - name: "transition_type"
-        type: "dropdown"
-        default: "None, fade_in"
-        editable: True
-        preview: True
+        - name: "transition"
+          type: "container"
+          preview: True
+          children:
+            - name: "type"
+              type: "dropdown"
+              default: "None"
+              options:
+                - "None"
+                - "fade_in"
+              editable: True
+              preview: True
 
-      - name: "transition_speed"
-        type: "int"
-        default: 500
-        editable: True
-        preview: True
+            - name: "speed"
+              type: "int"
+              default: 500
+              editable: True
+              preview: True
+    # Create Text
+    - display_name: "Create Text"
+      action_name: "create_text"
+      requirements:
+        - name: "key"
+          type: "str"
+          default: ""
+          editable: True
+          preview: True
 
-  - display_name: "Create Background"
-    action_name: "create_background"
-    requirements:
-    - name: "key"
-      type: "str"
-      default: "Background"
-      editable: False
-      preview: True
+        - name: "position"
+          type: "tuple"
+          default: 0,0
+          editable: True
+          preview: True
 
-    - name: "sprite"
-      type: "file_image"
-      default: "None"
-      editable: False
-      preview: True
+        - name: "center_align"
+          type: "bool"
+          default: True
+          global:
+            category: "TextSettings"
+            global_parameter: "center_align"
+          editable: True
+          preview: False
 
-    - name: "position"
-      type: "tuple"
-      default: 0,0
-      editable: True
-      preview: False
+        - name: "text"
+          type: "str"
+          default: ""
+          editable: True
+          preview: True
 
-    - name: "z_order"
-      type: "int"
-      default: -9999 #Replace with a reference to the global setting
-      global:
-        category: "SpriteSettings"
-        global_parameter: "background_z_order"
-      editable: False
-      preview: False
+        - name: "text_size"
+          type: "int"
+          default: 24
+          global:
+            category: "TextSettings"
+            global_parameter: "size"
+          editable: True
+          preview: True
+
+        - name: "text_color"
+          type: "color"
+          default: [255, 255, 255]
+          global:
+            category: "TextSettings"
+            global_parameter: "color"
+          editable: True
+          preview: True
+
+        - name: "font"
+          type: "file_font"
+          default: "None"
+          global:
+            category: "TextSettings"
+            global_parameter: "font"
+          editable: False
+          preview: False
+
+        - name: "z_order"
+          type: "int"
+          default: 0
+          global:
+            category: "TextSettings"
+            global_parameter: "z_order"
+          editable: True
+          preview: True
+
+        - name: "transition"
+          type: "container"
+          preview: True
+          children:
+            - name: "type"
+              type: "dropdown"
+              default: "None"
+              options:
+                - "None"
+                - "fade_in"
+              editable: True
+              preview: True
+
+            - name: "speed"
+              type: "int"
+              default: 500
+              editable: True
+              preview: True
+    # Create Background
+    - display_name: "Create Background"
+      action_name: "create_background"
+      requirements:
+        - name: "key"
+          type: "str"
+          default: "Background"
+          editable: False
+          preview: True
+
+        - name: "sprite"
+          type: "file_image"
+          default: "None"
+          editable: False
+          preview: True
+
+        - name: "position"
+          type: "tuple"
+          default: 0,0
+          editable: True
+          preview: False
+
+        - name: "z_order"
+          type: "int"
+          default: -9999 #Replace with a reference to the global setting
+          global:
+            category: "SpriteSettings"
+            global_parameter: "background_z_order"
+          editable: False
+          preview: False
 
 Dialogue:
   icon: "Content/Icons/Dialogue.png"
   options:
-  - display_name: "Dialogue"
-    action_name: "dialogue"
-    requirements:
-      - name: "key"
-        type: "str"
-        default: ""
-        editable: True
-        preview: True
+    - display_name: "Dialogue"
+      action_name: "dialogue"
+      requirements:
+        - name: "speaker"
+          type: "container"
+          preview: True
+          children:
+            - name: "key"
+              type: "str"
+              default: ""
+              editable: True
+              preview: True
 
-      - name: "sprite"
-        type: "file_image"
-        default: "None"
-        editable: False
-        preview: True
+            - name: "position"
+              type: "tuple"
+              default: 0,0
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_text_position"
+              editable: True
+              preview: False
 
-      - name: "position"
-        type: "tuple"
-        default: 0,0
-        editable: True
-        preview: True
+            - name: "center_align"
+              type: "bool"
+              default: True
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_center_align"
+              editable: True
+              preview: False
 
-      - name: "center_align"
-        type: "bool"
-        default: True
-        global:
-          category: "SpriteSettings"
-          global_parameter: "center_align"
-        editable: True
-        preview: True
+            - name: "text"
+              type: "str"
+              default: ""
+              editable: True
+              preview: True
 
-      - name: "z_order"
-        type: "int"
-        default: 0
-        global:
-          category: "SpriteSettings"
-          global_parameter: "z_order"
-        editable: True
-        preview: False
+            - name: "text_size"
+              type: "int"
+              default: 24
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_text_size"
+              editable: True
+              preview: False
 
-      - name: "transition"
-        type: "container"
-        preview: False
-        children:
-          - name: "transition_type"
-            type: "dropdown"
-            default: "None, fade_in"
-            editable: True
-            preview: True
-  - display_name: "Choice"
-    action_name: "choice"
+            - name: "text_color"
+              type: "color"
+              default: [255, 255, 255]
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_text_color"
+              editable: True
+              preview: False
+
+            - name: "font"
+              type: "file_font"
+              default: "None"
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_font"
+              editable: False
+              preview: False
+
+            - name: "z_order"
+              type: "int"
+              default: 0
+              global:
+                category: "DialogueSettings"
+                global_parameter: "speaker_z_order"
+              editable: True
+              preview: True
+
+        - name: "dialogue"
+          type: "container"
+          preview: True
+          children:
+            - name: "position"
+              type: "tuple"
+              default: 0,0
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_text_position"
+              editable: True
+              preview: False
+
+            - name: "center_align"
+              type: "bool"
+              default: True
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_center_align"
+              editable: True
+              preview: False
+
+            - name: "text"
+              type: "str"
+              default: ""
+              editable: True
+              preview: True
+
+            - name: "text_size"
+              type: "int"
+              default: 24
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_text_size"
+              editable: True
+              preview: False
+
+            - name: "text_color"
+              type: "color"
+              default: [255, 255, 255]
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_text_color"
+              editable: True
+              preview: False
+
+            - name: "font"
+              type: "file_font"
+              default: "None"
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_font"
+              editable: False
+              preview: False
+
+            - name: "z_order"
+              type: "int"
+              default: 0
+              global:
+                category: "DialogueSettings"
+                global_parameter: "dialogue_z_order"
+              editable: True
+              preview: True
+
+      #- display_name: "Choice"
+      #  action_name: "choice"
 
 #- Sound: ""
 #- Effect: ""

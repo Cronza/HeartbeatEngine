@@ -24,12 +24,16 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         # 'name_widget' and 'input_widget' are declared, but not initialized as it is up to the subclass to
         # do that
         self.name_widget = QtWidgets.QLabel()
+        self.name_widget.setFont(self.settings.paragraph_font)
+        self.name_widget.setStyleSheet(settings.paragraph_color)
+
         self.input_widget = None
         self.input_container = QtWidgets.QWidget()
 
         # 'global_toggle' is not supposed to be shown for all entries. It's only used for entries that need it
         self.show_global_toggle = False
         self.global_toggle = SimpleCheckbox(self.GlobalToggle)
+        self.global_toggle.setToolTip("Whether to use the global value specified in the project file for this entry")
 
         self.main_layout = QtWidgets.QHBoxLayout(self.input_container)
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -57,8 +61,10 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         When the global checkbox is toggled on, call a provided function, passing a reference to this class
         This function is not meant to be overridden
         """
+        print("sldsd")
         # Only update using global data when the global setting is turned 'on'
         if self.global_toggle.Get():
+            print(self.global_toggle_func)
             self.global_toggle_func(self)
 
 

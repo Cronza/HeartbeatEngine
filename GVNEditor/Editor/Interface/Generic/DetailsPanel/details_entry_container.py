@@ -1,5 +1,4 @@
-from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
+from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryContainer(DetailsEntryBase):

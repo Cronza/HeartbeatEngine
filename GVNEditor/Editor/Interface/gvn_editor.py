@@ -131,8 +131,8 @@ class GVNEditorUI():
         self.getting_started_layout = QtWidgets.QVBoxLayout(self.getting_started_container)
 
         getting_started_title = QtWidgets.QLabel("Getting Started")
-        getting_started_title.setFont(self.settings.header_3_font)
-        getting_started_title.setStyleSheet(self.settings.header_3_color)
+        getting_started_title.setFont(self.settings.editor_info_title_font)
+        getting_started_title.setStyleSheet(self.settings.editor_info_title_color)
 
         getting_started_message = QtWidgets.QLabel()
         getting_started_message.setText(
@@ -140,8 +140,8 @@ class GVNEditorUI():
             "1) Go to 'File' -> 'New Project' to Create a new GVN Project\n"
             "2) Go to 'File' -> 'Open Project' to Open an existing GVN Project"
         )
-        getting_started_message.setFont(self.settings.paragraph_2_font)
-        getting_started_message.setStyleSheet(self.settings.paragraph_2_color)
+        getting_started_message.setFont(self.settings.editor_info_paragraph_font)
+        getting_started_message.setStyleSheet(self.settings.editor_info_paragraph_color)
 
         self.getting_started_layout.setAlignment(Qt.AlignCenter)
         self.getting_started_layout.addWidget(getting_started_title)

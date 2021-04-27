@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.details_entry_base import DetailsEntryBase
+from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryFileSelector(DetailsEntryBase):
@@ -10,19 +10,17 @@ class DetailsEntryFileSelector(DetailsEntryBase):
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
+        self.input_widget.setFont(self.settings.paragraph_font)
+        self.input_widget.setStyleSheet(settings.paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-        # Create the file selector button, ands style it accordingly
+        # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
-        self.file_select_button.setStyleSheet(self.settings.details_button_style)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Folder.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.file_select_button.setIcon(icon)
         self.file_select_button.clicked.connect(self.OpenFilePrompt)
-
-        # By default, the user can't manually add a value to the input widget
-        #self.MakeUneditable()
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
