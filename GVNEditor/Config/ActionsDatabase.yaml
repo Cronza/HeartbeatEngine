@@ -109,7 +109,7 @@ Renderables:
           preview: False
 
         - name: "text"
-          type: "str"
+          type: "paragraph"
           default: ""
           editable: True
           preview: True
@@ -211,9 +211,9 @@ Dialogue:
           children:
             - name: "key"
               type: "str"
-              default: ""
-              editable: True
-              preview: True
+              default: "SpeakerText"
+              editable: False
+              preview: False
 
             - name: "position"
               type: "tuple"
@@ -279,6 +279,12 @@ Dialogue:
           type: "container"
           preview: True
           children:
+            - name: "key"
+              type: "str"
+              default: "DialogueText"
+              editable: False
+              preview: False
+
             - name: "position"
               type: "tuple"
               default: 0,0
@@ -298,7 +304,7 @@ Dialogue:
               preview: False
 
             - name: "text"
-              type: "str"
+              type: "paragraph"
               default: ""
               editable: True
               preview: True

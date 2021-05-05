@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 from Editor.Interface.Generic.DetailsPanel.details_entry_text import DetailsEntryText
+from Editor.Interface.Generic.DetailsPanel.details_entry_paragraph import DetailsEntryParagraph
 from Editor.Interface.Generic.DetailsPanel.details_entry_bool import DetailsEntryBool
 from Editor.Interface.Generic.DetailsPanel.details_entry_color import DetailsEntryColor
 from Editor.Interface.Generic.DetailsPanel.details_entry_tuple import DetailsEntryTuple
@@ -67,10 +68,12 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_table.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
         self.details_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.details_table.setUniformRowHeights(True)
 
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
         self.details_table.header().setMinimumSectionSize(round(self.details_table.header().width() / 4))
+        #self.details_table.header().setmaxim
 
         # 2. Force the last column to be barely larger than a standard checkbox
         self.details_table.setColumnWidth(2, round(self.details_table.header().width() / 5))
@@ -107,6 +110,51 @@ class DetailsPanel(QtWidgets.QWidget):
 
             # Create a new entry, and add it to the details list
             self.AddEntry(self.CreateEntryWidget(requirement))
+
+        # Expand all dropdowns automatically
+        self.details_table.expandAll()
+
+    def UpdateCachePROTOTYPE(self, parent=None):
+        """
+        Collect all inputs for all detail entries, and cache them in the active entry's action data
+        """
+        if self.active_entry:
+
+            # If we've been provided a parent (due to recursion or otherwise), parse it's children instead of root
+            target_item = None
+            if parent:
+                target_item = parent
+            else:
+                target_item = self.details_table.invisibleRootItem()
+
+            for details_entry_index in range(0, target_item.childCount()):
+
+                details_entry = target_item.child(details_entry_index)
+                details_entry_name = details_entry.name_widget.text()
+
+                # Since the requirements list is a list, we need to parse through for specifically for the
+                # match for this entry
+                for requirement in self.active_entry.action_data['requirements']:
+                    if requirement['name'] == details_entry_name:
+
+                        # If this details_entry has children (IE. It's a container), consider it's children
+                        # Currently this does a depth search of 1. A future upgrade may involve using recursion to
+                        # achieve a depth search of n
+                        if details_entry.childCount() > 0:
+
+                            for child_entry_index in range(0, details_entry.childCount()):
+                                child_entry = details_entry.child(child_entry_index)
+                                child_entry_name = child_entry.name_widget.text()
+
+                                # Repeat the search process. If a child is found, cache a value
+                                for child_requirement in requirement['children']:
+                                    if child_requirement['name'] == child_entry_name:
+                                        child_requirement['cache'] = child_entry.Get()
+
+                        # Containers don't store values themselves, so the above code accounts solely for it's children
+                        # If this entry is not a container, lets cache normally
+                        else:
+                            requirement['cache'] = details_entry.Get()
 
     def UpdateCache(self):
         """
@@ -175,8 +223,8 @@ class DetailsPanel(QtWidgets.QWidget):
 
     def AddEntry(self, entry, parent=None):
         """
-        Given a details widget, add it to the bottom of the details tree
-        Optionally, if a parent is provided, the entry is assigned as a child to it
+        Given a details widget, add it to the bottom of the details tree. If the details widget has any children, add
+        all of them through recursion
         """
         if parent:
             parent.addChild(entry)
@@ -201,6 +249,8 @@ class DetailsPanel(QtWidgets.QWidget):
 
         if data_type == "str":
              return DetailsEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+        elif data_type == "paragraph":
+            return DetailsEntryParagraph(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "tuple":
             return DetailsEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "bool":

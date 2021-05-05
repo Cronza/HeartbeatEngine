@@ -61,10 +61,8 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         When the global checkbox is toggled on, call a provided function, passing a reference to this class
         This function is not meant to be overridden
         """
-        print("sldsd")
         # Only update using global data when the global setting is turned 'on'
         if self.global_toggle.Get():
-            print(self.global_toggle_func)
             self.global_toggle_func(self)
 
 

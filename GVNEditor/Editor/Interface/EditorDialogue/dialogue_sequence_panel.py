@@ -1,5 +1,7 @@
+import copy
 from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.action_menu import ActionMenu
+from Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
 
 class DialogueSequencePanel(QtWidgets.QWidget):
@@ -10,7 +12,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.settings = settings
 
         # Create an action menu to be used later on for adding entries to the sequence
-        self.action_menu = ActionMenu(self.ed_core.settings, self.ed_core.AddEntry)
+        self.action_menu = ActionMenu(self.settings, self.AddEntry)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -56,7 +58,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.remove_entry_button.setIcon(icon)
-        self.remove_entry_button.clicked.connect(self.ed_core.RemoveEntry)
+        self.remove_entry_button.clicked.connect(self.RemoveEntry)
         self.main_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Copy Entry Button
@@ -64,7 +66,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.copy_entry_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Copy.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.copy_entry_button.setIcon(icon)
-        self.copy_entry_button.clicked.connect(self.ed_core.CopyEntry)
+        self.copy_entry_button.clicked.connect(self.CopyEntry)
         self.main_toolbar_layout.addWidget(self.copy_entry_button)
 
         # Move Entry Up Button
@@ -72,7 +74,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.move_entry_up_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Up.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.move_entry_up_button.setIcon(icon)
-        self.move_entry_up_button.clicked.connect(self.ed_core.MoveEntryUp)
+        self.move_entry_up_button.clicked.connect(self.MoveEntryUp)
         self.main_toolbar_layout.addWidget(self.move_entry_up_button)
 
         # Move Entry Down Button
@@ -80,7 +82,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.move_entry_down_button.setStyleSheet(button_style)
         icon.addPixmap(QtGui.QPixmap("Content/Icons/Down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.move_entry_down_button.setIcon(icon)
-        self.move_entry_down_button.clicked.connect(self.ed_core.MoveEntryDown)
+        self.move_entry_down_button.clicked.connect(self.MoveEntryDown)
         self.main_toolbar_layout.addWidget(self.move_entry_down_button)
 
         # Empty Space Spacer
@@ -108,3 +110,115 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         """ Deletes all data in the dialogue table """
         for row in range(self.dialogue_table.rowCount(), 0, -1):
             self.dialogue_table.removeRow(row - 1)
+
+    def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False) -> DialogueEntry:
+        """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
+        print("Adding new dialogue entry")
+
+        # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
+        new_entry_row = self.dialogue_table.rowCount()
+        if specific_row is not None:
+            new_entry_row = specific_row
+            self.dialogue_table.insertRow(new_entry_row)
+        else:
+            self.dialogue_table.insertRow(new_entry_row)
+
+        # Create a new dialogue entry object, and add it to the sequence widget
+        new_entry = DialogueEntry(action_data, self.settings, self.ed_core.UpdateActiveEntry)
+
+        # Assign the entry widget to the row
+        self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
+
+        # Since selecting the new row will cause the details panel to refesh, allowing opting out in case
+        # batch entry creation is happening
+        if not skip_select:
+            print('DONT skip')
+            self.dialogue_table.selectRow(new_entry_row)
+        else:
+            print("skip")
+
+        # Resize the row to fit any contents it has
+        self.dialogue_table.resizeRowToContents(new_entry_row)
+
+        return new_entry
+
+    def RemoveEntry(self):
+        """ If an entry is selected, delete it from the table """
+        selection = self.GetSelectedRow()
+
+        if selection is not None:
+            self.dialogue_table.removeRow(self.GetSelectedRow())
+
+    def CopyEntry(self):
+        """ If an entry is selected, clone it and add it to the sequence """
+        selection = self.GetSelectedEntry()
+
+        if selection:
+            self.AddEntry(copy.deepcopy(selection.action_data))
+
+    def MoveEntryUp(self):
+        """ If an entry is selected, move it up one row """
+        if self.dialogue_table.rowCount():
+            selection = self.GetSelectedRow()
+
+            # Only allow moving up if we're not already at the top of the sequence
+            if selection == 0:
+                self.logger.Log("Warning: Can't move entry up as we're at the top of the sequence")
+            else:
+                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
+                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
+                taken_entry = self.dialogue_table.cellWidget(selection, 0)
+
+                # Delete the origin row
+                self.dialogue_table.removeRow(selection)
+
+                # Add a new entry two rows above the initial row
+                new_row_num = selection - 1
+                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
+
+                # Transfer the data from the original entry to the new one, before refreshing the details
+                new_entry.action_data = taken_entry.action_data
+                self.ed_core.UpdateActiveEntry()
+
+    def MoveEntryDown(self):
+        """ If an entry is selected, move it down one row """
+        if self.dialogue_table.rowCount():
+            selection = self.GetSelectedRow()
+
+            # Only allow moving down if we're not already at the bottom of the sequence
+            if selection + 1 >= self.dialogue_table.rowCount():
+                self.logger.Log("Warning: Can't move entry down as we're at the bottom of the sequence")
+            else:
+                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
+                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
+                taken_entry = self.dialogue_table.cellWidget(selection, 0)
+
+                # Delete the origin row
+                self.dialogue_table.removeRow(selection)
+
+                # Add a new entry two rows above the initial row
+                new_row_num = selection + 1
+                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
+
+                # Transfer the data from the original entry to the new one, before refreshing the details
+                new_entry.action_data = taken_entry.action_data
+                self.UpdateActiveEntry()
+
+    def GetSelectedEntry(self) -> DialogueEntry:
+        """ Returns the currently selected dialogue entry. If there isn't one, returns None """
+        selected_entry = self.dialogue_table.selectedIndexes()
+
+        if selected_entry:
+            selected_row = selected_entry[0].row()
+            return self.dialogue_table.cellWidget(selected_row, 0)
+        else:
+            return None
+
+    def GetSelectedRow(self) -> int:
+        """ Returns the currently selected row. If there isn't one, returns None """
+        selected_row = self.dialogue_table.selectedIndexes()
+
+        if selected_row:
+            return selected_row[0].row()
+        else:
+            return None
