@@ -39,7 +39,6 @@ class DialogueEntry(QtWidgets.QWidget):
         """ Updates the subtext displaying entry parameters """
         self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
 
-
     def CompileSubtextString(self, data):
         """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
         cur_string = ""
@@ -54,7 +53,7 @@ class DialogueEntry(QtWidgets.QWidget):
                     # Recurse, searching the children as well
                     cur_string += f"{param_name}: ["
                     cur_string += self.CompileSubtextString(param['children'])
-                    cur_string += "]"
+                    cur_string += "], "
 
                 else:
                     if "cache" in param:
@@ -63,6 +62,10 @@ class DialogueEntry(QtWidgets.QWidget):
                         param_data = param["default"]
 
                     cur_string += f"{param_name}: {param_data}, "
+
+                # Adjust to make space for the new subtext (Particularly important if it introduced newlines)
+                #self.adjustSize()
+                #self.contents
 
         # Due to how the comma formatting is, strip it from the end of the string
         return cur_string.strip(', ')

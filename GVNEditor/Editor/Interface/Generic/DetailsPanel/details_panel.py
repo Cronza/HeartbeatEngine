@@ -114,79 +114,39 @@ class DetailsPanel(QtWidgets.QWidget):
         # Expand all dropdowns automatically
         self.details_table.expandAll()
 
-    def UpdateCachePROTOTYPE(self, parent=None):
+    def UpdateCache(self, parent_entry=None, action_data=None):
         """
         Collect all inputs for all detail entries, and cache them in the active entry's action data
+
+        If 'parent_entry' and 'action_data' are provided, parse them. Otherwise, only consider
+        entries at the root. Either way, recurse for any children found
         """
         if self.active_entry:
 
-            # If we've been provided a parent (due to recursion or otherwise), parse it's children instead of root
-            target_item = None
-            if parent:
-                target_item = parent
+            # If we've been provided a parent (due to recursion or otherwise), target's it's children and data.
+            # Otherwise, target the root entries and action data
+            details_entry_parent = None
+            action_data_target = None
+            if parent_entry:
+                details_entry_parent = parent_entry
+                action_data_target = action_data
             else:
-                target_item = self.details_table.invisibleRootItem()
+                details_entry_parent = self.details_table.invisibleRootItem()
+                action_data_target = self.active_entry.action_data['requirements']
 
-            for details_entry_index in range(0, target_item.childCount()):
-
-                details_entry = target_item.child(details_entry_index)
+            for details_entry_index in range(0, details_entry_parent.childCount()):
+                details_entry = details_entry_parent.child(details_entry_index)
                 details_entry_name = details_entry.name_widget.text()
 
                 # Since the requirements list is a list, we need to parse through for specifically for the
                 # match for this entry
-                for requirement in self.active_entry.action_data['requirements']:
+                for requirement in action_data_target:
                     if requirement['name'] == details_entry_name:
 
-                        # If this details_entry has children (IE. It's a container), consider it's children
-                        # Currently this does a depth search of 1. A future upgrade may involve using recursion to
-                        # achieve a depth search of n
+                        # If this details_entry has children (IE. It's a container), recursively update the cache for
+                        # any and all children entries
                         if details_entry.childCount() > 0:
-
-                            for child_entry_index in range(0, details_entry.childCount()):
-                                child_entry = details_entry.child(child_entry_index)
-                                child_entry_name = child_entry.name_widget.text()
-
-                                # Repeat the search process. If a child is found, cache a value
-                                for child_requirement in requirement['children']:
-                                    if child_requirement['name'] == child_entry_name:
-                                        child_requirement['cache'] = child_entry.Get()
-
-                        # Containers don't store values themselves, so the above code accounts solely for it's children
-                        # If this entry is not a container, lets cache normally
-                        else:
-                            requirement['cache'] = details_entry.Get()
-
-    def UpdateCache(self):
-        """
-        Cache any changes to details in the entry, so next time its selected, that data can be shown
-        """
-        # Instead of using the cache, just update the action data directly
-        if self.active_entry:
-
-            details_entry_count = self.details_table.invisibleRootItem().childCount()
-            for details_entry_index in range(0, details_entry_count):
-
-                details_entry = self.details_table.invisibleRootItem().child(details_entry_index)
-                details_entry_name = details_entry.name_widget.text()
-
-                # Since the requirements list is a list, we need to parse through for specifically for the
-                # match for this entry
-                for requirement in self.active_entry.action_data['requirements']:
-                    if requirement['name'] == details_entry_name:
-
-                        # If this details_entry has children (IE. It's a container), consider it's children
-                        # Currently this does a depth search of 1. A future upgrade may involve using recursion to
-                        # achieve a depth search of n
-                        if details_entry.childCount() > 0:
-
-                            for child_entry_index in range(0, details_entry.childCount()):
-                                child_entry = details_entry.child(child_entry_index)
-                                child_entry_name = child_entry.name_widget.text()
-
-                                # Repeat the search process. If a child is found, cache a value
-                                for child_requirement in requirement['children']:
-                                    if child_requirement['name'] == child_entry_name:
-                                        child_requirement['cache'] = child_entry.Get()
+                            self.UpdateCache(details_entry, requirement['children'])
 
                         # Containers don't store values themselves, so the above code accounts solely for it's children
                         # If this entry is not a container, lets cache normally
@@ -205,9 +165,11 @@ class DetailsPanel(QtWidgets.QWidget):
         if not data["type"] == "container":
             # Only show the global toggle if this detail has a global setting. By default, all settings with global
             # values use them by default
-            if 'global' in data:
-                details_widget.show_global_toggle = True
-                details_widget.global_toggle.Set(True)
+
+            #TODO: Renable when the updatecache prototype is done
+            #if 'global' in data:
+            #    details_widget.show_global_toggle = True
+            #    details_widget.global_toggle.Set(True)
 
             # Update the contents of the entry
             if 'cache' in data:

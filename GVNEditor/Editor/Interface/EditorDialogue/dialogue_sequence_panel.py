@@ -3,7 +3,12 @@ from PyQt5 import QtWidgets, QtGui
 from Editor.Interface.Generic.action_menu import ActionMenu
 from Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
+"""
+The core U.I class for the dialogue sequence panel. This contains all logic for generating, moving and removing
+any and all child widgets pertaining to the panel.
 
+This class is not meant for any destructive data changes, merely U.I actions
+"""
 class DialogueSequencePanel(QtWidgets.QWidget):
     def __init__(self, settings, ed_core):
         super().__init__()
@@ -100,6 +105,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
         self.dialogue_table.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
+        self.dialogue_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
@@ -202,7 +208,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
                 # Transfer the data from the original entry to the new one, before refreshing the details
                 new_entry.action_data = taken_entry.action_data
-                self.UpdateActiveEntry()
+                self.ed_core.UpdateActiveEntry()
 
     def GetSelectedEntry(self) -> DialogueEntry:
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """

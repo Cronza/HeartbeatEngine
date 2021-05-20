@@ -36,7 +36,7 @@ class EditorDialogue():
         """ Makes the selected entry the active one, refreshing the details panel """
         print("Changing active entry")
 
-        selection = self.GetSelectedEntry()
+        selection = self.ed_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
         self.UpdateDetails(selection)

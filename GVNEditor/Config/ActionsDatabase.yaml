@@ -275,6 +275,25 @@ Dialogue:
               editable: True
               preview: True
 
+            - name: "transition"
+              type: "container"
+              preview: True
+              children:
+                - name: "type"
+                  type: "dropdown"
+                  default: "None"
+                  options:
+                    - "fade_in"
+                    - "None"
+                  editable: True
+                  preview: True
+
+                - name: "speed"
+                  type: "int"
+                  default: 500
+                  editable: True
+                  preview: True
+
         - name: "dialogue"
           type: "container"
           preview: True
@@ -344,6 +363,25 @@ Dialogue:
                 global_parameter: "dialogue_z_order"
               editable: True
               preview: True
+
+            - name: "transition"
+              type: "container"
+              preview: True
+              children:
+                - name: "type"
+                  type: "dropdown"
+                  default: "None"
+                  options:
+                    - "fade_in"
+                    - "None"
+                  editable: True
+                  preview: True
+
+                - name: "speed"
+                  type: "int"
+                  default: 500
+                  editable: True
+                  preview: True
 
       #- display_name: "Choice"
       #  action_name: "choice"

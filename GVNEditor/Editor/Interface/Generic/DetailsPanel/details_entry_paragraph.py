@@ -23,10 +23,9 @@ class DetailsEntryParagraph(DetailsEntryBase):
         self.input_widget.disconnect()
 
         # Change the data without causing any signal calls
-        #self.input_widget.setText(data)
-        self.input_widget.setPlainText("This is a test string\nI wonder if the line break worked")
-        #self.input_widget.setFixedHeight(self.input_widget.size().height())
-        #print(self.input_widget.))
+        #self.input_widget.setPlainText("This is a test string\nI wonder if the line break worked") # DEBUG
+        self.input_widget.setPlainText(data)
+
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 

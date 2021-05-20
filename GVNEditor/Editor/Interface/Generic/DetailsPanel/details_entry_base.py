@@ -52,7 +52,6 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         # Any change to detail entries while the global toggle is enabled will toggle it off
         if self.global_toggle.Get():
             self.global_toggle.Set(False)
-            print("Turning global toggle off")
 
         self.refresh_func(self)
 
