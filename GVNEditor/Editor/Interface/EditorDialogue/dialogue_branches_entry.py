@@ -56,6 +56,10 @@ class BranchesEntry(QtWidgets.QWidget):
         self.name_widget.setText(data[0])
         self.subtext_widget.setText(data[1])
 
+    def GetData(self) -> dict:
+        """ Returns the branch data stored in this branch entry """
+        return self.branch_data
+
     def Refresh(self):
         """
         Refresh is the common function used by elements that need refreshing when an important U.I change is made

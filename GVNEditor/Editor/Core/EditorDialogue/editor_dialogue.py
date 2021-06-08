@@ -14,15 +14,14 @@
     You should have received a copy of the GNU General Public License
     along with GVNEditor.  If not, see <https://www.gnu.org/licenses/>.
 """
+from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
 from PyQt5 import QtWidgets
 
-class EditorDialogue():
+class EditorDialogue(EditorBase):
     def __init__(self, settings, logger):
-        self.settings = settings
-        self.logger = logger
-
-        self.logger.Log("Initializing Dialogue Editor...")
+        super().__init__(settings, logger)
+        self.editor_type = self.editor_types[0] # Dialogue
 
         # Build the Dialogue Editor UI
         self.ed_ui = EditorDialogueUI(self)
@@ -56,20 +55,23 @@ class EditorDialogue():
         # If there is no source branch, then there is nothing to store
         if cur_branch:
 
-            # Clear the contents of the current branch since we're forcefully updating whats stored
-            cur_branch.branch_data.clear()
-
-            # Store the data from each entry in the branch
-            num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
-            for entry_index in range(num_of_entries):
-                # Store the data held by the entry
-                dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
-                cur_branch.branch_data.append(dialogue_entry.action_data)
-
-            # Clear the list of dialogue entries now that their data is stored
+            self.UpdateBranchData(cur_branch)
             self.ed_ui.dialogue_sequence.Clear()
 
         # Load any entries in the new branch (if applicable)
         if new_branch.branch_data:
             for entry in new_branch.branch_data:
                 self.ed_ui.dialogue_sequence.AddEntry(entry, None, True)
+
+    def UpdateBranchData(self, cur_branch):
+        """ Updates the active branch with all active dialogue entries """
+        # Clear the contents of the current branch since we're forcefully updating whats stored
+        cur_branch.branch_data.clear()
+
+        # Store the data from each entry in the branch
+        num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
+        for entry_index in range(num_of_entries):
+
+            # Store the data held by the entry
+            dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
+            cur_branch.branch_data.append(dialogue_entry.action_data)

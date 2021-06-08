@@ -56,8 +56,6 @@ class DetailsEntryFileSelector(DetailsEntryBase):
             selected_dir = file_path[0]
 
             # Is the path in the active project dir?
-            print(self.settings.user_project_dir)
-            print(selected_dir)
             if self.settings.user_project_dir in selected_dir:
 
                 # Remove the project dir from the path, so that the selected dir only contains a relative path

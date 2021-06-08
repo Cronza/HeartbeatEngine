@@ -105,13 +105,16 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
         self.dialogue_table.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
-        self.dialogue_table.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
         self.main_layout.addWidget(self.main_toolbar)
         self.main_layout.addWidget(self.dialogue_table)
 
+    def RefreshCurrentRowSize(self):
+        """ Resize the currently selected row based on the size of it's contents """
+        self.dialogue_table.resizeRowToContents(self.dialogue_table.currentIndex().row())
+        
     def Clear(self):
         """ Deletes all data in the dialogue table """
         for row in range(self.dialogue_table.rowCount(), 0, -1):
@@ -130,12 +133,17 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             self.dialogue_table.insertRow(new_entry_row)
 
         # Create a new dialogue entry object, and add it to the sequence widget
-        new_entry = DialogueEntry(action_data, self.settings, self.ed_core.UpdateActiveEntry)
+        new_entry = DialogueEntry(
+            action_data,
+            self.settings,
+            self.ed_core.UpdateActiveEntry,
+            self.RefreshCurrentRowSize
+        )
 
         # Assign the entry widget to the row
         self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
 
-        # Since selecting the new row will cause the details panel to refesh, allowing opting out in case
+        # Since selecting the new row will cause the details panel to refresh, allow opting out in case
         # batch entry creation is happening
         if not skip_select:
             print('DONT skip')
@@ -169,7 +177,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
             # Only allow moving up if we're not already at the top of the sequence
             if selection == 0:
-                self.logger.Log("Warning: Can't move entry up as we're at the top of the sequence")
+                self.ed_core.logger.Log("Can't move entry up as we're at the top of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry
@@ -193,7 +201,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
             # Only allow moving down if we're not already at the bottom of the sequence
             if selection + 1 >= self.dialogue_table.rowCount():
-                self.logger.Log("Warning: Can't move entry down as we're at the bottom of the sequence")
+                self.ed_core.logger.Log("Can't move entry down as we're at the bottom of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry

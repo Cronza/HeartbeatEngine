@@ -1,9 +1,14 @@
 import os
 import sys
 import shutil
+from pathlib import Path
 from PyQt5 import QtWidgets
 from Editor.Utilities.settings import Settings
+#from Editor.Utilities.Exporters.exporter_dialogue import ExporterDialogue
+from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Interface import gvn_editor as gvne
+from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
+from Editor.Interface.Generic.Prompts.file_system_prompt import FileSystemPrompt
 from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 
 
@@ -20,12 +25,16 @@ class GVNEditor:
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
-
-        # State Tracking
         self.active_editor = None
-
+        self.create_editor_funcs = {
+            FileType.Dialogue: self.OpenDialogueEditor
+            #FileType.Scene_Dialogue: EditorSceneDialogue,
+            #FileType.Scene_Dialogue: EditorScenePointAndClick,
+            #FileType.Scene_Point_And_Click: EditorCharacter,
+        }
+        #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        self.SetActiveProject("To Infinity", "D:/GVNENGINE_PROJECTS/Testing")
+        self.SetActiveProject("To Infinity", "D:\Scripts\GVNEngine\PROJECTS\To Infinity")
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -36,47 +45,55 @@ class GVNEditor:
     # ****** INTERFACE MENU ACTIONS ******
 
     def NewProject(self):
+        """
+        Prompts the user for a directory to create a new project, and for a project name. Then creates the
+        chosen project
+        """
         # Ask the user to choose a directory to create a project in
         self.logger.Log("Requesting directory for the new project...'")
-        new_project_dir = QtWidgets.QFileDialog.getExistingDirectory()
 
-        # Has the user provided a project directory?
-        if new_project_dir == "":
-            self.logger.Log("Error: Project directory was not provided - Cancelling 'New Project' action")
-            QtWidgets.QMessageBox.about(self.e_ui.central_widget, "No Value Provided!",
-                                        "No project directory was provided"
-                                        )
+        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        new_project_dir = prompt.GetDirectory(
+            str(Path.home()),
+            "Choose a Directory to Create a Project"
+        )
+
+        if not new_project_dir:
+            self.logger.Log("Project directory was not provided - Cancelling 'New Project' action", 3)
         else:
             # Ask the user for a project name
             # [0] = user_input: str, [1] = value_provided: bool
             self.logger.Log("Requesting a name for the new project...'")
-            user_project_name = QtWidgets.QInputDialog.getText(self.e_ui.central_widget,
-                                                                             "New Project",
-                                                                             "Please Enter a Project Name:")[0]
+            user_project_name = QtWidgets.QInputDialog.getText(
+                self.e_ui.central_widget,
+                "New Project",
+                "Please Enter a Project Name:"
+            )[0]
 
-            # Has the user provided a project name?
-            if user_project_name == "":
-                self.logger.Log("Error: Project name was not provided - Cancelling 'New Project' action")
-                QtWidgets.QMessageBox.about(self.e_ui.central_widget, "No Value Provided!",
-                                            "No project name was provided"
-                                            )
+            if user_project_name:
+                self.logger.Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
                 if os.path.exists(os.path.join(new_project_dir, user_project_name)):
-                    self.logger.Log("Error: Chosen project directory already exists - Cancelling 'New Project' action")
-                    QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Project Already Exists!",
-                                                "The chosen directory already contains a project of the chosen name.\n"
-                                                "Please either delete this project, or choose another directory"
-                                                )
+                    self.logger.Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
+                    QtWidgets.QMessageBox.about(
+                        self.e_ui.central_widget,
+                        "Project Already Exists!",
+                        "The chosen directory already contains a project of the chosen name.\n"
+                        "Please either delete this project, or choose another directory"
+                    )
+
                 # Everything is good to go. Create a new project!
                 else:
-                    self.logger.Log("Creating project folder structure...")
+                    self.logger.Log("Valid project destination chosen! Creating project folder structure...")
+
                     # Create the project directory
                     project_path = os.path.join(new_project_dir, user_project_name)
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
                     for main_dir in self.settings.PROJECT_FOLDER_STRUCTURE.items():
+
                         # Create the main dir (.../Content)
                         main_dir_path = os.path.join(project_path, main_dir[0])
                         os.mkdir(main_dir_path)
@@ -97,22 +114,25 @@ class GVNEditor:
                             os.path.join(self.settings.BASE_ENGINE_DIR, rel_path),
                             os.path.join(project_path, rel_path))
 
-                    self.logger.Log(f"Project Created at: {project_path}")
+                    self.logger.Log(f"Project Created at: {project_path}", 2)
 
                     # Set this as the active project
                     self.SetActiveProject(user_project_name, project_path)
 
     def OpenProject(self):
+        """ Prompts the user for a project directory, then loads that file in the respective editor """
         self.logger.Log("Requesting path to project root...")
-        existing_project_dir = QtWidgets.QFileDialog.getExistingDirectory()
 
-        # Validate that a value was provided, and that the path is a proper GVN project
+        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        existing_project_dir = prompt.GetDirectory(
+            str(Path.home()),
+            "Choose a Project Directory"
+         )
+
         if not existing_project_dir:
-            self.logger.Log("Error: Project directory was not provided - Cancelling 'Open Project' action")
-            QtWidgets.QMessageBox.about(self.e_ui.central_widget, "No Value Provided!",
-                                        "No project directory was provided"
-                                        )
+            self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 4)
         else:
+            # Does the directory already have a project in it (Denoted by the admin folder's existence)
             if os.path.exists(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR)):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
@@ -121,11 +141,56 @@ class GVNEditor:
                 self.SetActiveProject(project_name, existing_project_dir)
 
             else:
-                self.logger.Log("Error: An invalid GVN project was selected - Cancelling 'Open Project' action")
-                QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Not a Valid Project Directory!",
-                                            "The chosen directory is not a valid GVN Project.\n"
-                                            "Please either choose a different project, or create a new project."
-                                            )
+                self.logger.Log("An invalid GVN project was selected - Cancelling 'Open Project' action", 4)
+                QtWidgets.QMessageBox.about(
+                    self.e_ui.central_widget,
+                    "Not a Valid Project Directory!",
+                    "The chosen directory is not a valid GVN Project.\n"
+                    "Please either choose a different project, or create a new project."
+                )
+                
+    def NewFile(self):
+        new_file_prompt = NewFileMenu(self.settings, self.logger, "Content/Icons/GVNEngine_Logo.png", "Choose a File Type")
+
+        # Did the user successfully choose something?
+        if new_file_prompt.exec():
+
+            project_dir = self.settings.GetProjectContentDirectory()
+            selected_type = new_file_prompt.GetSelection()
+            sub_dir = self.settings.FILE_TYPE_LOCATIONS[selected_type]
+
+            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+            result = prompt.SaveFile(
+                self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+                os.path.join(self.settings.GetProjectContentDirectory(), sub_dir),
+                "Save File As"
+            )
+
+            # Did the user choose a place and a name for the new file?
+            if result:
+                with open(result, 'w') as new_file:
+                    pass
+                    self.logger.Log(f"File created - {result}", 2)
+
+            # Invoke the create function for the respective editor
+            self.create_editor_funcs[selected_type]()
+
+
+    def SaveAs(self):
+        print("Saving")
+        cur_editor_ui = self.e_ui.main_tab_editor.currentWidget()
+
+        if cur_editor_ui:
+            # TODO: Make this not awful
+            # Each type of editor follows a different export / save process, so split off for each here
+            # So uh, how do we differentiate editors?
+
+            cur_editor_type = cur_editor_ui.core.editor_type
+
+            if cur_editor_type == "Dialogue":
+                exporter = ExporterDialogue(self.settings, self.logger)
+                exporter.Export(cur_editor_ui)
+                
 
     def OpenDialogueEditor(self):
         """ Creates a 'Dialogue Editor' tab """
@@ -155,7 +220,7 @@ class GVNEditor:
     def SetActiveProject(self, project_name, project_dir):
         """ Sets the active project, pointing the editor to the new location, and refreshing the inteface """
         self.settings.user_project_name = project_name
-        self.settings.user_project_dir = project_dir
+        self.settings.user_project_dir = project_dir.replace("\\", "/")
         self.settings.LoadProjectSettings()
 
         # If this is the first time a user is loading a project after opening the editor, delete the 'Getting Started'

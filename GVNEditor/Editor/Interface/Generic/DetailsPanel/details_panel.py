@@ -73,7 +73,6 @@ class DetailsPanel(QtWidgets.QWidget):
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
         self.details_table.header().setMinimumSectionSize(round(self.details_table.header().width() / 4))
-        #self.details_table.header().setmaxim
 
         # 2. Force the last column to be barely larger than a standard checkbox
         self.details_table.setColumnWidth(2, round(self.details_table.header().width() / 5))
@@ -166,10 +165,9 @@ class DetailsPanel(QtWidgets.QWidget):
             # Only show the global toggle if this detail has a global setting. By default, all settings with global
             # values use them by default
 
-            #TODO: Renable when the updatecache prototype is done
-            #if 'global' in data:
-            #    details_widget.show_global_toggle = True
-            #    details_widget.global_toggle.Set(True)
+            if 'global' in data:
+                details_widget.show_global_toggle = True
+                details_widget.global_toggle.Set(True)
 
             # Update the contents of the entry
             if 'cache' in data:

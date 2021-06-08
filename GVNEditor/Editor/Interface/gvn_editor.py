@@ -1,9 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from Editor.Core.logger import Logger
+from Editor.Core.Generic.logger import Logger
 
 
-class GVNEditorUI():
+class GVNEditorUI:
     def __init__(self, e_core, settings):
         super().__init__()
 
@@ -37,7 +37,6 @@ class GVNEditorUI():
 
         # ****** Add everything to the interface ******
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        #self.CreateTabEditor()
         self.CreateGettingStartedDisplay()
         self.main_resize_container.addWidget(self.logger.log_ui)
 
@@ -63,25 +62,29 @@ class GVNEditorUI():
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
         self.file_menu.setFont(self.settings.button_font)
         self.file_menu.setStyleSheet(self.settings.button_color)
+        self.a_new_file = QtWidgets.QAction(main_window)
+        self.a_new_file.triggered.connect(self.e_core.NewFile)
+        self.a_save_file_as = QtWidgets.QAction(main_window)
+        self.a_save_file_as.triggered.connect(self.e_core.SaveAs)
         self.a_new_project = QtWidgets.QAction(main_window)
         self.a_new_project.triggered.connect(self.e_core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
         self.a_open_project.triggered.connect(self.e_core.OpenProject)
-        self.a_save = QtWidgets.QAction(main_window)
+        self.file_menu.addAction(self.a_new_file)
+        self.file_menu.addAction(self.a_save_file_as)
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
-        self.file_menu.addAction(self.a_save)
 
-        self.dialogue_menu = QtWidgets.QMenu(self.menu_bar)
-        self.dialogue_menu.setFont(self.settings.button_font)
-        self.dialogue_menu.setStyleSheet(self.settings.button_color)
+        self.editors_menu = QtWidgets.QMenu(self.menu_bar)
+        self.editors_menu.setFont(self.settings.button_font)
+        self.editors_menu.setStyleSheet(self.settings.button_color)
         self.a_open_dialogue_editor = QtWidgets.QAction(main_window)
         self.a_open_dialogue_editor.triggered.connect(self.e_core.OpenDialogueEditor)
-        self.dialogue_menu.addAction(self.a_open_dialogue_editor)
+        self.editors_menu.addAction(self.a_open_dialogue_editor)
 
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
-        self.menu_bar.addAction(self.dialogue_menu.menuAction())
+        self.menu_bar.addAction(self.editors_menu.menuAction())
 
         # Initialize the Menu Bar
         main_window.setMenuBar(self.menu_bar)
@@ -94,16 +97,18 @@ class GVNEditorUI():
         # *** Update Engine Menu Bar ***
         # Menu Headers
         self.file_menu.setTitle(_translate("MainWindow", "File"))
-        self.dialogue_menu.setTitle(_translate("MainWindow", "Dialogue"))
+        self.editors_menu.setTitle(_translate("MainWindow", "Editors"))
 
         # 'File Menu' Actions
+        self.a_new_file.setText(_translate("MainWindow", "New File"))
+        self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
+        self.a_save_file_as.setText(_translate("MainWindow", "Save"))
+        self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
-        self.a_save.setText(_translate("MainWindow", "Save"))
-        self.a_save.setShortcut(_translate("MainWindow", "Ctrl+S"))
 
-        # 'Dialogue' Actions
-        self.a_open_dialogue_editor.setText(_translate("MainWindow", "Open Editor"))
+        # 'Editors' Actions
+        self.a_open_dialogue_editor.setText(_translate("MainWindow", "Open Dialogue Editor"))
         self.a_open_dialogue_editor.setShortcut(_translate("MainWindow", "Ctrl+Alt+D"))
 
     def CreateTabEditor(self):

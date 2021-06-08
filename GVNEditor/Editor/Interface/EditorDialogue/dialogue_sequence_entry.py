@@ -2,12 +2,16 @@ from PyQt5 import QtWidgets, QtGui
 
 
 class DialogueEntry(QtWidgets.QWidget):
-    def __init__(self, action_data, settings, select_func):
+    def __init__(self, action_data, settings, select_func, size_refresh_func):
         super().__init__()
         self.settings = settings
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
+
+        # Store a func object that is used when the row containing this object should be resized based on the
+        # subtext data in this object
+        self.size_refresh_func = size_refresh_func
 
         # Store this entries action data
         self.action_data = action_data
@@ -34,6 +38,10 @@ class DialogueEntry(QtWidgets.QWidget):
         # Add everything to the layout
         self.main_layout.addWidget(self.name_widget)
         self.main_layout.addWidget(self.subtext_widget)
+
+    def Get(self) -> dict:
+        """ Returns the action data stored in this object """
+        return self.action_data
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
@@ -63,10 +71,6 @@ class DialogueEntry(QtWidgets.QWidget):
 
                     cur_string += f"{param_name}: {param_data}, "
 
-                # Adjust to make space for the new subtext (Particularly important if it introduced newlines)
-                #self.adjustSize()
-                #self.contents
-
         # Due to how the comma formatting is, strip it from the end of the string
         return cur_string.strip(', ')
 
@@ -76,3 +80,5 @@ class DialogueEntry(QtWidgets.QWidget):
         """
 
         self.UpdateSubtext()
+        self.size_refresh_func()
+

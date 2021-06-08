@@ -1,6 +1,7 @@
 import os
 from PyQt5 import QtGui
-from Editor.Utilities.yaml_reader import Reader
+from Editor.Utilities.yaml_manager import Reader
+from Editor.Utilities.DataTypes.file_types import FileType
 
 
 class Settings:
@@ -34,6 +35,14 @@ class Settings:
         "Image": "Image Files (*.png *.jpg)",
         "Data": "YAML Files (*.yaml)",
         "Font": "Font Files (*.ttf)"
+    }
+
+    # A dict of file types and the respective folder names in which they're stored within the project
+    FILE_TYPE_LOCATIONS = {
+        FileType.Dialogue: "Dialogue",
+        FileType.Scene_Dialogue: "Scenes",
+        FileType.Scene_Point_And_Click: "Scenes",
+        FileType.Character: "Characters"
     }
 
     def __init__(self):
@@ -123,11 +132,14 @@ class Settings:
         self.button_font.setBold(self.settings['EditorTextSettings']['button_is_bold'])
         self.button_font.setItalic(self.settings['EditorTextSettings']['button_is_italicized'])
 
+        self.button_font = QtGui.QFont(self.settings['EditorTextSettings']['button_font'], self.settings['EditorTextSettings']['button_text_size'])
+        self.button_color = f"color: rgb({self.settings['EditorTextSettings']['button_color']})"
+        self.button_font.setBold(self.settings['EditorTextSettings']['button_is_bold'])
+        self.button_font.setItalic(self.settings['EditorTextSettings']['button_is_italicized'])
+
         # Color and Style
         self.toolbar_background_color = self.settings['EditorInterfaceSettings']['toolbar_background_color']
         self.toolbar_button_background_color = self.settings['EditorInterfaceSettings']['toolbar_button_background_color']
-
-
 
         # State
         self.read_only_background_color = f"background-color: rgb({self.settings['EditorStateSettings']['read_only_background_color']})"

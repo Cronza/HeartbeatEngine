@@ -15,22 +15,16 @@
     along with GVNEditor.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
-from Editor.Interface.logger import LoggerUI
-from PyQt5 import QtCore, QtGui, QtWidgets
-
-
-class Logger:
-    def __init__(self, e_ui, settings):
-
+class EditorBase():
+    def __init__(self, settings, logger):
         self.settings = settings
+        self.logger = logger
+        self.logger.Log("Initializing Editor...")
 
-        # Build the Logger UI
-        self.log_ui = LoggerUI(self)
-        self.Log("Initializing Logger...")
-
-    def Log(self, log_text):
-        self.log_ui.log_list.addItem(datetime.now().strftime("%H:%M:%S") + ": " + log_text)
-
-    def ClearLog(self):
-        self.log_ui.log_list.clear()
+        # To differentiate editors, use a si
+        self.editor_type = None
+        self.editor_types = [
+            'Dialogue',
+            'Scene',
+            'Character'
+        ]

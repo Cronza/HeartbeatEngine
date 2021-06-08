@@ -273,11 +273,11 @@ Dialogue:
                 category: "DialogueSettings"
                 global_parameter: "speaker_z_order"
               editable: True
-              preview: True
+              preview: False
 
             - name: "transition"
               type: "container"
-              preview: True
+              preview: False
               children:
                 - name: "type"
                   type: "dropdown"
@@ -286,13 +286,13 @@ Dialogue:
                     - "fade_in"
                     - "None"
                   editable: True
-                  preview: True
+                  preview: False
 
                 - name: "speed"
                   type: "int"
                   default: 500
                   editable: True
-                  preview: True
+                  preview: False
 
         - name: "dialogue"
           type: "container"
@@ -362,11 +362,11 @@ Dialogue:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_z_order"
               editable: True
-              preview: True
+              preview: False
 
             - name: "transition"
               type: "container"
-              preview: True
+              preview: False
               children:
                 - name: "type"
                   type: "dropdown"
@@ -375,13 +375,13 @@ Dialogue:
                     - "fade_in"
                     - "None"
                   editable: True
-                  preview: True
+                  preview: False
 
                 - name: "speed"
                   type: "int"
                   default: 500
                   editable: True
-                  preview: True
+                  preview: False
 
       #- display_name: "Choice"
       #  action_name: "choice"
