@@ -68,7 +68,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_table.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
         self.details_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        #self.details_table.setUniformRowHeights(True)
 
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
@@ -131,7 +130,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 action_data_target = action_data
             else:
                 details_entry_parent = self.details_table.invisibleRootItem()
-                action_data_target = self.active_entry.action_data['requirements']
+                action_data_target = self.active_entry.action_data["requirements"]
 
             for details_entry_index in range(0, details_entry_parent.childCount()):
                 details_entry = details_entry_parent.child(details_entry_index)
@@ -140,20 +139,26 @@ class DetailsPanel(QtWidgets.QWidget):
                 # Since the requirements list is a list, we need to parse through for specifically for the
                 # match for this entry
                 for requirement in action_data_target:
-                    if requirement['name'] == details_entry_name:
+                    if requirement["name"] == details_entry_name:
 
                         # If this details_entry has children (IE. It's a container), recursively update the cache for
                         # any and all children entries
                         if details_entry.childCount() > 0:
-                            self.UpdateCache(details_entry, requirement['children'])
+                            self.UpdateCache(details_entry, requirement["children"])
 
                         # Containers don't store values themselves, so the above code accounts solely for it's children
                         # If this entry is not a container, lets cache normally
                         else:
-                            requirement['cache'] = details_entry.Get()
+                            requirement["cache"] = details_entry.Get()
+
+                            # If this entry has a global option, keep track of it's value
+                            if details_entry.show_global_toggle:
+                                global_value = details_entry.GetGlobal()
+                                requirement["global"]["active"] = global_value
 
     def CreateEntryWidget(self, data):
         """ Given an action_data dict, create a new details entry widget and return it """
+
         # Populate the data column with the widget appropriate to the given type
         details_widget = self.GetDetailsWidget(data)
 
@@ -162,12 +167,20 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Containers are special in that they don't hold data, so generally ignore them for certain actions
         if not data["type"] == "container":
-            # Only show the global toggle if this detail has a global setting. By default, all settings with global
-            # values use them by default
 
+            # Only show the global toggle if this detail has a global setting. By default, all settings with global
+            # values use the global toggle
             if 'global' in data:
                 details_widget.show_global_toggle = True
-                details_widget.global_toggle.Set(True)
+
+                # Keep the global toggle off if the user previously turned it off
+                if 'active' in data['global']:
+                    if data['global']['active']:
+                        details_widget.global_toggle.Set(True)
+                    else:
+                        details_widget.global_toggle.Set(False)
+                else:
+                    details_widget.global_toggle.Set(True)
 
             # Update the contents of the entry
             if 'cache' in data:

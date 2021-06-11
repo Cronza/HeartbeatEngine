@@ -14,17 +14,40 @@
     You should have received a copy of the GNU General Public License
     along with GVNEditor.  If not, see <https://www.gnu.org/licenses/>.
 """
+import os
 
-class EditorBase():
-    def __init__(self, settings, logger):
+
+class EditorBase:
+    def __init__(self, settings, logger, file_path):
         self.settings = settings
         self.logger = logger
+        self.file_path = file_path
+
+        #self.editor_type = None
+        #self.editor_types = [
+        #    'Dialogue',
+        #    'Scene',
+        #    'Character'
+        #]
+
         self.logger.Log("Initializing Editor...")
 
-        # To differentiate editors, use a si
-        self.editor_type = None
-        self.editor_types = [
-            'Dialogue',
-            'Scene',
-            'Character'
-        ]
+    def GetFileName(self):
+        """ Retrieves the name of the file that is being targeted by this editor """
+        return os.path.basename(self.file_path)
+
+    def GetFilePath(self):
+        """ Retrieves the path of the file that is being targeted by this editor """
+        return self.file_path
+
+    def Save(self):
+        """ Write the data held in the editor to the file it points to """
+        pass
+
+    def Export(self):
+        """
+        Writes the data held in the editor to a variant of the file it points to in the structure usable by the
+        engine
+        """
+        pass
+

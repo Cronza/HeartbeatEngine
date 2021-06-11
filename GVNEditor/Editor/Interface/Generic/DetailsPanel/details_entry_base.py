@@ -44,6 +44,10 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
     def Set(self, data) -> None:
         pass
 
+    def GetGlobal(self) -> bool:
+        """ Returns the current value of the global checkbox """
+        return self.global_toggle.Get()
+
     def MakeUneditable(self):
         pass
 

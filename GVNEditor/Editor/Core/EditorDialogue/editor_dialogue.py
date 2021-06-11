@@ -16,12 +16,14 @@
 """
 from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
-from PyQt5 import QtWidgets
+from Editor.Utilities.Exporters.exporter_dialogue import ExporterDialogue
+from Editor.Utilities.yaml_manager import Writer
+from Editor.Utilities.database_manager import DBManager
+
 
 class EditorDialogue(EditorBase):
-    def __init__(self, settings, logger):
-        super().__init__(settings, logger)
-        self.editor_type = self.editor_types[0] # Dialogue
+    def __init__(self, settings, logger, file_name):
+        super().__init__(settings, logger, file_name)
 
         # Build the Dialogue Editor UI
         self.ed_ui = EditorDialogueUI(self)
@@ -52,9 +54,9 @@ class EditorDialogue(EditorBase):
     # @TODO: How to support the initial switch when 'main' is created?
     def SwitchBranches(self, cur_branch, new_branch):
         """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
+
         # If there is no source branch, then there is nothing to store
         if cur_branch:
-
             self.UpdateBranchData(cur_branch)
             self.ed_ui.dialogue_sequence.Clear()
 
@@ -75,3 +77,60 @@ class EditorDialogue(EditorBase):
             # Store the data held by the entry
             dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
             cur_branch.branch_data.append(dialogue_entry.action_data)
+
+    def GetAllDialogueData(self) -> dict:
+        """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
+        data_to_export = {}
+        branch_count = self.ed_ui.branches.branches_list.count()
+        for index in range(0, branch_count):
+            # Get the actual branch entry widget instead of the containing item widget
+            branch = self.ed_ui.branches.branches_list.itemWidget(self.ed_ui.branches.branches_list.item(index))
+
+            # Before we save, let's be double sure the current information in the details panel is cached properly
+            self.ed_ui.details.UpdateCache()
+
+            # If a branch is currently active, then it's likely to of not updated it's cached branch data (Only
+            # happens when the active branch is switched). To account for this, make sure the active branch is checked
+            # differently by scanning the current dialogue entries
+            if branch is self.ed_ui.branches.active_branch:
+                self.logger.Log("Scanning dialogue entries...")
+                self.UpdateBranchData(branch)
+
+            branch_name = branch.Get()[0]
+            branch_data = branch.GetData()
+
+            data_to_export[branch_name] = branch_data
+
+        return data_to_export
+
+    def Save(self):
+        super().Save()
+        self.logger.Log(f"Saving Dialogue data for: {self.file_path}")
+
+        data_to_export = self.GetAllDialogueData()
+
+        # Write the data out
+        self.logger.Log("Writing data to file...")
+        try:
+            Writer.WriteFile(data_to_export, self.file_path)
+            self.logger.Log("File Saved!", 2)
+        except:
+            self.logger.Log("Failed to Save!", 4)
+
+
+    def Export(self):
+        super().Export()
+        self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
+
+        data_to_export = self.GetAllDialogueData()
+
+        db_manager = DBManager()
+        data_to_export = db_manager.ConvertDialogueFileToEngineFormat(data_to_export)
+
+        # Write the data out
+        self.logger.Log("Writing data to file...")
+        try:
+            Writer.WriteFile(data_to_export, "D:/Scripts/GVNEngine/PROJECTS/To Infinity/Content/Dialogue/game_Test.yaml")
+            self.logger.Log("File Exported!", 2)
+        except:
+            self.logger.Log("Failed to Export!", 4)

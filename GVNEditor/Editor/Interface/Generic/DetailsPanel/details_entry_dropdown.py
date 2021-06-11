@@ -20,7 +20,6 @@ class DetailsEntryDropdown(DetailsEntryBase):
 
     def Get(self):
         return self.input_widget.currentText()
-        return "Test"
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle

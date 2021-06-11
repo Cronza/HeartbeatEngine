@@ -65,7 +65,7 @@ class GVNEditorUI:
         self.a_new_file = QtWidgets.QAction(main_window)
         self.a_new_file.triggered.connect(self.e_core.NewFile)
         self.a_save_file_as = QtWidgets.QAction(main_window)
-        self.a_save_file_as.triggered.connect(self.e_core.SaveAs)
+        self.a_save_file_as.triggered.connect(self.e_core.Save)
         self.a_new_project = QtWidgets.QAction(main_window)
         self.a_new_project.triggered.connect(self.e_core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
@@ -75,16 +75,8 @@ class GVNEditorUI:
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
 
-        self.editors_menu = QtWidgets.QMenu(self.menu_bar)
-        self.editors_menu.setFont(self.settings.button_font)
-        self.editors_menu.setStyleSheet(self.settings.button_color)
-        self.a_open_dialogue_editor = QtWidgets.QAction(main_window)
-        self.a_open_dialogue_editor.triggered.connect(self.e_core.OpenDialogueEditor)
-        self.editors_menu.addAction(self.a_open_dialogue_editor)
-
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
-        self.menu_bar.addAction(self.editors_menu.menuAction())
 
         # Initialize the Menu Bar
         main_window.setMenuBar(self.menu_bar)
@@ -97,7 +89,6 @@ class GVNEditorUI:
         # *** Update Engine Menu Bar ***
         # Menu Headers
         self.file_menu.setTitle(_translate("MainWindow", "File"))
-        self.editors_menu.setTitle(_translate("MainWindow", "Editors"))
 
         # 'File Menu' Actions
         self.a_new_file.setText(_translate("MainWindow", "New File"))
@@ -106,10 +97,6 @@ class GVNEditorUI:
         self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
-
-        # 'Editors' Actions
-        self.a_open_dialogue_editor.setText(_translate("MainWindow", "Open Dialogue Editor"))
-        self.a_open_dialogue_editor.setShortcut(_translate("MainWindow", "Ctrl+Alt+D"))
 
     def CreateTabEditor(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """

@@ -45,6 +45,7 @@ class DetailsEntryTuple(DetailsEntryBase):
         self.input_widget_alt.disconnect()
 
         # Change the data without causing any signal calls
+        #parsed_data = data.split(",")
         self.input_widget.setText(str(data[0]))
         self.input_widget_alt.setText(str(data[1]))
 

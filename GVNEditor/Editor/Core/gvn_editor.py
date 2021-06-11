@@ -4,7 +4,6 @@ import shutil
 from pathlib import Path
 from PyQt5 import QtWidgets
 from Editor.Utilities.settings import Settings
-#from Editor.Utilities.Exporters.exporter_dialogue import ExporterDialogue
 from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Interface import gvn_editor as gvne
 from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
@@ -26,12 +25,7 @@ class GVNEditor:
 
         self.logger = self.e_ui.logger
         self.active_editor = None
-        self.create_editor_funcs = {
-            FileType.Dialogue: self.OpenDialogueEditor
-            #FileType.Scene_Dialogue: EditorSceneDialogue,
-            #FileType.Scene_Dialogue: EditorScenePointAndClick,
-            #FileType.Scene_Point_And_Click: EditorCharacter,
-        }
+
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
         self.SetActiveProject("To Infinity", "D:\Scripts\GVNEngine\PROJECTS\To Infinity")
@@ -133,6 +127,7 @@ class GVNEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 4)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
+            print(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR))
             if os.path.exists(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR)):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
@@ -150,12 +145,15 @@ class GVNEditor:
                 )
                 
     def NewFile(self):
+        """
+        Prompts the user for a type of file to create, and a location & name for the new file. Then creates that
+        file, and loads the respective editor
+        """
         new_file_prompt = NewFileMenu(self.settings, self.logger, "Content/Icons/GVNEngine_Logo.png", "Choose a File Type")
 
         # Did the user successfully choose something?
         if new_file_prompt.exec():
 
-            project_dir = self.settings.GetProjectContentDirectory()
             selected_type = new_file_prompt.GetSelection()
             sub_dir = self.settings.FILE_TYPE_LOCATIONS[selected_type]
 
@@ -172,12 +170,13 @@ class GVNEditor:
                     pass
                     self.logger.Log(f"File created - {result}", 2)
 
-            # Invoke the create function for the respective editor
-            self.create_editor_funcs[selected_type]()
+            self.OpenEditor(result, selected_type)
 
-
-    def SaveAs(self):
-        print("Saving")
+    def Save(self):
+        """ Requests the active editor to save it's data """
+        self.active_editor.Save()
+        self.active_editor.Export()
+        """
         cur_editor_ui = self.e_ui.main_tab_editor.currentWidget()
 
         if cur_editor_ui:
@@ -190,26 +189,32 @@ class GVNEditor:
             if cur_editor_type == "Dialogue":
                 exporter = ExporterDialogue(self.settings, self.logger)
                 exporter.Export(cur_editor_ui)
-                
+        """
 
-    def OpenDialogueEditor(self):
-        """ Creates a 'Dialogue Editor' tab """
+    def OpenEditor(self, target_file_path, editor_type):
+        """ Creates an editor tab based on the provided file information """
 
-        # Check if a project is actively open
-        if self.settings.user_project_name:
+        if not self.CheckTabLimit():
 
-            if not self.CheckTabLimit():
+            editor_classes = {
+                FileType.Dialogue: EditorDialogue
+                #FileType.Scene_Dialogue: EditorSceneDialogue,
+                #FileType.Scene_Dialogue: EditorScenePointAndClick,
+                #FileType.Scene_Point_And_Click: EditorCharacter,
+             }
 
-                # Initialize the Dialogue Editor
-                self.active_editor = EditorDialogue(self.settings, self.logger)
+            # Initialize the Editor
+            self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
 
-                # Add it to the tab list (If we're not at the tab limit)
-                self.e_ui.main_tab_editor.addTab(self.active_editor.ed_ui, "Dialogue Editor")
-            else:
-                QtWidgets.QMessageBox.about(self.e_ui.central_widget, "Tab Limit Reached!",
-                                            "You have reached the maximum number of open tabs. Please close "
-                                            "a tab before attempting to open another"
-                                            )
+            # Add it to the tab list
+            self.e_ui.main_tab_editor.addTab(self.active_editor.ed_ui, os.path.basename(target_file_path))
+        else:
+            QtWidgets.QMessageBox.about(
+                self.e_ui.central_widget,
+                "Tab Limit Reached!",
+                "You have reached the maximum number of open tabs. Please close "
+                "a tab before attempting to open another"
+            )
 
     # ****** UTILITY FUNCTIONS ******
 

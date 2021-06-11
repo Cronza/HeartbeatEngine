@@ -41,12 +41,12 @@ class FileSystemPrompt(QFileDialog):
         print(starting_dir)
         dir_path = self.getExistingDirectory(
             self.parent(),
+            prompt_title,
             starting_dir
         )
-
         # Did the user choose a value?
         if dir_path:
-            return dir_path[0]
+            return dir_path
         else:
             self.logger.Log("No directory chosen", 3)
             return ""

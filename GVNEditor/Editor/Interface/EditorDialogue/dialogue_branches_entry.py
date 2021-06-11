@@ -30,7 +30,6 @@ class BranchesEntry(QtWidgets.QWidget):
         self.name_widget.setStyleSheet(settings.header_2_color)
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
-        #self.name_widget.setAlignment(Qt.AlignTop)
         self.name_widget.setSizePolicy(size_policy)
         self.name_widget.heightForWidth(0)
 
@@ -38,7 +37,6 @@ class BranchesEntry(QtWidgets.QWidget):
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setFont(settings.subtext_font)
         self.subtext_widget.setStyleSheet(settings.subtext_color)
-        #self.subtext_widget.setWordWrap(True)
         self.subtext_widget.setText('Test Description')
         self.subtext_widget.setAlignment(Qt.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)
@@ -56,8 +54,8 @@ class BranchesEntry(QtWidgets.QWidget):
         self.name_widget.setText(data[0])
         self.subtext_widget.setText(data[1])
 
-    def GetData(self) -> dict:
-        """ Returns the branch data stored in this branch entry """
+    def GetData(self) -> list:
+        """ Returns a list of dialogue entry data stored in this branch entry """
         return self.branch_data
 
     def Refresh(self):
