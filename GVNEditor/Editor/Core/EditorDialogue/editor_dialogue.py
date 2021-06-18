@@ -16,21 +16,21 @@
 """
 from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
-from Editor.Utilities.Exporters.exporter_dialogue import ExporterDialogue
 from Editor.Utilities.yaml_manager import Writer
+from Editor.Utilities.yaml_manager import Reader
 from Editor.Utilities.database_manager import DBManager
 
 
 class EditorDialogue(EditorBase):
-    def __init__(self, settings, logger, file_name):
-        super().__init__(settings, logger, file_name)
+    def __init__(self, settings, logger, file_path):
+        super().__init__(settings, logger, file_path)
 
         # Build the Dialogue Editor UI
         self.ed_ui = EditorDialogueUI(self)
 
         # Initialize a main branch
         self.ed_ui.branches.CreateBranch(
-            ("main", "This is the default, main branch\nConsider this the root of your dialogue tree")
+            ("Main", "This is the default, main branch\nConsider this the root of your dialogue tree")
         )
 
     def UpdateActiveEntry(self):
@@ -117,7 +117,6 @@ class EditorDialogue(EditorBase):
         except:
             self.logger.Log("Failed to Save!", 4)
 
-
     def Export(self):
         super().Export()
         self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
@@ -130,7 +129,34 @@ class EditorDialogue(EditorBase):
         # Write the data out
         self.logger.Log("Writing data to file...")
         try:
-            Writer.WriteFile(data_to_export, "D:/Scripts/GVNEngine/PROJECTS/To Infinity/Content/Dialogue/game_Test.yaml")
+            Writer.WriteFile(
+                data_to_export,
+                self.file_path,
+                "# Type: Dialogue\n" +
+                f"# {self.settings.editor_data['EditorSettings']['version_string']}"
+            )
             self.logger.Log("File Exported!", 2)
         except:
             self.logger.Log("Failed to Export!", 4)
+
+    def Import(self):
+        super().Import()
+        self.logger.Log(f"Importing Dialogue data for: {self.file_path}")
+
+        file_data = Reader.ReadAll(self.file_path)
+
+        db_manager = DBManager()
+        converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data, self.settings)
+
+        # The main branch is treated specially since we don't need to create it
+        for branch_name, branch_data in converted_data.items():
+            if branch_name == "Main":
+                for action in branch_data:
+                    self.ed_ui.dialogue_sequence.AddEntry(action, None, True)
+
+            else:
+                self.ed_ui.branches.CreateBranch(branch, "Auto-Generated")
+
+
+
+

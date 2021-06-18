@@ -1,9 +1,11 @@
 import os
 import sys
 import shutil
+import re
 from pathlib import Path
 from PyQt5 import QtWidgets
 from Editor.Utilities.settings import Settings
+#from Editor.Utilities.database_manager import DBManager
 from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Interface import gvn_editor as gvne
 from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
@@ -124,10 +126,9 @@ class GVNEditor:
          )
 
         if not existing_project_dir:
-            self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 4)
+            self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            print(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR))
             if os.path.exists(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR)):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
@@ -172,26 +173,44 @@ class GVNEditor:
 
             self.OpenEditor(result, selected_type)
 
+    def OpenFile(self):
+        """ Prompt the user to choose a file, then load the respective editor using the data found """
+
+        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        existing_file = prompt.GetFile(
+            self.settings.GetProjectContentDirectory(),
+            self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+            "Choose a File to Open"
+        )
+
+        if not existing_file:
+            self.logger.Log("File path was not provided - Cancelling 'Open File' action", 3)
+        else:
+            # Read the first line to determine the type of file
+            with open(existing_file) as f:
+
+                # Check the metadata at the top of the file to see which file type this is
+                line = f.readline()
+                search = re.search("# Type: (.*)", line)
+
+                if search:
+                    file_type = FileType[search.group(1)]
+                    self.OpenEditor(existing_file, file_type, True)
+                else:
+                    self.logger.Log("An invalid file was selected - Cancelling 'Open File' action", 4)
+                    QtWidgets.QMessageBox.about(
+                        self.e_ui.central_widget,
+                        "Not a Valid File!",
+                        "The chosen file was not created by the GVNEditor.\n"
+                        "Please either choose a different file, or create a new one.\n\n"
+                        "If you authored this file by hand, please add the correct metadata to the top of the file"
+                    )
+
     def Save(self):
         """ Requests the active editor to save it's data """
-        self.active_editor.Save()
         self.active_editor.Export()
-        """
-        cur_editor_ui = self.e_ui.main_tab_editor.currentWidget()
 
-        if cur_editor_ui:
-            # TODO: Make this not awful
-            # Each type of editor follows a different export / save process, so split off for each here
-            # So uh, how do we differentiate editors?
-
-            cur_editor_type = cur_editor_ui.core.editor_type
-
-            if cur_editor_type == "Dialogue":
-                exporter = ExporterDialogue(self.settings, self.logger)
-                exporter.Export(cur_editor_ui)
-        """
-
-    def OpenEditor(self, target_file_path, editor_type):
+    def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
 
         if not self.CheckTabLimit():
@@ -205,6 +224,10 @@ class GVNEditor:
 
             # Initialize the Editor
             self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
+
+            # If the caller wants to load the provided file instead of just marking it as the export target, do so here
+            if import_file:
+                self.active_editor.Import()
 
             # Add it to the tab list
             self.e_ui.main_tab_editor.addTab(self.active_editor.ed_ui, os.path.basename(target_file_path))
@@ -220,7 +243,7 @@ class GVNEditor:
 
     def CheckTabLimit(self):
         """ Returns true or false depending on whether we've reached the maximum number of tabs """
-        return self.settings.settings['EditorSettings']['max_tabs'] <= self.e_ui.main_tab_editor.count()
+        return self.settings.editor_data['EditorSettings']['max_tabs'] <= self.e_ui.main_tab_editor.count()
 
     def SetActiveProject(self, project_name, project_dir):
         """ Sets the active project, pointing the editor to the new location, and refreshing the inteface """

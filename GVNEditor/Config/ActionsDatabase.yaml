@@ -25,25 +25,25 @@ Renderables:
       requirements:
         - name: "key"
           type: "str"
-          default: ""
+          value: ""
           editable: True
           preview: True
 
         - name: "sprite"
           type: "file_image"
-          default: "None"
+          value: "None"
           editable: False
           preview: True
 
         - name: "position"
           type: "tuple"
-          default: 0,0
+          value: [0,0]
           editable: True
           preview: True
 
         - name: "center_align"
           type: "bool"
-          default: True
+          value: True
           global:
             category: "SpriteSettings"
             global_parameter: "center_align"
@@ -52,13 +52,13 @@ Renderables:
 
         - name: "flip"
           type: "bool"
-          default: False
+          value: False
           editable: True
           preview: False
 
         - name: "z_order"
           type: "int"
-          default: 0
+          value: 0
           global:
             category: "SpriteSettings"
             global_parameter: "z_order"
@@ -71,7 +71,7 @@ Renderables:
           children:
             - name: "type"
               type: "dropdown"
-              default: "None"
+              value: "None"
               options:
                 - "None"
                 - "fade_in"
@@ -80,7 +80,7 @@ Renderables:
 
             - name: "speed"
               type: "int"
-              default: 500
+              value: 500
               editable: True
               preview: True
     # Create Text
@@ -89,19 +89,19 @@ Renderables:
       requirements:
         - name: "key"
           type: "str"
-          default: ""
+          value: ""
           editable: True
           preview: True
 
         - name: "position"
           type: "tuple"
-          default: 0,0
+          value: [0,0]
           editable: True
           preview: True
 
         - name: "center_align"
           type: "bool"
-          default: True
+          value: True
           global:
             category: "TextSettings"
             global_parameter: "center_align"
@@ -110,13 +110,13 @@ Renderables:
 
         - name: "text"
           type: "paragraph"
-          default: ""
+          value: ""
           editable: True
           preview: True
 
         - name: "text_size"
           type: "int"
-          default: 24
+          value: 24
           global:
             category: "TextSettings"
             global_parameter: "size"
@@ -125,7 +125,7 @@ Renderables:
 
         - name: "text_color"
           type: "color"
-          default: [255, 255, 255]
+          value: [255, 255, 255]
           global:
             category: "TextSettings"
             global_parameter: "color"
@@ -134,7 +134,7 @@ Renderables:
 
         - name: "font"
           type: "file_font"
-          default: "None"
+          value: "None"
           global:
             category: "TextSettings"
             global_parameter: "font"
@@ -143,7 +143,7 @@ Renderables:
 
         - name: "z_order"
           type: "int"
-          default: 0
+          value: 0
           global:
             category: "TextSettings"
             global_parameter: "z_order"
@@ -156,7 +156,7 @@ Renderables:
           children:
             - name: "type"
               type: "dropdown"
-              default: "None"
+              value: "None"
               options:
                 - "None"
                 - "fade_in"
@@ -165,7 +165,7 @@ Renderables:
 
             - name: "speed"
               type: "int"
-              default: 500
+              value: 500
               editable: True
               preview: True
     # Create Background
@@ -174,25 +174,25 @@ Renderables:
       requirements:
         - name: "key"
           type: "str"
-          default: "Background"
+          value: "Background"
           editable: False
           preview: True
 
         - name: "sprite"
           type: "file_image"
-          default: "None"
+          value: "None"
           editable: False
           preview: True
 
         - name: "position"
           type: "tuple"
-          default: 0,0
+          value: [0,0]
           editable: True
           preview: False
 
         - name: "z_order"
           type: "int"
-          default: -9999 #Replace with a reference to the global setting
+          value: -9999 #Replace with a reference to the global setting
           global:
             category: "SpriteSettings"
             global_parameter: "background_z_order"
@@ -211,13 +211,13 @@ Dialogue:
           children:
             - name: "key"
               type: "str"
-              default: "SpeakerText"
+              value: "SpeakerText"
               editable: False
               preview: False
 
             - name: "position"
               type: "tuple"
-              default: 0,0
+              value: [0,0]
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_text_position"
@@ -226,7 +226,7 @@ Dialogue:
 
             - name: "center_align"
               type: "bool"
-              default: True
+              value: True
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_center_align"
@@ -235,13 +235,13 @@ Dialogue:
 
             - name: "text"
               type: "str"
-              default: ""
+              value: ""
               editable: True
               preview: True
 
             - name: "text_size"
               type: "int"
-              default: 24
+              value: 24
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_text_size"
@@ -250,7 +250,7 @@ Dialogue:
 
             - name: "text_color"
               type: "color"
-              default: [255, 255, 255]
+              value: [255, 255, 255]
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_text_color"
@@ -259,7 +259,7 @@ Dialogue:
 
             - name: "font"
               type: "file_font"
-              default: "None"
+              value: "None"
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_font"
@@ -268,7 +268,7 @@ Dialogue:
 
             - name: "z_order"
               type: "int"
-              default: 0
+              value: 0
               global:
                 category: "DialogueSettings"
                 global_parameter: "speaker_z_order"
@@ -281,7 +281,7 @@ Dialogue:
               children:
                 - name: "type"
                   type: "dropdown"
-                  default: "None"
+                  value: "None"
                   options:
                     - "fade_in"
                     - "None"
@@ -290,7 +290,7 @@ Dialogue:
 
                 - name: "speed"
                   type: "int"
-                  default: 500
+                  value: 500
                   editable: True
                   preview: False
 
@@ -300,13 +300,13 @@ Dialogue:
           children:
             - name: "key"
               type: "str"
-              default: "DialogueText"
+              value: "DialogueText"
               editable: False
               preview: False
 
             - name: "position"
               type: "tuple"
-              default: 0,0
+              value: [0,0]
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_text_position"
@@ -315,7 +315,7 @@ Dialogue:
 
             - name: "center_align"
               type: "bool"
-              default: True
+              value: True
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_center_align"
@@ -324,13 +324,13 @@ Dialogue:
 
             - name: "text"
               type: "paragraph"
-              default: ""
+              value: ""
               editable: True
               preview: True
 
             - name: "text_size"
               type: "int"
-              default: 24
+              value: 24
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_text_size"
@@ -339,7 +339,7 @@ Dialogue:
 
             - name: "text_color"
               type: "color"
-              default: [255, 255, 255]
+              value: [255, 255, 255]
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_text_color"
@@ -348,7 +348,7 @@ Dialogue:
 
             - name: "font"
               type: "file_font"
-              default: "None"
+              value: "None"
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_font"
@@ -357,7 +357,7 @@ Dialogue:
 
             - name: "z_order"
               type: "int"
-              default: 0
+              value: 0
               global:
                 category: "DialogueSettings"
                 global_parameter: "dialogue_z_order"
@@ -370,7 +370,7 @@ Dialogue:
               children:
                 - name: "type"
                   type: "dropdown"
-                  default: "None"
+                  value: "None"
                   options:
                     - "fade_in"
                     - "None"
@@ -379,7 +379,7 @@ Dialogue:
 
                 - name: "speed"
                   type: "int"
-                  default: 500
+                  value: 500
                   editable: True
                   preview: False
 

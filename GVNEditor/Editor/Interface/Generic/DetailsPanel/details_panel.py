@@ -112,6 +112,8 @@ class DetailsPanel(QtWidgets.QWidget):
         # Expand all dropdowns automatically
         self.details_table.expandAll()
 
+        #print(self.settings.action_database)
+
     def UpdateCache(self, parent_entry=None, action_data=None):
         """
         Collect all inputs for all detail entries, and cache them in the active entry's action data
@@ -149,7 +151,13 @@ class DetailsPanel(QtWidgets.QWidget):
                         # Containers don't store values themselves, so the above code accounts solely for it's children
                         # If this entry is not a container, lets cache normally
                         else:
-                            requirement["cache"] = details_entry.Get()
+                            #if requirement['type'] == 'tuple':
+                            #    print(details_entry.Get())
+                            #    print(type(details_entry.Get()))
+                            requirement["value"] = details_entry.Get()
+                            #if requirement['type'] == 'tuple':
+                            #    print(details_entry.Get())
+                            #    print(type(details_entry.Get()))
 
                             # If this entry has a global option, keep track of it's value
                             if details_entry.show_global_toggle:
@@ -174,8 +182,8 @@ class DetailsPanel(QtWidgets.QWidget):
                 details_widget.show_global_toggle = True
 
                 # Keep the global toggle off if the user previously turned it off
-                if 'active' in data['global']:
-                    if data['global']['active']:
+                if "active" in data["global"]:
+                    if data["global"]["active"]:
                         details_widget.global_toggle.Set(True)
                     else:
                         details_widget.global_toggle.Set(False)
@@ -183,10 +191,7 @@ class DetailsPanel(QtWidgets.QWidget):
                     details_widget.global_toggle.Set(True)
 
             # Update the contents of the entry
-            if 'cache' in data:
-                details_widget.Set(data["cache"])
-            else:
-                details_widget.Set(data["default"])
+            details_widget.Set(data["value"])
 
             # Make the option read-only if applicable
             if not data["editable"]:
@@ -272,24 +277,24 @@ class DetailsPanel(QtWidgets.QWidget):
         # The key changes depending if we're at root of parsing children ('requirements' vs 'children')
         requirements_list = None
         if parent:
-            requirements_list = parent['children']
+            requirements_list = parent["children"]
         else:
             requirements_list = self.active_entry.action_data["requirements"]
 
         # Search through the active entry's data, and try to find the corresponding entry for this
         for requirement in requirements_list:
-            if requirement['name'] == key_name:
-                requirement['cache'] = self.settings.GetGlobalSetting(
-                    requirement['global']['category'],
-                    requirement['global']['global_parameter']
+            if requirement["name"] == key_name:
+                requirement["value"] = self.settings.GetGlobalSetting(
+                    requirement["global"]["category"],
+                    requirement["global"]["global_parameter"]
                 )
 
                 # Since we have the details entry reference, let's update it's input
-                details_entry.Set(requirement['cache'])
+                details_entry.Set(requirement["value"])
 
                 # Refresh the active entry
                 self.active_entry.Refresh()
 
             # Recurse if applicable
-            elif requirement['type'] == 'container':
+            elif requirement["type"] == "container":
                 self.GlobalToggleEnabled(details_entry, requirement)

@@ -53,7 +53,6 @@ class DialogueEntry(QtWidgets.QWidget):
         for param in data:
             if param["preview"]:
 
-                # If cached data is available, use it. Otherwise display the default
                 param_name = param["name"]
                 param_data = None
 
@@ -64,11 +63,7 @@ class DialogueEntry(QtWidgets.QWidget):
                     cur_string += "], "
 
                 else:
-                    if "cache" in param:
-                        param_data = param["cache"]
-                    else:
-                        param_data = param["default"]
-
+                    param_data = param["value"]
                     cur_string += f"{param_name}: {param_data}, "
 
         # Due to how the comma formatting is, strip it from the end of the string

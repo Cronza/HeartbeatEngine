@@ -37,7 +37,11 @@ class DetailsEntryTuple(DetailsEntryBase):
         self.main_layout.addWidget(self.input_widget_alt)
 
     def Get(self):
-        return f"{self.input_widget.text()},{self.input_widget_alt.text()}"
+        #print(type(f"{self.input_widget.text()},{self.input_widget_alt.text()}"))
+        #print("heh")
+        #print(self.input_widget.text(), self.input_widget_alt.text())
+        #print(type(self.input_widget.text(), self.input_widget_alt.text()))
+        return self.input_widget.text(), self.input_widget_alt.text()
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
@@ -45,7 +49,6 @@ class DetailsEntryTuple(DetailsEntryBase):
         self.input_widget_alt.disconnect()
 
         # Change the data without causing any signal calls
-        #parsed_data = data.split(",")
         self.input_widget.setText(str(data[0]))
         self.input_widget_alt.setText(str(data[1]))
 

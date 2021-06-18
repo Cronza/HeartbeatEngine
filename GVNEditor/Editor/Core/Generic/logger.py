@@ -31,12 +31,12 @@ class Logger:
         self.log_ui = LoggerUI(self)
 
         # Load styling
-        self.log_font = QFont(self.settings.settings['EditorTextSettings']['log_font'], self.settings.settings['EditorTextSettings']['log_text_size'])
+        self.log_font = QFont(self.settings.style_data['EditorTextSettings']['log_font'], self.settings.style_data['EditorTextSettings']['log_text_size'])
         self.log_colors = {
-            LogType.Normal: self.settings.settings['EditorTextSettings']['log_normal_color'],
-            LogType.Success: self.settings.settings['EditorTextSettings']['log_success_color'],
-            LogType.Warning: self.settings.settings['EditorTextSettings']['log_warning_color'],
-            LogType.Error: self.settings.settings['EditorTextSettings']['log_error_color']
+            LogType.Normal: self.settings.style_data['EditorTextSettings']['log_normal_color'],
+            LogType.Success: self.settings.style_data['EditorTextSettings']['log_success_color'],
+            LogType.Warning: self.settings.style_data['EditorTextSettings']['log_warning_color'],
+            LogType.Error: self.settings.style_data['EditorTextSettings']['log_error_color']
         }
         self.log_prefixes = {
             LogType.Normal: "",
@@ -65,6 +65,7 @@ class Logger:
 
         new_entry = QListWidgetItem(datetime.now().strftime("%H:%M:%S") + ": " + prefix + log_text)
         new_entry.setForeground(QColor(color[0], color[1], color[2]))
+        new_entry.setFont(self.log_font)
         self.log_ui.log_list.addItem(new_entry)
 
     def ClearLog(self):

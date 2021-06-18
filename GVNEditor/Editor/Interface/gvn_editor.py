@@ -40,7 +40,7 @@ class GVNEditorUI:
         self.CreateGettingStartedDisplay()
         self.main_resize_container.addWidget(self.logger.log_ui)
 
-        #Adjust the main editor container so it takes up as much space as possible
+        # Adjust the main editor container so it takes up as much space as possible
         self.main_resize_container.setStretchFactor(0, 10)
 
         # Hook up buttons
@@ -64,6 +64,8 @@ class GVNEditorUI:
         self.file_menu.setStyleSheet(self.settings.button_color)
         self.a_new_file = QtWidgets.QAction(main_window)
         self.a_new_file.triggered.connect(self.e_core.NewFile)
+        self.a_open_file = QtWidgets.QAction(main_window)
+        self.a_open_file.triggered.connect(self.e_core.OpenFile)
         self.a_save_file_as = QtWidgets.QAction(main_window)
         self.a_save_file_as.triggered.connect(self.e_core.Save)
         self.a_new_project = QtWidgets.QAction(main_window)
@@ -71,6 +73,7 @@ class GVNEditorUI:
         self.a_open_project = QtWidgets.QAction(main_window)
         self.a_open_project.triggered.connect(self.e_core.OpenProject)
         self.file_menu.addAction(self.a_new_file)
+        self.file_menu.addAction(self.a_open_file)
         self.file_menu.addAction(self.a_save_file_as)
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
@@ -93,10 +96,13 @@ class GVNEditorUI:
         # 'File Menu' Actions
         self.a_new_file.setText(_translate("MainWindow", "New File"))
         self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
+        self.a_open_file.setText(_translate("MainWindow", "Open File"))
+        self.a_open_file.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.a_save_file_as.setText(_translate("MainWindow", "Save"))
         self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
+
 
     def CreateTabEditor(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """

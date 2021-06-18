@@ -23,13 +23,6 @@ class EditorBase:
         self.logger = logger
         self.file_path = file_path
 
-        #self.editor_type = None
-        #self.editor_types = [
-        #    'Dialogue',
-        #    'Scene',
-        #    'Character'
-        #]
-
         self.logger.Log("Initializing Editor...")
 
     def GetFileName(self):
@@ -50,4 +43,7 @@ class EditorBase:
         engine
         """
         pass
+
+    def Import(self):
+        """ Reads in and loads file this editor points to """
 
