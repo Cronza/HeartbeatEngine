@@ -67,12 +67,12 @@ class ActionManager:
         """
         Returns the object associated with the provided transition text
         """
-        if 'transition_type' in transition_data:
+        if 'type' in transition_data:
             transition = None
 
             available_transitions = inspect.getmembers(transitions, inspect.isclass)
             for transition, t_object in available_transitions:
-                if transition_data['transition_type'] == transition:
+                if transition_data['type'] == transition:
                     transition = t_object
                     break
 
@@ -84,8 +84,8 @@ class ActionManager:
 
             return transition
 
-            #if 'transition_speed' in transition_data:
-            #    #return transition(self, self.scene, renderable, transition_data['transition_speed'])
+            #if 'speed' in transition_data:
+            #    #return transition(self, self.scene, renderable, transition_data['speed'])
             #else:
             #    print("Transition Speed not specified - Resorting to default")
             #    return transition(self, self.scene, renderable)
@@ -95,7 +95,7 @@ class ActionManager:
     def CreateTransition(self, transition_data, renderable):
         transition = self.GetTransition(transition_data)
 
-        if 'transition_speed' in transition_data:
-            return transition(self.scene, self, renderable, transition_data['transition_speed'])
+        if 'speed' in transition_data:
+            return transition(self.scene, self, renderable, transition_data['speed'])
         else:
             return transition(self.scene, self, renderable)

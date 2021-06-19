@@ -22,18 +22,19 @@ class FileSystemPrompt(QFileDialog):
         if file_path[0]:
             selected_dir = file_path[0]
 
-            if self.settings.user_project_dir in selected_dir:
-                self.logger.Log("Valid directory chosen")
-                return selected_dir
-            else:
-                if project_only:
+            if project_only:
+                if self.settings.user_project_dir in selected_dir:
+                    self.logger.Log("Valid file chosen")
+                    return selected_dir
+                else:
                     self.ShowPathOutsideProjectMessage()
                     return ""
-                else:
-                    self.logger.Log("Valid directory chosen")
-                    return selected_dir
+            else:
+                self.logger.Log("Valid file chosen")
+                return selected_dir
         else:
             self.logger.Log("File name and path not provided", 3)
+            return ""
 
     def GetDirectory(self, starting_dir, prompt_title="Choose a Directory", project_only=True) -> str:
         """ Opens up a prompt for choosing an existing directory """
@@ -46,16 +47,16 @@ class FileSystemPrompt(QFileDialog):
         )
 
         if dir_path:
-            if self.settings.user_project_dir in dir_path:
-                self.logger.Log("Valid directory chosen")
-                return dir_path
-            else:
-                if project_only:
-                    self.ShowPathOutsideProjectMessage()
-                    return ""
-                else:
+            if project_only:
+                if self.settings.user_project_dir in dir_path:
                     self.logger.Log("Valid directory chosen")
                     return dir_path
+                else:
+                    self.ShowPathOutsideProjectMessage()
+                    return ""
+            else:
+                self.logger.Log("Valid directory chosen")
+                return dir_path
         else:
             self.logger.Log("No directory chosen", 3)
             return ""
@@ -75,18 +76,19 @@ class FileSystemPrompt(QFileDialog):
         if file_path[0]:
             selected_dir = file_path[0]
 
-            if self.settings.user_project_dir in selected_dir:
-                self.logger.Log("Valid file chosen")
-                return selected_dir
-            else:
-                if project_only:
-                    self.ShowPathOutsideProjectMessage()
-                    return ""
-                else:
+            if project_only:
+                if self.settings.user_project_dir in selected_dir:
                     self.logger.Log("Valid file chosen")
                     return selected_dir
+                else:
+                    self.ShowPathOutsideProjectMessage()
+                    return ""
+            else:
+                self.logger.Log("Valid file chosen")
+                return selected_dir
         else:
             self.logger.Log("File name and path not provided", 3)
+            return ""
 
     def ShowPathOutsideProjectMessage(self):
         """ Show a notice to the user that the path they have chosen does not reside in the active project directory """

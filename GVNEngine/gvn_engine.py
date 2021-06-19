@@ -7,10 +7,10 @@ class GVNEngine():
     def __init__(self):
         # Build a settings object to house engine & project settings
         self.settings = Settings()
-        self.settings.EvaluateProjectSettings("Config/Game.yaml")
+        self.settings.Evaluateproject_settings("Config/Game.yaml")
 
         # Configure the game based on project settings
-        pygame.display.set_caption(self.settings.projectSettings['Game']['title'])
+        pygame.display.set_caption(self.settings.project_settings['Game']['title'])
 
         # Declare the scene manager, but we'll initialize it during the game loop
         self.scene_manager = None

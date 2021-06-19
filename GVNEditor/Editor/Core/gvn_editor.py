@@ -51,7 +51,8 @@ class GVNEditor:
         prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
         new_project_dir = prompt.GetDirectory(
             str(Path.home()),
-            "Choose a Directory to Create a Project"
+            "Choose a Directory to Create a Project",
+            False
         )
 
         if not new_project_dir:
@@ -66,7 +67,7 @@ class GVNEditor:
                 "Please Enter a Project Name:"
             )[0]
 
-            if user_project_name:
+            if not user_project_name:
                 self.logger.Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
@@ -122,7 +123,8 @@ class GVNEditor:
         prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
         existing_project_dir = prompt.GetDirectory(
             str(Path.home()),
-            "Choose a Project Directory"
+            "Choose a Project Directory",
+            False
          )
 
         if not existing_project_dir:
@@ -150,65 +152,85 @@ class GVNEditor:
         Prompts the user for a type of file to create, and a location & name for the new file. Then creates that
         file, and loads the respective editor
         """
-        new_file_prompt = NewFileMenu(self.settings, self.logger, "Content/Icons/GVNEngine_Logo.png", "Choose a File Type")
-
-        # Did the user successfully choose something?
-        if new_file_prompt.exec():
-
-            selected_type = new_file_prompt.GetSelection()
-            sub_dir = self.settings.FILE_TYPE_LOCATIONS[selected_type]
-
-            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
-            result = prompt.SaveFile(
-                self.settings.SUPPORTED_CONTENT_TYPES['Data'],
-                os.path.join(self.settings.GetProjectContentDirectory(), sub_dir),
-                "Save File As"
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            new_file_prompt = NewFileMenu(
+                self.settings,
+                self.logger,
+                "Content/Icons/GVNEngine_Logo.png",
+                "Choose a File Type"
             )
 
-            # Did the user choose a place and a name for the new file?
-            if result:
-                with open(result, 'w') as new_file:
-                    pass
-                    self.logger.Log(f"File created - {result}", 2)
+            # Did the user successfully choose something?
+            if new_file_prompt.exec():
 
-            self.OpenEditor(result, selected_type)
+                selected_type = new_file_prompt.GetSelection()
+                sub_dir = self.settings.FILE_TYPE_LOCATIONS[selected_type]
+
+                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                result = prompt.SaveFile(
+                    self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+                    os.path.join(self.settings.GetProjectContentDirectory(), sub_dir),
+                    "Save File As"
+                )
+
+                # Did the user choose a place and a name for the new file?
+                if result:
+                    with open(result, 'w') as new_file:
+                        pass
+                        self.logger.Log(f"File created - {result}", 2)
+
+                self.OpenEditor(result, selected_type)
 
     def OpenFile(self):
         """ Prompt the user to choose a file, then load the respective editor using the data found """
-
-        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
-        existing_file = prompt.GetFile(
-            self.settings.GetProjectContentDirectory(),
-            self.settings.SUPPORTED_CONTENT_TYPES['Data'],
-            "Choose a File to Open"
-        )
-
-        if not existing_file:
-            self.logger.Log("File path was not provided - Cancelling 'Open File' action", 3)
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
         else:
-            # Read the first line to determine the type of file
-            with open(existing_file) as f:
+            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+            existing_file = prompt.GetFile(
+                self.settings.GetProjectContentDirectory(),
+                self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+                "Choose a File to Open"
+            )
 
-                # Check the metadata at the top of the file to see which file type this is
-                line = f.readline()
-                search = re.search("# Type: (.*)", line)
+            if not existing_file:
+                self.logger.Log("File path was not provided - Cancelling 'Open File' action", 3)
+            else:
+                # Read the first line to determine the type of file
+                with open(existing_file) as f:
 
-                if search:
-                    file_type = FileType[search.group(1)]
-                    self.OpenEditor(existing_file, file_type, True)
-                else:
-                    self.logger.Log("An invalid file was selected - Cancelling 'Open File' action", 4)
-                    QtWidgets.QMessageBox.about(
-                        self.e_ui.central_widget,
-                        "Not a Valid File!",
-                        "The chosen file was not created by the GVNEditor.\n"
-                        "Please either choose a different file, or create a new one.\n\n"
-                        "If you authored this file by hand, please add the correct metadata to the top of the file"
-                    )
+                    # Check the metadata at the top of the file to see which file type this is
+                    line = f.readline()
+                    search = re.search("# Type: (.*)", line)
+
+                    if search:
+                        file_type = FileType[search.group(1)]
+                        self.OpenEditor(existing_file, file_type, True)
+                    else:
+                        self.logger.Log("An invalid file was selected - Cancelling 'Open File' action", 4)
+                        QtWidgets.QMessageBox.about(
+                            self.e_ui.central_widget,
+                            "Not a Valid File!",
+                            "The chosen file was not created by the GVNEditor.\n"
+                            "Please either choose a different file, or create a new one.\n\n"
+                            "If you authored this file by hand, please add the correct metadata to the top of the file"
+                        )
+    def Play(self):
+        """ Launches the GVNEngine """
+        self.logger.Log("Launching engine...")
 
     def Save(self):
         """ Requests the active editor to save it's data """
-        self.active_editor.Export()
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+
+        if self.active_editor:
+            self.active_editor.Export()
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
@@ -240,6 +262,15 @@ class GVNEditor:
             )
 
     # ****** UTILITY FUNCTIONS ******
+
+    def ShowNoActiveProjectPrompt(self):
+        """ Shows a simple dialog informing the user that no project is currently active """
+        QtWidgets.QMessageBox.about(
+            self.e_ui.central_widget,
+            "No Active Project",
+            "There is currently no project open.\n"
+            "Please either open an existing project, or create a new one."
+        )
 
     def CheckTabLimit(self):
         """ Returns true or false depending on whether we've reached the maximum number of tabs """

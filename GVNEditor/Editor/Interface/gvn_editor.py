@@ -59,6 +59,7 @@ class GVNEditorUI:
         self.menu_bar.setFont(self.settings.button_font)
         self.menu_bar.setStyleSheet(self.settings.button_color)
 
+        # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
         self.file_menu.setFont(self.settings.button_font)
         self.file_menu.setStyleSheet(self.settings.button_color)
@@ -78,8 +79,17 @@ class GVNEditorUI:
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
 
+        # Play Menu
+        self.play_menu = QtWidgets.QMenu(self.menu_bar)
+        self.play_menu.setFont(self.settings.button_font)
+        self.play_menu.setStyleSheet(self.settings.button_color)
+        self.a_play_game = QtWidgets.QAction(main_window)
+        self.a_play_game.triggered.connect(self.e_core.Play)
+        self.play_menu.addAction(self.a_play_game)
+
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
+        self.menu_bar.addAction(self.play_menu.menuAction())
 
         # Initialize the Menu Bar
         main_window.setMenuBar(self.menu_bar)
@@ -92,6 +102,7 @@ class GVNEditorUI:
         # *** Update Engine Menu Bar ***
         # Menu Headers
         self.file_menu.setTitle(_translate("MainWindow", "File"))
+        self.play_menu.setTitle(_translate("MainWindow", "Play"))
 
         # 'File Menu' Actions
         self.a_new_file.setText(_translate("MainWindow", "New File"))
@@ -103,6 +114,9 @@ class GVNEditorUI:
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
 
+        # 'Play Menu' Actions
+        self.a_play_game.setText(_translate("MainWindow", "Play"))
+        self.a_play_game.setShortcut(_translate("MainWindow", "Ctrl+Alt+P"))
 
     def CreateTabEditor(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """

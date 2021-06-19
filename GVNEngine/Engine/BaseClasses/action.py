@@ -4,7 +4,7 @@ class Action():
         self.action_data = action_data
         self.a_manager = a_manager
         self.active_transition = None
-        self.transition_speed = 5
+        self.speed = 5
         self.skippable = True
         self.complete = False
         self.complete_delegate = None  # Allow actions to call something when they finish

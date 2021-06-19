@@ -36,8 +36,8 @@ Main:
       - 1.25
     wait_for_input: False
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     speaker:
@@ -57,8 +57,8 @@ Main:
     flip: false
     wait_for_input: False
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     character: "Rei"
@@ -70,8 +70,8 @@ Main:
     key: "Isea_Idle_Concerned"
     wait_for_input: False
     transition:
-      transition_type: 'fade_out'
-      transition_speed: 3000
+      type: 'fade_out'
+      speed: 3000
 
   - action: "create_character"
     key: "Isea_Idle_Straight_Face"
@@ -84,8 +84,8 @@ Main:
     flip: false
     wait_until_complete: True
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     speaker:
@@ -104,8 +104,8 @@ Main:
     key: "Rei_Idle_Straight_Face"
     wait_for_input: False
     transition:
-      transition_type: 'fade_out'
-      transition_speed: 3000
+      type: 'fade_out'
+      speed: 3000
 
   - action: "create_character"
     key: "Rei_Idle_Smiling"
@@ -118,8 +118,8 @@ Main:
     flip: false
     wait_until_complete: True
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     character: "Rei"
@@ -178,8 +178,8 @@ Choice01_ICouldBeBetter:
     key: "Rei_Idle_Smiling"
     wait_for_input: False
     transition:
-      transition_type: 'fade_out'
-      transition_speed: 3000
+      type: 'fade_out'
+      speed: 3000
 
   - action: "create_character"
     key: "Rei_Idle_Straight_Face"
@@ -192,8 +192,8 @@ Choice01_ICouldBeBetter:
     flip: false
     wait_for_input: False
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     character: "Rei"
@@ -261,8 +261,8 @@ Choice02_MyDeathAwaits:
     key: "Isea_Idle_Straight_Face"
     wait_for_input: False
     transition:
-      transition_type: 'fade_out'
-      transition_speed: 3000
+      type: 'fade_out'
+      speed: 3000
 
   - action: "create_character"
     key: "Isea_Idle_Concerned"
@@ -275,8 +275,8 @@ Choice02_MyDeathAwaits:
     flip: false
     wait_until_complete: True
     transition:
-      transition_type: 'fade_in'
-      transition_speed: 700
+      type: 'fade_in'
+      speed: 700
 
   - action: "dialogue"
     character: "Isea"

@@ -4,7 +4,8 @@ Game:
   title: 'To Infinity'
   author: 'Garrett Fredley'
   company: 'Garrett Fredley'
-  starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
+  #starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
+  starting_scene: 'Content/Scenes/Test_Editor_Generated_Dialogue_Scene_01.yaml'
 
 WindowSettings:
   resolution: 0
@@ -66,7 +67,7 @@ PauseMenuSettings:
   data_file: 'Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml'
 
 SceneTransitionsSettings:
-  transition_speed: 150
+  speed: 150
   z_order: 9999
 
 ChoiceSettings:
