@@ -1,6 +1,6 @@
 import copy
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.action_menu import ActionMenu
+from Editor.Interface.Menus.ActionMenu.action_menu import ActionMenu
 from Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
 """
@@ -52,7 +52,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setMenu(self.action_menu)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
@@ -61,7 +65,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Remove Entry Button
         self.remove_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.remove_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.remove_entry_button.setIcon(icon)
         self.remove_entry_button.clicked.connect(self.RemoveEntry)
         self.main_toolbar_layout.addWidget(self.remove_entry_button)
@@ -69,7 +77,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Copy Entry Button
         self.copy_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.copy_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Copy.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.copy_entry_button.setIcon(icon)
         self.copy_entry_button.clicked.connect(self.CopyEntry)
         self.main_toolbar_layout.addWidget(self.copy_entry_button)
@@ -77,7 +89,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Move Entry Up Button
         self.move_entry_up_button = QtWidgets.QToolButton(self.main_toolbar)
         self.move_entry_up_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Up.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.move_entry_up_button.setIcon(icon)
         self.move_entry_up_button.clicked.connect(self.MoveEntryUp)
         self.main_toolbar_layout.addWidget(self.move_entry_up_button)
@@ -85,7 +101,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Move Entry Down Button
         self.move_entry_down_button = QtWidgets.QToolButton(self.main_toolbar)
         self.move_entry_down_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.move_entry_down_button.setIcon(icon)
         self.move_entry_down_button.clicked.connect(self.MoveEntryDown)
         self.main_toolbar_layout.addWidget(self.move_entry_down_button)

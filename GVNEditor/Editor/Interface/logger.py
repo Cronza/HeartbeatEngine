@@ -11,13 +11,6 @@ class LoggerUI(QtWidgets.QWidget):
         font.setBold(True)
         font.setWeight(75)
 
-        # Main Container
-        #izePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        #sizePolicy.setHorizontalStretch(0)
-        #sizePolicy.setVerticalStretch(0)
-        #sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
-        #self.setSizePolicy(sizePolicy)
-
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(4, 2, 4, 2)
@@ -52,7 +45,11 @@ class LoggerUI(QtWidgets.QWidget):
         # Clear Log Button
         self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
         self.clear_log_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Trash.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.l_core.settings.ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.clear_log_button.setIcon(icon)
         self.clear_log_button.clicked.connect(self.l_core.ClearLog)
 

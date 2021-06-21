@@ -47,7 +47,11 @@ class BranchesPanel(QtWidgets.QWidget):
         # Add Branch Button
         self.add_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.add_entry_button.clicked.connect(self.AddBranch)
@@ -56,7 +60,11 @@ class BranchesPanel(QtWidgets.QWidget):
         # Remove Branch Button
         self.remove_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
         self.remove_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Minus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.remove_entry_button.setIcon(icon)
         self.remove_entry_button.clicked.connect(self.RemoveBranch)
         self.branches_toolbar_layout.addWidget(self.remove_entry_button)

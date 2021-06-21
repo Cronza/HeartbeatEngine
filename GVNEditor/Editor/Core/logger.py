@@ -18,12 +18,12 @@
 from datetime import datetime
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QFont
-from Editor.Interface.Generic.logger import LoggerUI
+from Editor.Interface.logger import LoggerUI
 from Editor.Utilities.DataTypes.log_types import LogType
 
 
 class Logger:
-    def __init__(self, e_ui, settings):
+    def __init__(self, settings):
 
         self.settings = settings
 
@@ -31,7 +31,10 @@ class Logger:
         self.log_ui = LoggerUI(self)
 
         # Load styling
-        self.log_font = QFont(self.settings.style_data['EditorTextSettings']['log_font'], self.settings.style_data['EditorTextSettings']['log_text_size'])
+        self.log_font = QFont(
+            self.settings.style_data['EditorTextSettings']['log_font'],
+            self.settings.style_data['EditorTextSettings']['log_text_size']
+        )
         self.log_colors = {
             LogType.Normal: self.settings.style_data['EditorTextSettings']['log_normal_color'],
             LogType.Success: self.settings.style_data['EditorTextSettings']['log_success_color'],

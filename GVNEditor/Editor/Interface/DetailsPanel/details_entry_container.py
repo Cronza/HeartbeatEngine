@@ -1,4 +1,4 @@
-from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
 
 
 class DetailsEntryContainer(DetailsEntryBase):

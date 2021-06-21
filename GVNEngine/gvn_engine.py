@@ -1,3 +1,4 @@
+import os
 import pygame
 from pygame.locals import VIDEORESIZE
 from Engine.Core.scene_manager import SceneManager
@@ -7,7 +8,8 @@ class GVNEngine():
     def __init__(self):
         # Build a settings object to house engine & project settings
         self.settings = Settings()
-        self.settings.Evaluateproject_settings("Config/Game.yaml")
+
+        self.settings.Evaluate(self.settings.ConvertPartialToAbsolutePath("Config/Game.yaml"))
 
         # Configure the game based on project settings
         pygame.display.set_caption(self.settings.project_settings['Game']['title'])

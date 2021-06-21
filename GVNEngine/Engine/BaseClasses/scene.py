@@ -2,6 +2,7 @@ from Engine.Utilities.yaml_reader import Reader
 from Engine.BaseClasses.renderable_group import RenderableGroup
 from Engine.Core.action_manager import ActionManager
 
+
 class Scene:
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
 
@@ -18,7 +19,7 @@ class Scene:
         self.delta_time = 0
 
         # Read in the active scene data
-        self.scene_data = Reader.ReadAll(scene_data_file)
+        self.scene_data = Reader.ReadAll(self.settings.ConvertPartialToAbsolutePath(scene_data_file))
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:

@@ -17,7 +17,11 @@ class NewFileMenu(BasePopupMenu):
 
         self.options_list = QtWidgets.QListWidget()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/GVNEngine_Logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/GVNEngine_Logo.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         FileOption(
             icon,
             FileType.Dialogue,

@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from Editor.Interface.BaseClasses.base_editor import EditorBaseUI
-from Editor.Interface.Generic.DetailsPanel.details_panel import DetailsPanel
+from Editor.Interface.DetailsPanel.details_panel import DetailsPanel
 from Editor.Interface.EditorDialogue.dialogue_branches_panel import BranchesPanel
 from Editor.Interface.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
 

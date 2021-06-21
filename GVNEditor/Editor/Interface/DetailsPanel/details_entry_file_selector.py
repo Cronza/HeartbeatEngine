@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class DetailsEntryFileSelector(DetailsEntryBase):
@@ -18,7 +19,11 @@ class DetailsEntryFileSelector(DetailsEntryBase):
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Folder.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Folder.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.file_select_button.setIcon(icon)
         self.file_select_button.clicked.connect(self.OpenFilePrompt)
 
@@ -46,29 +51,20 @@ class DetailsEntryFileSelector(DetailsEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-        file_path = QtWidgets.QFileDialog.getOpenFileName(self.input_container,
-                                                          "Open File",
-                                                          self.settings.GetProjectContentDirectory(),
-                                                          self.type_filter
-                                                          )
+
+        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        existing_file = prompt.GetFile(
+            self.settings.GetProjectContentDirectory(),
+            self.type_filter,
+            "Choose a File to Open"
+        )
+
         # Did the user choose a value?
-        if file_path[0]:
-            selected_dir = file_path[0]
+        if existing_file:
+            selected_dir = existing_file
 
-            # Is the path in the active project dir?
-            if self.settings.user_project_dir in selected_dir:
-
-                # Remove the project dir from the path, so that the selected dir only contains a relative path
-                self.Set(selected_dir.replace(self.settings.user_project_dir + "/", ""))
-
-            # It is not. This is not allowed
-            else:
-                # @TODO: Can we present the user with an import prompt here
-                QtWidgets.QMessageBox.about(self.parent(), "Invalid Value Provided!",
-                                            "The chosen file exists outside the active project directory.\n"
-                                            "Please either select a file that resides in the active project,\n"
-                                            "or move the chosen file into the project's Content directory"
-                                            )
+            # Remove the project dir from the path, so that the selected dir only contains a relative path
+            self.Set(selected_dir.replace(self.settings.user_project_dir + "/", ""))
 
 
 

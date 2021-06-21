@@ -1,5 +1,5 @@
-from PyQt5 import QtWidgets, QtCore
-from Editor.Interface.Generic.Primitives.simple_checkbox import SimpleCheckbox
+from PyQt5 import QtWidgets
+from Editor.Interface.Primitives.simple_checkbox import SimpleCheckbox
 
 
 class DetailsEntryBase(QtWidgets.QTreeWidgetItem):

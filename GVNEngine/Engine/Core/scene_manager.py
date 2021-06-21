@@ -23,7 +23,9 @@ class SceneManager():
         }
 
         # Do a special read and load for the initial scene
-        starting_scene_data = self.settings.project_settings['Game']['starting_scene']
+        starting_scene_data = self.settings.ConvertPartialToAbsolutePath(
+            self.settings.project_settings['Game']['starting_scene']
+        )
         scene_data = Reader.ReadAll(starting_scene_data)
 
         if 'type' in scene_data:
@@ -32,7 +34,9 @@ class SceneManager():
             print("'type' was not specified in the starting file .yaml. Unable to initialize first scene")
 
         # Read in the yaml data for the pause menu
-        self.pause_menu_data = Reader.ReadAll(self.settings.project_settings['PauseMenuSettings']['data_file'])
+        self.pause_menu_data = Reader.ReadAll(
+            self.settings.ConvertPartialToAbsolutePath(self.settings.project_settings['PauseMenuSettings']['data_file'])
+        )
         self.pause_menu_data['action'] = "create_container"
 
     def LoadScene(self, scene_file, scene_type):

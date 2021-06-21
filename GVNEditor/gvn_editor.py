@@ -5,13 +5,12 @@ import re
 from pathlib import Path
 from PyQt5 import QtWidgets
 from Editor.Utilities.settings import Settings
-#from Editor.Utilities.database_manager import DBManager
 from Editor.Utilities.DataTypes.file_types import FileType
+from Editor.Utilities.play_manager import PlayManager
 from Editor.Interface import gvn_editor as gvne
 from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
-from Editor.Interface.Generic.Prompts.file_system_prompt import FileSystemPrompt
+from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
-
 
 class GVNEditor:
     def __init__(self):
@@ -30,7 +29,7 @@ class GVNEditor:
 
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        self.SetActiveProject("To Infinity", "D:\Scripts\GVNEngine\PROJECTS\To Infinity")
+        #self.SetActiveProject("To Infinity", "/PROJECTS/To Infinity")
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -89,7 +88,7 @@ class GVNEditor:
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
-                    for main_dir in self.settings.PROJECT_FOLDER_STRUCTURE.items():
+                    for main_dir in self.settings.project_folder_structure.items():
 
                         # Create the main dir (.../Content)
                         main_dir_path = os.path.join(project_path, main_dir[0])
@@ -102,13 +101,13 @@ class GVNEditor:
                                 os.mkdir(sub_dir_path)
 
                     # Create the admin folder
-                    admin_dir_path = os.path.join(project_path, self.settings.PROJECT_ADMIN_DIR)
+                    admin_dir_path = os.path.join(project_path, self.settings.project_admin_dir)
                     os.mkdir(admin_dir_path)
 
                     # Clone project default files
-                    for key, rel_path in self.settings.PROJECT_DEFAULT_FILES.items():
+                    for key, rel_path in self.settings.project_default_files.items():
                         shutil.copy(
-                            os.path.join(self.settings.BASE_ENGINE_DIR, rel_path),
+                            os.path.join(self.settings.base_engine_dir, rel_path),
                             os.path.join(project_path, rel_path))
 
                     self.logger.Log(f"Project Created at: {project_path}", 2)
@@ -131,7 +130,7 @@ class GVNEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(os.path.join(existing_project_dir, self.settings.PROJECT_ADMIN_DIR)):
+            if os.path.exists(os.path.join(existing_project_dir, self.settings.project_admin_dir)):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
@@ -167,11 +166,11 @@ class GVNEditor:
             if new_file_prompt.exec():
 
                 selected_type = new_file_prompt.GetSelection()
-                sub_dir = self.settings.FILE_TYPE_LOCATIONS[selected_type]
+                sub_dir = self.settings.file_type_locations[selected_type]
 
                 prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
                 result = prompt.SaveFile(
-                    self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+                    self.settings.supported_content_types['Data'],
                     os.path.join(self.settings.GetProjectContentDirectory(), sub_dir),
                     "Save File As"
                 )
@@ -193,7 +192,7 @@ class GVNEditor:
             prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
             existing_file = prompt.GetFile(
                 self.settings.GetProjectContentDirectory(),
-                self.settings.SUPPORTED_CONTENT_TYPES['Data'],
+                self.settings.supported_content_types['Data'],
                 "Choose a File to Open"
             )
 
@@ -220,8 +219,13 @@ class GVNEditor:
                             "If you authored this file by hand, please add the correct metadata to the top of the file"
                         )
     def Play(self):
-        """ Launches the GVNEngine """
-        self.logger.Log("Launching engine...")
+        """ Launches the GVNEngine, temporarily suspending the GVNEditor """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            p_manager = PlayManager()
+            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir)
 
     def Save(self):
         """ Requests the active editor to save it's data """

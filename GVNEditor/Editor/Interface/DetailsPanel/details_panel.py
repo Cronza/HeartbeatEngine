@@ -1,13 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
-from Editor.Interface.Generic.DetailsPanel.details_entry_text import DetailsEntryText
-from Editor.Interface.Generic.DetailsPanel.details_entry_paragraph import DetailsEntryParagraph
-from Editor.Interface.Generic.DetailsPanel.details_entry_bool import DetailsEntryBool
-from Editor.Interface.Generic.DetailsPanel.details_entry_color import DetailsEntryColor
-from Editor.Interface.Generic.DetailsPanel.details_entry_tuple import DetailsEntryTuple
-from Editor.Interface.Generic.DetailsPanel.details_entry_int import DetailsEntryInt
-from Editor.Interface.Generic.DetailsPanel.details_entry_file_selector import DetailsEntryFileSelector
-from Editor.Interface.Generic.DetailsPanel.details_entry_dropdown import DetailsEntryDropdown
-from Editor.Interface.Generic.DetailsPanel.details_entry_container import DetailsEntryContainer
+from Editor.Interface.DetailsPanel.details_entry_text import DetailsEntryText
+from Editor.Interface.DetailsPanel.details_entry_paragraph import DetailsEntryParagraph
+from Editor.Interface.DetailsPanel.details_entry_bool import DetailsEntryBool
+from Editor.Interface.DetailsPanel.details_entry_color import DetailsEntryColor
+from Editor.Interface.DetailsPanel.details_entry_tuple import DetailsEntryTuple
+from Editor.Interface.DetailsPanel.details_entry_int import DetailsEntryInt
+from Editor.Interface.DetailsPanel.details_entry_file_selector import DetailsEntryFileSelector
+from Editor.Interface.DetailsPanel.details_entry_dropdown import DetailsEntryDropdown
+from Editor.Interface.DetailsPanel.details_entry_container import DetailsEntryContainer
 
 
 # @TODO: Split this file up into a functions class & U.I class
@@ -240,9 +240,9 @@ class DetailsPanel(QtWidgets.QWidget):
         elif data_type == "file":
             return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_image":
-            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return DetailsEntryFileSelector(self.settings, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_font":
-            return DetailsEntryFileSelector(self.settings, self.settings.SUPPORTED_CONTENT_TYPES['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return DetailsEntryFileSelector(self.settings, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "dropdown":
             return DetailsEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "container":

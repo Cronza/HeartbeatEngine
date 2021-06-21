@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from Editor.Interface.Generic.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
 
 class DetailsEntryParagraph(DetailsEntryBase):
     def __init__(self, settings, refresh_func=None, global_toggle_func=None):

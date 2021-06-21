@@ -16,7 +16,7 @@ class TextRenderable(Renderable):
         super().__init__(scene, renderable_data)
 
         # YAML Parameters
-        font = self.renderable_data['font']
+        font = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data['text']
         text_size = self.renderable_data['text_size']
         text_color = self.renderable_data['text_color']

@@ -5,47 +5,50 @@ from Editor.Utilities.DataTypes.file_types import FileType
 
 
 class Settings:
-    # Where is the base GVNEngine distro that comes with the editor?
-    BASE_ENGINE_DIR = "../GVNEngine"
-
-    # Where does the editor store data needed to track and handle project directories?
-    PROJECT_ADMIN_DIR = ".gvn"
-    PROJECT_FOLDER_STRUCTURE = {
-        "Content": [
-            "Audio",
-            "Characters",
-            "Dialogue",
-            "Fonts",
-            "Objects",
-            "Scenes",
-            "Sprites",
-            "Styles",
-            "Values"
-        ],
-        "Config":
-            None
-    }
-    # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
-    PROJECT_DEFAULT_FILES = {
-        "Config": "Config/Game.yaml"
-    }
-
-    # A dict of types of files, and the individual formats which are supported in the engine / editor
-    SUPPORTED_CONTENT_TYPES = {
-        "Image": "Image Files (*.png *.jpg)",
-        "Data": "YAML Files (*.yaml)",
-        "Font": "Font Files (*.ttf)"
-    }
-
-    # A dict of file types and the respective folder names in which they're stored within the project
-    FILE_TYPE_LOCATIONS = {
-        FileType.Dialogue: "Dialogue",
-        FileType.Scene_Dialogue: "Scenes",
-        FileType.Scene_Point_And_Click: "Scenes",
-        FileType.Character: "Characters"
-    }
-
     def __init__(self):
+        self.root_dir = os.getcwd().replace("\\", "/")
+
+        # Alter the path if the user is opening just the editor project, or the full GVNEngine project
+        if "GVNEditor" not in self.root_dir:
+            self.root_dir = os.path.join(self.root_dir, "GVNEditor")
+
+        self.base_engine_dir = os.path.join(self.root_dir, "GVNEngine")
+        self.project_admin_dir = ".gvn"
+        self.project_folder_structure = {
+            "Content": [
+                "Audio",
+                "Characters",
+                "Dialogue",
+                "Fonts",
+                "Objects",
+                "Scenes",
+                "Sprites",
+                "Styles",
+                "Values"
+            ],
+            "Config":
+                None
+        }
+        # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
+        self.project_default_files = {
+            "Config": "Config/Game.yaml"
+        }
+
+        # A dict of types of files, and the individual formats which are supported in the engine / editor
+        self.supported_content_types = {
+            "Image": "Image Files (*.png *.jpg)",
+            "Data": "YAML Files (*.yaml)",
+            "Font": "Font Files (*.ttf)"
+        }
+
+        # A dict of file types and the respective folder names in which they're stored within the project
+        self.file_type_locations = {
+            FileType.Dialogue: "Dialogue",
+            FileType.Scene_Dialogue: "Scenes",
+            FileType.Scene_Point_And_Click: "Scenes",
+            FileType.Character: "Characters"
+        }
+
         self.style_data = None
         self.action_database = None
 
@@ -63,16 +66,16 @@ class Settings:
         self.toolbar_background_color = None
         self.toolbar_button_background_color = None
 
-        self.LoadEditorSettings("Config/Editor.yaml")
-        self.LoadStyleSettings("Config/EditorStyle.yaml")
-        self.LoadActionDatabase("Config/ActionsDatabase.yaml")
+        self.LoadEditorSettings(f"{self.root_dir}/Config/Editor.yaml")
+        self.LoadStyleSettings(f"{self.root_dir}/Config/EditorStyle.yaml")
+        self.LoadActionDatabase(f"{self.root_dir}/Config/ActionsDatabase.yaml")
 
     def LoadProjectSettings(self):
         """ Reads the 'Game.yaml' file for the active project """
         self.user_project_data = Reader.ReadAll(
             os.path.join(
                 self.user_project_dir,
-                self.PROJECT_DEFAULT_FILES['Config']
+                self.project_default_files['Config']
             )
         )
 
@@ -147,3 +150,9 @@ class Settings:
         self.read_only_background_color = f"background-color: rgb({self.style_data['EditorStateSettings']['read_only_background_color']})"
 
         self.selection_color = f"selection-background-color: rgb({self.style_data['EditorStateSettings']['selection_color']})"
+
+        # *** Utility Functions ***
+
+    def ConvertPartialToAbsolutePath(self, partial_path):
+        """ Given a parital path, return a absolute path """
+        return os.path.join(self.root_dir, partial_path)

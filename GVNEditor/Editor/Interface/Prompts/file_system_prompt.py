@@ -10,7 +10,10 @@ class FileSystemPrompt(QFileDialog):
         self.logger = logger
 
     def SaveFile(self, type_filter, starting_dir, prompt_title="Save File", project_only=True) -> str:
-        """ Prompts the user with a filedialog which has them specify a file to create or write to """
+        """
+        Prompts the user with a filedialog which has them specify a file to create or write to. If nothing
+        is selected, return an empty string
+        """
         file_path = self.getSaveFileName(
             self.parent(),
             prompt_title,
@@ -37,7 +40,7 @@ class FileSystemPrompt(QFileDialog):
             return ""
 
     def GetDirectory(self, starting_dir, prompt_title="Choose a Directory", project_only=True) -> str:
-        """ Opens up a prompt for choosing an existing directory """
+        """ Opens up a prompt for choosing an existing directory. If nothing is selected, return an empty string"""
         self.logger.Log("Requesting directory path...")
 
         dir_path = self.getExistingDirectory(
@@ -62,7 +65,7 @@ class FileSystemPrompt(QFileDialog):
             return ""
 
     def GetFile(self, starting_dir, type_filter, prompt_title="Choose a File", project_only=True) -> str:
-        """ Opens up a prompt for choosing an existing file """
+        """ Opens up a prompt for choosing an existing file. If nothing is selected, return an empty string"""
         self.logger.Log("Requesting file path...")
 
         file_path = self.getOpenFileName(

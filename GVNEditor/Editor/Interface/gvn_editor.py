@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from Editor.Core.Generic.logger import Logger
+from Editor.Core.logger import Logger
 
 
 class GVNEditorUI:
@@ -14,7 +14,9 @@ class GVNEditorUI:
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-        MainWindow.setWindowIcon(QtGui.QIcon('Content/Icons/GVNEngine_Logo.png'))
+        MainWindow.setWindowIcon(
+            QtGui.QIcon(self.settings.ConvertPartialToAbsolutePath('Content/Icons/GVNEngine_Logo.png'))
+        )
 
         # Build the core window widget object
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -29,7 +31,7 @@ class GVNEditorUI:
         self.CreateMenuBar(MainWindow)
 
         # Initialize the Logger
-        self.logger = Logger(self, self.settings)
+        self.logger = Logger(self.settings)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)

@@ -1,4 +1,8 @@
+
+
 class DBManager:
+    """ A manager dedicated to actions that interface with the ActionDatabase """
+
     def ConvertDialogueFileToEngineFormat(self, action_data: dict):
         """
         Given a full dict of dialogue file data in editor format(branches and all), convert it to the engine format
