@@ -7,12 +7,13 @@ from Editor.Utilities.DataTypes.file_types import FileType
 class Settings:
     def __init__(self):
         self.root_dir = os.getcwd().replace("\\", "/")
+        self.editor_root = self.root_dir
 
         # Alter the path if the user is opening just the editor project, or the full GVNEngine project
         if "GVNEditor" not in self.root_dir:
-            self.root_dir = os.path.join(self.root_dir, "GVNEditor")
+            self.editor_root = os.path.join(self.root_dir, "GVNEditor")
 
-        self.base_engine_dir = os.path.join(self.root_dir, "GVNEngine")
+        self.engine_root = os.path.join(self.root_dir, "GVNEngine")
         self.project_admin_dir = ".gvn"
         self.project_folder_structure = {
             "Content": [
@@ -66,9 +67,9 @@ class Settings:
         self.toolbar_background_color = None
         self.toolbar_button_background_color = None
 
-        self.LoadEditorSettings(f"{self.root_dir}/Config/Editor.yaml")
-        self.LoadStyleSettings(f"{self.root_dir}/Config/EditorStyle.yaml")
-        self.LoadActionDatabase(f"{self.root_dir}/Config/ActionsDatabase.yaml")
+        self.LoadEditorSettings(f"{self.editor_root}/Config/Editor.yaml")
+        self.LoadStyleSettings(f"{self.editor_root}/Config/EditorStyle.yaml")
+        self.LoadActionDatabase(f"{self.editor_root}/Config/ActionsDatabase.yaml")
 
     def LoadProjectSettings(self):
         """ Reads the 'Game.yaml' file for the active project """
@@ -155,4 +156,4 @@ class Settings:
 
     def ConvertPartialToAbsolutePath(self, partial_path):
         """ Given a parital path, return a absolute path """
-        return os.path.join(self.root_dir, partial_path)
+        return os.path.join(self.editor_root, partial_path)

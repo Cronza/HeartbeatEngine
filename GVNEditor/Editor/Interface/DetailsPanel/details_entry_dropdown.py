@@ -11,7 +11,7 @@ class DetailsEntryDropdown(DetailsEntryBase):
         self.input_widget.setStyleSheet(settings.paragraph_color)
 
         for option in options:
-            self.input_widget.addItem(option)
+            self.input_widget.addItem(str(option))
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)

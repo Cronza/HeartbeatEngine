@@ -23,7 +23,11 @@ class DetailsEntryColor(DetailsEntryBase):
         # Create the color selector button, and style it accordingly
         self.color_select_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Color_Wheel.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 

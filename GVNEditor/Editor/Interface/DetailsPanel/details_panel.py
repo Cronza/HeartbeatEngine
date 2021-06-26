@@ -15,10 +15,11 @@ from Editor.Interface.DetailsPanel.details_entry_container import DetailsEntryCo
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, settings):
+    def __init__(self, settings, logger):
         super().__init__()
 
         self.settings = settings
+        self.logger = logger
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
         self.active_entry = None
@@ -151,13 +152,7 @@ class DetailsPanel(QtWidgets.QWidget):
                         # Containers don't store values themselves, so the above code accounts solely for it's children
                         # If this entry is not a container, lets cache normally
                         else:
-                            #if requirement['type'] == 'tuple':
-                            #    print(details_entry.Get())
-                            #    print(type(details_entry.Get()))
                             requirement["value"] = details_entry.Get()
-                            #if requirement['type'] == 'tuple':
-                            #    print(details_entry.Get())
-                            #    print(type(details_entry.Get()))
 
                             # If this entry has a global option, keep track of it's value
                             if details_entry.show_global_toggle:
@@ -238,11 +233,11 @@ class DetailsPanel(QtWidgets.QWidget):
         elif data_type == "int":
             return DetailsEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file":
-            return DetailsEntryFileSelector(self.settings, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return DetailsEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_image":
-            return DetailsEntryFileSelector(self.settings, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return DetailsEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_font":
-            return DetailsEntryFileSelector(self.settings, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return DetailsEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "dropdown":
             return DetailsEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "container":
@@ -272,6 +267,7 @@ class DetailsPanel(QtWidgets.QWidget):
         Whenever a detail entry's global checkbox is used, we need to refresh that entry with the relevant
         global information stored in the active entry
         """
+        #@TODO: Instead of loading the global parameter, just make it Uneditable, thus removing the entire need for loading the global data
         key_name = details_entry.name_widget.text()
 
         # The key changes depending if we're at root of parsing children ('requirements' vs 'children')

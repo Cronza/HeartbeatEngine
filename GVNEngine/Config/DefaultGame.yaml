@@ -9,8 +9,8 @@ Game:
 WindowSettings:
   resolution: 0
   resolution_options:
-    0: [1280, 720]
-    1: [1920, 1080]
+    - [1280, 720]
+    - [1920, 1080]
 
 # Feature Configurations - Defaults
 

@@ -11,6 +11,7 @@ from Editor.Interface import gvn_editor as gvne
 from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
+from Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 
 class GVNEditor:
     def __init__(self):
@@ -29,7 +30,7 @@ class GVNEditor:
 
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        #self.SetActiveProject("To Infinity", "/PROJECTS/To Infinity")
+        self.SetActiveProject("To Infinity", "PROJECTS/To Infinity")
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -107,7 +108,7 @@ class GVNEditor:
                     # Clone project default files
                     for key, rel_path in self.settings.project_default_files.items():
                         shutil.copy(
-                            os.path.join(self.settings.base_engine_dir, rel_path),
+                            os.path.join(self.settings.engine_root, rel_path),
                             os.path.join(project_path, rel_path))
 
                     self.logger.Log(f"Project Created at: {project_path}", 2)
@@ -218,6 +219,7 @@ class GVNEditor:
                             "Please either choose a different file, or create a new one.\n\n"
                             "If you authored this file by hand, please add the correct metadata to the top of the file"
                         )
+
     def Play(self):
         """ Launches the GVNEngine, temporarily suspending the GVNEditor """
         # Only allow this is there is an active project
@@ -242,10 +244,11 @@ class GVNEditor:
         if not self.CheckTabLimit():
 
             editor_classes = {
-                FileType.Dialogue: EditorDialogue
+                FileType.Dialogue: EditorDialogue,
                 #FileType.Scene_Dialogue: EditorSceneDialogue,
                 #FileType.Scene_Dialogue: EditorScenePointAndClick,
                 #FileType.Scene_Point_And_Click: EditorCharacter,
+                FileType.Project_Settings: EditorProjectSettings
              }
 
             # Initialize the Editor
@@ -255,14 +258,28 @@ class GVNEditor:
             if import_file:
                 self.active_editor.Import()
 
-            # Add it to the tab list
-            self.e_ui.main_tab_editor.addTab(self.active_editor.ed_ui, os.path.basename(target_file_path))
+            self.e_ui.AddTab(self.active_editor.GetUI(), os.path.basename(target_file_path))
+
         else:
             QtWidgets.QMessageBox.about(
                 self.e_ui.central_widget,
                 "Tab Limit Reached!",
                 "You have reached the maximum number of open tabs. Please close "
                 "a tab before attempting to open another"
+            )
+
+    def OpenProjectSettings(self):
+        """ Opens the 'Project Settings' editor """
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            self.OpenEditor(
+                os.path.join(
+                    self.settings.user_project_dir,
+                    self.settings.project_default_files['Config']
+                ),
+                FileType.Project_Settings,
+                True
             )
 
     # ****** UTILITY FUNCTIONS ******

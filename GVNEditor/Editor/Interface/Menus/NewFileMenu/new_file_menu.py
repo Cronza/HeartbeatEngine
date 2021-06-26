@@ -23,6 +23,7 @@ class NewFileMenu(BasePopupMenu):
             QtGui.QIcon.Off
         )
         FileOption(
+            settings,
             icon,
             FileType.Dialogue,
             "Dialogue",
@@ -30,6 +31,7 @@ class NewFileMenu(BasePopupMenu):
             self.options_list
         )
         FileOption(
+            settings,
             icon,
             FileType.Scene_Point_And_Click,
             "Scene (Point & Click)",
@@ -37,6 +39,7 @@ class NewFileMenu(BasePopupMenu):
             self.options_list
         )
         FileOption(
+            settings,
             icon,
             FileType.Scene_Dialogue,
             "Scene (Dialogue)",
@@ -44,6 +47,7 @@ class NewFileMenu(BasePopupMenu):
             self.options_list
         )
         FileOption(
+            settings,
             icon,
             FileType.Character,
             "Character",
@@ -53,6 +57,8 @@ class NewFileMenu(BasePopupMenu):
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
+        self.description.setFont(settings.paragraph_font)
+
         self.options_layout.addWidget(self.options_list, 2)
         self.options_layout.addWidget(self.description, 1, Qt.AlignTop)
 

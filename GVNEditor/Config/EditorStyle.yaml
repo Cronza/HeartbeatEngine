@@ -9,13 +9,13 @@ EditorStateSettings:
 EditorTextSettings:
   header_1_font: "Helvetica"
   header_1_text_size: 12
-  header_1_color: 0, 0, 0
+  header_1_color: 44,53,57
   header_1_is_bold: True
   header_1_is_italicized: False
 
   header_2_font: "Helvetica"
   header_2_text_size: 11
-  header_2_color: 0, 0, 0
+  header_2_color: 44,53,57
   header_2_is_bold: False
   header_2_is_italicized: False
 

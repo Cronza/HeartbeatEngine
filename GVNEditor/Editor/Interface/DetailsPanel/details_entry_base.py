@@ -57,7 +57,8 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         if self.global_toggle.Get():
             self.global_toggle.Set(False)
 
-        self.refresh_func(self)
+        if self.refresh_func:
+            self.refresh_func(self)
 
     def GlobalToggle(self):
         """
@@ -65,7 +66,7 @@ class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
         This function is not meant to be overridden
         """
         # Only update using global data when the global setting is turned 'on'
-        if self.global_toggle.Get():
+        if self.global_toggle.Get() and self.global_toggle_func:
             self.global_toggle_func(self)
 
 

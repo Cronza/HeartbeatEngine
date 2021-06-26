@@ -4,8 +4,12 @@ from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class DetailsEntryFileSelector(DetailsEntryBase):
-    def __init__(self, settings, type_filter, refresh_func=None, global_toggle_func=None):
+    def __init__(self, settings, logger, details_panel, type_filter, refresh_func=None, global_toggle_func=None):
         super().__init__(settings, refresh_func, global_toggle_func)
+
+        # This type requires the logger and a direct ref to the owning QWidget for filesystem operations
+        self.logger = logger
+        self.details_panel = details_panel
 
         # Store a type filter to restrict what files can be chosen in the browser
         self.type_filter = type_filter
@@ -51,8 +55,7 @@ class DetailsEntryFileSelector(DetailsEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-
-        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        prompt = FileSystemPrompt(self.settings, self.logger, self.details_panel)
         existing_file = prompt.GetFile(
             self.settings.GetProjectContentDirectory(),
             self.type_filter,

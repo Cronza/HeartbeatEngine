@@ -81,6 +81,14 @@ class GVNEditorUI:
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
 
+        # Settings Menu
+        self.settings_menu = QtWidgets.QMenu(self.menu_bar)
+        self.settings_menu.setFont(self.settings.button_font)
+        self.settings_menu.setStyleSheet(self.settings.button_color)
+        self.a_open_project_settings = QtWidgets.QAction(main_window)
+        self.a_open_project_settings.triggered.connect(self.e_core.OpenProjectSettings)
+        self.settings_menu.addAction(self.a_open_project_settings)
+
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self.menu_bar)
         self.play_menu.setFont(self.settings.button_font)
@@ -91,6 +99,7 @@ class GVNEditorUI:
 
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
+        self.menu_bar.addAction(self.settings_menu.menuAction())
         self.menu_bar.addAction(self.play_menu.menuAction())
 
         # Initialize the Menu Bar
@@ -104,6 +113,7 @@ class GVNEditorUI:
         # *** Update Engine Menu Bar ***
         # Menu Headers
         self.file_menu.setTitle(_translate("MainWindow", "File"))
+        self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
         self.play_menu.setTitle(_translate("MainWindow", "Play"))
 
         # 'File Menu' Actions
@@ -120,6 +130,9 @@ class GVNEditorUI:
         self.a_play_game.setText(_translate("MainWindow", "Play"))
         self.a_play_game.setShortcut(_translate("MainWindow", "Ctrl+Alt+P"))
 
+        # 'Settings Menu' Actions
+        self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
+
     def CreateTabEditor(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """
 
@@ -130,6 +143,8 @@ class GVNEditorUI:
         self.main_tab_editor = QtWidgets.QTabWidget(self.main_editor_container)
         self.main_tab_editor.setFont(self.settings.button_font)
         self.main_tab_editor.setStyleSheet(self.settings.button_color)
+        self.main_tab_editor.setTabsClosable(True)
+        self.main_tab_editor.tabCloseRequested.connect(self.RemoveTab)
 
         self.main_editor_layout.addWidget(self.main_tab_editor)
         self.main_resize_container.insertWidget(0, self.main_editor_container)
@@ -162,6 +177,23 @@ class GVNEditorUI:
         self.getting_started_layout.addWidget(getting_started_message)
 
         self.main_resize_container.addWidget(self.getting_started_container)
+
+    def AddTab(self, widget, file_path):
+        """ Adds a tab to the tab editor, setting the tab widget to the provided widget before selecting that tab """
+
+        tab_index = self.main_tab_editor.addTab(widget, file_path)
+        self.main_tab_editor.setCurrentIndex(tab_index)
+
+    def RemoveTab(self, index):
+        """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg """
+        #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
+        self.logger.Log("Shutting down editor...")
+
+        editor_widget = self.main_tab_editor.widget(index)
+        del editor_widget
+        self.main_tab_editor.removeTab(index)
+
+        self.logger.Log("Editor closed")
 
 #if __name__ == "__main__":
 #    import sys

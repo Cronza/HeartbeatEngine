@@ -6,3 +6,4 @@ class FileType(Enum):
     Scene_Point_And_Click = 2
     Scene_Dialogue = 3
     Character = 4
+    Project_Settings = 5

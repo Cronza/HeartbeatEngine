@@ -20,7 +20,7 @@ class BranchesPanel(QtWidgets.QWidget):
         # Create title
         self.branches_title = QtWidgets.QLabel(self)
         self.branches_title.setFont(self.settings.header_1_font)
-        self.branches_title.setStyleSheet(settings.header_1_color)
+        self.branches_title.setStyleSheet(self.settings.header_1_color)
         self.branches_title.setText("Branches")
 
         # Create the toolbar
@@ -88,8 +88,8 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_layout.addWidget(self.branches_toolbar)
         self.branches_layout.addWidget(self.branches_list)
 
-    def CreateBranch(self, data):
-        """ Adds a new branch entry to the branch list """
+    def CreateBranch(self, branch_name, branch_description):
+        """ Adds a new branch entry to the branch list, and set it's name and description using the given data """
         # Create the list item container
         list_item = QtWidgets.QListWidgetItem()
         self.branches_list.addItem(list_item)
@@ -97,7 +97,7 @@ class BranchesPanel(QtWidgets.QWidget):
         # Create the core part of the entry
         new_entry = BranchesEntry(self.settings, None)
         self.branches_list.setItemWidget(list_item, new_entry)
-        new_entry.Set(data)
+        new_entry.Set((branch_name, branch_description))
 
         # Adjust the size hint of the item container to match the contents
         list_item.setSizeHint(new_entry.sizeHint())
@@ -108,11 +108,11 @@ class BranchesPanel(QtWidgets.QWidget):
     def AddBranch(self):
         """ Prompts the user for branch information, and creates a branch with that information """
         # Create the prompt object, using the defaults for the params
-        new_data = self.ConfigurePrompt()
+        branch_name, branch_description = self.ConfigurePrompt()
 
         # If the data has been validated, then create the new branch
-        if new_data:
-            self.CreateBranch(new_data)
+        if branch_name:
+            self.CreateBranch(branch_name, branch_description)
 
     def RemoveBranch(self):
         """ Deletes the selected branch if it is not the main branch """
@@ -142,8 +142,6 @@ class BranchesPanel(QtWidgets.QWidget):
 
     def ConfigurePrompt(self, branch_name="New Branch Name", branch_description="New Branch Description") -> tuple:
         """ Prompts the user with a branch configuration window. Returns the new data if provided, or None if not """
-        print('Configuration prompt')
-
         # Create the prompt object
         prompt = EditBranchPrompt(branch_name, branch_description)
 
@@ -161,9 +159,10 @@ class BranchesPanel(QtWidgets.QWidget):
 
             # The chosen name already exists. Inform the user
             else:
-                QtWidgets.QMessageBox.about(self, "Branch Name in Use!",
-                                            "The chosen branch name is already in use!\nPlease choose a new name"
-                                            )
+                QtWidgets.QMessageBox.about(
+                    self, "Branch Name in Use!",
+                    "The chosen branch name is already in use!\nPlease choose a new name"
+                )
 
     def ValidateBranchName(self, name) -> bool:
         """ Check if the provided branch name already exists """

@@ -1,0 +1,83 @@
+# This file is used to define the types of all settings in a GVN Project file using the 'ParameterType' enum.
+# Traditionally, a 'TypedDict' would be preferred over using this approach, but since we use non-standard types such
+# as 'file_image', 'paragraph', etc, we can't rely on raw Python data types
+
+# Whenever a new setting is added to the project file (Ideally propagating back to the 'DefaultGame' file), this file
+# should be updated as well
+
+Game:
+  title: "String"
+  author: "String"
+  company: "String"
+  starting_scene: "File"
+
+WindowSettings:
+  resolution: "Int"
+  resolution_options: "Dropdown"
+
+SpriteSettings:
+  background_z_order: "Int"
+  z_order: "Int"
+  center_align: "Bool"
+
+InteractableSettings:
+  z_order: "Int"
+  center_align: "Bool"
+
+TextSettings:
+  size: "Int"
+  color: "Color"
+  font: "File_Font"
+  z_order: "Int"
+  center_align: "Bool"
+
+ButtonSettings:
+  sprite: "File_Image"
+  sprite_hover: "File_Image"
+  sprite_clicked: "File_Image"
+  text_size: "Int"
+  text_color: "Color"
+  font: "File_Font"
+  text_z_order: "Int"
+  text_center_align: "Bool"
+  button_z_order: "Int"
+  button_center_align: "Bool"
+
+DialogueSettings:
+  text_speed: "Int"
+  speaker_text_position: "Tuple"
+  speaker_text_size: "Int"
+  speaker_text_color: "Color"
+  speaker_font: "File_Font"
+  speaker_z_order: "Int"
+  speaker_center_align: "Bool"
+  dialogue_text_position: "Tuple"
+  dialogue_text_size: "Int"
+  dialogue_text_color: "Color"
+  dialogue_font: "File_Font"
+  dialogue_wait_for_input: "Bool"
+  dialogue_z_order: "Int"
+  dialogue_center_align: "Bool"
+  dialogue_frame_sprite: "File_Image"
+  dialogue_frame_z_order: "Int"
+  dialogue_frame_center_align: "Bool"
+  dialogue_frame_position: "Tuple"
+
+PauseMenuSettings:
+  data_file: "File"
+
+SceneTransitionsSettings:
+  speed: "Int"
+  z_order: "Int"
+
+ChoiceSettings:
+  button_sprite: "File_Image"
+  button_sprite_hover: "File_Image"
+  button_sprite_clicked: "File_Image"
+  button_text_size: "Int"
+  button_text_color: "Color"
+  button_font: "File_Font"
+  button_text_z_order: "Int"
+  button_text_center_align: "Bool"
+  button_z_order: "Int"
+  button_center_align: "Bool"

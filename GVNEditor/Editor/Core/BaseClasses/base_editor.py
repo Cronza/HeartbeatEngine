@@ -22,16 +22,21 @@ class EditorBase:
         self.settings = settings
         self.logger = logger
         self.file_path = file_path
+        self.editor_ui = None
 
         self.logger.Log("Initializing Editor...")
 
     def GetFileName(self):
-        """ Retrieves the name of the file that is being targeted by this editor """
+        """ Returns the name of the file that is being targeted by this editor """
         return os.path.basename(self.file_path)
 
     def GetFilePath(self):
-        """ Retrieves the path of the file that is being targeted by this editor """
+        """ Returns the path of the file that is being targeted by this editor """
         return self.file_path
+
+    def GetUI(self):
+        """ Returns the UI object for this editor """
+        return self.editor_ui
 
     def Save(self):
         """ Write the data held in the editor to the file it points to """

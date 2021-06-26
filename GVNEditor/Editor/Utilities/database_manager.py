@@ -9,10 +9,8 @@ class DBManager:
         Return the converted dict
         """
         converted_dict = {}
-
         for branch in action_data.items():
             branch_name = branch[0]
-
             action_list = []
             for editor_action in branch[1]:
                 # Get the action name
@@ -25,8 +23,10 @@ class DBManager:
                 action_list.append(converted_action)
 
             # Add the list of actions under the target branch
+            #@TODO: BECAUSE WE INSERT IT BACK IN A DICTIONARY, THE ORDER GET'S REARRANGED
             converted_dict[branch_name] = action_list
-
+        print("Post Convert")
+        print(converted_dict)
         return converted_dict
 
     def ConvertActionRequirementsToEngineFormat(self, editor_action_data, has_parent=None):
@@ -45,8 +45,9 @@ class DBManager:
                 # is changed
 
                 if "global" in requirement:
-                    if not requirement["global"]["active"]:
-                        converted_action[requirement["name"]] = requirement["value"]
+                    if "active" in requirement["global"]:
+                        if not requirement["global"]["active"]:
+                            converted_action[requirement["name"]] = requirement["value"]
                 else:
                     converted_action[requirement["name"]] = requirement["value"]
             else:

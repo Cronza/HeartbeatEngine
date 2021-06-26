@@ -25,19 +25,17 @@ class EditorDialogue(EditorBase):
     def __init__(self, settings, logger, file_path):
         super().__init__(settings, logger, file_path)
 
-        # Build the Dialogue Editor UI
-        self.ed_ui = EditorDialogueUI(self)
-
-        # Initialize a main branch
-        self.ed_ui.branches.CreateBranch(
-            ("Main", "This is the default, main branch\nConsider this the root of your dialogue tree")
+        self.editor_ui = EditorDialogueUI(self)
+        self.editor_ui.branches.CreateBranch(
+            "Main",
+            "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
+
+        self.logger.Log("Editor initialized")
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
-        print("Changing active entry")
-
-        selection = self.ed_ui.dialogue_sequence.GetSelectedEntry()
+        selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
         self.UpdateDetails(selection)
@@ -45,11 +43,11 @@ class EditorDialogue(EditorBase):
     def UpdateDetails(self, selected_entry):
         """ Refreshes the details panel with the details from the selected dialogue entry """
         if selected_entry:
-            self.ed_ui.details.PopulateDetails(selected_entry)
+            self.editor_ui.details.PopulateDetails(selected_entry)
 
         # No entries left to select. Wipe remaining details
         else:
-            self.ed_ui.details.Clear()
+            self.editor_ui.details.Clear()
 
     # @TODO: How to support the initial switch when 'main' is created?
     def SwitchBranches(self, cur_branch, new_branch):
@@ -58,12 +56,12 @@ class EditorDialogue(EditorBase):
         # If there is no source branch, then there is nothing to store
         if cur_branch:
             self.UpdateBranchData(cur_branch)
-            self.ed_ui.dialogue_sequence.Clear()
+            self.editor_ui.dialogue_sequence.Clear()
 
         # Load any entries in the new branch (if applicable)
         if new_branch.branch_data:
             for entry in new_branch.branch_data:
-                self.ed_ui.dialogue_sequence.AddEntry(entry, None, True)
+                self.editor_ui.dialogue_sequence.AddEntry(entry, None, True)
 
     def UpdateBranchData(self, cur_branch):
         """ Updates the active branch with all active dialogue entries """
@@ -71,28 +69,28 @@ class EditorDialogue(EditorBase):
         cur_branch.branch_data.clear()
 
         # Store the data from each entry in the branch
-        num_of_entries = self.ed_ui.dialogue_sequence.dialogue_table.rowCount()
+        num_of_entries = self.editor_ui.dialogue_sequence.dialogue_table.rowCount()
         for entry_index in range(num_of_entries):
 
             # Store the data held by the entry
-            dialogue_entry = self.ed_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
+            dialogue_entry = self.editor_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
             cur_branch.branch_data.append(dialogue_entry.action_data)
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
         data_to_export = {}
-        branch_count = self.ed_ui.branches.branches_list.count()
+        branch_count = self.editor_ui.branches.branches_list.count()
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the containing item widget
-            branch = self.ed_ui.branches.branches_list.itemWidget(self.ed_ui.branches.branches_list.item(index))
+            branch = self.editor_ui.branches.branches_list.itemWidget(self.editor_ui.branches.branches_list.item(index))
 
             # Before we save, let's be double sure the current information in the details panel is cached properly
-            self.ed_ui.details.UpdateCache()
+            self.editor_ui.details.UpdateCache()
 
             # If a branch is currently active, then it's likely to of not updated it's cached branch data (Only
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
             # differently by scanning the current dialogue entries
-            if branch is self.ed_ui.branches.active_branch:
+            if branch is self.editor_ui.branches.active_branch:
                 self.logger.Log("Scanning dialogue entries...")
                 self.UpdateBranchData(branch)
 
@@ -150,12 +148,11 @@ class EditorDialogue(EditorBase):
 
         # The main branch is treated specially since we don't need to create it
         for branch_name, branch_data in converted_data.items():
-            if branch_name == "Main":
-                for action in branch_data:
-                    self.ed_ui.dialogue_sequence.AddEntry(action, None, True)
+            if not branch_name == "Main":
+                self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
 
-            else:
-                self.ed_ui.branches.CreateBranch(branch, "Auto-Generated")
+            for action in branch_data:
+                self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
 
 

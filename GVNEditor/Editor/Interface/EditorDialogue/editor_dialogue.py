@@ -14,7 +14,6 @@ class EditorDialogueUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        #self.CreateOutliner()
         self.CreateBranchesPanel()
         self.CreateDialogueSequencePanel()
         self.CreateDetailsPanel()
@@ -50,5 +49,5 @@ class EditorDialogueUI(EditorBaseUI):
         Create the details panel using the generic details object. Since this panel is generic,
         it functions independently of whether it has a reference to the editor core
         """
-        self.details = DetailsPanel(self.core.settings)
+        self.details = DetailsPanel(self.core.settings, self.core.logger)
 
