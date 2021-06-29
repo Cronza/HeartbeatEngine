@@ -30,7 +30,8 @@ class GVNEditor:
 
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        self.SetActiveProject("To Infinity", "PROJECTS/To Infinity")
+        #self.SetActiveProject("To Infinity", "PROJECTS/To Infinity") # Machine 1
+        self.SetActiveProject("To Infinity", "PROJECTS/Testing")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -197,6 +198,7 @@ class GVNEditor:
                 "Choose a File to Open"
             )
 
+            # Does the file actually exist?
             if not existing_file:
                 self.logger.Log("File path was not provided - Cancelling 'Open File' action", 3)
             else:
@@ -207,6 +209,7 @@ class GVNEditor:
                     line = f.readline()
                     search = re.search("# Type: (.*)", line)
 
+                    # Was the expected metadata found?
                     if search:
                         file_type = FileType[search.group(1)]
                         self.OpenEditor(existing_file, file_type, True)
@@ -251,14 +254,21 @@ class GVNEditor:
                 FileType.Project_Settings: EditorProjectSettings
              }
 
-            # Initialize the Editor
-            self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
+            # Let's check if we already have an editor open for this file
+            result = self.CheckIfFileOpen(target_file_path)
+            if result:
+                #@TODO: Should there be a reimport if the user tries to reimport an open file? Or maybe a refesh button?
+                self.logger.Log("An editor for the selected file is already open - Switching to the open editor ", 4)
+                self.e_ui.main_tab_editor.setCurrentWidget(result)
+            else:
+                # Initialize the Editor
+                self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
 
-            # If the caller wants to load the provided file instead of just marking it as the export target, do so here
-            if import_file:
-                self.active_editor.Import()
+                # If the caller wants to load the provided file instead of just marking it as the export target, do so here
+                if import_file:
+                    self.active_editor.Import()
 
-            self.e_ui.AddTab(self.active_editor.GetUI(), os.path.basename(target_file_path))
+                self.e_ui.AddTab(self.active_editor.GetUI(), os.path.basename(target_file_path))
 
         else:
             QtWidgets.QMessageBox.about(
@@ -292,6 +302,15 @@ class GVNEditor:
             "There is currently no project open.\n"
             "Please either open an existing project, or create a new one."
         )
+
+    def CheckIfFileOpen(self, file_path):
+        """ Checks all open editor tabs for the provided file. Returns a bool if already open """
+        for tab_index in range(0, self.e_ui.main_tab_editor.count()):
+            open_editor = self.e_ui.main_tab_editor.widget(tab_index)
+            if open_editor.core.file_path == file_path:
+                return open_editor
+
+        return None
 
     def CheckTabLimit(self):
         """ Returns true or false depending on whether we've reached the maximum number of tabs """
