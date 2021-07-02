@@ -20,8 +20,8 @@ class Settings:
         self.project_settings = Reader.ReadAll(data_path)
 
         # *** WINDOWS SETTINGS ***
-        self.resolution = self.project_settings['WindowSettings']['resolution']
-        self.resolution_options = self.project_settings['WindowSettings']['resolution_options']
+        self.resolution = self.project_settings['Window']['resolution']
+        self.resolution_options = self.project_settings['Window']['resolution_options']
         self.active_resolution = tuple(self.resolution_options[self.resolution])
 
     def ConvertPartialToAbsolutePath(self, partial_path):

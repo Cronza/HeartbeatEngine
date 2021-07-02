@@ -41,7 +41,7 @@ class EditorProjectSettings(EditorBase):
         self.editor_ui.UpdateProjectSettingsData()
 
         # *** PRE-EXPORT DATA ADJUSTMENTS ***
-        self.project_settings["WindowSettings"]
+        self.project_settings["Window"]
 
         # Write the data out
         self.logger.Log("Writing data to file...")

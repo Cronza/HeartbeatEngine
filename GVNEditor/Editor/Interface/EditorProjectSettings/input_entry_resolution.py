@@ -30,7 +30,7 @@ class InputEntryResolution(InputEntryBase):
 
         # Use the value of the "Int" widget mentioned in the class docstring to switch the active option
         # @TODO: Figure out how to avoid hard-coding the category name here
-        self.input_widget.setCurrentIndex(self.project_settings["WindowSettings"]["resolution"])
+        self.input_widget.setCurrentIndex(self.project_settings["Window"]["resolution"])
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
@@ -42,7 +42,7 @@ class InputEntryResolution(InputEntryBase):
         # let's make sure to update the additional "Int" widget mentioned in the class docstring
 
         #@TODO: Figure out how to avoid hard-coding the category name here
-        self.project_settings["WindowSettings"]["resolution"] = self.input_widget.currentIndex()
+        self.project_settings["Window"]["resolution"] = self.input_widget.currentIndex()
 
         return self.options
 

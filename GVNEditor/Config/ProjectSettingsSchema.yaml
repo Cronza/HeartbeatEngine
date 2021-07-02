@@ -11,27 +11,27 @@ Game:
   company: "String"
   starting_scene: "File"
 
-WindowSettings:
+Window:
   resolution: "" # This is generated when choosing a value for 'resolution_options'
   resolution_options: "CUST_Resolution"
 
-SpriteSettings:
+Sprite:
   background_z_order: "Int"
   z_order: "Int"
   center_align: "Bool"
 
-InteractableSettings:
+Interactable:
   z_order: "Int"
   center_align: "Bool"
 
-TextSettings:
+Text:
   size: "Int"
   color: "Color"
   font: "File_Font"
   z_order: "Int"
   center_align: "Bool"
 
-ButtonSettings:
+Button:
   sprite: "File_Image"
   sprite_hover: "File_Image"
   sprite_clicked: "File_Image"
@@ -43,7 +43,7 @@ ButtonSettings:
   button_z_order: "Int"
   button_center_align: "Bool"
 
-DialogueSettings:
+Dialogue:
   text_speed: "Int"
   speaker_text_position: "Tuple"
   speaker_text_size: "Int"
@@ -63,14 +63,14 @@ DialogueSettings:
   dialogue_frame_center_align: "Bool"
   dialogue_frame_position: "Tuple"
 
-PauseMenuSettings:
+Pause Menu:
   data_file: "File"
 
-SceneTransitionsSettings:
+Scene Transitions:
   speed: "Int"
   z_order: "Int"
 
-ChoiceSettings:
+Choice:
   button_sprite: "File_Image"
   button_sprite_hover: "File_Image"
   button_sprite_clicked: "File_Image"

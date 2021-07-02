@@ -113,19 +113,19 @@ class create_dialogue_interface(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'sprite' not in self.action_data:
-            self.action_data['sprite'] = self.scene.settings.project_settings['DialogueSettings'][
+            self.action_data['sprite'] = self.scene.settings.project_settings['Dialogue'][
                 'dialogue_frame_sprite']
 
         if 'position' not in self.action_data:
-            self.action_data['position'] = self.scene.settings.project_settings['DialogueSettings'][
+            self.action_data['position'] = self.scene.settings.project_settings['Dialogue'][
                 'dialogue_frame_position']
 
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+            self.action_data['z_order'] = self.scene.settings.project_settings['Dialogue'][
                 'dialogue_frame_z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+            self.action_data['center_align'] = self.scene.settings.project_settings['Dialogue'][
                 'dialogue_frame_center_align']
 
         dialogue_frame = SpriteRenderable(
@@ -163,7 +163,7 @@ class create_background(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['SpriteSettings']['background_z_order']
+            self.action_data['z_order'] = self.scene.settings.project_settings['Sprite']['background_z_order']
 
         new_sprite = SpriteRenderable(
             self.scene,
@@ -201,11 +201,11 @@ class create_sprite(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['SpriteSettings'][
+            self.action_data['z_order'] = self.scene.settings.project_settings['Sprite'][
                 'z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['SpriteSettings'][
+            self.action_data['center_align'] = self.scene.settings.project_settings['Sprite'][
                 'center_align']
 
         new_sprite = SpriteRenderable(
@@ -253,11 +253,11 @@ class create_interactable(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['InteractableSettings'][
+            self.action_data['z_order'] = self.scene.settings.project_settings['Interactable'][
                 'z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['InteractableSettings'][
+            self.action_data['center_align'] = self.scene.settings.project_settings['Interactable'][
                 'center_align']
 
         new_renderable = Interactable(
@@ -303,19 +303,19 @@ class create_text(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['TextSettings']['z_order']
+            self.action_data['z_order'] = self.scene.settings.project_settings[Text]['z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['TextSettings']['center_align']
+            self.action_data['center_align'] = self.scene.settings.project_settings[Text]['center_align']
 
         if 'font' not in self.action_data:
-            self.action_data['font'] = self.scene.settings.project_settings['TextSettings']['font']
+            self.action_data['font'] = self.scene.settings.project_settings[Text]['font']
 
         if 'text_size' not in self.action_data:
-            self.action_data['text_size'] = self.scene.settings.project_settings['TextSettings']['size']
+            self.action_data['text_size'] = self.scene.settings.project_settings[Text]['size']
 
         if 'text_color' not in self.action_data:
-            self.action_data['text_color'] = self.scene.settings.project_settings['TextSettings']['color']
+            self.action_data['text_color'] = self.scene.settings.project_settings[Text]['color']
 
         new_text_renderable = TextRenderable(
             self.scene,
@@ -361,34 +361,34 @@ class create_button(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'sprite' not in self.action_data:
-            self.action_data['sprite'] = self.scene.settings.project_settings['ButtonSettings']['sprite']
+            self.action_data['sprite'] = self.scene.settings.project_settings['Button']['sprite']
 
         if 'sprite_hover' not in self.action_data:
-            self.action_data['sprite_hover'] = self.scene.settings.project_settings['ButtonSettings']['sprite_hover']
+            self.action_data['sprite_hover'] = self.scene.settings.project_settings['Button']['sprite_hover']
 
         if 'sprite_clicked' not in self.action_data:
-            self.action_data['sprite_clicked'] = self.scene.settings.project_settings['ButtonSettings']['sprite_clicked']
+            self.action_data['sprite_clicked'] = self.scene.settings.project_settings['Button']['sprite_clicked']
 
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['ButtonSettings']['button_z_order']
+            self.action_data['z_order'] = self.scene.settings.project_settings['Button']['button_z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['ButtonSettings']['button_center_align']
+            self.action_data['center_align'] = self.scene.settings.project_settings['Button']['button_center_align']
 
         if 'text_z_order' not in self.action_data:
-            self.action_data['text_z_order'] = self.scene.settings.project_settings['ButtonSettings']['text_z_order']
+            self.action_data['text_z_order'] = self.scene.settings.project_settings['Button']['text_z_order']
 
         if 'text_center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['ButtonSettings']['text_center_align']
+            self.action_data['center_align'] = self.scene.settings.project_settings['Button']['text_center_align']
 
         if 'font' not in self.action_data:
-            self.action_data['font'] = self.scene.settings.project_settings['ButtonSettings']['font']
+            self.action_data['font'] = self.scene.settings.project_settings['Button']['font']
 
         if 'text_size' not in self.action_data:
-            self.action_data['text_size'] = self.scene.settings.project_settings['ButtonSettings']['text_size']
+            self.action_data['text_size'] = self.scene.settings.project_settings['Button']['text_size']
 
         if 'text_color' not in self.action_data:
-            self.action_data['text_color'] = self.scene.settings.project_settings['ButtonSettings']['text_color']
+            self.action_data['text_color'] = self.scene.settings.project_settings['Button']['text_color']
 
         new_renderable = Button(
             self.scene,
@@ -501,19 +501,19 @@ class dialogue(Action):
             character_data['text_color'] = character_data['color']
 
             # PROJECT DEFAULTS
-            character_data['position'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['position'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_text_position']
 
-            character_data['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['z_order'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_z_order']
 
-            character_data['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['center_align'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_center_align']
 
-            character_data['font'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['font'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_font']
 
-            character_data['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['text_size'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_text_size']
 
             new_character_text = TextRenderable(
@@ -531,27 +531,27 @@ class dialogue(Action):
 
             # PROJECT DEFAULTS OVERRIDE
             if 'position' not in self.action_data['speaker']:
-                self.action_data['speaker']['position'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['position'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_position']
 
             if 'center_align' not in self.action_data['speaker']:
-                self.action_data['speaker']['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['center_align'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_center_align']
 
             if 'text_size' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['text_size'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_size']
 
             if 'text_color' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_color'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['text_color'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_color']
 
             if 'font' not in self.action_data['speaker']:
-                self.action_data['speaker']['font'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['font'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_font']
 
             if 'z_order' not in self.action_data['speaker']:
-                self.action_data['speaker']['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['z_order'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_z_order']
 
             new_speaker_text = TextRenderable(
@@ -568,27 +568,27 @@ class dialogue(Action):
 
             # PROJECT DEFAULTS OVERRIDE
             if 'position' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['position'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['position'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_position']
 
             if 'center_align' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['center_align'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_center_align']
 
             if 'text_size' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['text_size'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_size']
 
             if 'text_color' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_color'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['text_color'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_color']
 
             if 'font' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['font'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['font'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_font']
 
             if 'z_order' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['z_order'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_z_order']
 
             new_dialogue_text = TextRenderable(
@@ -658,19 +658,19 @@ class character_dialogue(Action):
             character_data['text_color'] = character_data['color']
 
             # PROJECT DEFAULTS
-            character_data['position'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['position'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_text_position']
 
-            character_data['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['z_order'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_z_order']
 
-            character_data['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['center_align'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_center_align']
 
-            character_data['font'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['font'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_font']
 
-            character_data['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+            character_data['text_size'] = self.scene.settings.project_settings['Dialogue'][
                 'speaker_text_size']
 
             new_character_text = TextRenderable(
@@ -688,27 +688,27 @@ class character_dialogue(Action):
 
             # PROJECT DEFAULTS OVERRIDE
             if 'position' not in self.action_data['speaker']:
-                self.action_data['speaker']['position'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['position'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_position']
 
             if 'z_order' not in self.action_data['speaker']:
-                self.action_data['speaker']['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['z_order'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_z_order']
 
             if 'center_align' not in self.action_data['speaker']:
-                self.action_data['speaker']['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['center_align'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_center_align']
 
             if 'font' not in self.action_data['speaker']:
-                self.action_data['speaker']['font'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['font'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_font']
 
             if 'text_size' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['text_size'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_size']
 
             if 'text_color' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_color'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['speaker']['text_color'] = self.scene.settings.project_settings['Dialogue'][
                     'speaker_text_color']
 
             new_speaker_text = TextRenderable(
@@ -725,27 +725,27 @@ class character_dialogue(Action):
 
             # PROJECT DEFAULTS OVERRIDE
             if 'position' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['position'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['position'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_position']
 
             if 'z_order' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['z_order'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['z_order'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_z_order']
 
             if 'center_align' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['center_align'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['center_align'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_center_align']
 
             if 'font' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['font'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['font'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_font']
 
             if 'text_size' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_size'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['text_size'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_size']
 
             if 'text_color' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_color'] = self.scene.settings.project_settings['DialogueSettings'][
+                self.action_data['dialogue']['text_color'] = self.scene.settings.project_settings['Dialogue'][
                     'dialogue_text_color']
 
             new_dialogue_text = TextRenderable(
@@ -815,11 +815,11 @@ class create_character(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['SpriteSettings'][
+            self.action_data['z_order'] = self.scene.settings.project_settings['Sprite'][
                 'z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings['SpriteSettings'][
+            self.action_data['center_align'] = self.scene.settings.project_settings['Sprite'][
                 'center_align']
 
         new_sprite = SpriteRenderable(
@@ -890,43 +890,43 @@ class choice(Action):
 
             # CHOICE BUTTONS - PROJECT DEFAULTS OVERRIDE
             if 'sprite' not in choice:
-                choice['sprite'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['sprite'] = self.scene.settings.project_settings['Choice'][
                     'button_sprite']
 
             if 'sprite_hover' not in choice:
-                choice['sprite_hover'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['sprite_hover'] = self.scene.settings.project_settings['Choice'][
                     'button_sprite_hover']
 
             if 'sprite_clicked' not in choice:
-                choice['sprite_clicked'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['sprite_clicked'] = self.scene.settings.project_settings['Choice'][
                     'button_sprite_clicked']
 
             if 'z_order' not in choice:
-                choice['z_order'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['z_order'] = self.scene.settings.project_settings['Choice'][
                     'button_z_order']
 
             if 'center_align' not in choice:
-                choice['center_align'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['center_align'] = self.scene.settings.project_settings['Choice'][
                     'button_center_align']
 
             if 'text_z_order' not in choice:
-                choice['text_z_order'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['text_z_order'] = self.scene.settings.project_settings['Choice'][
                     'button_text_z_order']
 
             if 'text_center_align' not in choice:
-                choice['center_align'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['center_align'] = self.scene.settings.project_settings['Choice'][
                     'button_text_center_align']
 
             if 'font' not in choice:
-                choice['font'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['font'] = self.scene.settings.project_settings['Choice'][
                     'button_font']
 
             if 'text_size' not in choice:
-                choice['text_size'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['text_size'] = self.scene.settings.project_settings['Choice'][
                     'button_text_size']
 
             if 'text_color' not in choice:
-                choice['text_color'] = self.scene.settings.project_settings['ChoiceSettings'][
+                choice['text_color'] = self.scene.settings.project_settings['Choice'][
                     'button_text_color']
 
         # Choices provide blocks of options. Each one needs to be built
@@ -998,10 +998,10 @@ class fade_scene_from_black(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings['SceneTransitionsSettings']['z_order']
+            self.action_data['z_order'] = self.scene.settings.project_settings['Scene Transitions']['z_order']
 
         if 'speed' not in self.action_data:
-            self.speed = self.scene.settings.project_settings['SceneTransitionsSettings']['speed']
+            self.speed = self.scene.settings.project_settings['Scene Transitions']['speed']
         else:
             self.speed = self.action_data['speed']
 

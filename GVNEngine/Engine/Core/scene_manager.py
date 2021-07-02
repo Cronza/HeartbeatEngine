@@ -35,7 +35,7 @@ class SceneManager():
 
         # Read in the yaml data for the pause menu
         self.pause_menu_data = Reader.ReadAll(
-            self.settings.ConvertPartialToAbsolutePath(self.settings.project_settings['PauseMenuSettings']['data_file'])
+            self.settings.ConvertPartialToAbsolutePath(self.settings.project_settings['Pause Menu']['data_file'])
         )
         self.pause_menu_data['action'] = "create_container"
 

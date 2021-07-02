@@ -13,7 +13,7 @@
 #          editable: <bool> (Whether the param is editable in the editor)
 #          preview: <bool> (Whether the param is editable in the editor)
 #          global: (OPTIONAL) (A value in the project's Game.yaml file)
-#              category: <str> (The name of the category, IE. 'SpriteSettings')
+#              category: <str> (The name of the category, IE. 'Sprite')
 #              global_parameter: <str> (The name of the parameter in the category, IE. 'center_align')
 
 Renderables:
@@ -45,7 +45,7 @@ Renderables:
           type: "bool"
           value: True
           global:
-            category: "SpriteSettings"
+            category: "Sprite"
             global_parameter: "center_align"
           editable: True
           preview: True
@@ -60,7 +60,7 @@ Renderables:
           type: "int"
           value: 0
           global:
-            category: "SpriteSettings"
+            category: "Sprite"
             global_parameter: "z_order"
           editable: True
           preview: True
@@ -103,7 +103,7 @@ Renderables:
           type: "bool"
           value: True
           global:
-            category: "TextSettings"
+            category: "Text"
             global_parameter: "center_align"
           editable: True
           preview: False
@@ -118,7 +118,7 @@ Renderables:
           type: "int"
           value: 24
           global:
-            category: "TextSettings"
+            category: "Text"
             global_parameter: "size"
           editable: True
           preview: True
@@ -127,7 +127,7 @@ Renderables:
           type: "color"
           value: [255, 255, 255]
           global:
-            category: "TextSettings"
+            category: "Text"
             global_parameter: "color"
           editable: True
           preview: True
@@ -136,7 +136,7 @@ Renderables:
           type: "file_font"
           value: "None"
           global:
-            category: "TextSettings"
+            category: "Text"
             global_parameter: "font"
           editable: False
           preview: False
@@ -145,7 +145,7 @@ Renderables:
           type: "int"
           value: 0
           global:
-            category: "TextSettings"
+            category: "Text"
             global_parameter: "z_order"
           editable: True
           preview: True
@@ -194,7 +194,7 @@ Renderables:
           type: "int"
           value: -9999 #Replace with a reference to the global setting
           global:
-            category: "SpriteSettings"
+            category: "Sprite"
             global_parameter: "background_z_order"
           editable: False
           preview: False
@@ -219,7 +219,7 @@ Dialogue:
               type: "tuple"
               value: [0,0]
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_text_position"
               editable: True
               preview: False
@@ -228,7 +228,7 @@ Dialogue:
               type: "bool"
               value: True
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_center_align"
               editable: True
               preview: False
@@ -243,7 +243,7 @@ Dialogue:
               type: "int"
               value: 24
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_text_size"
               editable: True
               preview: False
@@ -252,7 +252,7 @@ Dialogue:
               type: "color"
               value: [255, 255, 255]
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_text_color"
               editable: True
               preview: False
@@ -261,7 +261,7 @@ Dialogue:
               type: "file_font"
               value: "None"
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_font"
               editable: False
               preview: False
@@ -270,7 +270,7 @@ Dialogue:
               type: "int"
               value: 0
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "speaker_z_order"
               editable: True
               preview: False
@@ -308,7 +308,7 @@ Dialogue:
               type: "tuple"
               value: [0,0]
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_text_position"
               editable: True
               preview: False
@@ -317,7 +317,7 @@ Dialogue:
               type: "bool"
               value: True
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_center_align"
               editable: True
               preview: False
@@ -332,7 +332,7 @@ Dialogue:
               type: "int"
               value: 24
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_text_size"
               editable: True
               preview: False
@@ -341,7 +341,7 @@ Dialogue:
               type: "color"
               value: [255, 255, 255]
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_text_color"
               editable: True
               preview: False
@@ -350,7 +350,7 @@ Dialogue:
               type: "file_font"
               value: "None"
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_font"
               editable: False
               preview: False
@@ -359,7 +359,7 @@ Dialogue:
               type: "int"
               value: 0
               global:
-                category: "DialogueSettings"
+                category: "Dialogue"
                 global_parameter: "dialogue_z_order"
               editable: True
               preview: False

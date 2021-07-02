@@ -6,7 +6,7 @@ Game:
   company: 'Company'
   starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
 
-WindowSettings:
+Window:
   resolution: 0
   resolution_options:
     - [1280, 720]
@@ -14,23 +14,23 @@ WindowSettings:
 
 # Feature Configurations - Defaults
 
-SpriteSettings:
+Sprite:
   background_z_order: -9999
   z_order: 0
   center_align: True
 
-InteractableSettings:
+Interactable:
   z_order: 100
   center_align: True
 
-TextSettings:
+Text:
   size: 24
   color: [255,255,255]
   font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
   z_order: 100
   center_align: True
 
-ButtonSettings:
+Button:
   sprite: "Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
   sprite_hover: "Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
   sprite_clicked: "Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
@@ -42,7 +42,7 @@ ButtonSettings:
   button_z_order: 100
   button_center_align: True
 
-DialogueSettings:
+Dialogue:
   text_speed: 5
   speaker_text_position: [0.25, 0.705]
   speaker_text_size: 32
@@ -62,14 +62,14 @@ DialogueSettings:
   dialogue_frame_center_align: True
   dialogue_frame_position: [0.5, 0.80]
 
-PauseMenuSettings:
+Pause Menu:
   data_file: 'Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml'
 
-SceneTransitionsSettings:
+Scene Transitions:
   speed: 150
   z_order: 9999
 
-ChoiceSettings:
+Choice:
   button_sprite: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Normal.png"
   button_sprite_hover: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Hover.png"
   button_sprite_clicked: "Engine/Content/Sprites/Interface/Buttons/Choice_Button_01_Clicked.png"
