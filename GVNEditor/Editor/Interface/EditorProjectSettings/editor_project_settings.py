@@ -1,14 +1,14 @@
 from PyQt5 import QtWidgets, QtCore
 from Editor.Interface.BaseClasses.base_editor import EditorBaseUI
-from Editor.Interface.DetailsPanel.details_entry_text import DetailsEntryText
-from Editor.Interface.DetailsPanel.details_entry_paragraph import DetailsEntryParagraph
-from Editor.Interface.DetailsPanel.details_entry_bool import DetailsEntryBool
-from Editor.Interface.DetailsPanel.details_entry_color import DetailsEntryColor
-from Editor.Interface.DetailsPanel.details_entry_tuple import DetailsEntryTuple
-from Editor.Interface.DetailsPanel.details_entry_int import DetailsEntryInt
-from Editor.Interface.DetailsPanel.details_entry_file_selector import DetailsEntryFileSelector
-from Editor.Interface.DetailsPanel.details_entry_dropdown import DetailsEntryDropdown
-from Editor.Interface.DetailsPanel.details_entry_container import DetailsEntryContainer
+from Editor.Interface.Primitives.input_entry_text import InputEntryText
+from Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
+from Editor.Interface.Primitives.input_entry_bool import InputEntryBool
+from Editor.Interface.Primitives.input_entry_color import InputEntryColor
+from Editor.Interface.Primitives.input_entry_tuple import InputEntryTuple
+from Editor.Interface.Primitives.input_entry_int import InputEntryInt
+from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
+from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
+from Editor.Interface.EditorProjectSettings.input_entry_resolution import InputEntryResolution
 from Editor.Utilities.DataTypes.parameter_types import ParameterType
 
 class EditorProjectSettingsUI(EditorBaseUI):
@@ -142,50 +142,56 @@ class EditorProjectSettingsUI(EditorBaseUI):
     def AddSetting(self, name, data, schema_data, parent=None):
         """ Creates a widget representing the name and inputs for the given setting. Recursively adds all children """
 
-        # Convert the scheme type string into an actual parameter type
-        data_type = ParameterType[schema_data[name]]
+        # If there is explicitly no matching schema, then don't show the input widget
+        if schema_data[name]:
+            # Convert the scheme type string into an actual parameter type
+            data_type = ParameterType[schema_data[name]]
 
-        # Create the widget, and update it's info
-        new_entry = self.CreateEntryWidget(data, data_type)
-        new_entry.name_widget.setText(name)
+            # Create the widget, and update it's info
+            new_entry = self.CreateEntryWidget(data, data_type)
+            new_entry.name_widget.setText(name)
 
-        # The dropdown widget only accepts a str, where as this normally assigns a list. Just skip it
-        if data_type != ParameterType.Dropdown:
-            new_entry.Set(data)
+            # Dropdown widgets initialize earlier with a list, and accept single strings through 'Set'. Skip this init
+            if data_type != ParameterType.CUST_Resolution:
+                new_entry.Set(data)
 
-        if not parent:
-            self.settings_table.addTopLevelItem(new_entry)
-        else:
-            self.settings_table.parent.addChild(new_entry)
+            if not parent:
+                self.settings_table.addTopLevelItem(new_entry)
+            else:
+                self.settings_table.parent.addChild(new_entry)
 
-        # Assign the appropriate components to the right columns
-        self.settings_table.setItemWidget(new_entry, 0, new_entry.name_widget)
-        self.settings_table.setItemWidget(new_entry, 1, new_entry.input_container)
+            # Assign the appropriate components to the right columns
+            self.settings_table.setItemWidget(new_entry, 0, new_entry.name_widget)
+            self.settings_table.setItemWidget(new_entry, 1, new_entry.input_container)
 
-        # Only recurse if there is data to recurse through
-        if isinstance(data, dict):
-            for child_name, child_data in data:
-                self.AddSetting(child_name, child_data, schema_data[name], new_entry)
+            # Only recurse if there is data to recurse through
+            if isinstance(data, dict):
+                for child_name, child_data in data:
+                    self.AddSetting(child_name, child_data, schema_data[name], new_entry)
 
     def CreateEntryWidget(self, data, data_type):
         """ Create a specialized entry widget based on the provided ParameterType """
         if data_type == ParameterType.String:
-            return DetailsEntryText(self.core.settings, None, None)
+            return InputEntryText(self.core.settings, None, None)
         elif data_type == ParameterType.Bool:
-            return DetailsEntryBool(self.core.settings, None, None)
+            return InputEntryBool(self.core.settings, None, None)
         elif data_type == ParameterType.Int:
-            return DetailsEntryInt(self.core.settings, None, None)
+            return InputEntryInt(self.core.settings, None, None)
         elif data_type == ParameterType.Tuple:
-            return DetailsEntryTuple(self.core.settings, None, None)
+            return InputEntryTuple(self.core.settings, None, None)
         elif data_type == ParameterType.Paragraph:
-            return DetailsEntryParagraph(self.core.settings, None, None)
+            return InputEntryParagraph(self.core.settings, None, None)
         elif data_type == ParameterType.Color:
-            return DetailsEntryColor(self.core.settings, None, None)
+            return InputEntryColor(self.core.settings, None, None)
         elif data_type == ParameterType.File:
-            return DetailsEntryFileSelector(self.core.settings, self.core.logger, self, "", None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, "", None, None)
         elif data_type == ParameterType.File_Font:
-            return DetailsEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Font'], None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Font'], None, None)
         elif data_type == ParameterType.File_Image:
-            return DetailsEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Image'], None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Image'], None, None)
         elif data_type == ParameterType.Dropdown:
-            return DetailsEntryDropdown(self.core.settings, data, None, None)
+            return InputEntryDropdown(self.core.settings, data, None, None)
+        elif data_type == ParameterType.CUST_Resolution:
+            return InputEntryResolution(self.core.settings, data, self.core.project_settings)
+        else:
+            return None

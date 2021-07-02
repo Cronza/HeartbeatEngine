@@ -1,9 +1,9 @@
 import re
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
-class DetailsEntryColor(DetailsEntryBase):
+class InputEntryColor(InputEntryBase):
     def __init__(self, settings, refresh_func=None, global_toggle_func=None):
         super().__init__(settings, refresh_func, global_toggle_func)
         # NOTE FOR THE LOGIC IN THIS FILE

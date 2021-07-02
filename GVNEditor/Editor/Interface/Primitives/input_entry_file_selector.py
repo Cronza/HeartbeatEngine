@@ -1,9 +1,9 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
-class DetailsEntryFileSelector(DetailsEntryBase):
+class InputEntryFileSelector(InputEntryBase):
     def __init__(self, settings, logger, details_panel, type_filter, refresh_func=None, global_toggle_func=None):
         super().__init__(settings, refresh_func, global_toggle_func)
 

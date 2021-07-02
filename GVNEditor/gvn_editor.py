@@ -257,14 +257,14 @@ class GVNEditor:
             # Let's check if we already have an editor open for this file
             result = self.CheckIfFileOpen(target_file_path)
             if result:
-                #@TODO: Should there be a reimport if the user tries to reimport an open file? Or maybe a refesh button?
+                #@TODO: Should there be a reimport if the user tries to open an opened file? Or maybe a refesh button?
                 self.logger.Log("An editor for the selected file is already open - Switching to the open editor ", 3)
                 self.e_ui.main_tab_editor.setCurrentWidget(result)
             else:
                 # Initialize the Editor
                 self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
 
-                # If the caller wants to load the provided file instead of just marking it as the export target, do so here
+                # Allow the caller to load the provided file instead of just marking it as the export target
                 if import_file:
                     self.active_editor.Import()
 

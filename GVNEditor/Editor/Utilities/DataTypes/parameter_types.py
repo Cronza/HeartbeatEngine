@@ -13,3 +13,4 @@ class ParameterType(Enum):
     File_Image = 9
     Dropdown = 10
     Container = 11
+    CUST_Resolution = 12

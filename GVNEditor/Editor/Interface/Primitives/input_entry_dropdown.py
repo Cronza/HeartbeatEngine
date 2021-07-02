@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
-from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
-class DetailsEntryDropdown(DetailsEntryBase):
+class InputEntryDropdown(InputEntryBase):
     def __init__(self, settings, options, refresh_func=None, global_toggle_func=None):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
         super().__init__(settings, refresh_func, global_toggle_func)
@@ -10,7 +10,9 @@ class DetailsEntryDropdown(DetailsEntryBase):
         self.input_widget.setFont(self.settings.paragraph_font)
         self.input_widget.setStyleSheet(settings.paragraph_color)
 
-        for option in options:
+        self.options = options
+
+        for option in self.options:
             self.input_widget.addItem(str(option))
 
         # Add input elements to the layout
@@ -33,4 +35,4 @@ class DetailsEntryDropdown(DetailsEntryBase):
 
     def MakeUneditable(self):
         self.input_widget.setReadOnly(True)
-        self.input_widget.setStyleSheet(self.settings.read_only_background_color);
+        self.input_widget.setStyleSheet(self.settings.read_only_background_color)

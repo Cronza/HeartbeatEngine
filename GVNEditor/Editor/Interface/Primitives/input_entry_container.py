@@ -1,7 +1,7 @@
-from Editor.Interface.DetailsPanel.details_entry_base import DetailsEntryBase
+from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
-class DetailsEntryContainer(DetailsEntryBase):
+class InputEntryContainer(InputEntryBase):
     def __init__(self, settings, children: list, refresh_func=None, global_toggle_func=None):
         super().__init__(settings, refresh_func, global_toggle_func)
 

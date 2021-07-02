@@ -1,13 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
-from Editor.Interface.DetailsPanel.details_entry_text import DetailsEntryText
-from Editor.Interface.DetailsPanel.details_entry_paragraph import DetailsEntryParagraph
-from Editor.Interface.DetailsPanel.details_entry_bool import DetailsEntryBool
-from Editor.Interface.DetailsPanel.details_entry_color import DetailsEntryColor
-from Editor.Interface.DetailsPanel.details_entry_tuple import DetailsEntryTuple
-from Editor.Interface.DetailsPanel.details_entry_int import DetailsEntryInt
-from Editor.Interface.DetailsPanel.details_entry_file_selector import DetailsEntryFileSelector
-from Editor.Interface.DetailsPanel.details_entry_dropdown import DetailsEntryDropdown
-from Editor.Interface.DetailsPanel.details_entry_container import DetailsEntryContainer
+from Editor.Interface.Primitives.input_entry_text import InputEntryText
+from Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
+from Editor.Interface.Primitives.input_entry_bool import InputEntryBool
+from Editor.Interface.Primitives.input_entry_color import InputEntryColor
+from Editor.Interface.Primitives.input_entry_tuple import InputEntryTuple
+from Editor.Interface.Primitives.input_entry_int import InputEntryInt
+from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
+from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
+from Editor.Interface.Primitives.input_entry_container import InputEntryContainer
 
 
 # @TODO: Split this file up into a functions class & U.I class
@@ -221,27 +221,27 @@ class DetailsPanel(QtWidgets.QWidget):
         data_type = data['type']
 
         if data_type == "str":
-             return DetailsEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+             return InputEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "paragraph":
-            return DetailsEntryParagraph(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryParagraph(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "tuple":
-            return DetailsEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "bool":
-            return DetailsEntryBool(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryBool(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "color":
-            return DetailsEntryColor(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryColor(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "int":
-            return DetailsEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file":
-            return DetailsEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_image":
-            return DetailsEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "file_font":
-            return DetailsEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "dropdown":
-            return DetailsEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
         elif data_type == "container":
-            new_entry = DetailsEntryContainer(self.settings, data['children'])
+            new_entry = InputEntryContainer(self.settings, data['children'])
             for child in data['children']:
                 new_entry.addChild(self.CreateEntryWidget(child))
 

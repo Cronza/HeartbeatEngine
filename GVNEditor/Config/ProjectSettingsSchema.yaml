@@ -12,8 +12,8 @@ Game:
   starting_scene: "File"
 
 WindowSettings:
-  resolution: "Int"
-  resolution_options: "Dropdown"
+  resolution: "" # This is generated when choosing a value for 'resolution_options'
+  resolution_options: "CUST_Resolution"
 
 SpriteSettings:
   background_z_order: "Int"

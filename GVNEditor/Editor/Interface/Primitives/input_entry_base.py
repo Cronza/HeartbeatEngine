@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 from Editor.Interface.Primitives.simple_checkbox import SimpleCheckbox
 
 
-class DetailsEntryBase(QtWidgets.QTreeWidgetItem):
+class InputEntryBase(QtWidgets.QTreeWidgetItem):
     def __init__(self, settings, refresh_func=None, global_toggle_func=None):
         super().__init__()
 
