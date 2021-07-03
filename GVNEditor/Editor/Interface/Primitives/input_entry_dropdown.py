@@ -2,9 +2,9 @@ from PyQt5 import QtWidgets
 from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 class InputEntryDropdown(InputEntryBase):
-    def __init__(self, settings, options, refresh_func=None, global_toggle_func=None):
+    def __init__(self, settings, options, refresh_func=None):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
-        super().__init__(settings, refresh_func, global_toggle_func)
+        super().__init__(settings, refresh_func)
 
         self.input_widget = QtWidgets.QComboBox()
         self.input_widget.setFont(self.settings.paragraph_font)
@@ -36,3 +36,7 @@ class InputEntryDropdown(InputEntryBase):
     def MakeUneditable(self):
         self.input_widget.setReadOnly(True)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color)
+
+    def MakeEditable(self):
+        self.input_widget.setReadOnly(False)
+        self.input_widget.setStyleSheet("")

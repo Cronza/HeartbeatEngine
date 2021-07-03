@@ -4,8 +4,8 @@ from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, settings, logger, details_panel, type_filter, refresh_func=None, global_toggle_func=None):
-        super().__init__(settings, refresh_func, global_toggle_func)
+    def __init__(self, settings, logger, details_panel, type_filter, refresh_func=None):
+        super().__init__(settings, refresh_func)
 
         # This type requires the logger and a direct ref to the owning QWidget for filesystem operations
         self.logger = logger
@@ -19,6 +19,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget.setStyleSheet(settings.paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.setReadOnly(True)
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -49,8 +50,12 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def MakeUneditable(self):
-        self.input_widget.setReadOnly(True)
-        self.input_widget.setStyleSheet(self.settings.read_only_background_color);
+        self.file_select_button.setEnabled(False)
+        self.input_widget.setStyleSheet(self.settings.read_only_background_color)
+
+    def MakeEditable(self):
+        self.file_select_button.setEnabled(True)
+        self.input_widget.setStyleSheet("")
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project

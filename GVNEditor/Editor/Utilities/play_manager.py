@@ -16,7 +16,6 @@ class PlayManager:
             logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 
-
             logger.Log("Engine closed - Editor functionality resumed")
             print(result)
         except Exception as exc:

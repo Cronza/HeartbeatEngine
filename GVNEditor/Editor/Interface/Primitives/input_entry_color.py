@@ -4,8 +4,8 @@ from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
 class InputEntryColor(InputEntryBase):
-    def __init__(self, settings, refresh_func=None, global_toggle_func=None):
-        super().__init__(settings, refresh_func, global_toggle_func)
+    def __init__(self, settings, refresh_func=None):
+        super().__init__(settings, refresh_func)
         # NOTE FOR THE LOGIC IN THIS FILE
         # So for some unholy reason, Qt doesn't really have a great way of changing widget colors. While stylesheets
         # are nice, retrieving data from a stylesheet is a lesson in pain (You get ALL of the data, not just a part
@@ -47,7 +47,10 @@ class InputEntryColor(InputEntryBase):
         self.input_widget.setStyleSheet(f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})")
 
     def MakeUneditable(self):
-        pass
+        self.color_select_button.setEnabled(False)
+
+    def MakeEditable(self):
+        self.color_select_button.setEnabled(True)
 
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog.getColor()

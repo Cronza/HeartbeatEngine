@@ -3,7 +3,7 @@ from Editor.Interface.Primitives.simple_checkbox import SimpleCheckbox
 
 
 class InputEntryBase(QtWidgets.QTreeWidgetItem):
-    def __init__(self, settings, refresh_func=None, global_toggle_func=None):
+    def __init__(self, settings, refresh_func=None):
         super().__init__()
 
         self.settings = settings
@@ -11,10 +11,6 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         # When the input widget is updated, in case another U.I element needs to refresh, allow us to execute an
         # ambiguous function
         self.refresh_func = refresh_func
-
-        # When the global toggle is enabled, we need to update this entry using the global value stored in the
-        # relevant data entry itself (IE. dialogue entry)
-        self.global_toggle_func = global_toggle_func
 
         # Details entries have three main widgets: 'name_widget', 'input_widget' and 'global_toggle'.
         # - 'name_widget': A standalone text widget representing the name of the detail
@@ -49,6 +45,11 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         return self.global_toggle.Get()
 
     def MakeUneditable(self):
+        """ Makes any relevant input widgets unable to be used """
+        pass
+
+    def MakeEditable(self):
+        """ Makes any relevant input widgets able to be used """
         pass
 
     def InputValueUpdated(self):
@@ -65,9 +66,8 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         When the global checkbox is toggled on, call a provided function, passing a reference to this class
         This function is not meant to be overridden
         """
-        # Only update using global data when the global setting is turned 'on'
-        if self.global_toggle.Get() and self.global_toggle_func:
-            self.global_toggle_func(self)
-
-
+        if self.global_toggle.Get():
+            self.MakeUneditable()
+        else:
+            self.MakeEditable()
 

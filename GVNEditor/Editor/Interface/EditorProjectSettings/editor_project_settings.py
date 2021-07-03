@@ -172,25 +172,25 @@ class EditorProjectSettingsUI(EditorBaseUI):
     def CreateEntryWidget(self, data, data_type):
         """ Create a specialized entry widget based on the provided ParameterType """
         if data_type == ParameterType.String:
-            return InputEntryText(self.core.settings, None, None)
+            return InputEntryText(self.core.settings, None)
         elif data_type == ParameterType.Bool:
-            return InputEntryBool(self.core.settings, None, None)
+            return InputEntryBool(self.core.settings, None)
         elif data_type == ParameterType.Int:
-            return InputEntryInt(self.core.settings, None, None)
+            return InputEntryInt(self.core.settings, None)
         elif data_type == ParameterType.Tuple:
-            return InputEntryTuple(self.core.settings, None, None)
+            return InputEntryTuple(self.core.settings, None)
         elif data_type == ParameterType.Paragraph:
-            return InputEntryParagraph(self.core.settings, None, None)
+            return InputEntryParagraph(self.core.settings, None)
         elif data_type == ParameterType.Color:
-            return InputEntryColor(self.core.settings, None, None)
+            return InputEntryColor(self.core.settings, None)
         elif data_type == ParameterType.File:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, "", None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, "", None)
         elif data_type == ParameterType.File_Font:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Font'], None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Font'], None)
         elif data_type == ParameterType.File_Image:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Image'], None, None)
+            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Image'], None)
         elif data_type == ParameterType.Dropdown:
-            return InputEntryDropdown(self.core.settings, data, None, None)
+            return InputEntryDropdown(self.core.settings, data, None)
         elif data_type == ParameterType.CUST_Resolution:
             return InputEntryResolution(self.core.settings, data, self.core.project_settings)
         else:

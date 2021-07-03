@@ -221,25 +221,25 @@ class DetailsPanel(QtWidgets.QWidget):
         data_type = data['type']
 
         if data_type == "str":
-             return InputEntryText(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+             return InputEntryText(self.settings, self.DetailEntryUpdated)
         elif data_type == "paragraph":
-            return InputEntryParagraph(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryParagraph(self.settings, self.DetailEntryUpdated)
         elif data_type == "tuple":
-            return InputEntryTuple(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryTuple(self.settings, self.DetailEntryUpdated)
         elif data_type == "bool":
-            return InputEntryBool(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryBool(self.settings, self.DetailEntryUpdated)
         elif data_type == "color":
-            return InputEntryColor(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryColor(self.settings, self.DetailEntryUpdated)
         elif data_type == "int":
-            return InputEntryInt(self.settings, self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryInt(self.settings, self.DetailEntryUpdated)
         elif data_type == "file":
-            return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated)
         elif data_type == "file_image":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated)
         elif data_type == "file_font":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated)
         elif data_type == "dropdown":
-            return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated, self.GlobalToggleEnabled)
+            return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
         elif data_type == "container":
             new_entry = InputEntryContainer(self.settings, data['children'])
             for child in data['children']:
@@ -261,36 +261,3 @@ class DetailsPanel(QtWidgets.QWidget):
 
             # Inform the active entry to refresh
             self.active_entry.Refresh()
-
-    def GlobalToggleEnabled(self, details_entry, parent=None):
-        """
-        Whenever a detail entry's global checkbox is used, we need to refresh that entry with the relevant
-        global information stored in the active entry
-        """
-        #@TODO: Instead of loading the global parameter, just make it Uneditable, thus removing the entire need for loading the global data
-        key_name = details_entry.name_widget.text()
-
-        # The key changes depending if we're at root of parsing children ('requirements' vs 'children')
-        requirements_list = None
-        if parent:
-            requirements_list = parent["children"]
-        else:
-            requirements_list = self.active_entry.action_data["requirements"]
-
-        # Search through the active entry's data, and try to find the corresponding entry for this
-        for requirement in requirements_list:
-            if requirement["name"] == key_name:
-                requirement["value"] = self.settings.GetGlobalSetting(
-                    requirement["global"]["category"],
-                    requirement["global"]["global_parameter"]
-                )
-
-                # Since we have the details entry reference, let's update it's input
-                details_entry.Set(requirement["value"])
-
-                # Refresh the active entry
-                self.active_entry.Refresh()
-
-            # Recurse if applicable
-            elif requirement["type"] == "container":
-                self.GlobalToggleEnabled(details_entry, requirement)

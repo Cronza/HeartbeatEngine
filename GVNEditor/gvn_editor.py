@@ -31,7 +31,7 @@ class GVNEditor:
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
         #self.SetActiveProject("To Infinity", "PROJECTS/To Infinity") # Machine 1
-        #self.SetActiveProject("To Infinity", "PROJECTS/Testing")  # Machine 2
+        self.SetActiveProject("To Infinity", "PROJECTS/Testing")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then

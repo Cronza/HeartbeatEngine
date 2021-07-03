@@ -32,7 +32,7 @@ Renderables:
         - name: "sprite"
           type: "file_image"
           value: "None"
-          editable: False
+          editable: True
           preview: True
 
         - name: "position"
@@ -138,7 +138,7 @@ Renderables:
           global:
             category: "Text"
             global_parameter: "font"
-          editable: False
+          editable: True
           preview: False
 
         - name: "z_order"
@@ -181,7 +181,7 @@ Renderables:
         - name: "sprite"
           type: "file_image"
           value: "None"
-          editable: False
+          editable: True
           preview: True
 
         - name: "position"
@@ -263,7 +263,7 @@ Dialogue:
               global:
                 category: "Dialogue"
                 global_parameter: "speaker_font"
-              editable: False
+              editable: True
               preview: False
 
             - name: "z_order"
@@ -352,7 +352,7 @@ Dialogue:
               global:
                 category: "Dialogue"
                 global_parameter: "dialogue_font"
-              editable: False
+              editable: True
               preview: False
 
             - name: "z_order"

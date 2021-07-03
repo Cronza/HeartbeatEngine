@@ -2,8 +2,8 @@ from PyQt5 import QtWidgets
 from Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 class InputEntryParagraph(InputEntryBase):
-    def __init__(self, settings, refresh_func=None, global_toggle_func=None):
-        super().__init__(settings, refresh_func, global_toggle_func)
+    def __init__(self, settings, refresh_func=None):
+        super().__init__(settings, refresh_func)
 
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
@@ -33,4 +33,6 @@ class InputEntryParagraph(InputEntryBase):
         self.input_widget.setReadOnly(True)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color)
 
-
+    def MakeEditable(self):
+        self.input_widget.setReadOnly(False)
+        self.input_widget.setStyleSheet("")
