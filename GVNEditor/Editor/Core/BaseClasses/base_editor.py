@@ -22,6 +22,7 @@ class EditorBase:
         self.settings = settings
         self.logger = logger
         self.file_path = file_path
+        self.file_type = None
         self.editor_ui = None
 
         self.logger.Log("Initializing Editor...")

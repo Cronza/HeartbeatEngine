@@ -16,6 +16,7 @@
 """
 from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
+from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Utilities.yaml_manager import Writer
 from Editor.Utilities.yaml_manager import Reader
 from Editor.Utilities.database_manager import DBManager
@@ -25,12 +26,15 @@ class EditorDialogue(EditorBase):
     def __init__(self, settings, logger, file_path):
         super().__init__(settings, logger, file_path)
 
+        self.file_type = FileType.Dialogue
+
         self.editor_ui = EditorDialogueUI(self)
         self.editor_ui.branches.CreateBranch(
             "Main",
             "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
 
+        self.Export()
         self.logger.Log("Editor initialized")
 
     def UpdateActiveEntry(self):

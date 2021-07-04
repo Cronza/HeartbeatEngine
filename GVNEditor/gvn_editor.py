@@ -12,6 +12,7 @@ from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from Editor.Core.EditorSceneDialogue.editor_scene_dialogue import EditorSceneDialogue
 
 class GVNEditor:
     def __init__(self):
@@ -31,7 +32,7 @@ class GVNEditor:
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
         #self.SetActiveProject("To Infinity", "PROJECTS/To Infinity") # Machine 1
-        self.SetActiveProject("To Infinity", "PROJECTS/Testing")  # Machine 2
+        self.SetActiveProject("To Infinity", "D:/GVNEngine/PROJECTS/Testing")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -72,7 +73,7 @@ class GVNEditor:
                 self.logger.Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
-                if os.path.exists(os.path.join(new_project_dir, user_project_name)):
+                if os.path.exists(new_project_dir + "/" + user_project_name):
                     self.logger.Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
                     QtWidgets.QMessageBox.about(
                         self.e_ui.central_widget,
@@ -86,31 +87,32 @@ class GVNEditor:
                     self.logger.Log("Valid project destination chosen! Creating project folder structure...")
 
                     # Create the project directory
-                    project_path = os.path.join(new_project_dir, user_project_name)
+                    project_path = new_project_dir + "/" + user_project_name
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
                     for main_dir in self.settings.project_folder_structure.items():
 
                         # Create the main dir (.../Content)
-                        main_dir_path = os.path.join(project_path, main_dir[0])
+                        main_dir_path = project_path + "/" + main_dir[0]
                         os.mkdir(main_dir_path)
 
                         # Loop deeper if necessary
                         if not main_dir[1] is None:
                             for sub_dir in main_dir[1]:
-                                sub_dir_path = os.path.join(main_dir_path, sub_dir)
+                                sub_dir_path = main_dir_path + "/" + sub_dir
                                 os.mkdir(sub_dir_path)
 
                     # Create the admin folder
-                    admin_dir_path = os.path.join(project_path, self.settings.project_admin_dir)
+                    admin_dir_path = project_path + "/" + self.settings.project_admin_dir
                     os.mkdir(admin_dir_path)
 
                     # Clone project default files
                     for key, rel_path in self.settings.project_default_files.items():
                         shutil.copy(
-                            os.path.join(self.settings.engine_root, rel_path),
-                            os.path.join(project_path, rel_path))
+                            self.settings.engine_root + "/" + rel_path,
+                            project_path + "/" + rel_path
+                        )
 
                     self.logger.Log(f"Project Created at: {project_path}", 2)
 
@@ -132,7 +134,7 @@ class GVNEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(os.path.join(existing_project_dir, self.settings.project_admin_dir)):
+            if os.path.exists(existing_project_dir + "/" + self.settings.project_admin_dir):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
@@ -173,7 +175,7 @@ class GVNEditor:
                 prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
                 result = prompt.SaveFile(
                     self.settings.supported_content_types['Data'],
-                    os.path.join(self.settings.GetProjectContentDirectory(), sub_dir),
+                    self.settings.GetProjectContentDirectory() + "/" + sub_dir,
                     "Save File As"
                 )
 
@@ -183,7 +185,9 @@ class GVNEditor:
                         pass
                         self.logger.Log(f"File created - {result}", 2)
 
-                self.OpenEditor(result, selected_type)
+                    self.OpenEditor(result, selected_type)
+                else:
+                    self.logger.Log("File information was not provided - Cancelling 'New File' action", 3)
 
     def OpenFile(self):
         """ Prompt the user to choose a file, then load the respective editor using the data found """
@@ -237,9 +241,33 @@ class GVNEditor:
         # Only allow this is there is an active project
         if not self.settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
+        else:
+            if self.active_editor:
+                self.active_editor.Export()
 
-        if self.active_editor:
-            self.active_editor.Export()
+
+    def SaveAs(self):
+        """ Prompts the user for a new location and file name to save the active editor's data """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            # The user is not allowed to rename the project settings file due to the number of dependencies on it
+            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+            new_file_path = prompt.SaveFile(
+                self.settings.supported_content_types['Data'],
+                self.active_editor.GetFilePath(),
+                "Choose a Location to Save the File",
+                True
+            )
+
+            if not new_file_path:
+                self.logger.Log("File path was not provided - Cancelling 'SaveAs' action", 3)
+            else:
+                can_save = self.ValidateNewFileLocation(new_file_path)
+                if can_save:
+                    self.active_editor.file_path = new_file_path
+                    self.active_editor.Export()
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
@@ -248,7 +276,7 @@ class GVNEditor:
 
             editor_classes = {
                 FileType.Dialogue: EditorDialogue,
-                #FileType.Scene_Dialogue: EditorSceneDialogue,
+                FileType.Scene_Dialogue: EditorSceneDialogue,
                 #FileType.Scene_Dialogue: EditorScenePointAndClick,
                 #FileType.Scene_Point_And_Click: EditorCharacter,
                 FileType.Project_Settings: EditorProjectSettings
@@ -284,10 +312,7 @@ class GVNEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             self.OpenEditor(
-                os.path.join(
-                    self.settings.user_project_dir,
-                    self.settings.project_default_files['Config']
-                ),
+                self.settings.user_project_dir + "/" + self.settings.project_default_files['Config'],
                 FileType.Project_Settings,
                 True
             )
@@ -307,6 +332,7 @@ class GVNEditor:
         """ Checks all open editor tabs for the provided file. Returns a bool if already open """
         for tab_index in range(0, self.e_ui.main_tab_editor.count()):
             open_editor = self.e_ui.main_tab_editor.widget(tab_index)
+
             if open_editor.core.file_path == file_path:
                 return open_editor
 
@@ -333,6 +359,28 @@ class GVNEditor:
         # Refresh U.I text using any active translations
         self.e_ui.retranslateUi(self.main_window)
 
+    def ValidateNewFileLocation(self, file_path) -> bool:
+        """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """
+
+        # Since we're allowing the user to pick a path, we have to be careful what we check for
+        # 1. Is the new location in the same core folder (Dialogue, Scenes, Characters, etc
+        # 2. Can this file type be placed in a new location? (For instance, project settings can't be moved)
+        if self.active_editor.file_type is FileType.Project_Settings:
+            self.logger.Log("Project Settings can not be renamed or saved to a new location", 3)
+            return False
+        else:
+            print(os.path.basename(file_path))
+            file_type_location = self.settings.file_type_locations[self.active_editor.file_type]
+            if file_type_location not in os.path.basename(file_path):
+                QtWidgets.QMessageBox.about(
+                    self.e_ui.central_widget,
+                    "Invalid Root Directory",
+                    "The chosen root directory is invalid. For this file type, you must use the"
+                    f" '{file_type_location}' folder."
+                )
+                return False
+            else:
+                return True
 
 if __name__ == "__main__":
     editor = GVNEditor()

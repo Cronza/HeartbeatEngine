@@ -69,14 +69,17 @@ class GVNEditorUI:
         self.a_new_file.triggered.connect(self.e_core.NewFile)
         self.a_open_file = QtWidgets.QAction(main_window)
         self.a_open_file.triggered.connect(self.e_core.OpenFile)
+        self.a_save_file = QtWidgets.QAction(main_window)
+        self.a_save_file.triggered.connect(self.e_core.Save)
         self.a_save_file_as = QtWidgets.QAction(main_window)
-        self.a_save_file_as.triggered.connect(self.e_core.Save)
+        self.a_save_file_as.triggered.connect(self.e_core.SaveAs)
         self.a_new_project = QtWidgets.QAction(main_window)
         self.a_new_project.triggered.connect(self.e_core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
         self.a_open_project.triggered.connect(self.e_core.OpenProject)
         self.file_menu.addAction(self.a_new_file)
         self.file_menu.addAction(self.a_open_file)
+        self.file_menu.addAction(self.a_save_file)
         self.file_menu.addAction(self.a_save_file_as)
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
@@ -121,8 +124,10 @@ class GVNEditorUI:
         self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.a_open_file.setText(_translate("MainWindow", "Open File"))
         self.a_open_file.setShortcut(_translate("MainWindow", "Ctrl+O"))
-        self.a_save_file_as.setText(_translate("MainWindow", "Save"))
-        self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.a_save_file.setText(_translate("MainWindow", "Save"))
+        self.a_save_file.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.a_save_file_as.setText(_translate("MainWindow", "Save As"))
+        self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+Alt+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
 
@@ -132,6 +137,7 @@ class GVNEditorUI:
 
         # 'Settings Menu' Actions
         self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
+        self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
 
     def CreateTabEditor(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """

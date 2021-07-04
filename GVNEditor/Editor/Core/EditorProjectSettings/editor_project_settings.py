@@ -16,6 +16,7 @@
 """
 from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorProjectSettings.editor_project_settings import EditorProjectSettingsUI
+from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Utilities.yaml_manager import Writer
 from Editor.Utilities.yaml_manager import Reader
 
@@ -23,6 +24,8 @@ from Editor.Utilities.yaml_manager import Reader
 class EditorProjectSettings(EditorBase):
     def __init__(self, settings, logger, file_path):
         super().__init__(settings, logger, file_path)
+
+        self.file_type = FileType.Project_Settings
 
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
@@ -49,6 +52,7 @@ class EditorProjectSettings(EditorBase):
             Writer.WriteFile(
                 self.project_settings,
                 self.file_path,
+                "# Type: Project_Settings\n" +
                 f"# {self.settings.editor_data['EditorSettings']['version_string']}"
             )
             self.logger.Log("File Exported!", 2)

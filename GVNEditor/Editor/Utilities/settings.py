@@ -11,9 +11,9 @@ class Settings:
 
         # Alter the path if the user is opening just the editor project, or the full GVNEngine project
         if "GVNEditor" not in self.root_dir:
-            self.editor_root = os.path.join(self.root_dir, "GVNEditor")
+            self.editor_root = self.root_dir + "/" + "GVNEditor"
 
-        self.engine_root = os.path.join(self.root_dir, "GVNEngine")
+        self.engine_root = self.root_dir + "/" + "GVNEngine"
         self.project_admin_dir = ".gvn"
         self.project_folder_structure = {
             "Content": [
@@ -73,16 +73,11 @@ class Settings:
 
     def LoadProjectSettings(self):
         """ Reads the 'Game.yaml' file for the active project """
-        self.user_project_data = Reader.ReadAll(
-            os.path.join(
-                self.user_project_dir,
-                self.project_default_files['Config']
-            )
-        )
+        self.user_project_data = Reader.ReadAll(self.user_project_dir + "/" + self.project_default_files['Config'])
 
     def GetProjectContentDirectory(self):
         """ Returns the 'Content' folder for the active project """
-        return os.path.join(self.user_project_dir, "Content")
+        return self.user_project_dir + "/" + "Content"
 
     def GetGlobalSetting(self, category, name):
         """ Returns a value from the open project file given a category and parameter name """
@@ -156,4 +151,4 @@ class Settings:
 
     def ConvertPartialToAbsolutePath(self, partial_path):
         """ Given a parital path, return a absolute path """
-        return os.path.join(self.editor_root, partial_path)
+        return self.editor_root + "/" + partial_path

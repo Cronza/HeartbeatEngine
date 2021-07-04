@@ -7,7 +7,7 @@ class Settings:
 
         # Alter the path if the user is opening just the engine project, or the full GVNEngine project
         if "GVNEngine/GVNEngine" not in self.root_dir:
-            self.root_dir = os.path.join(self.root_dir, "GVNEngine")
+            self.root_dir = self.root_dir + "/" + "GVNEngine"
 
         self.project_settings = None
 
@@ -26,5 +26,4 @@ class Settings:
 
     def ConvertPartialToAbsolutePath(self, partial_path):
         """ Given a parital path, return a absolute path """
-        print(os.path.join(self.root_dir, partial_path))
-        return os.path.join(self.root_dir, partial_path)
+        return self.root_dir + "/" + partial_path

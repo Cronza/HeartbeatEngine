@@ -14,6 +14,7 @@ class FileSystemPrompt(QFileDialog):
         Prompts the user with a filedialog which has them specify a file to create or write to. If nothing
         is selected, return an empty string
         """
+
         file_path = self.getSaveFileName(
             self.parent(),
             prompt_title,

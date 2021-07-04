@@ -62,6 +62,7 @@ class LoggerUI(QtWidgets.QWidget):
         self.log_list = QtWidgets.QListWidget(self)
         self.log_list.setFont(self.l_core.settings.paragraph_font)
         self.log_list.setStyleSheet(self.l_core.settings.paragraph_color)
+        self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.logger_title)
