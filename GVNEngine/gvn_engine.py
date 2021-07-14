@@ -1,15 +1,21 @@
 import os
+import argparse
 import pygame
 from pygame.locals import VIDEORESIZE
 from Engine.Core.scene_manager import SceneManager
 from Engine.Utilities.settings import Settings
 
-class GVNEngine():
-    def __init__(self):
-        # Build a settings object to house engine & project settings
-        self.settings = Settings()
+class GVNEngine:
+    def __init__(self, project_path):
+        #@TODO: What is the right way to handle this?
+        if not project_path:
+            print("No project path provided - Unable to launch GVNEngine")
+            quit(1)
 
-        self.settings.Evaluate(self.settings.ConvertPartialToAbsolutePath("Config/Game.yaml"))
+        # Build a settings object to house engine & project settings
+        self.settings = Settings(project_path)
+
+        self.settings.Evaluate(self.settings.project_dir + "/Config/Game.yaml")
 
         # Configure the game based on project settings
         pygame.display.set_caption(self.settings.project_settings['Game']['title'])
@@ -80,7 +86,10 @@ class GVNEngine():
 
             self.scene_manager.active_scene.Draw()
 
-
 if __name__ == "__main__":
-    engine = GVNEngine()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('project_path', type=str, help="A file path for a GVNEngine Project")
+    args = parser.parse_args()
+
+    engine = GVNEngine(args.project_path)
     engine.Main()

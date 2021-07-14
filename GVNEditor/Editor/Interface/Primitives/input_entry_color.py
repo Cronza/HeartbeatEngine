@@ -40,7 +40,7 @@ class InputEntryColor(InputEntryBase):
         pattern = "background-color: rgb\((.*)\)"
 
         color = re.search(pattern, raw_style_sheet).group(1)
-        return color.split(",")
+        return list(map(int, color.split(",")))
 
     def Set(self, data) -> None:
         # Change the data without causing any signal calls

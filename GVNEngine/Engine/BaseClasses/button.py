@@ -15,7 +15,6 @@ class Button(Interactable):
         button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data
-            #self.key + "_Text"  # For simplicity, child text renderables will inherit a mod. version of the button's key
         )
         self.children.append(button_text_renderable)
         self.scene.renderables_group.Add(button_text_renderable)

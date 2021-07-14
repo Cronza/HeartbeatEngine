@@ -15,21 +15,10 @@ class Settings:
 
         self.engine_root = self.root_dir + "/" + "GVNEngine"
         self.project_admin_dir = ".gvn"
-        self.project_folder_structure = {
-            "Content": [
-                "Audio",
-                "Characters",
-                "Dialogue",
-                "Fonts",
-                "Objects",
-                "Scenes",
-                "Sprites",
-                "Styles",
-                "Values"
-            ],
-            "Config":
-                None
-        }
+        self.project_folder_structure = [
+            "Content",
+            "Config"
+        ]
         # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
         self.project_default_files = {
             "Config": "Config/Game.yaml"
@@ -40,14 +29,6 @@ class Settings:
             "Image": "Image Files (*.png *.jpg)",
             "Data": "YAML Files (*.yaml)",
             "Font": "Font Files (*.ttf)"
-        }
-
-        # A dict of file types and the respective folder names in which they're stored within the project
-        self.file_type_locations = {
-            FileType.Dialogue: "Dialogue",
-            FileType.Scene_Dialogue: "Scenes",
-            FileType.Scene_Point_And_Click: "Scenes",
-            FileType.Character: "Characters"
         }
 
         self.style_data = None

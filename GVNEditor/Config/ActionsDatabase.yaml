@@ -36,7 +36,7 @@ Renderables:
           preview: True
 
         - name: "position"
-          type: "tuple"
+          type: "vector2"
           value: [0,0]
           editable: True
           preview: True
@@ -83,6 +83,16 @@ Renderables:
               value: 500
               editable: True
               preview: True
+
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_for_input"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_for_complete"
+          editable: True
+          preview: True
     # Create Text
     - display_name: "Create Text"
       action_name: "create_text"
@@ -94,7 +104,7 @@ Renderables:
           preview: True
 
         - name: "position"
-          type: "tuple"
+          type: "vector2"
           value: [0,0]
           editable: True
           preview: True
@@ -168,6 +178,16 @@ Renderables:
               value: 500
               editable: True
               preview: True
+
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_for_input"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_for_complete"
+          editable: True
+          preview: True
     # Create Background
     - display_name: "Create Background"
       action_name: "create_background"
@@ -185,7 +205,7 @@ Renderables:
           preview: True
 
         - name: "position"
-          type: "tuple"
+          type: "vector2"
           value: [0,0]
           editable: True
           preview: False
@@ -216,7 +236,7 @@ Dialogue:
               preview: False
 
             - name: "position"
-              type: "tuple"
+              type: "vector2"
               value: [0,0]
               global:
                 category: "Dialogue"

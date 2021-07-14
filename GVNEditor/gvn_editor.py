@@ -14,6 +14,7 @@ from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 from Editor.Core.EditorSceneDialogue.editor_scene_dialogue import EditorSceneDialogue
 
+
 class GVNEditor:
     def __init__(self):
 
@@ -32,7 +33,7 @@ class GVNEditor:
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
         #self.SetActiveProject("To Infinity", "PROJECTS/To Infinity") # Machine 1
-        self.SetActiveProject("To Infinity", "D:/GVNEngine/PROJECTS/Testing")  # Machine 2
+        self.SetActiveProject("Hello World", "D:/GVNEngine/PROJECTS/Hello World")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
@@ -91,17 +92,9 @@ class GVNEditor:
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
-                    for main_dir in self.settings.project_folder_structure.items():
-
-                        # Create the main dir (.../Content)
-                        main_dir_path = project_path + "/" + main_dir[0]
+                    for main_dir in self.settings.project_folder_structure:
+                        main_dir_path = project_path + "/" + main_dir
                         os.mkdir(main_dir_path)
-
-                        # Loop deeper if necessary
-                        if not main_dir[1] is None:
-                            for sub_dir in main_dir[1]:
-                                sub_dir_path = main_dir_path + "/" + sub_dir
-                                os.mkdir(sub_dir_path)
 
                     # Create the admin folder
                     admin_dir_path = project_path + "/" + self.settings.project_admin_dir
@@ -170,12 +163,10 @@ class GVNEditor:
             if new_file_prompt.exec():
 
                 selected_type = new_file_prompt.GetSelection()
-                sub_dir = self.settings.file_type_locations[selected_type]
-
                 prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
                 result = prompt.SaveFile(
                     self.settings.supported_content_types['Data'],
-                    self.settings.GetProjectContentDirectory() + "/" + sub_dir,
+                    self.settings.GetProjectContentDirectory(),
                     "Save File As"
                 )
 
@@ -185,7 +176,9 @@ class GVNEditor:
                         pass
                         self.logger.Log(f"File created - {result}", 2)
 
+                    # Create the editor, then export to initially populate the new file
                     self.OpenEditor(result, selected_type)
+                    self.active_editor.Export()
                 else:
                     self.logger.Log("File information was not provided - Cancelling 'New File' action", 3)
 
@@ -245,7 +238,6 @@ class GVNEditor:
             if self.active_editor:
                 self.active_editor.Export()
 
-
     def SaveAs(self):
         """ Prompts the user for a new location and file name to save the active editor's data """
         # Only allow this is there is an active project
@@ -253,21 +245,29 @@ class GVNEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             # The user is not allowed to rename the project settings file due to the number of dependencies on it
-            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
-            new_file_path = prompt.SaveFile(
-                self.settings.supported_content_types['Data'],
-                self.active_editor.GetFilePath(),
-                "Choose a Location to Save the File",
-                True
-            )
-
-            if not new_file_path:
-                self.logger.Log("File path was not provided - Cancelling 'SaveAs' action", 3)
+            if self.active_editor.file_type is FileType.Project_Settings:
+                self.logger.Log("Project Settings can not be renamed or saved to a new location", 3)
             else:
-                can_save = self.ValidateNewFileLocation(new_file_path)
-                if can_save:
-                    self.active_editor.file_path = new_file_path
-                    self.active_editor.Export()
+                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                new_file_path = prompt.SaveFile(
+                    self.settings.supported_content_types['Data'],
+                    self.active_editor.GetFilePath(),
+                    "Choose a Location to Save the File",
+                    True
+                )
+
+                if not new_file_path:
+                    self.logger.Log("File path was not provided - Cancelling 'SaveAs' action", 3)
+                else:
+                    can_save = self.ValidateNewFileLocation(new_file_path)
+                    if can_save:
+                        self.active_editor.file_path = new_file_path
+                        self.e_ui.main_tab_editor.setTabText(
+                            self.e_ui.main_tab_editor.currentIndex(),
+                            self.active_editor.GetFileName()
+                        )
+
+                        self.active_editor.Export()
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
@@ -297,7 +297,6 @@ class GVNEditor:
                     self.active_editor.Import()
 
                 self.e_ui.AddTab(self.active_editor.GetUI(), os.path.basename(target_file_path))
-
         else:
             QtWidgets.QMessageBox.about(
                 self.e_ui.central_widget,
@@ -362,25 +361,16 @@ class GVNEditor:
     def ValidateNewFileLocation(self, file_path) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """
 
-        # Since we're allowing the user to pick a path, we have to be careful what we check for
-        # 1. Is the new location in the same core folder (Dialogue, Scenes, Characters, etc
-        # 2. Can this file type be placed in a new location? (For instance, project settings can't be moved)
-        if self.active_editor.file_type is FileType.Project_Settings:
-            self.logger.Log("Project Settings can not be renamed or saved to a new location", 3)
+        if self.settings.user_project_dir not in file_path:
+            QtWidgets.QMessageBox.about(
+                self.e_ui.central_widget,
+                "Invalid Directory",
+                "The chosen path is outside the Content folder. \n\n"
+                "Please choose another location inside the Content folder"
+            )
             return False
         else:
-            print(os.path.basename(file_path))
-            file_type_location = self.settings.file_type_locations[self.active_editor.file_type]
-            if file_type_location not in os.path.basename(file_path):
-                QtWidgets.QMessageBox.about(
-                    self.e_ui.central_widget,
-                    "Invalid Root Directory",
-                    "The chosen root directory is invalid. For this file type, you must use the"
-                    f" '{file_type_location}' folder."
-                )
-                return False
-            else:
-                return True
+            return True
 
 if __name__ == "__main__":
     editor = GVNEditor()

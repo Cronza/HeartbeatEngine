@@ -27,7 +27,6 @@ class DialogueScene(PointAndClickScene):
                     else:
                         self.LoadAction()
 
-
     def LoadAction(self):
         """
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
@@ -35,29 +34,21 @@ class DialogueScene(PointAndClickScene):
         """
         if len(self.dialogue_data[self.active_branch]) > self.dialogue_index:
             action_data = self.dialogue_data[self.active_branch][self.dialogue_index]
-
-            #@TODO: Review how the wait mechanism works, and how its communicated to the user
-
-            # Should we automatically load the next action, or wait until the next input?
-            if 'wait_for_input' in action_data:
-                if action_data['wait_for_input'] is True:
-                    self.a_manager.PerformAction(action_data, action_data['action'])
+            if "post_wait" in action_data:
+                if "wait_for_input" in action_data["post_wait"]:
+                    self.a_manager.PerformAction(action_data, action_data["action"])
                     self.dialogue_index += 1
-                else:
-                    # Don't wait for input on this action. Run it, and move to the next
-                    self.a_manager.PerformAction(action_data, action_data['action'])
+                elif "wait_until_complete" in action_data["post_wait"]:
+                    self.a_manager.PerformAction(action_data, action_data["action"], self.ActionComplete)
+                elif "no_wait" in action_data["post_wait"]:
+                    self.a_manager.PerformAction(action_data, action_data["action"])
                     self.dialogue_index += 1
                     self.LoadAction()
-            # Should we let the action load the next action when it's complete?
-            elif 'wait_until_complete' in action_data:
-                if action_data['wait_until_complete'] is True:
-                    self.a_manager.PerformAction(action_data, action_data['action'], self.ActionComplete)
-                else:
-                    self.a_manager.PerformAction(action_data, action_data['action'])
-                    self.dialogue_index += 1
+            # Default to 'no_wait' when nothing is provided
             else:
-                self.a_manager.PerformAction(action_data, action_data['action'])
+                self.a_manager.PerformAction(action_data, action_data["action"])
                 self.dialogue_index += 1
+                self.LoadAction()
         else:
             print('The end of available dialogue actions has been reached')
 

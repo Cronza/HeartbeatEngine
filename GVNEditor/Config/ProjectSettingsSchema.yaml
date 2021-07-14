@@ -45,13 +45,13 @@ Button:
 
 Dialogue:
   text_speed: "Int"
-  speaker_text_position: "Tuple"
+  speaker_text_position: "Vector2"
   speaker_text_size: "Int"
   speaker_text_color: "Color"
   speaker_font: "File_Font"
   speaker_z_order: "Int"
   speaker_center_align: "Bool"
-  dialogue_text_position: "Tuple"
+  dialogue_text_position: "Vector2"
   dialogue_text_size: "Int"
   dialogue_text_color: "Color"
   dialogue_font: "File_Font"
@@ -61,7 +61,7 @@ Dialogue:
   dialogue_frame_sprite: "File_Image"
   dialogue_frame_z_order: "Int"
   dialogue_frame_center_align: "Bool"
-  dialogue_frame_position: "Tuple"
+  dialogue_frame_position: "Vector2"
 
 Pause Menu:
   data_file: "File"

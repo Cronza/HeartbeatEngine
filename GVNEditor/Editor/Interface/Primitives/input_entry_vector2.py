@@ -22,9 +22,12 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
-        self.validator = QtGui.QIntValidator()
-        self.input_widget.setValidator(self.validator)
-        self.input_widget_alt.setValidator(self.validator)
+        #self.validator = QtGui.QIntValidator()
+        #self.input_widget.setValidator(self.validator)
+        #self.input_widget_alt.setValidator(self.validator)
+        validator = QtGui.QDoubleValidator(0, 1, 8)
+        self.input_widget.setValidator(validator)
+        self.input_widget_alt.setValidator(validator)
 
         # Assign default value
         self.input_widget.setText("0")
@@ -37,11 +40,15 @@ class InputEntryTuple(InputEntryBase):
         self.main_layout.addWidget(self.input_widget_alt)
 
     def Get(self):
-        #print(type(f"{self.input_widget.text()},{self.input_widget_alt.text()}"))
-        #print("heh")
-        #print(self.input_widget.text(), self.input_widget_alt.text())
-        #print(type(self.input_widget.text(), self.input_widget_alt.text()))
-        return self.input_widget.text(), self.input_widget_alt.text()
+        text_x = self.input_widget.text()
+        text_y = self.input_widget_alt.text()
+
+        if text_x == "":
+            text_x = 0
+        if text_y == "":
+            text_y = 0
+
+        return [float(text_x), float(text_y)]
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle

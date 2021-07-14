@@ -3,7 +3,7 @@ from Editor.Interface.Primitives.input_entry_text import InputEntryText
 from Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
 from Editor.Interface.Primitives.input_entry_bool import InputEntryBool
 from Editor.Interface.Primitives.input_entry_color import InputEntryColor
-from Editor.Interface.Primitives.input_entry_tuple import InputEntryTuple
+from Editor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
 from Editor.Interface.Primitives.input_entry_int import InputEntryInt
 from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
 from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
@@ -224,7 +224,7 @@ class DetailsPanel(QtWidgets.QWidget):
              return InputEntryText(self.settings, self.DetailEntryUpdated)
         elif data_type == "paragraph":
             return InputEntryParagraph(self.settings, self.DetailEntryUpdated)
-        elif data_type == "tuple":
+        elif data_type == "vector2":
             return InputEntryTuple(self.settings, self.DetailEntryUpdated)
         elif data_type == "bool":
             return InputEntryBool(self.settings, self.DetailEntryUpdated)

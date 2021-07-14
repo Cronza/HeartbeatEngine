@@ -83,12 +83,6 @@ class ActionManager:
                 return None
 
             return transition
-
-            #if 'speed' in transition_data:
-            #    #return transition(self, self.scene, renderable, transition_data['speed'])
-            #else:
-            #    print("Transition Speed not specified - Resorting to default")
-            #    return transition(self, self.scene, renderable)
         else:
             print('No transition type specified - Unable to process transition')
 

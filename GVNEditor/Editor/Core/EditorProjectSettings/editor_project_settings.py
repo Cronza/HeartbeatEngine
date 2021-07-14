@@ -43,16 +43,13 @@ class EditorProjectSettings(EditorBase):
         # Just in case the user has made any changes to the settings, save them
         self.editor_ui.UpdateProjectSettingsData()
 
-        # *** PRE-EXPORT DATA ADJUSTMENTS ***
-        self.project_settings["Window"]
-
         # Write the data out
         self.logger.Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 self.project_settings,
                 self.file_path,
-                "# Type: Project_Settings\n" +
+                f"# Type: {FileType.Project_Settings.name}\n" +
                 f"# {self.settings.editor_data['EditorSettings']['version_string']}"
             )
             self.logger.Log("File Exported!", 2)

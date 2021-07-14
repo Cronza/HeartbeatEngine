@@ -303,19 +303,19 @@ class create_text(Action):
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = self.scene.settings.project_settings[Text]['z_order']
+            self.action_data['z_order'] = self.scene.settings.project_settings["Text"]['z_order']
 
         if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = self.scene.settings.project_settings[Text]['center_align']
+            self.action_data['center_align'] = self.scene.settings.project_settings["Text"]['center_align']
 
         if 'font' not in self.action_data:
-            self.action_data['font'] = self.scene.settings.project_settings[Text]['font']
+            self.action_data['font'] = self.scene.settings.project_settings["Text"]['font']
 
         if 'text_size' not in self.action_data:
-            self.action_data['text_size'] = self.scene.settings.project_settings[Text]['size']
+            self.action_data['text_size'] = self.scene.settings.project_settings["Text"]['size']
 
         if 'text_color' not in self.action_data:
-            self.action_data['text_color'] = self.scene.settings.project_settings[Text]['color']
+            self.action_data['text_color'] = self.scene.settings.project_settings["Text"]['color']
 
         new_text_renderable = TextRenderable(
             self.scene,

@@ -33,8 +33,6 @@ class EditorDialogue(EditorBase):
             "Main",
             "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
-
-        self.Export()
         self.logger.Log("Editor initialized")
 
     def UpdateActiveEntry(self):
@@ -134,7 +132,7 @@ class EditorDialogue(EditorBase):
             Writer.WriteFile(
                 data_to_export,
                 self.file_path,
-                "# Type: Dialogue\n" +
+                f"# Type: {FileType.Dialogue.name}\n" +
                 f"# {self.settings.editor_data['EditorSettings']['version_string']}"
             )
             self.logger.Log("File Exported!", 2)

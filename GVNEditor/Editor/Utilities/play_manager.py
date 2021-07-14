@@ -12,7 +12,9 @@ class PlayManager:
         logger.Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing
-            result = subprocess.Popen("GVNEngine/venv/Scripts/python GVNEngine/gvn_engine.py", stdout=True, stderr=True)
+            print("Project Dir")
+            print(project_path)
+            result = subprocess.Popen([f"GVNEngine/venv/Scripts/python", "GVNEngine/gvn_engine.py", project_path], stdout=True, stderr=True)
             logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 

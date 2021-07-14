@@ -1,16 +1,17 @@
 # Project Configuration
 
 Game:
-  title: 'Project Name'
-  author: 'Project Author'
-  company: 'Company'
-  starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
+  title: 'To Infinity'
+  author: 'Garrett Fredley'
+  company: 'Garrett Fredley'
+  #starting_scene: 'Content/Scenes/Test_Main_Menu.yaml'
+  starting_scene: 'Content/Scenes/Test_Editor_Generated_Dialogue_Scene_01.yaml'
 
 Window:
   resolution: 0
   resolution_options:
-    - [1280, 720]
-    - [1920, 1080]
+  - [1280, 720]
+  - [1920, 1080]
 
 # Feature Configurations - Defaults
 

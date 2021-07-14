@@ -4,7 +4,7 @@ from Editor.Interface.Primitives.input_entry_text import InputEntryText
 from Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
 from Editor.Interface.Primitives.input_entry_bool import InputEntryBool
 from Editor.Interface.Primitives.input_entry_color import InputEntryColor
-from Editor.Interface.Primitives.input_entry_tuple import InputEntryTuple
+from Editor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
 from Editor.Interface.Primitives.input_entry_int import InputEntryInt
 from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
 from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
@@ -177,7 +177,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
             return InputEntryBool(self.core.settings, None)
         elif data_type == ParameterType.Int:
             return InputEntryInt(self.core.settings, None)
-        elif data_type == ParameterType.Tuple:
+        elif data_type == ParameterType.Vector2:
             return InputEntryTuple(self.core.settings, None)
         elif data_type == ParameterType.Paragraph:
             return InputEntryParagraph(self.core.settings, None)
