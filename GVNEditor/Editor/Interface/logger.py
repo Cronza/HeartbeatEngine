@@ -16,12 +16,6 @@ class LoggerUI(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(4, 2, 4, 2)
         self.main_layout.setSpacing(0)
 
-        # Header
-        self.logger_title = QtWidgets.QLabel(self)
-        self.logger_title.setFont(self.l_core.settings.header_1_font)
-        self.logger_title.setStyleSheet(self.l_core.settings.header_1_color)
-        self.logger_title.setText("Logger")
-
         # Toolbar
         self.logger_toolbar = QtWidgets.QFrame(self)
         self.logger_toolbar.setAutoFillBackground(False)
@@ -58,13 +52,12 @@ class LoggerUI(QtWidgets.QWidget):
         toolbar_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.logger_toolbar_layout.addItem(toolbar_spacer)
 
-        #Logger data list
+        # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
         self.log_list.setFont(self.l_core.settings.paragraph_font)
         self.log_list.setStyleSheet(self.l_core.settings.paragraph_color)
         self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
-        self.main_layout.addWidget(self.logger_title)
         self.main_layout.addWidget(self.logger_toolbar)
         self.main_layout.addWidget(self.log_list)

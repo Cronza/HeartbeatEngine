@@ -28,6 +28,8 @@ class GVNEditor:
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
+        self.outliner = self.e_ui.outliner
+
         self.active_editor = None
 
         #@TODO: REMOVE EVENTUALLY
@@ -296,7 +298,11 @@ class GVNEditor:
                 if import_file:
                     self.active_editor.Import()
 
-                self.e_ui.AddTab(self.active_editor.GetUI(), os.path.basename(target_file_path))
+                self.e_ui.AddTab(
+                    self.active_editor.GetUI(),
+                    os.path.basename(target_file_path),
+                    self.e_ui.main_tab_editor
+                )
         else:
             QtWidgets.QMessageBox.about(
                 self.e_ui.central_widget,
@@ -353,10 +359,13 @@ class GVNEditor:
             target = self.e_ui.main_resize_container.widget(0)
             target.deleteLater()
 
-            self.e_ui.CreateTabEditor()
+            self.e_ui.CreateMainTabContainer()
 
         # Refresh U.I text using any active translations
         self.e_ui.retranslateUi(self.main_window)
+
+        # Update the outliner with the new project root
+        self.outliner.UpdateRoot(self.settings.user_project_dir)
 
     def ValidateNewFileLocation(self, file_path) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """

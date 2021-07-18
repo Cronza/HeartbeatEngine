@@ -72,4 +72,9 @@ class Logger:
         self.log_ui.log_list.addItem(new_entry)
 
     def ClearLog(self):
+        """ Deletes all log entries """
         self.log_ui.log_list.clear()
+
+    def GetUI(self):
+        """ Returns a reference to the logger U.I """
+        return self.log_ui

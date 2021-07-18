@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from Editor.Core.logger import Logger
+from Editor.Core.outliner import Outliner
 
 
 class GVNEditorUI:
@@ -30,8 +31,9 @@ class GVNEditorUI:
         # Initialize the Menu Bar
         self.CreateMenuBar(MainWindow)
 
-        # Initialize the Logger
+        # Initialize various utility windows
         self.logger = Logger(self.settings)
+        self.outliner = Outliner(self.settings)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
@@ -40,7 +42,9 @@ class GVNEditorUI:
         # ****** Add everything to the interface ******
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
         self.CreateGettingStartedDisplay()
-        self.main_resize_container.addWidget(self.logger.log_ui)
+        self.CreateBottomTabContainer()
+        self.AddTab(self.logger.GetUI(), "Logger", self.bottom_tab_editor)
+        self.AddTab(self.outliner.GetUI(), "Outliner", self.bottom_tab_editor)
 
         # Adjust the main editor container so it takes up as much space as possible
         self.main_resize_container.setStretchFactor(0, 10)
@@ -139,7 +143,7 @@ class GVNEditorUI:
         self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
         self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
 
-    def CreateTabEditor(self):
+    def CreateMainTabContainer(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """
 
         self.main_editor_container = QtWidgets.QWidget()
@@ -150,7 +154,7 @@ class GVNEditorUI:
         self.main_tab_editor.setFont(self.settings.button_font)
         self.main_tab_editor.setStyleSheet(self.settings.button_color)
         self.main_tab_editor.setTabsClosable(True)
-        self.main_tab_editor.tabCloseRequested.connect(self.RemoveTab)
+        self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
 
         self.main_editor_layout.addWidget(self.main_tab_editor)
         self.main_resize_container.insertWidget(0, self.main_editor_container)
@@ -158,6 +162,17 @@ class GVNEditorUI:
         # QSplitter's use a more verbose method of auto-scaling it's children. We need to ensure that it's going to
         # scale our tab editor accordingly, so set it to take priority here
         self.main_resize_container.setStretchFactor(0, 1)
+
+    def CreateBottomTabContainer(self):
+        """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
+
+        self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
+        self.bottom_tab_editor.setFont(self.settings.button_font)
+
+        self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
+
+        # QSplitter's use a more verbose method of auto-scaling it's children. We need to ensure that it's going to
+        # scale our tab editor accordingly, so set it to take priority here
 
     def CreateGettingStartedDisplay(self):
         """ Creates some temporary UI elements that inform the user how to prepare the editor """
@@ -184,16 +199,16 @@ class GVNEditorUI:
 
         self.main_resize_container.addWidget(self.getting_started_container)
 
-    def AddTab(self, widget, file_path):
-        """ Adds a tab to the tab editor, setting the tab widget to the provided widget before selecting that tab """
+    def AddTab(self, widget, tab_name, target_tab_widget):
+        """ Adds a tab to the given tab widget before selecting that new tab """
 
-        tab_index = self.main_tab_editor.addTab(widget, file_path)
-        self.main_tab_editor.setCurrentIndex(tab_index)
+        tab_index = target_tab_widget.addTab(widget, tab_name)
+        target_tab_widget.setCurrentIndex(tab_index)
 
-    def RemoveTab(self, index):
-        """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg """
+    def RemoveEditorTab(self, index):
+        """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg) """
         #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
-        self.logger.Log("Shutting down editor...")
+        self.logger.Log("Closing editor...")
 
         editor_widget = self.main_tab_editor.widget(index)
         del editor_widget
