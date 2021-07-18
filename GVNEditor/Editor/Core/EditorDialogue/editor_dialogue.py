@@ -26,7 +26,7 @@ class EditorDialogue(EditorBase):
     def __init__(self, settings, logger, file_path):
         super().__init__(settings, logger, file_path)
 
-        self.file_type = FileType.Dialogue
+        self.file_type = FileType.Scene_Dialogue
 
         self.editor_ui = EditorDialogueUI(self)
         self.editor_ui.branches.CreateBranch(
@@ -132,7 +132,7 @@ class EditorDialogue(EditorBase):
             Writer.WriteFile(
                 data_to_export,
                 self.file_path,
-                f"# Type: {FileType.Dialogue.name}\n" +
+                f"# Type: {FileType.Scene_Dialogue.name}\n" +
                 f"# {self.settings.editor_data['EditorSettings']['version_string']}"
             )
             self.logger.Log("File Exported!", 2)

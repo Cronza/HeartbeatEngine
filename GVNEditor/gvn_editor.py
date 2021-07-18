@@ -277,10 +277,9 @@ class GVNEditor:
         if not self.CheckTabLimit():
 
             editor_classes = {
-                FileType.Dialogue: EditorDialogue,
-                FileType.Scene_Dialogue: EditorSceneDialogue,
-                #FileType.Scene_Dialogue: EditorScenePointAndClick,
-                #FileType.Scene_Point_And_Click: EditorCharacter,
+                FileType.Scene_Dialogue: EditorDialogue,
+                #FileType.Scene_Point_And_Click: EditorScenePointAndClick,
+                #FileType.Character: EditorCharacter,
                 FileType.Project_Settings: EditorProjectSettings
              }
 

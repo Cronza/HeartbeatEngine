@@ -25,9 +25,9 @@ class NewFileMenu(BasePopupMenu):
         FileOption(
             settings,
             icon,
-            FileType.Dialogue,
-            "Dialogue",
-            "A file containing a sequence of dialogue between characters. These files may contain additional branches",
+            FileType.Scene_Dialogue,
+            "Scene (Dialogue)",
+            "A scene containing a sequence of dialogue between characters. These files may contain additional branches",
             self.options_list
         )
         FileOption(
@@ -35,15 +35,7 @@ class NewFileMenu(BasePopupMenu):
             icon,
             FileType.Scene_Point_And_Click,
             "Scene (Point & Click)",
-            "A file representing a scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
-            self.options_list
-        )
-        FileOption(
-            settings,
-            icon,
-            FileType.Scene_Dialogue,
-            "Scene (Dialogue)",
-            "A simple file representing the scene where dialogue takes place",
+            "A scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
             self.options_list
         )
         FileOption(
