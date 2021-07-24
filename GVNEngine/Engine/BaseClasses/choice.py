@@ -1,10 +1,3 @@
-import pygame
-
-from Engine.Utilities.data_classes import State
-from Engine.BaseClasses.interactable import Interactable
-from Engine.BaseClasses.renderable import Renderable
-from Engine.BaseClasses.renderable_sprite import SpriteRenderable
-from Engine.BaseClasses.renderable_text import TextRenderable
 from Engine.BaseClasses.renderable_container import Container
 
 class Choice(Container):

@@ -2,6 +2,7 @@ from Engine.BaseClasses.scene import Scene
 from Engine.BaseClasses.scene_pointandclick import PointAndClickScene
 from Engine.BaseClasses.scene_dialogue import DialogueScene
 from Engine.Utilities.yaml_reader import Reader
+from Engine.Utilities.DataTypes.file_types import FileType
 
 class SceneManager():
     def __init__(self, window, pygame_lib, settings):
@@ -17,9 +18,8 @@ class SceneManager():
         self.pause_menu_data = None  # Menu data is stored in the manager, but the menu is owned by a scene
 
         self.scene_types = {
-            'Dialogue': DialogueScene,
-            'PointAndClick': PointAndClickScene,
-            'Base': Scene
+            FileType.Scene_Dialogue: DialogueScene,
+            FileType.Scene_Point_And_Click: PointAndClickScene
         }
 
         #@TODO: Review starting scene load implementation
@@ -28,9 +28,9 @@ class SceneManager():
         scene_data = Reader.ReadAll(self.settings.ConvertPartialToAbsolutePath(starting_scene_partial_path))
 
         if 'type' in scene_data:
-            self.LoadScene(starting_scene_partial_path, scene_data['type'])
+            self.LoadScene(starting_scene_partial_path, FileType[scene_data['type']])
         else:
-            print("'type' was not specified in the starting file .yaml. Unable to initialize first scene")
+            assert "'type' was not specified in the starting file .yaml. Unable to initialize first scene"
 
         # Read in the yaml data for the pause menu
         #@TODO: Re-enable after review

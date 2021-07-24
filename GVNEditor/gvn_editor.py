@@ -12,8 +12,6 @@ from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
-from Editor.Core.EditorSceneDialogue.editor_scene_dialogue import EditorSceneDialogue
-
 
 class GVNEditor:
     def __init__(self):

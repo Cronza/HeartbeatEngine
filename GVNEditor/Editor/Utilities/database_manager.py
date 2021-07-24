@@ -23,10 +23,8 @@ class DBManager:
                 action_list.append(converted_action)
 
             # Add the list of actions under the target branch
-            #@TODO: BECAUSE WE INSERT IT BACK IN A DICTIONARY, THE ORDER GET'S REARRANGED
             converted_dict[branch_name] = action_list
-        print("Post Convert")
-        print(converted_dict)
+
         return converted_dict
 
     def ConvertActionRequirementsToEngineFormat(self, editor_action_data, has_parent=None):

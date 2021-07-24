@@ -1,6 +1,6 @@
 import pygame
 
-from Engine.Utilities.data_classes import State
+from Engine.Utilities.DataTypes.input_states import State
 from Engine.BaseClasses.renderable_sprite import SpriteRenderable
 
 class Interactable(SpriteRenderable):

@@ -122,9 +122,11 @@ class EditorDialogue(EditorBase):
         self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
 
         data_to_export = self.GetAllDialogueData()
-
         db_manager = DBManager()
-        data_to_export = db_manager.ConvertDialogueFileToEngineFormat(data_to_export)
+        data_to_export = {
+            "type": FileType.Scene_Dialogue.name,
+            "dialogue": db_manager.ConvertDialogueFileToEngineFormat(data_to_export)
+        }
 
         # Write the data out
         self.logger.Log("Writing data to file...")
@@ -146,7 +148,7 @@ class EditorDialogue(EditorBase):
         file_data = Reader.ReadAll(self.file_path)
 
         db_manager = DBManager()
-        converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data, self.settings)
+        converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
 
         # The main branch is treated specially since we don't need to create it
         for branch_name, branch_data in converted_data.items():

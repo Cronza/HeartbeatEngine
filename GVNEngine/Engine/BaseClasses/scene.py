@@ -85,23 +85,8 @@ class Scene:
         self.Draw()
 
     def LoadSceneData(self):
-        """
-        Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc. We
-        can also use aliases in order to make specific action calls
-        """
-        # TODO: Create an aliases file so users can write their own
-
-        # 'background' alias for loading the background sprite
-        if 'background' in self.scene_data:
-            bg_path = self.scene_data['background']
-            print(f"Background specified -  Loading: {bg_path}")
-
-            action_data = {
-                'action': 'create_background',
-                'sprite': bg_path
-            }
-
-            self.a_manager.PerformAction(action_data, action_data['action'])
+        """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """
+        pass
 
     def CalculateScreenSizeMultiplier(self, old_resolution, new_resolution):
         """

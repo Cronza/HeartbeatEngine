@@ -1,6 +1,3 @@
-import pygame
-
-from Engine.Utilities.data_classes import State
 from Engine.BaseClasses.interactable import Interactable
 from Engine.BaseClasses.renderable_text import TextRenderable
 
