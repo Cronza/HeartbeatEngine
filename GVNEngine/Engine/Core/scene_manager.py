@@ -1,6 +1,5 @@
-from Engine.BaseClasses.scene import Scene
-from Engine.BaseClasses.scene_pointandclick import PointAndClickScene
-from Engine.BaseClasses.scene_dialogue import DialogueScene
+from Engine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
+from Engine.Core.BaseClasses.scene_dialogue import DialogueScene
 from Engine.Utilities.yaml_reader import Reader
 from Engine.Utilities.DataTypes.file_types import FileType
 

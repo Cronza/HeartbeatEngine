@@ -1,5 +1,5 @@
-from Engine.BaseClasses.scene import Scene
-from Engine.BaseClasses.interactable import Interactable
+from Engine.Core.BaseClasses.scene import Scene
+
 
 class PointAndClickScene(Scene):
     def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):

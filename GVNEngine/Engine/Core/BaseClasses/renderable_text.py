@@ -1,6 +1,5 @@
 import pygame
-import os
-from Engine.BaseClasses.renderable import Renderable
+from Engine.Core.BaseClasses.renderable import Renderable
 
 
 class TextRenderable(Renderable):

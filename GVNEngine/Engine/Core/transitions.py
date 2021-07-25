@@ -1,4 +1,4 @@
-from Engine.BaseClasses.transition import Transition
+from Engine.Core.BaseClasses.transition import Transition
 
 class fade_in(Transition):
     def __init__(self, scene, a_manager, renderable, speed=5):

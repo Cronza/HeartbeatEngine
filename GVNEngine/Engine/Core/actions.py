@@ -15,13 +15,13 @@ All actions can be designed to accept and use a variety of different parameters.
 provided actions
 """
 import Engine
-from Engine.BaseClasses.renderable_sprite import SpriteRenderable
-from Engine.BaseClasses.renderable_text import TextRenderable
-from Engine.BaseClasses.interactable import Interactable
-from Engine.BaseClasses.button import Button
-from Engine.BaseClasses.choice import Choice
-from Engine.BaseClasses.renderable_container import Container
-from Engine.BaseClasses.action import Action
+from Engine.Core.BaseClasses.renderable_sprite import SpriteRenderable
+from Engine.Core.BaseClasses.renderable_text import TextRenderable
+from Engine.Core.BaseClasses.interactable import Interactable
+from Engine.Core.BaseClasses.button import Button
+from Engine.Core.BaseClasses.choice import Choice
+from Engine.Core.BaseClasses.renderable_container import Container
+from Engine.Core.BaseClasses.action import Action
 
 class remove_renderable(Action):
     """ Based on a given key, remove the associated renderable from the renderable stack """
@@ -478,7 +478,7 @@ class dialogue(Action):
     def Start(self):
 
         # Dialogue-specific adjustments
-        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == Engine.Core.BaseClasses.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed"
         )
 
@@ -635,7 +635,7 @@ class character_dialogue(Action):
     def Start(self):
 
         # Dialogue-specific adjustments
-        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == Engine.Core.BaseClasses.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed"
         )
 
@@ -793,7 +793,7 @@ class create_character(Action):
     def Start(self):
 
         # Character-specific adjustments
-        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == Engine.Core.BaseClasses.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed")
         assert 'character' in self.action_data, print(
             f"No 'character' block assigned to {self}. This makes for an impossible action!")
@@ -946,7 +946,7 @@ class choose_branch(Action):
     def Start(self):
 
         # This action requires that the active scene is a dialogue scene. Assert if it is not
-        assert type(self.scene) == Engine.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == Engine.Core.BaseClasses.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed"
         )
 

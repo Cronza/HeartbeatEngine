@@ -1,8 +1,7 @@
 import inspect
 
-from Engine.Actions import actions
-from Engine.Actions import transitions
-from Engine.BaseClasses.transition import Transition
+from Engine.Core import actions, transitions
+
 
 class ActionManager:
     def __init__(self, scene, settings):

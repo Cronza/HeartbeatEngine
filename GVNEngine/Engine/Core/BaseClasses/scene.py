@@ -1,5 +1,5 @@
 from Engine.Utilities.yaml_reader import Reader
-from Engine.BaseClasses.renderable_group import RenderableGroup
+from Engine.Core.BaseClasses.renderable_group import RenderableGroup
 from Engine.Core.action_manager import ActionManager
 
 

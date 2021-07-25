@@ -1,9 +1,7 @@
-import os
 import argparse
 import pygame
-from pygame.locals import VIDEORESIZE
 from Engine.Core.scene_manager import SceneManager
-from Engine.Utilities.settings import Settings
+from Engine.Core.settings import Settings
 
 class GVNEngine:
     def __init__(self, project_path):

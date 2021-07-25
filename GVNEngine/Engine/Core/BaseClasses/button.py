@@ -1,5 +1,5 @@
-from Engine.BaseClasses.interactable import Interactable
-from Engine.BaseClasses.renderable_text import TextRenderable
+from Engine.Core.BaseClasses.interactable import Interactable
+from Engine.Core.BaseClasses.renderable_text import TextRenderable
 
 class Button(Interactable):
     """

@@ -1,5 +1,4 @@
-from Engine.BaseClasses.scene_pointandclick import PointAndClickScene
-from Engine.Utilities.yaml_reader import Reader
+from Engine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
 
 
 class DialogueScene(PointAndClickScene):

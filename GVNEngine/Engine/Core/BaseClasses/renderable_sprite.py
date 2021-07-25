@@ -1,7 +1,6 @@
 import pygame
 
-from Engine.Utilities.yaml_reader import Reader
-from Engine.BaseClasses.renderable import Renderable
+from Engine.Core.BaseClasses.renderable import Renderable
 
 class SpriteRenderable(Renderable):
     """

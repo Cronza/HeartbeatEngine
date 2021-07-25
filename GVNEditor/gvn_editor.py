@@ -4,7 +4,7 @@ import shutil
 import re
 from pathlib import Path
 from PyQt5 import QtWidgets
-from Editor.Utilities.settings import Settings
+from Editor.Core.settings import Settings
 from Editor.Utilities.DataTypes.file_types import FileType
 from Editor.Utilities.play_manager import PlayManager
 from Editor.Interface import gvn_editor as gvne
