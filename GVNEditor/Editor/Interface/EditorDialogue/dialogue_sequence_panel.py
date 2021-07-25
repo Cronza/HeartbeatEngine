@@ -142,8 +142,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
     def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False) -> DialogueEntry:
         """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
-        print("Adding new dialogue entry")
-
         # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
         new_entry_row = self.dialogue_table.rowCount()
         if specific_row is not None:
@@ -154,7 +152,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Create a new dialogue entry object, and add it to the sequence widget
         new_entry = DialogueEntry(
-            action_data,
+            copy.deepcopy(action_data),
             self.settings,
             self.ed_core.UpdateActiveEntry,
             self.RefreshCurrentRowSize
@@ -166,10 +164,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Since selecting the new row will cause the details panel to refresh, allow opting out in case
         # batch entry creation is happening
         if not skip_select:
-            print('DONT skip')
             self.dialogue_table.selectRow(new_entry_row)
-        else:
-            print("skip")
 
         # Resize the row to fit any contents it has
         self.dialogue_table.resizeRowToContents(new_entry_row)
@@ -188,7 +183,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         selection = self.GetSelectedEntry()
 
         if selection:
-            self.AddEntry(copy.deepcopy(selection.action_data))
+            self.AddEntry(selection.action_data)
 
     def MoveEntryUp(self):
         """ If an entry is selected, move it up one row """

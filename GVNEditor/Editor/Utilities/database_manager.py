@@ -1,11 +1,11 @@
-
+import copy
 
 class DBManager:
     """ A manager dedicated to actions that interface with the ActionDatabase """
 
     def ConvertDialogueFileToEngineFormat(self, action_data: dict):
         """
-        Given a full dict of dialogue file data in editor format(branches and all), convert it to the engine format
+        Given a full dict of dialogue file data in editor format (branches and all), convert it to the engine format
         Return the converted dict
         """
         converted_dict = {}
@@ -74,7 +74,7 @@ class DBManager:
                 for cat_name, cat_data in settings.action_database.items():
                     for option in cat_data["options"]:
                         if action_name in option['action_name']:
-                            database_entry = option
+                            database_entry = copy.deepcopy(option)
                             break
 
                     if database_entry:
