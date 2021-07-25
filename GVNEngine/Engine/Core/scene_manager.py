@@ -21,8 +21,10 @@ class SceneManager():
             FileType.Scene_Point_And_Click: PointAndClickScene
         }
 
-        #@TODO: Review starting scene load implementation
-        # Do a special read and load for the initial scene
+        # Load the starting scene defined in the project settings
+        if not self.settings.project_settings['Game']['starting_scene']:
+            raise ValueError("No starting scene was provided")
+
         starting_scene_partial_path = self.settings.project_settings['Game']['starting_scene']
         scene_data = Reader.ReadAll(self.settings.ConvertPartialToAbsolutePath(starting_scene_partial_path))
 
