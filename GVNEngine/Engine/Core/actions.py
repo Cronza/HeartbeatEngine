@@ -36,7 +36,7 @@ class remove_renderable(Action):
             else:
                 self.scene.renderables_group.Remove(self.action_data['key'])
                 self.scene.Draw()
-                self.complete = True
+                self.Complete()
         else:
             print("'remove_renderable' action Failed - Key not specified")
 
@@ -44,14 +44,14 @@ class remove_renderable(Action):
         if self.active_transition.complete is True:
             print("Transition Complete")
             self.scene.renderables_group.Remove(self.action_data['key'])
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class remove_container(Action):
     def Start(self):
@@ -82,7 +82,7 @@ class remove_container(Action):
 
                 self.scene.renderables_group.Remove(self.action_data['key'])
                 self.scene.Draw()
-                self.complete = True
+                self.Complete()
 
         else:
             print("'remove_renderable' action Failed - Key not specified")
@@ -91,14 +91,14 @@ class remove_container(Action):
         if self.active_transition.complete is True:
             print("Transition Complete")
             self.scene.renderables_group.Remove(self.action_data['key'])
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class create_dialogue_interface(Action):
     """
@@ -137,7 +137,7 @@ class create_dialogue_interface(Action):
         self.scene.renderables_group.Add(dialogue_frame)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
 #@TODO: Remove parameter 'if' checks in place of having the editor enforce defaults
 class create_background(Action):
@@ -173,7 +173,7 @@ class create_background(Action):
         self.scene.renderables_group.Add(new_sprite)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_sprite
 
@@ -226,21 +226,21 @@ class create_sprite(Action):
             self.active_transition.Start()
         else:
             self.scene.Draw()
-            self.complete = True
+            self.Complete()
 
         return new_sprite
 
     def Update(self):
         if self.active_transition.complete:
             print("Transition Complete")
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class create_interactable(Action):
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
@@ -273,7 +273,7 @@ class create_interactable(Action):
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_renderable
 
@@ -331,21 +331,20 @@ class create_text(Action):
             self.active_transition.Start()
         else:
             self.scene.Draw()
-            self.complete = True
+            self.Complete()
 
         return new_text_renderable
 
     def Update(self):
         if self.active_transition.complete is True:
-            print("Transition Complete")
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class create_button(Action):
     """ Creates a button interactable, and adds it to the renderable stack. Returns a 'Button' """
@@ -403,7 +402,7 @@ class create_button(Action):
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_renderable
 
@@ -428,7 +427,7 @@ class create_container(Action):
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_renderable
 
@@ -445,7 +444,7 @@ class load_scene(Action):
         else:
             print('Load Scene Failed - No scene file provided, or a scene type was not provided')
 
-        self.complete = True
+        self.Complete()
 
 class quit_game(Action):
     """ Immediately closes the game """
@@ -617,14 +616,14 @@ class dialogue(Action):
     def Update(self):
         if self.active_transition.complete is True:
             print("Transition Complete")
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class character_dialogue(Action):
     """
@@ -774,14 +773,14 @@ class character_dialogue(Action):
     def Update(self):
         if self.active_transition.complete is True:
             print("Transition Complete")
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 class create_character(Action):
     """
@@ -840,21 +839,21 @@ class create_character(Action):
             self.active_transition.Start()
         else:
             self.scene.Draw()
-            self.complete = True
+            self.Complete()
 
         return new_sprite
 
     def Update(self):
         if self.active_transition.complete:
             print("Transition Complete")
-            self.complete = True
+            self.Complete()
         else:
             self.active_transition.Update()
 
     def Skip(self):
         if self.active_transition:
             self.active_transition.Skip()
-        self.complete = True
+        self.Complete()
 
 #@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
@@ -938,7 +937,7 @@ class choice(Action):
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_renderable
 
@@ -953,7 +952,7 @@ class choose_branch(Action):
         self.scene.SwitchDialogueBranch(self.action_data['branch'])
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
 class create_choice_button(Action):
     """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable'"""
@@ -976,7 +975,7 @@ class create_choice_button(Action):
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
-        self.complete = True
+        self.Complete()
 
         return new_renderable
 
@@ -1027,9 +1026,9 @@ class fade_scene_from_black(Action):
 
         if self.progress <= self.goal:
             print("Transition Complete")
-            self.complete = True
+            self.Complete()
 
     def Skip(self):
         self.renderable.GetSurface().set_alpha(self.goal)
         self.scene.Draw()
-        self.complete = True
+        self.Complete()

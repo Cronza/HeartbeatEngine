@@ -32,13 +32,16 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
+        print("Load")
         if len(self.dialogue_data[self.active_branch]) > self.dialogue_index:
             action_data = self.dialogue_data[self.active_branch][self.dialogue_index]
+            print(action_data)
             if "post_wait" in action_data:
                 if "wait_for_input" in action_data["post_wait"]:
                     self.a_manager.PerformAction(action_data, action_data["action"])
                     self.dialogue_index += 1
                 elif "wait_until_complete" in action_data["post_wait"]:
+                    print("Waiting until complete")
                     self.a_manager.PerformAction(action_data, action_data["action"], self.ActionComplete)
                 elif "no_wait" in action_data["post_wait"]:
                     self.a_manager.PerformAction(action_data, action_data["action"])
@@ -77,7 +80,8 @@ class DialogueScene(PointAndClickScene):
     #        self.character_data[char] = Reader.ReadAll(data)
 
     def ActionComplete(self):
-        """ When an action specifies 'wait', use this function as the completion delegate """
+        """ Moves the dialogue counter forward one, and loads the next action """
+        print("ACTION COMPELTE")
         self.dialogue_index += 1
         self.LoadAction()
 

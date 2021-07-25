@@ -90,7 +90,7 @@ Renderables:
           options:
             - "no_wait"
             - "wait_for_input"
-            - "wait_for_complete"
+            - "wait_until_complete"
           editable: True
           preview: True
     # Create Text
@@ -185,7 +185,7 @@ Renderables:
           options:
             - "no_wait"
             - "wait_for_input"
-            - "wait_for_complete"
+            - "wait_until_complete"
           editable: True
           preview: True
     # Create Background

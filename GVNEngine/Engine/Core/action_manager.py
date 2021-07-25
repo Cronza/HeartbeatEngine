@@ -15,14 +15,17 @@ class ActionManager:
         if self.active_actions:
             # We can't edit the dict size while iterating, so if any actions are complete, store them and delete them
             # afterwards
-            for action in self.active_actions:
+            for action, null_val in self.active_actions.items():
                 if action.complete is True:
                     pending_completion.append(action)
                 else:
                     action.Update()
             if pending_completion:
                 for action in pending_completion:
-                    # Use the complete delegate if its available
+                    # We defer using completion delegates to here since, if actions could execute them, it might
+                    # cause them to close prematurely. It's also difficult to have oversight on what actions might
+                    # do, and what completion delegates may do. To avoid any confusion, always run the delegates just
+                    # as the action is closing
                     if action.complete_delegate:
                         action.complete_delegate()
                     del self.active_actions[action]
