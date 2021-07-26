@@ -79,7 +79,6 @@ class DialogueScene(PointAndClickScene):
 
     def ActionComplete(self):
         """ Moves the dialogue counter forward one, and loads the next action """
-        print("ACTION COMPELTE")
         self.dialogue_index += 1
         self.LoadAction()
 
