@@ -234,10 +234,12 @@ class DetailsPanel(QtWidgets.QWidget):
             return InputEntryInt(self.settings, self.DetailEntryUpdated)
         elif data_type == "file":
             return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated)
+        elif data_type == "file_data":
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Data"], self.DetailEntryUpdated)
         elif data_type == "file_image":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Image'], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Image"], self.DetailEntryUpdated)
         elif data_type == "file_font":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types['Font'], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Font"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
             return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
         elif data_type == "container":

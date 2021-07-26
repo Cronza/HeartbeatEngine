@@ -61,9 +61,10 @@ class Scene:
                     if child.visible:
                         self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
-    def SwitchScene(self, scene_file, scene_type):
+    def SwitchScene(self, scene_file):
+        """ Clears all renderables, and requests a scene change from the scene_manager"""
         self.renderables_group.Clear()
-        self.scene_manager.LoadScene(scene_file, scene_type)
+        self.scene_manager.LoadScene(scene_file)
 
     def Resize(self):
         """ Determines a new sprite size based on the difference between the main resolution and the new resolution """

@@ -19,7 +19,7 @@ class ActionMenu(QtWidgets.QMenu):
             # Build the category object and assign it
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
-            cat_menu.setIcon(QtGui.QIcon(data['icon']))
+            cat_menu.setIcon(QtGui.QIcon(settings.editor_root + "/" + data["icon"]))
             cat_menu.setFont(settings.button_font)
             cat_menu.setStyleSheet(settings.button_color)
             self.addMenu(cat_menu)

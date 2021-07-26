@@ -22,35 +22,39 @@ class SceneManager():
         }
 
         # Load the starting scene defined in the project settings
-        if not self.settings.project_settings['Game']['starting_scene']:
-            raise ValueError("No starting scene was provided")
-
-        starting_scene_partial_path = self.settings.project_settings['Game']['starting_scene']
-        scene_data = Reader.ReadAll(self.settings.ConvertPartialToAbsolutePath(starting_scene_partial_path))
-
-        if 'type' in scene_data:
-            self.LoadScene(starting_scene_partial_path, FileType[scene_data['type']])
-        else:
-            assert "'type' was not specified in the starting file .yaml. Unable to initialize first scene"
+        if not self.settings.project_settings["Game"]["starting_scene"]:
+            raise ValueError("No starting scene was provided in the project settings")
+        self.LoadScene(self.settings.project_settings["Game"]["starting_scene"])
 
         # Read in the yaml data for the pause menu
         #@TODO: Re-enable after review
         #self.pause_menu_data = Reader.ReadAll(self.settings.project_dir + "/" + self.settings.project_settings['Pause Menu']['data_file'])
         #self.pause_menu_data['action'] = "create_container"
 
-    def LoadScene(self, scene_file, scene_type):
-        print(" *** LOADING NEW SCENE ***")
-        if scene_type in self.scene_types:
-            del self.active_scene
-            self.active_scene = self.scene_types[scene_type](
-                scene_file,
-                self.window,
-                self.pygame_lib,
-                self.settings,
-                self
-            )
+    def LoadScene(self, scene_file):
+        """ Given a path to a scene file, check it's type, and load the corresponding scene object """
+        # We need to read the file to find it's type. This is denoted by the 'type' value somewhere near the top of the
+        # file. We can't guarentee it's position since the metadata may grow one day, and the line number would shift.
+        scene_type = None
+        with open(self.settings.ConvertPartialToAbsolutePath(scene_file), "r") as f:
+            for line in f:
+                if line.startswith("type:"):
+                    scene_type = FileType[line.replace("type: ", "").strip()]
+
+        if scene_type is not None:
+            if scene_type in self.scene_types:
+                del self.active_scene
+                self.active_scene = self.scene_types[scene_type](
+                    scene_file,
+                    self.window,
+                    self.pygame_lib,
+                    self.settings,
+                    self
+                )
+            else:
+                raise ValueError(f"Failed to Load Scene - Specified scene type does not exist: {scene_type}")
         else:
-            print(f"Failed to Load Scene - Specified scene type does not exist: {scene_type}")
+            raise ValueError(f"No scene type specified in file '{scene_file}'")
 
     def ResizeScene(self):
         """ Inform the scene object o resize to support a resolution change """

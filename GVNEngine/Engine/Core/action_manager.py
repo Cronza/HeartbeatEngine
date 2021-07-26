@@ -80,13 +80,13 @@ class ActionManager:
 
             # The given transition name was not found, thus not populating 'transition' properly
             if transition is None:
-                print("The provided transition name is invalid. Please review the available transitions, or add a new action "
-                      "object for the one provided")
+                raise ValueError("The provided transition name is invalid. Please review the available transitions, "
+                                 "or add a new action object for the one provided")
                 return None
 
             return transition
         else:
-            print('No transition type specified - Unable to process transition')
+            raise ValueError("No transition type specified - Unable to process transition")
 
     def CreateTransition(self, transition_data, renderable):
         transition = self.GetTransition(transition_data)

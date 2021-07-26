@@ -145,7 +145,6 @@ class GVNEditorUI:
 
     def CreateMainTabContainer(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """
-
         self.main_editor_container = QtWidgets.QWidget()
         self.main_editor_layout = QtWidgets.QVBoxLayout(self.main_editor_container)
         self.main_editor_layout.setContentsMargins(2,2,2,2)
@@ -155,6 +154,7 @@ class GVNEditorUI:
         self.main_tab_editor.setStyleSheet(self.settings.button_color)
         self.main_tab_editor.setTabsClosable(True)
         self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
+        self.main_tab_editor.currentChanged.connect(self.ChangeTab)
 
         self.main_editor_layout.addWidget(self.main_tab_editor)
         self.main_resize_container.insertWidget(0, self.main_editor_container)
@@ -163,20 +163,18 @@ class GVNEditorUI:
         # scale our tab editor accordingly, so set it to take priority here
         self.main_resize_container.setStretchFactor(0, 1)
 
+    def ChangeTab(self, index):
+        """ Updates the active editor when the tab selection changes """
+        self.e_core.active_editor = self.main_tab_editor.widget(index).core
+
     def CreateBottomTabContainer(self):
         """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
-
         self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
         self.bottom_tab_editor.setFont(self.settings.button_font)
-
         self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
-
-        # QSplitter's use a more verbose method of auto-scaling it's children. We need to ensure that it's going to
-        # scale our tab editor accordingly, so set it to take priority here
 
     def CreateGettingStartedDisplay(self):
         """ Creates some temporary UI elements that inform the user how to prepare the editor """
-
         self.getting_started_container = QtWidgets.QWidget()
         self.getting_started_layout = QtWidgets.QVBoxLayout(self.getting_started_container)
 
@@ -201,7 +199,6 @@ class GVNEditorUI:
 
     def AddTab(self, widget, tab_name, target_tab_widget):
         """ Adds a tab to the given tab widget before selecting that new tab """
-
         tab_index = target_tab_widget.addTab(widget, tab_name)
         target_tab_widget.setCurrentIndex(tab_index)
 

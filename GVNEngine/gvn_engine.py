@@ -7,7 +7,7 @@ class GVNEngine:
     def __init__(self, project_path):
         #@TODO: What is the right way to handle this?
         if not project_path:
-            print("No project path provided - Unable to launch GVNEngine")
+            raise ValueError("No project path provided - Unable to launch GVNEngine")
             quit(1)
 
         # Build a settings object to house engine & project settings

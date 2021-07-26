@@ -98,7 +98,6 @@ class EditorDialogue(EditorBase):
 
             branch_name = branch.Get()[0]
             branch_data = branch.GetData()
-
             data_to_export[branch_name] = branch_data
 
         return data_to_export

@@ -12,9 +12,7 @@
 #          default: <contextual_type> (The initial value)
 #          editable: <bool> (Whether the param is editable in the editor)
 #          preview: <bool> (Whether the param is editable in the editor)
-#          global: (OPTIONAL) (A value in the project's Game.yaml file)
-#              category: <str> (The name of the category, IE. 'Sprite')
-#              global_parameter: <str> (The name of the parameter in the category, IE. 'center_align')
+#          global: (OPTIONAL) (Whether the param has a global setting available in the project settings)
 
 Renderables:
   icon: "Content/Icons/Renderable.png"
@@ -44,9 +42,8 @@ Renderables:
         - name: "center_align"
           type: "bool"
           value: True
-          global:
-            category: "Sprite"
-            global_parameter: "center_align"
+          global: 
+            active: True
           editable: True
           preview: True
 
@@ -59,9 +56,8 @@ Renderables:
         - name: "z_order"
           type: "int"
           value: 0
-          global:
-            category: "Sprite"
-            global_parameter: "z_order"
+          global: 
+            active: True
           editable: True
           preview: True
 
@@ -112,9 +108,8 @@ Renderables:
         - name: "center_align"
           type: "bool"
           value: True
-          global:
-            category: "Text"
-            global_parameter: "center_align"
+          global: 
+            active: True
           editable: True
           preview: False
 
@@ -127,36 +122,32 @@ Renderables:
         - name: "text_size"
           type: "int"
           value: 24
-          global:
-            category: "Text"
-            global_parameter: "size"
+          global: 
+            active: True
           editable: True
           preview: True
 
         - name: "text_color"
           type: "color"
           value: [255, 255, 255]
-          global:
-            category: "Text"
-            global_parameter: "color"
+          global: 
+            active: True
           editable: True
           preview: True
 
         - name: "font"
           type: "file_font"
           value: "None"
-          global:
-            category: "Text"
-            global_parameter: "font"
+          global: 
+            active: True
           editable: True
           preview: False
 
         - name: "z_order"
           type: "int"
           value: 0
-          global:
-            category: "Text"
-            global_parameter: "z_order"
+          global: 
+            active: True
           editable: True
           preview: True
 
@@ -212,16 +203,111 @@ Renderables:
 
         - name: "z_order"
           type: "int"
-          value: -9999 #Replace with a reference to the global setting
-          global:
-            category: "Sprite"
-            global_parameter: "background_z_order"
+          value: -9999
+          global: 
+            active: True
           editable: False
           preview: False
+
+        - name: "post_wait"
+          type: "dropdown"
+          value: "no_wait"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
+    # Remove Renderable
+    - display_name: "Remove Renderable"
+      action_name: "remove_renderable"
+      requirements:
+        - name: "key"
+          type: "str"
+          value: ""
+          editable: True
+          preview: True
+
+        - name: "transition"
+          type: "container"
+          preview: True
+          children:
+            - name: "type"
+              type: "dropdown"
+              value: "None"
+              options:
+                - "None"
+                - "fade_out"
+              editable: True
+              preview: True
+
+            - name: "speed"
+              type: "int"
+              value: 500
+              editable: True
+              preview: True
+
+        - name: "post_wait"
+          type: "dropdown"
+          value: "no_wait"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
 
 Dialogue:
   icon: "Content/Icons/Dialogue.png"
   options:
+    # Create Dialogue Interface
+    - display_name: "Create Dialogue Interface"
+      action_name: "create_dialogue_interface"
+      requirements:
+        - name: "sprite"
+          type: "file_image"
+          value: "None"
+          global: 
+            active: True
+          editable: True
+          preview: True
+
+        - name: "position"
+          type: "vector2"
+          value: [0,0]
+          global: 
+            active: True
+          editable: True
+          preview: True
+
+        - name: "center_align"
+          type: "bool"
+          value: True
+          global: 
+            active: True
+          editable: True
+          preview: True
+
+        - name: "z_order"
+          type: "int"
+          value: 0
+          global: 
+            active: True
+          editable: True
+          preview: True
+        
+        - name: "post_wait"
+          type: "dropdown"
+          value: "no_wait"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
+        
+
+    # Dialogue
     - display_name: "Dialogue"
       action_name: "dialogue"
       requirements:
@@ -238,18 +324,16 @@ Dialogue:
             - name: "position"
               type: "vector2"
               value: [0,0]
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_text_position"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "center_align"
               type: "bool"
               value: True
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_center_align"
+              global: 
+                active: True
               editable: True
               preview: False
 
@@ -262,36 +346,32 @@ Dialogue:
             - name: "text_size"
               type: "int"
               value: 24
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_text_size"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "text_color"
               type: "color"
               value: [255, 255, 255]
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_text_color"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "font"
               type: "file_font"
               value: "None"
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_font"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "z_order"
               type: "int"
               value: 0
-              global:
-                category: "Dialogue"
-                global_parameter: "speaker_z_order"
+              global: 
+                active: True
               editable: True
               preview: False
 
@@ -325,20 +405,18 @@ Dialogue:
               preview: False
 
             - name: "position"
-              type: "tuple"
+              type: "vector2"
               value: [0,0]
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_text_position"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "center_align"
               type: "bool"
               value: True
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_center_align"
+              global: 
+                active: True
               editable: True
               preview: False
 
@@ -351,36 +429,32 @@ Dialogue:
             - name: "text_size"
               type: "int"
               value: 24
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_text_size"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "text_color"
               type: "color"
               value: [255, 255, 255]
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_text_color"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "font"
               type: "file_font"
               value: "None"
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_font"
+              global: 
+                active: True
               editable: True
               preview: False
 
             - name: "z_order"
               type: "int"
               value: 0
-              global:
-                category: "Dialogue"
-                global_parameter: "dialogue_z_order"
+              global: 
+                active: True
               editable: True
               preview: False
 
@@ -403,8 +477,55 @@ Dialogue:
                   editable: True
                   preview: False
 
-      #- display_name: "Choice"
-      #  action_name: "choice"
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_for_input"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
+
+Scene:
+  icon: "Content/Icons/Dialogue.png"
+  options:
+    # Load Scene
+    - display_name: "Load Scene"
+      action_name: "load_scene"
+      requirements:
+        - name: "scene_file"
+          type: "file_data"
+          value: ""
+          editable: True
+          preview: True
+    # Fade Scene From Black
+    - display_name: "Fade Scene From Black"
+      action_name: "fade_scene_from_black"
+      requirements:
+        - name: "z_order"
+          type: "int"
+          value: "9999"
+          global:
+            active: True
+          editable: True
+          preview: True
+        - name: "speed"
+          type: "int"
+          value: "150"
+          global:
+            active: True
+          editable: True
+          preview: True
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_until_complete"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
 
 #- Sound: ""
 #- Effect: ""

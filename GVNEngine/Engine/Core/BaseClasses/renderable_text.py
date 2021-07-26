@@ -14,16 +14,13 @@ class TextRenderable(Renderable):
     def __init__(self, scene, renderable_data):
         super().__init__(scene, renderable_data)
 
-        # YAML Parameters
-        #@TODO: Is it right that we concentate like this here?
-
         font = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data['text']
         text_size = self.renderable_data['text_size']
         text_color = self.renderable_data['text_color']
 
         self.font_obj = pygame.font.Font(font, text_size)
-        self.surface = self.font_obj.render(self.text, True, text_color) #@TODO: Change the editor to use vector tuple nstead of lift for color
+        self.surface = self.font_obj.render(self.text, True, text_color)
         self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
