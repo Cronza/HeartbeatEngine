@@ -1,5 +1,12 @@
 # GVNEngine
 ![ScreenShot](Images/GVNEngine_Banner.jpg?raw=true "GVNEngine Banner")
+
+[![License](https://img.shields.io/badge/license-MIT-green?label=engine-license&style=flat-square)](./GVNEngine/LICENSE.txt)
+[![License](https://img.shields.io/badge/license-GPLv2-blue?label=editor-license&style=flat-square)](./GVNEditor/LICENSE.txt)
+![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/GVNEngine?style=flat-square)
+[![Python Version](https://img.shields.io/badge/python-3.8-4B8BBE)](https://www.python.org/downloads/release/python-380/)
+[![Twitter Badge](https://img.shields.io/badge/Twitter-Profile-informational?style=flat&logo=twitter&logoColor=white&color=1CA2F1)](https://twitter.com/SomeCronzaGuy)
+
 <p align="center"><em>A Visual Novel / Dating Sim Game Engine Designed for Creative Developers</em></p>
 
 # What is the 'GVNEngine'?
