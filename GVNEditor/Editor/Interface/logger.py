@@ -11,23 +11,10 @@ class LoggerUI(QtWidgets.QWidget):
         font.setBold(True)
         font.setWeight(75)
 
-        # Main Container
-        #izePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        #sizePolicy.setHorizontalStretch(0)
-        #sizePolicy.setVerticalStretch(0)
-        #sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
-        #self.setSizePolicy(sizePolicy)
-
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(4, 2, 4, 2)
         self.main_layout.setSpacing(0)
-
-        # Header
-        self.logger_title = QtWidgets.QLabel(self)
-        self.logger_title.setFont(self.l_core.settings.header_1_font)
-        self.logger_title.setStyleSheet(self.l_core.settings.header_1_color)
-        self.logger_title.setText("Logger")
 
         # Toolbar
         self.logger_toolbar = QtWidgets.QFrame(self)
@@ -52,7 +39,11 @@ class LoggerUI(QtWidgets.QWidget):
         # Clear Log Button
         self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
         self.clear_log_button.setStyleSheet(button_style)
-        icon.addPixmap(QtGui.QPixmap("Content/Icons/Trash.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(
+            QtGui.QPixmap(self.l_core.settings.ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
+            QtGui.QIcon.Normal,
+            QtGui.QIcon.Off
+        )
         self.clear_log_button.setIcon(icon)
         self.clear_log_button.clicked.connect(self.l_core.ClearLog)
 
@@ -61,12 +52,12 @@ class LoggerUI(QtWidgets.QWidget):
         toolbar_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.logger_toolbar_layout.addItem(toolbar_spacer)
 
-        #Logger data list
+        # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
         self.log_list.setFont(self.l_core.settings.paragraph_font)
         self.log_list.setStyleSheet(self.l_core.settings.paragraph_color)
+        self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
-        self.main_layout.addWidget(self.logger_title)
         self.main_layout.addWidget(self.logger_toolbar)
         self.main_layout.addWidget(self.log_list)

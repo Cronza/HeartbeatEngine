@@ -1,8 +1,7 @@
 import inspect
 
-from Engine.Actions import actions
-from Engine.Actions import transitions
-from Engine.BaseClasses.transition import Transition
+from Engine.Core import actions, transitions
+
 
 class ActionManager:
     def __init__(self, scene, settings):
@@ -16,14 +15,17 @@ class ActionManager:
         if self.active_actions:
             # We can't edit the dict size while iterating, so if any actions are complete, store them and delete them
             # afterwards
-            for action in self.active_actions:
+            for action, null_val in self.active_actions.items():
                 if action.complete is True:
                     pending_completion.append(action)
                 else:
                     action.Update()
             if pending_completion:
                 for action in pending_completion:
-                    # Use the complete delegate if its available
+                    # We defer using completion delegates to here since, if actions could execute them, it might
+                    # cause them to close prematurely. It's also difficult to have oversight on what actions might
+                    # do, and what completion delegates may do. To avoid any confusion, always run the delegates just
+                    # as the action is closing
                     if action.complete_delegate:
                         action.complete_delegate()
                     del self.active_actions[action]
@@ -67,35 +69,29 @@ class ActionManager:
         """
         Returns the object associated with the provided transition text
         """
-        if 'transition_type' in transition_data:
+        if 'type' in transition_data:
             transition = None
 
             available_transitions = inspect.getmembers(transitions, inspect.isclass)
             for transition, t_object in available_transitions:
-                if transition_data['transition_type'] == transition:
+                if transition_data['type'] == transition:
                     transition = t_object
                     break
 
             # The given transition name was not found, thus not populating 'transition' properly
             if transition is None:
-                print("The provided transition name is invalid. Please review the available transitions, or add a new action "
-                      "object for the one provided")
+                raise ValueError("The provided transition name is invalid. Please review the available transitions, "
+                                 "or add a new action object for the one provided")
                 return None
 
             return transition
-
-            #if 'transition_speed' in transition_data:
-            #    #return transition(self, self.scene, renderable, transition_data['transition_speed'])
-            #else:
-            #    print("Transition Speed not specified - Resorting to default")
-            #    return transition(self, self.scene, renderable)
         else:
-            print('No transition type specified - Unable to process transition')
+            raise ValueError("No transition type specified - Unable to process transition")
 
     def CreateTransition(self, transition_data, renderable):
         transition = self.GetTransition(transition_data)
 
-        if 'transition_speed' in transition_data:
-            return transition(self.scene, self, renderable, transition_data['transition_speed'])
+        if 'speed' in transition_data:
+            return transition(self.scene, self, renderable, transition_data['speed'])
         else:
             return transition(self.scene, self, renderable)

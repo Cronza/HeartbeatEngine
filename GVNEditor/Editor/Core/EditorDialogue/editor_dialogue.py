@@ -14,150 +14,149 @@
     You should have received a copy of the GNU General Public License
     along with GVNEditor.  If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
+from Editor.Core.BaseClasses.base_editor import EditorBase
 from Editor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
-from Editor.Interface.EditorDialogue.dialogue_entry import DialogueEntry
-from PyQt5 import QtWidgets
+from Editor.Utilities.DataTypes.file_types import FileType
+from Editor.Utilities.yaml_manager import Writer
+from Editor.Utilities.yaml_manager import Reader
+from Editor.Utilities.database_manager import DBManager
 
-class EditorDialogue():
-    def __init__(self, settings, logger):
-        self.settings = settings
-        self.logger = logger
 
-        self.logger.Log("Initializing Dialogue Editor...")
+class EditorDialogue(EditorBase):
+    def __init__(self, settings, logger, file_path):
+        super().__init__(settings, logger, file_path)
 
-        # Build the Dialogue Editor UI
-        self.ed_ui = EditorDialogueUI(self)
+        self.file_type = FileType.Scene_Dialogue
+
+        self.editor_ui = EditorDialogueUI(self)
+        self.editor_ui.branches.CreateBranch(
+            "Main",
+            "This is the default, main branch\nConsider this the root of your dialogue tree"
+        )
+        self.logger.Log("Editor initialized")
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
-        print("Changing active entry")
-
-        selection = self.GetSelectedEntry()
+        selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
         self.UpdateDetails(selection)
 
-    # ****** TOOLBAR BUTTON FUNCTIONS ******
-
-    def AddEntry(self, action_data: dict, specific_row: int = None) -> DialogueEntry:
-        """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
-        print("Adding new dialogue entry")
-
-        # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
-        new_entry_row = self.ed_ui.dialogue_sequence.rowCount()
-        if specific_row is not None:
-            new_entry_row = specific_row
-            self.ed_ui.dialogue_sequence.insertRow(new_entry_row)
-        else:
-            self.ed_ui.dialogue_sequence.insertRow(new_entry_row)
-
-        # Create a new dialogue entry object, and add it to the sequence widget
-        new_entry = DialogueEntry(action_data, self.settings, self.UpdateActiveEntry)
-
-        # Assign the entry widget to the row
-        self.ed_ui.dialogue_sequence.setCellWidget(new_entry_row, 0, new_entry)
-        self.ed_ui.dialogue_sequence.selectRow(new_entry_row)
-
-        # Resize the row to fit any contents it has
-        self.ed_ui.dialogue_sequence.resizeRowToContents(new_entry_row)
-
-        self.logger.Log(f"Adding new dialogue sequence entry")
-
-        return new_entry
-
-    def RemoveEntry(self):
-        """ If an entry is selected, delete it from the table """
-        selection = self.GetSelectedRow()
-
-        if selection is not None:
-            self.ed_ui.dialogue_sequence.removeRow(self.GetSelectedRow())
-
-
-    def CopyEntry(self):
-        """ If an entry is selected, clone it and add it to the sequence """
-        selection = self.GetSelectedEntry()
-
-        if selection:
-            self.AddEntry(selection.action_data)
-
-    def MoveEntryUp(self):
-        """ If an entry is selected, move it up one row """
-
-        if self.ed_ui.dialogue_sequence.rowCount():
-            selection = self.GetSelectedRow()
-
-            # Only allow moving up if we're not already at the top of the sequence
-            if selection == 0:
-                self.logger.Log("Warning: Can't move entry up as we're at the top of the sequence")
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.ed_ui.dialogue_sequence.cellWidget(selection, 0)
-
-                # Delete the origin row
-                self.ed_ui.dialogue_sequence.removeRow(selection)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection - 1
-                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.cache_data = taken_entry.cache_data
-                self.UpdateActiveEntry()
-
-    def MoveEntryDown(self):
-        """ If an entry is selected, move it down one row """
-
-        if self.ed_ui.dialogue_sequence.rowCount():
-            selection = self.GetSelectedRow()
-
-            # Only allow moving down if we're not already at the bottom of the sequence
-            if selection + 1 >= self.ed_ui.dialogue_sequence.rowCount():
-                self.logger.Log("Warning: Can't move entry down as we're at the bottom of the sequence")
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.ed_ui.dialogue_sequence.cellWidget(selection, 0)
-
-                # Delete the origin row
-                self.ed_ui.dialogue_sequence.removeRow(selection)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection + 1
-                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.cache_data = taken_entry.cache_data
-                self.UpdateActiveEntry()
-
     def UpdateDetails(self, selected_entry):
         """ Refreshes the details panel with the details from the selected dialogue entry """
         if selected_entry:
-            self.ed_ui.details.PopulateDetails(selected_entry)
+            self.editor_ui.details.PopulateDetails(selected_entry)
 
         # No entries left to select. Wipe remaining details
         else:
-            self.ed_ui.details.Clear()
+            self.editor_ui.details.Clear()
 
-    def GetSelectedEntry(self) -> DialogueEntry:
-        """ Returns the currently selected dialogue entry. If there isn't one, returns None """
-        selected_entry = self.ed_ui.dialogue_sequence.selectedIndexes()
+    # @TODO: How to support the initial switch when 'main' is created?
+    def SwitchBranches(self, cur_branch, new_branch):
+        """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
 
-        if selected_entry:
-            selected_row = selected_entry[0].row()
-            return self.ed_ui.dialogue_sequence.cellWidget(selected_row, 0)
-        else:
-            return None
+        # If there is no source branch, then there is nothing to store
+        if cur_branch:
+            self.UpdateBranchData(cur_branch)
+            self.editor_ui.dialogue_sequence.Clear()
 
-    def GetSelectedRow(self) -> int:
-        """ Returns the currently selected row. If there isn't one, returns None """
-        selected_row = self.ed_ui.dialogue_sequence.selectedIndexes()
+        # Load any entries in the new branch (if applicable)
+        if new_branch.branch_data:
+            for entry in new_branch.branch_data:
+                self.editor_ui.dialogue_sequence.AddEntry(entry, None, True)
 
-        if selected_row:
-            return selected_row[0].row()
-        else:
-            return None
+    def UpdateBranchData(self, cur_branch):
+        """ Updates the active branch with all active dialogue entries """
+        # Clear the contents of the current branch since we're forcefully updating whats stored
+        cur_branch.branch_data.clear()
+
+        # Store the data from each entry in the branch
+        num_of_entries = self.editor_ui.dialogue_sequence.dialogue_table.rowCount()
+        for entry_index in range(num_of_entries):
+
+            # Store the data held by the entry
+            dialogue_entry = self.editor_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
+            cur_branch.branch_data.append(dialogue_entry.action_data)
+
+    def GetAllDialogueData(self) -> dict:
+        """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
+        data_to_export = {}
+        branch_count = self.editor_ui.branches.branches_list.count()
+        for index in range(0, branch_count):
+            # Get the actual branch entry widget instead of the containing item widget
+            branch = self.editor_ui.branches.branches_list.itemWidget(self.editor_ui.branches.branches_list.item(index))
+
+            # Before we save, let's be double sure the current information in the details panel is cached properly
+            self.editor_ui.details.UpdateCache()
+
+            # If a branch is currently active, then it's likely to of not updated it's cached branch data (Only
+            # happens when the active branch is switched). To account for this, make sure the active branch is checked
+            # differently by scanning the current dialogue entries
+            if branch is self.editor_ui.branches.active_branch:
+                self.logger.Log("Scanning dialogue entries...")
+                self.UpdateBranchData(branch)
+
+            branch_name = branch.Get()[0]
+            branch_data = branch.GetData()
+            data_to_export[branch_name] = branch_data
+
+        return data_to_export
+
+    def Save(self):
+        super().Save()
+        self.logger.Log(f"Saving Dialogue data for: {self.file_path}")
+
+        data_to_export = self.GetAllDialogueData()
+
+        # Write the data out
+        self.logger.Log("Writing data to file...")
+        try:
+            Writer.WriteFile(data_to_export, self.file_path)
+            self.logger.Log("File Saved!", 2)
+        except:
+            self.logger.Log("Failed to Save!", 4)
+
+    def Export(self):
+        super().Export()
+        self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
+
+        data_to_export = self.GetAllDialogueData()
+        db_manager = DBManager()
+        data_to_export = {
+            "type": FileType.Scene_Dialogue.name,
+            "dialogue": db_manager.ConvertDialogueFileToEngineFormat(data_to_export)
+        }
+
+        # Write the data out
+        self.logger.Log("Writing data to file...")
+        try:
+            Writer.WriteFile(
+                data_to_export,
+                self.file_path,
+                f"# Type: {FileType.Scene_Dialogue.name}\n" +
+                f"# {self.settings.editor_data['EditorSettings']['version_string']}"
+            )
+            self.logger.Log("File Exported!", 2)
+        except:
+            self.logger.Log("Failed to Export!", 4)
+
+    def Import(self):
+        super().Import()
+        self.logger.Log(f"Importing Dialogue data for: {self.file_path}")
+
+        file_data = Reader.ReadAll(self.file_path)
+
+        db_manager = DBManager()
+        converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
+
+        # The main branch is treated specially since we don't need to create it
+        for branch_name, branch_data in converted_data.items():
+            if not branch_name == "Main":
+                self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
+
+            for action in branch_data:
+                self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
+
 
 
 

@@ -1,9 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from Editor.Core.logger import Logger
+from Editor.Core.outliner import Outliner
 
 
-class GVNEditorUI():
+class GVNEditorUI:
     def __init__(self, e_core, settings):
         super().__init__()
 
@@ -14,7 +15,9 @@ class GVNEditorUI():
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-        MainWindow.setWindowIcon(QtGui.QIcon('Content/Icons/GVNEngine_Logo.png'))
+        MainWindow.setWindowIcon(
+            QtGui.QIcon(self.settings.ConvertPartialToAbsolutePath('Content/Icons/GVNEngine_Logo.png'))
+        )
 
         # Build the core window widget object
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -28,8 +31,9 @@ class GVNEditorUI():
         # Initialize the Menu Bar
         self.CreateMenuBar(MainWindow)
 
-        # Initialize the Logger
-        self.logger = Logger(self, self.settings)
+        # Initialize various utility windows
+        self.logger = Logger(self.settings)
+        self.outliner = Outliner(self.settings)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
@@ -37,11 +41,12 @@ class GVNEditorUI():
 
         # ****** Add everything to the interface ******
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        #self.CreateTabEditor()
         self.CreateGettingStartedDisplay()
-        self.main_resize_container.addWidget(self.logger.log_ui)
+        self.CreateBottomTabContainer()
+        self.AddTab(self.logger.GetUI(), "Logger", self.bottom_tab_editor)
+        self.AddTab(self.outliner.GetUI(), "Outliner", self.bottom_tab_editor)
 
-        #Adjust the main editor container so it takes up as much space as possible
+        # Adjust the main editor container so it takes up as much space as possible
         self.main_resize_container.setStretchFactor(0, 10)
 
         # Hook up buttons
@@ -60,28 +65,49 @@ class GVNEditorUI():
         self.menu_bar.setFont(self.settings.button_font)
         self.menu_bar.setStyleSheet(self.settings.button_color)
 
+        # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
         self.file_menu.setFont(self.settings.button_font)
         self.file_menu.setStyleSheet(self.settings.button_color)
+        self.a_new_file = QtWidgets.QAction(main_window)
+        self.a_new_file.triggered.connect(self.e_core.NewFile)
+        self.a_open_file = QtWidgets.QAction(main_window)
+        self.a_open_file.triggered.connect(self.e_core.OpenFile)
+        self.a_save_file = QtWidgets.QAction(main_window)
+        self.a_save_file.triggered.connect(self.e_core.Save)
+        self.a_save_file_as = QtWidgets.QAction(main_window)
+        self.a_save_file_as.triggered.connect(self.e_core.SaveAs)
         self.a_new_project = QtWidgets.QAction(main_window)
         self.a_new_project.triggered.connect(self.e_core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
         self.a_open_project.triggered.connect(self.e_core.OpenProject)
-        self.a_save = QtWidgets.QAction(main_window)
+        self.file_menu.addAction(self.a_new_file)
+        self.file_menu.addAction(self.a_open_file)
+        self.file_menu.addAction(self.a_save_file)
+        self.file_menu.addAction(self.a_save_file_as)
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
-        self.file_menu.addAction(self.a_save)
 
-        self.dialogue_menu = QtWidgets.QMenu(self.menu_bar)
-        self.dialogue_menu.setFont(self.settings.button_font)
-        self.dialogue_menu.setStyleSheet(self.settings.button_color)
-        self.a_open_dialogue_editor = QtWidgets.QAction(main_window)
-        self.a_open_dialogue_editor.triggered.connect(self.e_core.OpenDialogueEditor)
-        self.dialogue_menu.addAction(self.a_open_dialogue_editor)
+        # Settings Menu
+        self.settings_menu = QtWidgets.QMenu(self.menu_bar)
+        self.settings_menu.setFont(self.settings.button_font)
+        self.settings_menu.setStyleSheet(self.settings.button_color)
+        self.a_open_project_settings = QtWidgets.QAction(main_window)
+        self.a_open_project_settings.triggered.connect(self.e_core.OpenProjectSettings)
+        self.settings_menu.addAction(self.a_open_project_settings)
+
+        # Play Menu
+        self.play_menu = QtWidgets.QMenu(self.menu_bar)
+        self.play_menu.setFont(self.settings.button_font)
+        self.play_menu.setStyleSheet(self.settings.button_color)
+        self.a_play_game = QtWidgets.QAction(main_window)
+        self.a_play_game.triggered.connect(self.e_core.Play)
+        self.play_menu.addAction(self.a_play_game)
 
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
-        self.menu_bar.addAction(self.dialogue_menu.menuAction())
+        self.menu_bar.addAction(self.settings_menu.menuAction())
+        self.menu_bar.addAction(self.play_menu.menuAction())
 
         # Initialize the Menu Bar
         main_window.setMenuBar(self.menu_bar)
@@ -94,21 +120,31 @@ class GVNEditorUI():
         # *** Update Engine Menu Bar ***
         # Menu Headers
         self.file_menu.setTitle(_translate("MainWindow", "File"))
-        self.dialogue_menu.setTitle(_translate("MainWindow", "Dialogue"))
+        self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
+        self.play_menu.setTitle(_translate("MainWindow", "Play"))
 
         # 'File Menu' Actions
+        self.a_new_file.setText(_translate("MainWindow", "New File"))
+        self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
+        self.a_open_file.setText(_translate("MainWindow", "Open File"))
+        self.a_open_file.setShortcut(_translate("MainWindow", "Ctrl+O"))
+        self.a_save_file.setText(_translate("MainWindow", "Save"))
+        self.a_save_file.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.a_save_file_as.setText(_translate("MainWindow", "Save As"))
+        self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+Alt+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
-        self.a_save.setText(_translate("MainWindow", "Save"))
-        self.a_save.setShortcut(_translate("MainWindow", "Ctrl+S"))
 
-        # 'Dialogue' Actions
-        self.a_open_dialogue_editor.setText(_translate("MainWindow", "Open Editor"))
-        self.a_open_dialogue_editor.setShortcut(_translate("MainWindow", "Ctrl+Alt+D"))
+        # 'Play Menu' Actions
+        self.a_play_game.setText(_translate("MainWindow", "Play"))
+        self.a_play_game.setShortcut(_translate("MainWindow", "Ctrl+Alt+P"))
 
-    def CreateTabEditor(self):
+        # 'Settings Menu' Actions
+        self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
+        self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
+
+    def CreateMainTabContainer(self):
         """ Creates the main tab editor window, allowing specific editors to be added to it """
-
         self.main_editor_container = QtWidgets.QWidget()
         self.main_editor_layout = QtWidgets.QVBoxLayout(self.main_editor_container)
         self.main_editor_layout.setContentsMargins(2,2,2,2)
@@ -116,6 +152,9 @@ class GVNEditorUI():
         self.main_tab_editor = QtWidgets.QTabWidget(self.main_editor_container)
         self.main_tab_editor.setFont(self.settings.button_font)
         self.main_tab_editor.setStyleSheet(self.settings.button_color)
+        self.main_tab_editor.setTabsClosable(True)
+        self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
+        self.main_tab_editor.currentChanged.connect(self.ChangeTab)
 
         self.main_editor_layout.addWidget(self.main_tab_editor)
         self.main_resize_container.insertWidget(0, self.main_editor_container)
@@ -124,15 +163,24 @@ class GVNEditorUI():
         # scale our tab editor accordingly, so set it to take priority here
         self.main_resize_container.setStretchFactor(0, 1)
 
+    def ChangeTab(self, index):
+        """ Updates the active editor when the tab selection changes """
+        self.e_core.active_editor = self.main_tab_editor.widget(index).core
+
+    def CreateBottomTabContainer(self):
+        """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
+        self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
+        self.bottom_tab_editor.setFont(self.settings.button_font)
+        self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
+
     def CreateGettingStartedDisplay(self):
         """ Creates some temporary UI elements that inform the user how to prepare the editor """
-
         self.getting_started_container = QtWidgets.QWidget()
         self.getting_started_layout = QtWidgets.QVBoxLayout(self.getting_started_container)
 
         getting_started_title = QtWidgets.QLabel("Getting Started")
-        getting_started_title.setFont(self.settings.header_3_font)
-        getting_started_title.setStyleSheet(self.settings.header_3_color)
+        getting_started_title.setFont(self.settings.editor_info_title_font)
+        getting_started_title.setStyleSheet(self.settings.editor_info_title_color)
 
         getting_started_message = QtWidgets.QLabel()
         getting_started_message.setText(
@@ -140,14 +188,30 @@ class GVNEditorUI():
             "1) Go to 'File' -> 'New Project' to Create a new GVN Project\n"
             "2) Go to 'File' -> 'Open Project' to Open an existing GVN Project"
         )
-        getting_started_message.setFont(self.settings.paragraph_2_font)
-        getting_started_message.setStyleSheet(self.settings.paragraph_2_color)
+        getting_started_message.setFont(self.settings.editor_info_paragraph_font)
+        getting_started_message.setStyleSheet(self.settings.editor_info_paragraph_color)
 
         self.getting_started_layout.setAlignment(Qt.AlignCenter)
         self.getting_started_layout.addWidget(getting_started_title)
         self.getting_started_layout.addWidget(getting_started_message)
 
         self.main_resize_container.addWidget(self.getting_started_container)
+
+    def AddTab(self, widget, tab_name, target_tab_widget):
+        """ Adds a tab to the given tab widget before selecting that new tab """
+        tab_index = target_tab_widget.addTab(widget, tab_name)
+        target_tab_widget.setCurrentIndex(tab_index)
+
+    def RemoveEditorTab(self, index):
+        """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg) """
+        #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
+        self.logger.Log("Closing editor...")
+
+        editor_widget = self.main_tab_editor.widget(index)
+        del editor_widget
+        self.main_tab_editor.removeTab(index)
+
+        self.logger.Log("Editor closed")
 
 #if __name__ == "__main__":
 #    import sys
