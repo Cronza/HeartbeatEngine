@@ -4,11 +4,12 @@
 
 # What is the 'GVNEngine'?
 
-The GVNEngine is a Visual Novel / Dating Simulator game engine writtem in Python using the PyGame framework. It comes with a fully-fledged editor built in Pyqt5. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow to allow developers to focus more on making games, and less on worrying about coding them.
+The GVNEngine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework. It comes with a fully-fledged editor built in Pyqt5. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow to allow developers to focus more on making games, and less on worrying about coding them.
 
 # Getting Started with the GVNEngine
 Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo, or contact the developer Garrett Fredley at:<br/>
-https://twitter.com/SomeCronzaGuy :shipit: (Dev Twitter)<br/>
+
+https://twitter.com/SomeCronzaGuy<br/>
 
 # License
 The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
