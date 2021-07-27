@@ -3,7 +3,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-green?label=engine-license&style=flat-square)](./GVNEngine/LICENSE.txt)
 [![License](https://img.shields.io/badge/license-GPLv2-blue?label=editor-license&style=flat-square)](./GVNEditor/LICENSE.txt)
-![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/GVNEngine?style=flat-square)
+[![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/GVNEngine?style=flat-square)](https://github.com/Cronza/GVNEngine/issues)
 [![Python Version](https://img.shields.io/badge/python-3.8-4B8BBE)](https://www.python.org/downloads/release/python-380/)
 [![Twitter Badge](https://img.shields.io/badge/Twitter-Profile-informational?style=flat&logo=twitter&logoColor=white&color=1CA2F1)](https://twitter.com/SomeCronzaGuy)
 
