@@ -138,8 +138,8 @@ dmypy.json
 cython_debug/
 
 # User-specific stuff
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
+.idea/
+GVNEngine/.idea/
+GVNEditor/.idea/
+GVNEngine/venv/
+GVNEditor/venv/
