@@ -18,9 +18,12 @@ from Editor.Interface.outliner import OutlinerUI
 
 
 class Outliner:
-    def __init__(self, settings):
+    def __init__(self, settings, gvn_core):
 
         self.settings = settings
+
+        # We need an explicit reference to the GVN core in order to access file commands
+        self.gvn_core = gvn_core
 
         # Build the Logger UI
         self.ui = OutlinerUI(self)
@@ -34,3 +37,11 @@ class Outliner:
         """ Returns a reference to the outliner U.I """
 
         return self.ui
+
+    def OpenFile(self, file_path):
+        """ Send a request to the GVN editor core to open the provided file path """
+        self.gvn_core.OpenFile(file_path)
+
+    def DeleteFile(self, file_path):
+        """ Send a request to the GVN editor core to delete the provided file path """
+        self.gvn_core.DeleteFile(file_path)

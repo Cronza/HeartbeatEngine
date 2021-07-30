@@ -182,18 +182,25 @@ class GVNEditor:
                 else:
                     self.logger.Log("File information was not provided - Cancelling 'New File' action", 3)
 
-    def OpenFile(self):
+    def OpenFile(self, target_file_path=None):
         """ Prompt the user to choose a file, then load the respective editor using the data found """
         # Only allow this is there is an active project
         if not self.settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
-            existing_file = prompt.GetFile(
-                self.settings.GetProjectContentDirectory(),
-                self.settings.supported_content_types['Data'],
-                "Choose a File to Open"
-            )
+            existing_file = None
+
+            # Is the user opening a file through the main "File->Open" mechanism?
+            if not target_file_path:
+                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                existing_file = prompt.GetFile(
+                    self.settings.GetProjectContentDirectory(),
+                    self.settings.supported_content_types['Data'],
+                    "Choose a File to Open"
+                )
+            # Most likely the outliner requested a file be opened. Use the provided path
+            else:
+                existing_file = target_file_path
 
             # Does the file actually exist?
             if not existing_file:
@@ -219,6 +226,14 @@ class GVNEditor:
                             "Please either choose a different file, or create a new one.\n\n"
                             "If you authored this file by hand, please add the correct metadata to the top of the file"
                         )
+
+    def DeleteFile(self, file_path):
+        """ Delete the provided file. Editor will remain open if the user wishes to resave """
+        try:
+            os.remove(file_path)
+            self.logger.Log(f"Successfully deleted file '{file_path}'", 2)
+        except Exception as exc:
+            self.logger.Log(f"Failed to delete file '{file_path}' - Please review the exception to understand more", 4)
 
     def Play(self):
         """ Launches the GVNEngine, temporarily suspending the GVNEditor """

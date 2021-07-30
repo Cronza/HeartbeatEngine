@@ -28,8 +28,11 @@ class OutlinerUI(QtWidgets.QWidget):
         self.dir_tree.viewport().setAcceptDrops(True)  # Enables dragging within the scrollable area
         self.dir_tree.setSelectionMode(QtWidgets.QAbstractItemView.ContiguousSelection)
         self.dir_tree.setModel(self.dir_tree_model)
+        self.dir_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.dir_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.dir_tree.customContextMenuRequested.connect(self.CreateContextMenu)
+        self.dir_tree.doubleClicked.connect(self.ItemDoubleClicked)
+        self.dir_tree.setEditTriggers(QtWidgets.QTreeView.NoEditTriggers)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.dir_tree)
@@ -47,40 +50,70 @@ class OutlinerUI(QtWidgets.QWidget):
         # Get the absolute path of the currently selected item
         selected_item = self.dir_tree_model.filePath(self.dir_tree.currentIndex())
 
-        context_menu = QtWidgets.QMenu()
-        context_menu.setToolTipsVisible(True)
-        context_menu.addAction(self.CreateAction(context_menu, "Rename", "Rename the File", None))
-        context_menu.addAction(self.CreateAction(context_menu, "Delete", "Delete the File (A confirmation prompt is shown", None))
+        # The project settings file can't be edited like this, nor the . Only open the menu for other files
+        # @TODO: How to best handle stopping editing top level folders
+        if not self.core.settings.project_default_files['Config'] in selected_item:
 
-        # Directories and files will have different context menu options (The former having create options)
-        # Depending on what type the selection is, add additional options
-        if self.dir_tree_model.isDir(self.dir_tree.currentIndex()):
-            create_menu = QtWidgets.QMenu()
-            create_menu.setToolTipsVisible(True)
-            create_menu.setTitle("Create")
-            for file_type in FileType:
+            context_menu = QtWidgets.QMenu()
+            context_menu.setToolTipsVisible(True)
+            context_menu.addAction(self.CreateAction(context_menu, "Rename", "Rename the File", self.RenameFile))
+            context_menu.addAction(self.CreateAction(context_menu, "Delete", "Delete the File (A confirmation prompt is shown", self.DeleteFile))
 
-                # Don't allow the user to create a new project settings file
-                if file_type is not FileType.Project_Settings:
-                    create_menu.addAction(self.CreateAction(
-                        create_menu,
-                        file_type.name,
-                        FileTypeDescriptions.descriptions[file_type],
-                        None
-                    ))
+            # Directories and files will have different context menu options (The former having create options)
+            # Depending on what type the selection is, add additional options
+            if self.dir_tree_model.isDir(self.dir_tree.currentIndex()):
+                create_menu = QtWidgets.QMenu()
+                create_menu.setToolTipsVisible(True)
+                create_menu.setTitle("Create")
+                for file_type in FileType:
 
-            context_menu.addMenu(create_menu)
+                    # Don't allow the user to create a new project settings file
+                    if file_type is not FileType.Project_Settings:
+                        create_menu.addAction(self.CreateAction(
+                            create_menu,
+                            file_type.name,
+                            FileTypeDescriptions.descriptions[file_type],
+                            None
+                        ))
 
-        # Since this menu is launched via a signal (instead of via a button), we need an extra step to spawn
-        # it at the right screen location
-        context_menu.exec_(self.dir_tree.viewport().mapToGlobal(position))
+                context_menu.addMenu(create_menu)
+
+            # Since this menu is launched via a signal (instead of via a button), we need an extra step to spawn
+            # it at the right screen location
+            context_menu.exec_(self.dir_tree.viewport().mapToGlobal(position))
 
     def CreateAction(self, menu, action_name, action_tooltip, action_func):
         """ Helper function that simplifies creating menu actions """
         new_option = QtWidgets.QWidgetAction(menu)
         new_option.setText(action_name)
         new_option.setToolTip(action_tooltip)
-        print(action_tooltip)
 
-        #new_option.triggered.connect(action_func)
+        if action_func: #debug
+            new_option.triggered.connect(action_func)
         return new_option
+
+    def ItemDoubleClicked(self, item: QtCore.QModelIndex):
+        """ If the double clicked item is a file, attempt to open it """
+        if not self.dir_tree_model.isDir(item):
+            self.core.OpenFile(self.dir_tree_model.filePath(item))
+
+    def DeleteFile(self):
+        """ Prompt the user for confirmation before proceeding with the deletion """
+        # Since we use a menu, we can't get passed the selected item, but we can grab it
+        selected_item = self.dir_tree_model.filePath(self.dir_tree.currentIndex())
+
+        result = QtWidgets.QMessageBox.question(
+            self,
+            "Please Confirm",
+            f"Are you sure you want to delete the following file:\n\n'{selected_item}'?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+        )
+
+        if result == QtWidgets.QMessageBox.Yes:
+            self.core.DeleteFile(selected_item)
+
+    def RenameFile(self):
+        """ Enables renaming for the currently selected item """
+        # Since we use a menu, we can't get passed the selected item, but we can grab it
+        selected_item = self.dir_tree.currentIndex()
+        self.dir_tree.edit(selected_item)

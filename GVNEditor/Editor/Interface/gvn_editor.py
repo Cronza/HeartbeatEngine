@@ -33,7 +33,7 @@ class GVNEditorUI:
 
         # Initialize various utility windows
         self.logger = Logger(self.settings)
-        self.outliner = Outliner(self.settings)
+        self.outliner = Outliner(self.settings, self.e_core)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
@@ -165,7 +165,10 @@ class GVNEditorUI:
 
     def ChangeTab(self, index):
         """ Updates the active editor when the tab selection changes """
-        self.e_core.active_editor = self.main_tab_editor.widget(index).core
+        if index != -1:
+            self.e_core.active_editor = self.main_tab_editor.widget(index).core
+        else:
+            self.e_core.active_editor = None
 
     def CreateBottomTabContainer(self):
         """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
