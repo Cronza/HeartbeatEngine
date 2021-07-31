@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from Editor.Core.logger import Logger
-from Editor.Core.outliner import Outliner
+from Editor.Core.Logger.logger import Logger
+from Editor.Core.Outliner.outliner import Outliner
 
 
 class GVNEditorUI:
@@ -31,9 +31,8 @@ class GVNEditorUI:
         # Initialize the Menu Bar
         self.CreateMenuBar(MainWindow)
 
-        # Initialize various utility windows
+        # Initialize the logger from the very beginning
         self.logger = Logger(self.settings)
-        self.outliner = Outliner(self.settings, self.e_core)
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
@@ -44,7 +43,6 @@ class GVNEditorUI:
         self.CreateGettingStartedDisplay()
         self.CreateBottomTabContainer()
         self.AddTab(self.logger.GetUI(), "Logger", self.bottom_tab_editor)
-        self.AddTab(self.outliner.GetUI(), "Outliner", self.bottom_tab_editor)
 
         # Adjust the main editor container so it takes up as much space as possible
         self.main_resize_container.setStretchFactor(0, 10)
@@ -199,6 +197,12 @@ class GVNEditorUI:
         self.getting_started_layout.addWidget(getting_started_message)
 
         self.main_resize_container.addWidget(self.getting_started_container)
+
+    def CreateOutliner(self):
+        """ Creates the outliner window, and adds it to the bottom tab menu """
+        self.outliner = Outliner(self.settings, self.e_core)
+        self.e_core.outliner = self.outliner
+        self.AddTab(self.outliner.GetUI(), "Outliner", self.bottom_tab_editor)
 
     def AddTab(self, widget, tab_name, target_tab_widget):
         """ Adds a tab to the given tab widget before selecting that new tab """

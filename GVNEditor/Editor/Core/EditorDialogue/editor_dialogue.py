@@ -146,17 +146,15 @@ class EditorDialogue(EditorBase):
 
         file_data = Reader.ReadAll(self.file_path)
 
-        db_manager = DBManager()
-        converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
+        # Skip importing if the file has no data to load
+        if file_data:
+            db_manager = DBManager()
+            converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
 
-        # The main branch is treated specially since we don't need to create it
-        for branch_name, branch_data in converted_data.items():
-            if not branch_name == "Main":
-                self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
+            # The main branch is treated specially since we don't need to create it
+            for branch_name, branch_data in converted_data.items():
+                if not branch_name == "Main":
+                    self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
 
-            for action in branch_data:
-                self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
-
-
-
-
+                for action in branch_data:
+                    self.editor_ui.dialogue_sequence.AddEntry(action, None, True)

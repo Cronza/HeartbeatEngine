@@ -64,6 +64,10 @@ class Settings:
         """ Returns a value from the open project file given a category and parameter name """
         return self.user_project_data[category][name]
 
+    def GetMetadataString(self, file_type: FileType):
+        """ Return the metadata string used to mark GVNEditor-exported files """
+        return f"# Type: {file_type.name}\n# {self.editor_data['EditorSettings']['version_string']}"
+
     def LoadActionDatabase(self, data_path):
         """ Reads in the 'ActionsDatabase.yaml' file """
         self.action_database = Reader.ReadAll(data_path)

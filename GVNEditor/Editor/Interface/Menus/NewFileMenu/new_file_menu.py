@@ -30,22 +30,22 @@ class NewFileMenu(BasePopupMenu):
             "A scene containing a sequence of dialogue between characters. These files may contain additional branches",
             self.options_list
         )
-        FileOption(
-            settings,
-            icon,
-            FileType.Scene_Point_And_Click,
-            "Scene (Point & Click)",
-            "A scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
-            self.options_list
-        )
-        FileOption(
-            settings,
-            icon,
-            FileType.Character,
-            "Character",
-            "A file containing details on a character, such as a special font for their name, their unique color, or various sprites representing their moods",
-            self.options_list
-        )
+        #FileOption(
+        #    settings,
+        #    icon,
+        #    FileType.Scene_Point_And_Click,
+        #    "Scene (Point & Click)",
+        #    "A scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
+        #    self.options_list
+        #)
+        #FileOption(
+        #    settings,
+        #    icon,
+        #    FileType.Character,
+        #    "Character",
+        #    "A file containing details on a character, such as a special font for their name, their unique color, or various sprites representing their moods",
+        #    self.options_list
+        #)
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)

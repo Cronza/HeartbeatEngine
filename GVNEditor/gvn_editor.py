@@ -26,7 +26,7 @@ class GVNEditor:
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
-        self.outliner = self.e_ui.outliner
+        self.outliner = None # Assignment happens once a project is loaded
 
         self.active_editor = None
 
@@ -227,14 +227,6 @@ class GVNEditor:
                             "If you authored this file by hand, please add the correct metadata to the top of the file"
                         )
 
-    def DeleteFile(self, file_path):
-        """ Delete the provided file. Editor will remain open if the user wishes to resave """
-        try:
-            os.remove(file_path)
-            self.logger.Log(f"Successfully deleted file '{file_path}'", 2)
-        except Exception as exc:
-            self.logger.Log(f"Failed to delete file '{file_path}' - Please review the exception to understand more", 4)
-
     def Play(self):
         """ Launches the GVNEngine, temporarily suspending the GVNEditor """
         # Only allow this is there is an active project
@@ -286,7 +278,6 @@ class GVNEditor:
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
-
         if not self.CheckTabLimit():
 
             editor_classes = {
@@ -360,7 +351,7 @@ class GVNEditor:
         return self.settings.editor_data['EditorSettings']['max_tabs'] <= self.e_ui.main_tab_editor.count()
 
     def SetActiveProject(self, project_name, project_dir):
-        """ Sets the active project, pointing the editor to the new location, and refreshing the inteface """
+        """ Sets the active project, pointing the editor to the new location, and refreshing the interface """
         self.settings.user_project_name = project_name
         self.settings.user_project_dir = project_dir.replace("\\", "/")
         self.settings.LoadProjectSettings()
@@ -370,14 +361,16 @@ class GVNEditor:
         if self.e_ui.getting_started_container:
             target = self.e_ui.main_resize_container.widget(0)
             target.deleteLater()
+            self.e_ui.getting_started_container = None
 
             self.e_ui.CreateMainTabContainer()
+            self.e_ui.CreateOutliner()
 
         # Refresh U.I text using any active translations
         self.e_ui.retranslateUi(self.main_window)
 
         # Update the outliner with the new project root
-        self.outliner.UpdateRoot(self.settings.user_project_dir)
+        self.outliner.UpdateRoot(self.settings.GetProjectContentDirectory())
 
     def ValidateNewFileLocation(self, file_path) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """

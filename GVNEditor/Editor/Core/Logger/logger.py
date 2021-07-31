@@ -18,7 +18,7 @@
 from datetime import datetime
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QFont
-from Editor.Interface.logger import LoggerUI
+from Editor.Interface.Logger.logger import LoggerUI
 from Editor.Utilities.DataTypes.log_types import LogType
 
 
