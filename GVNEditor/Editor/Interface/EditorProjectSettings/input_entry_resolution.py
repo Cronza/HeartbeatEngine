@@ -16,7 +16,7 @@ class InputEntryResolution(InputEntryBase):
     """
 
     def __init__(self, settings, resolution_options, project_settings):
-        super().__init__(settings, None, None)
+        super().__init__(settings, None)
 
         self.project_settings = project_settings
 
@@ -45,25 +45,4 @@ class InputEntryResolution(InputEntryBase):
         self.project_settings["Window"]["resolution"] = self.input_widget.currentIndex()
 
         return self.options
-
-
-    """
-    def Get(self):
-        # Create a clone of the options list since we're going to reorder it by moving the selected index
-        # to the front of the list
-        options_list_clone = self.options.copy()
-
-        option_text = self.input_widget.currentText()
-        for option_index in range(0, len(options_list_clone)):
-
-            # Since it's non-deterministic which data type this data is, let's make sure it's always
-            # compared as a string
-            if str(options_list_clone[option_index]) == option_text:
-                # Remove the index, then place it at the top of the list
-                options_list_clone.pop(option_index)
-                options_list_clone.insert(0, option_text)
-                break
-
-        # Return the new list
-        return options_list_clone
-    """
+    

@@ -30,11 +30,13 @@ class InputEntryFileSelector(InputEntryBase):
             QtGui.QIcon.Off
         )
         self.file_select_button.setIcon(icon)
-        self.file_select_button.clicked.connect(self.OpenFilePrompt)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addWidget(self.file_select_button)
+
+        # Connect Signals
+        self.file_select_button.clicked.connect(self.OpenFilePrompt)
 
     def Get(self):
         return self.input_widget.text()

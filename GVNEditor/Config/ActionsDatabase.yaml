@@ -487,6 +487,31 @@ Dialogue:
           editable: True
           preview: True
 
+    # Choice
+    - display_name: "Choice"
+      action_name: "choice"
+      requirements:
+        - name: "Choice"
+          type: "choice"
+          value: None
+          editable: True
+          preview: True
+          template:
+            - name: "type"
+              type: "dropdown"
+              value: "None"
+              options:
+                - "None"
+                - "fade_in"
+              editable: True
+              preview: True
+
+            - name: "speed"
+              type: "int"
+              value: 500
+              editable: True
+              preview: True
+
 Scene:
   icon: "Content/Icons/Dialogue.png"
   options:

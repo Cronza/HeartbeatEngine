@@ -7,10 +7,12 @@ class InputEntryBool(InputEntryBase):
         super().__init__(settings, refresh_func)
 
         self.input_widget = QtWidgets.QCheckBox()
-        self.input_widget.stateChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
+
+        # Connect Signals
+        self.input_widget.stateChanged.connect(self.InputValueUpdated)
 
     def Get(self) -> bool:
         return self.input_widget.isChecked()

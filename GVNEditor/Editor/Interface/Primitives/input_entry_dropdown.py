@@ -12,13 +12,16 @@ class InputEntryDropdown(InputEntryBase):
 
         self.options = options
 
+        # Pre-load the list of dropdown options
         for option in self.options:
             self.input_widget.addItem(str(option))
+
+        self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
 
-        self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
+
 
     def Get(self):
         return self.input_widget.currentText()

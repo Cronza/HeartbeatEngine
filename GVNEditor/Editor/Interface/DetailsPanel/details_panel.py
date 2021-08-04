@@ -8,6 +8,7 @@ from Editor.Interface.Primitives.input_entry_int import InputEntryInt
 from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
 from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
 from Editor.Interface.Primitives.input_entry_container import InputEntryContainer
+from Editor.Interface.Primitives.input_widget_choice import InputEntryChoice
 
 
 # @TODO: Split this file up into a functions class & U.I class
@@ -23,6 +24,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
         self.active_entry = None
+
+        # Optional dependencies (Some input widgets might need certain references depending on the owner)
+        self.branch_list = None
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -242,6 +246,8 @@ class DetailsPanel(QtWidgets.QWidget):
             return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Font"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
             return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
+        elif data_type == "choice": # Requires optional dependency: branch_list
+            return InputEntryChoice(self.settings, self.branch_list, self.DetailEntryUpdated)
         elif data_type == "container":
             new_entry = InputEntryContainer(self.settings, data['children'])
             for child in data['children']:
