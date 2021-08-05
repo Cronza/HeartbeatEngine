@@ -150,7 +150,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
                         # If this details_entry has children (IE. It's a container), recursively update the cache for
                         # any and all children entries
-                        if details_entry.childCount() > 0:
+                        if details_entry.childCount() > 0 and "children" in requirement: #@TODO: TESTING: Please review
                             self.UpdateCache(details_entry, requirement["children"])
 
                         # Containers don't store values themselves, so the above code accounts solely for it's children
@@ -246,8 +246,8 @@ class DetailsPanel(QtWidgets.QWidget):
             return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Font"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
             return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
-        elif data_type == "choice": # Requires optional dependency: branch_list
-            return InputEntryChoice(self.settings, self.branch_list, self.DetailEntryUpdated)
+        elif data_type == "choice":
+            return InputEntryChoice(self.settings, data, self.AddEntry, self.CreateEntryWidget, self.branch_list, self.DetailEntryUpdated)
         elif data_type == "container":
             new_entry = InputEntryContainer(self.settings, data['children'])
             for child in data['children']:

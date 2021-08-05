@@ -18,6 +18,10 @@ class EditorDialogueUI(EditorBaseUI):
         self.CreateDialogueSequencePanel()
         self.CreateDetailsPanel()
 
+        # The dialogue editor makes use of the "Choice" input widget, which requires a reference
+        # to the branches list
+        self.details.branch_list = self.branches.branches_list
+
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
