@@ -42,7 +42,7 @@ class Settings:
 
         # Idea 1: We still use main, but we don't package the editor, and in main, we have a flag to skip
         # the editor (Likely ill-advised)
-
+        print(os.getcwd())
         # Idea 2: We modify this code for the build
         if partial_path.startswith("ENGINE_FILES"):
             return partial_path.replace("ENGINE_FILES", "GVNEngine") #TEMP HACK (ごめねさい anyone who sees this)

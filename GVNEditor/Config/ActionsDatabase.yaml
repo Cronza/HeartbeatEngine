@@ -497,9 +497,47 @@ Dialogue:
           editable: True
           preview: True
           template:
-            - name: "key"
+            - name: "position"
+              type: "vector2"
+              value: [ 0,0 ]
+              editable: True
+              preview: True
+
+            - name: "text"
               type: "str"
               value: ""
+              editable: True
+              preview: True
+
+            - name: "text_size"
+              type: "int"
+              value: 24
+              global:
+                active: True
+              editable: True
+              preview: True
+
+            - name: "text_color"
+              type: "color"
+              value: [ 255, 255, 255 ]
+              global:
+                active: True
+              editable: True
+              preview: True
+
+            - name: "font"
+              type: "file_font"
+              value: "None"
+              global:
+                active: True
+              editable: True
+              preview: False
+
+            - name: "z_order"
+              type: "int"
+              value: 0
+              global:
+                active: True
               editable: True
               preview: True
 
@@ -526,6 +564,7 @@ Scene:
             active: True
           editable: True
           preview: True
+
         - name: "speed"
           type: "int"
           value: "150"
@@ -533,6 +572,7 @@ Scene:
             active: True
           editable: True
           preview: True
+
         - name: "post_wait"
           type: "dropdown"
           value: "wait_until_complete"

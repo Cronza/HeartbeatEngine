@@ -127,7 +127,6 @@ class DetailsPanel(QtWidgets.QWidget):
         entries at the root. Either way, recurse for any children found
         """
         if self.active_entry:
-
             # If we've been provided a parent (due to recursion or otherwise), target's it's children and data.
             # Otherwise, target the root entries and action data
             details_entry_parent = None
@@ -165,7 +164,6 @@ class DetailsPanel(QtWidgets.QWidget):
 
     def CreateEntryWidget(self, data):
         """ Given an action_data dict, create a new details entry widget and return it """
-
         # Populate the data column with the widget appropriate to the given type
         details_widget = self.GetDetailsWidget(data)
 

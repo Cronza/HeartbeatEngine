@@ -119,7 +119,6 @@ class EditorDialogue(EditorBase):
     def Export(self):
         super().Export()
         self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
-
         data_to_export = self.GetAllDialogueData()
         db_manager = DBManager()
         data_to_export = {

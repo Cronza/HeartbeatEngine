@@ -29,7 +29,7 @@ class Outliner:
         self.gvn_core = gvn_core
 
         # Build the Logger UI
-        self.ui = OutlinerUI(self)
+        self.ui = OutlinerUI(self, settings)
 
     def UpdateRoot(self, new_root):
         """ Requests that the FileSystemTree refresh it's tree using a new root """

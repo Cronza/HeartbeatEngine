@@ -830,72 +830,66 @@ class choice(Action):
         self.skippable = False
 
         # Choice-specific adjustments
-        self.action_data['position'] = (0, 0)
-        self.action_data['z_order'] = 0
-        self.action_data['center_align'] = False
-        self.action_data['key'] = "Choice"
+        self.action_data["position"] = (0, 0)
+        self.action_data["z_order"] = 0
+        self.action_data["center_align"] = False
+        self.action_data["key"] = "Choice"
 
-        assert 'choices' in self.action_data, print(
-            f"No 'choices' block assigned to {self}. This makes for an impossible action!")
-
-        # All choice options use the same underlying action. Specify and enforce that here
+        # All choice options use the same underlying 'create_button' action. Specify and enforce that here
         # Additionally, apply all settings determined here to each choice button
-        for choice in self.action_data['choices']:
+        for choice in self.action_data["choices"]:
+
             # Build the child dict that gets sent to the interact action
-            choice['action'] = {
-                'action': 'choose_branch',
-                'branch': choice['branch'],
-                'key': choice['key']
+            choice["action"] = {
+                "action": "choose_branch",
+                "branch": choice["branch"],
+                "key": choice["key"]
             }
-            print(choice)
-            # If a choice has no specified branch, then technically its a dead end. Assert if this happens
-            assert 'branch' in choice, print(
-                f"No 'branch' specified in choice {choice}. This would lead to a dead selection")
 
             # CHOICE BUTTONS - OVERRIDES WITH NO PROJECT DEFAULTS
-            if 'text_position' not in choice:
-                choice['text_position'] = self.action_data['position']
+            if "text_position" not in choice:
+                choice["text_position"] = self.action_data["position"]
 
             # CHOICE BUTTONS - PROJECT DEFAULTS OVERRIDE
-            if 'sprite' not in choice:
-                choice['sprite'] = self.scene.settings.project_settings['Choice'][
-                    'button_sprite']
+            if "sprite" not in choice:
+                choice["sprite"] = self.scene.settings.project_settings["Choice"][
+                    "button_sprite"]
 
             if 'sprite_hover' not in choice:
-                choice['sprite_hover'] = self.scene.settings.project_settings['Choice'][
-                    'button_sprite_hover']
+                choice["sprite_hover"] = self.scene.settings.project_settings["Choice"][
+                    "button_sprite_hover"]
 
-            if 'sprite_clicked' not in choice:
-                choice['sprite_clicked'] = self.scene.settings.project_settings['Choice'][
-                    'button_sprite_clicked']
+            if "sprite_clicked" not in choice:
+                choice["sprite_clicked"] = self.scene.settings.project_settings["Choice"][
+                    "button_sprite_clicked"]
 
-            if 'z_order' not in choice:
-                choice['z_order'] = self.scene.settings.project_settings['Choice'][
-                    'button_z_order']
+            if "z_order" not in choice:
+                choice["z_order"] = self.scene.settings.project_settings["Choice"][
+                    "button_z_order"]
 
-            if 'center_align' not in choice:
-                choice['center_align'] = self.scene.settings.project_settings['Choice'][
-                    'button_center_align']
+            if "center_align" not in choice:
+                choice["center_align"] = self.scene.settings.project_settings["Choice"][
+                    "button_center_align"]
 
-            if 'text_z_order' not in choice:
-                choice['text_z_order'] = self.scene.settings.project_settings['Choice'][
-                    'button_text_z_order']
+            if "text_z_order" not in choice:
+                choice["text_z_order"] = self.scene.settings.project_settings["Choice"][
+                    "button_text_z_order"]
 
-            if 'text_center_align' not in choice:
-                choice['center_align'] = self.scene.settings.project_settings['Choice'][
-                    'button_text_center_align']
+            if "text_center_align" not in choice:
+                choice["center_align"] = self.scene.settings.project_settings["Choice"][
+                    "button_text_center_align"]
 
-            if 'font' not in choice:
-                choice['font'] = self.scene.settings.project_settings['Choice'][
-                    'button_font']
+            if "font" not in choice:
+                choice["font"] = self.scene.settings.project_settings["Choice"][
+                    "button_font"]
 
-            if 'text_size' not in choice:
-                choice['text_size'] = self.scene.settings.project_settings['Choice'][
-                    'button_text_size']
+            if "text_size" not in choice:
+                choice["text_size"] = self.scene.settings.project_settings["Choice"][
+                    "button_text_size"]
 
-            if 'text_color' not in choice:
-                choice['text_color'] = self.scene.settings.project_settings['Choice'][
-                    'button_text_color']
+            if "text_color" not in choice:
+                choice["text_color"] = self.scene.settings.project_settings["Choice"][
+                    "button_text_color"]
 
         # Choices provide blocks of options. Each one needs to be built
         new_renderable = Choice(
@@ -903,25 +897,16 @@ class choice(Action):
             self.action_data
         )
 
+        # Generate and add each choice button to the choice container
+        for choice_data in self.action_data["choices"]:
+            new_renderable.children.append(self.a_manager.PerformAction(choice_data, "create_choice_button"))
+
         self.scene.renderables_group.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
 
         return new_renderable
-
-class choose_branch(Action):
-    def Start(self):
-
-        # This action requires that the active scene is a dialogue scene. Assert if it is not
-        assert type(self.scene) == Engine.Core.BaseClasses.scene_dialogue.DialogueScene, print(
-            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
-        )
-
-        self.scene.SwitchDialogueBranch(self.action_data['branch'])
-
-        self.scene.Draw()
-        self.Complete()
 
 class create_choice_button(Action):
     """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable'"""
@@ -947,6 +932,21 @@ class create_choice_button(Action):
         self.Complete()
 
         return new_renderable
+
+class choose_branch(Action):
+    def Start(self):
+        # If a choice button lead to this, delete that whole choice container, otherwise it would persist
+        # into the new branch
+        if self.scene.renderables_group.Exists("Choice"):
+            self.a_manager.PerformAction(
+                {"key": "Choice", "transition" : {"type": "None"}},
+                "remove_container"
+            )
+
+        self.scene.SwitchDialogueBranch(self.action_data['branch'])
+
+        self.scene.Draw()
+        self.Complete()
 
 # -------------- TRANSITION ACTIONS --------------
 """ 

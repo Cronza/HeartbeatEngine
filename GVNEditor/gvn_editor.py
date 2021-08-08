@@ -21,6 +21,13 @@ class GVNEditor:
 
         # Initialize the main window and editor interface
         self.app = QtWidgets.QApplication(sys.argv)
+
+        #self.app.setStyle('Fusion')
+        # DEBUG
+        #with open("GVNEditor/Content/Styles/DarkGray/DarkGray.qss") as f:
+            #print(f.readlines())
+        #    self.app.setStyleSheet(f.read())
+
         self.main_window = QtWidgets.QMainWindow()
         self.e_ui = gvne.GVNEditorUI(self, self.settings)
         self.e_ui.setupUi(self.main_window)
@@ -32,8 +39,8 @@ class GVNEditor:
 
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        #self.SetActiveProject("Hello World", "E:/GVNEngine/Projects/Hello World")  # Machine 2
-        self.SetActiveProject("Hello World", "D:/GVNEngine/PROJECTS/Hello World")  # Machine 2
+        self.SetActiveProject("Hello World", "E:/GVNEngine/Projects/Hello World")  # Machine 2
+        #self.SetActiveProject("Hello World", "D:/GVNEngine/PROJECTS/Hello World")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then

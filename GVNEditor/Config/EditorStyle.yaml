@@ -1,6 +1,8 @@
 EditorInterfaceSettings:
   toolbar_background_color: 44, 53, 57
   toolbar_button_background_color: 57, 67, 79
+  general_button_background_color: 217, 217, 217
+  general_button_border_color: 96, 96, 96
 
 EditorStateSettings:
   read_only_background_color: 200, 200, 200

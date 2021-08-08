@@ -103,9 +103,12 @@ class Interactable(SpriteRenderable):
         due to the speed at which they are requested when the user spams the hover or click events
         """
         state_missing_warning = " - Defaulting the state to use the 'Normal' sprite"
-        if 'sprite_hover' in self.renderable_data:
+        hover_sprite = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
+        clicked_sprite = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
+
+        if "sprite_hover" in self.renderable_data:
             if self.renderable_data['sprite_hover'] != "":
-                self.hover_surface = pygame.image.load(self.renderable_data['sprite_hover']).convert_alpha()
+                self.hover_surface = pygame.image.load(hover_sprite).convert_alpha()
             else:
                 print("No hover sprite specified" + state_missing_warning)
                 self.hover_surface = self.surface
@@ -114,8 +117,8 @@ class Interactable(SpriteRenderable):
             self.hover_surface = self.surface
 
         if 'sprite_clicked' in self.renderable_data:
-            if self.renderable_data['sprite_clicked'] != "":
-                self.clicked_surface = pygame.image.load(self.renderable_data['sprite_clicked']).convert_alpha()
+            if self.renderable_data["sprite_clicked"] != "":
+                self.clicked_surface = pygame.image.load(clicked_sprite).convert_alpha()
             else:
                 print("No clicked sprite specified" + state_missing_warning)
                 self.clicked_surface = self.surface

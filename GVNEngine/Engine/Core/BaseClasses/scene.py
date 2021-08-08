@@ -45,8 +45,6 @@ class Scene:
                                                                        "create_container")
 
     def Draw(self):
-        #print("*** REDRAWING SCENE ***")
-
         # Sort the renderable elements by their z-order (Lowest to Highest)
         renderables = sorted(self.renderables_group.renderables.values(), key=lambda renderable: renderable.z_order)
 

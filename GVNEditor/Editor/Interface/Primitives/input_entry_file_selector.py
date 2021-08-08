@@ -25,7 +25,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.file_select_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Folder.png")),
+            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )

@@ -83,53 +83,57 @@ class Settings:
         self.style_data = Reader.ReadAll(data_path)
 
         # Text and Font
-        self.header_1_font = QtGui.QFont(self.style_data['EditorTextSettings']['header_1_font'],self.style_data['EditorTextSettings']['header_1_text_size'],)
+        self.header_1_font = QtGui.QFont(self.style_data["EditorTextSettings"]["header_1_font"],self.style_data["EditorTextSettings"]["header_1_text_size"],)
         self.header_1_color = f"color: rgb({self.style_data['EditorTextSettings']['header_1_color']})"
-        self.header_1_font.setBold(self.style_data['EditorTextSettings']['header_1_is_bold'])
-        self.header_1_font.setItalic(self.style_data['EditorTextSettings']['header_1_is_italicized'])
+        self.header_1_font.setBold(self.style_data["EditorTextSettings"]["header_1_is_bold"])
+        self.header_1_font.setItalic(self.style_data["EditorTextSettings"]["header_1_is_italicized"])
 
-        self.header_2_font = QtGui.QFont(self.style_data['EditorTextSettings']['header_2_font'],self.style_data['EditorTextSettings']['header_2_text_size'])
+        self.header_2_font = QtGui.QFont(self.style_data["EditorTextSettings"]["header_2_font"],self.style_data["EditorTextSettings"]["header_2_text_size"])
         self.header_2_color = f"color: rgb({self.style_data['EditorTextSettings']['header_2_color']})"
-        self.header_2_font.setBold(self.style_data['EditorTextSettings']['header_2_is_bold'])
-        self.header_2_font.setItalic(self.style_data['EditorTextSettings']['header_2_is_italicized'])
+        self.header_2_font.setBold(self.style_data["EditorTextSettings"]["header_2_is_bold"])
+        self.header_2_font.setItalic(self.style_data["EditorTextSettings"]["header_2_is_italicized"])
 
-        self.editor_info_title_font = QtGui.QFont(self.style_data['EditorTextSettings']['editor_info_title_font'],self.style_data['EditorTextSettings']['editor_info_title_text_size'])
+        self.editor_info_title_font = QtGui.QFont(self.style_data["EditorTextSettings"]["editor_info_title_font"],self.style_data["EditorTextSettings"]["editor_info_title_text_size"])
         self.editor_info_title_color = f"color: rgb({self.style_data['EditorTextSettings']['editor_info_title_color']})"
-        self.editor_info_title_font.setBold(self.style_data['EditorTextSettings']['editor_info_title_is_bold'])
-        self.editor_info_title_font.setItalic(self.style_data['EditorTextSettings']['editor_info_title_is_italicized'])
+        self.editor_info_title_font.setBold(self.style_data["EditorTextSettings"]["editor_info_title_is_bold"])
+        self.editor_info_title_font.setItalic(self.style_data["EditorTextSettings"]["editor_info_title_is_italicized"])
 
-        self.paragraph_font = QtGui.QFont(self.style_data['EditorTextSettings']['paragraph_font'],self.style_data['EditorTextSettings']['paragraph_text_size'])
+        self.paragraph_font = QtGui.QFont(self.style_data["EditorTextSettings"]["paragraph_font"],self.style_data["EditorTextSettings"]["paragraph_text_size"])
         self.paragraph_color = f"color: rgb({self.style_data['EditorTextSettings']['paragraph_color']})"
-        self.paragraph_font.setBold(self.style_data['EditorTextSettings']['paragraph_is_bold'])
-        self.paragraph_font.setItalic(self.style_data['EditorTextSettings']['paragraph_is_italicized'])
+        self.paragraph_font.setBold(self.style_data["EditorTextSettings"]["paragraph_is_bold"])
+        self.paragraph_font.setItalic(self.style_data["EditorTextSettings"]["paragraph_is_italicized"])
 
-        self.editor_info_paragraph_font = QtGui.QFont(self.style_data['EditorTextSettings']['editor_info_paragraph_font'],self.style_data['EditorTextSettings']['editor_info_paragraph_text_size'])
+        self.editor_info_paragraph_font = QtGui.QFont(self.style_data["EditorTextSettings"]["editor_info_paragraph_font"],self.style_data["EditorTextSettings"]["editor_info_paragraph_text_size"])
         self.editor_info_paragraph_color = f"color: rgb({self.style_data['EditorTextSettings']['editor_info_paragraph_color']})"
-        self.editor_info_paragraph_font.setBold(self.style_data['EditorTextSettings']['editor_info_paragraph_is_bold'])
-        self.editor_info_paragraph_font.setItalic(self.style_data['EditorTextSettings']['editor_info_paragraph_is_italicized'])
+        self.editor_info_paragraph_font.setBold(self.style_data["EditorTextSettings"]["editor_info_paragraph_is_bold"])
+        self.editor_info_paragraph_font.setItalic(self.style_data["EditorTextSettings"]["editor_info_paragraph_is_italicized"])
 
-        self.subtext_font = QtGui.QFont(self.style_data['EditorTextSettings']['subtext_font'], self.style_data['EditorTextSettings']['subtext_text_size'],QtGui.QFont.Bold)
+        self.subtext_font = QtGui.QFont(self.style_data["EditorTextSettings"]["subtext_font"], self.style_data["EditorTextSettings"]["subtext_text_size"],QtGui.QFont.Bold)
         self.subtext_color = f"color: rgb({self.style_data['EditorTextSettings']['subtext_color']})"
-        self.subtext_font.setBold(self.style_data['EditorTextSettings']['subtext_is_bold'])
-        self.subtext_font.setItalic(self.style_data['EditorTextSettings']['subtext_is_italicized'])
+        self.subtext_font.setBold(self.style_data["EditorTextSettings"]["subtext_is_bold"])
+        self.subtext_font.setItalic(self.style_data["EditorTextSettings"]["subtext_is_italicized"])
 
-        self.button_font = QtGui.QFont(self.style_data['EditorTextSettings']['button_font'], self.style_data['EditorTextSettings']['button_text_size'])
+        self.button_font = QtGui.QFont(self.style_data["EditorTextSettings"]["button_font"], self.style_data["EditorTextSettings"]["button_text_size"])
         self.button_color = f"color: rgb({self.style_data['EditorTextSettings']['button_color']})"
-        self.button_font.setBold(self.style_data['EditorTextSettings']['button_is_bold'])
-        self.button_font.setItalic(self.style_data['EditorTextSettings']['button_is_italicized'])
+        self.button_font.setBold(self.style_data["EditorTextSettings"]["button_is_bold"])
+        self.button_font.setItalic(self.style_data["EditorTextSettings"]["button_is_italicized"])
 
-        self.button_font = QtGui.QFont(self.style_data['EditorTextSettings']['button_font'], self.style_data['EditorTextSettings']['button_text_size'])
+        self.button_font = QtGui.QFont(self.style_data["EditorTextSettings"]["button_font"], self.style_data["EditorTextSettings"]["button_text_size"])
         self.button_color = f"color: rgb({self.style_data['EditorTextSettings']['button_color']})"
-        self.button_font.setBold(self.style_data['EditorTextSettings']['button_is_bold'])
-        self.button_font.setItalic(self.style_data['EditorTextSettings']['button_is_italicized'])
+        self.button_font.setBold(self.style_data["EditorTextSettings"]["button_is_bold"])
+        self.button_font.setItalic(self.style_data["EditorTextSettings"]["button_is_italicized"])
 
-        # Color and Style
-        self.toolbar_background_color = self.style_data['EditorInterfaceSettings']['toolbar_background_color']
-        self.toolbar_button_background_color = self.style_data['EditorInterfaceSettings']['toolbar_button_background_color']
+        # Widget Misc
+        self.toolbar_background_color = self.style_data["EditorInterfaceSettings"]["toolbar_background_color"]
+
+        # Buttons
+        self.general_button_background_color = self.style_data["EditorInterfaceSettings"]["general_button_background_color"]
+        self.general_button_border_color = self.style_data["EditorInterfaceSettings"]["general_button_border_color"]
+
+        self.toolbar_button_background_color = self.style_data["EditorInterfaceSettings"]["toolbar_button_background_color"]
 
         # State
         self.read_only_background_color = f"background-color: rgb({self.style_data['EditorStateSettings']['read_only_background_color']})"
-
         self.selection_color = f"selection-background-color: rgb({self.style_data['EditorStateSettings']['selection_color']})"
 
         # *** Utility Functions ***

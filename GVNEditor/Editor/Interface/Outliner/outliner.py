@@ -3,10 +3,11 @@ from Editor.Interface.Outliner.file_system_tree import FileSystemTree
 from Editor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
 
 class OutlinerUI(QtWidgets.QWidget):
-    def __init__(self, core):
+    def __init__(self, core, settings):
         super().__init__()
 
         self.core = core
+        self.settings = settings
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -16,6 +17,7 @@ class OutlinerUI(QtWidgets.QWidget):
         # Directory view
         self.fs_tree = FileSystemTree(
             self,
+            self.settings,
             self.core.gvn_core.OpenFile,
             self.core.CreateFile,
             self.core.CreateFolder,
