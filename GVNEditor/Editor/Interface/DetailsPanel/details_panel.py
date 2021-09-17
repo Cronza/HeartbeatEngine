@@ -1,14 +1,14 @@
 from PyQt5 import QtWidgets, QtCore
-from Editor.Interface.Primitives.input_entry_text import InputEntryText
-from Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
-from Editor.Interface.Primitives.input_entry_bool import InputEntryBool
-from Editor.Interface.Primitives.input_entry_color import InputEntryColor
-from Editor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
-from Editor.Interface.Primitives.input_entry_int import InputEntryInt
-from Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
-from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
-from Editor.Interface.Primitives.input_entry_container import InputEntryContainer
-from Editor.Interface.Primitives.input_widget_choice import InputEntryChoice
+from GVNEditor.Editor.Interface.Primitives.input_entry_text import InputEntryText
+from GVNEditor.Editor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
+from GVNEditor.Editor.Interface.Primitives.input_entry_bool import InputEntryBool
+from GVNEditor.Editor.Interface.Primitives.input_entry_color import InputEntryColor
+from GVNEditor.Editor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
+from GVNEditor.Editor.Interface.Primitives.input_entry_int import InputEntryInt
+from GVNEditor.Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
+from GVNEditor.Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
+from GVNEditor.Editor.Interface.Primitives.input_entry_container import InputEntryContainer
+from GVNEditor.Editor.Interface.Primitives.input_widget_choice import InputEntryChoice
 
 
 # @TODO: Split this file up into a functions class & U.I class

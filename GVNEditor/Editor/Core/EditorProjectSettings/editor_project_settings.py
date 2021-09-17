@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with GVNEditor.  If not, see <https://www.gnu.org/licenses/>.
 """
-from Editor.Core.BaseClasses.base_editor import EditorBase
-from Editor.Interface.EditorProjectSettings.editor_project_settings import EditorProjectSettingsUI
-from Editor.Utilities.DataTypes.file_types import FileType
-from Editor.Utilities.yaml_manager import Writer
-from Editor.Utilities.yaml_manager import Reader
+from GVNEditor.Editor.Core.BaseClasses.base_editor import EditorBase
+from GVNEditor.Editor.Interface.EditorProjectSettings.editor_project_settings import EditorProjectSettingsUI
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Editor.Utilities.yaml_manager import Writer
+from GVNEditor.Editor.Utilities.yaml_manager import Reader
 
 
 class EditorProjectSettings(EditorBase):

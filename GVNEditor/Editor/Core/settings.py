@@ -1,7 +1,7 @@
 import os
 from PyQt5 import QtGui
-from Editor.Utilities.yaml_manager import Reader
-from Editor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Editor.Utilities.yaml_manager import Reader
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
 
 
 class Settings:

@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from Editor.Core.Logger.logger import Logger
-from Editor.Core.Outliner.outliner import Outliner
+from GVNEditor.Editor.Core.Logger.logger import Logger
+from GVNEditor.Editor.Core.Outliner.outliner import Outliner
 
 
 class GVNEditorUI:

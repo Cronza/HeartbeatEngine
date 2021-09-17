@@ -1,4 +1,5 @@
 import subprocess
+import os
 from PyQt5.QtWidgets import QMessageBox
 
 
@@ -14,7 +15,17 @@ class PlayManager:
             # Launch the engine, and wait until it shuts down before continuing
             print("Project Dir")
             print(project_path)
-            result = subprocess.Popen([f"GVNEngine/venv/Scripts/python", "GVNEngine/gvn_engine.py", project_path], stdout=True, stderr=True)
+
+            print("Current Working Dir")
+            print(os.getcwd())
+            result = subprocess.Popen(
+                [
+                    f"venv/Scripts/python",
+                    "GVNEngine/gvn_engine.py",
+                    project_path
+                ],
+                stdout=True,
+                stderr=True            )
             logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 

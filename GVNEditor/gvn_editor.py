@@ -4,14 +4,14 @@ import shutil
 import re
 from pathlib import Path
 from PyQt5 import QtWidgets
-from Editor.Core.settings import Settings
-from Editor.Utilities.DataTypes.file_types import FileType
-from Editor.Utilities.play_manager import PlayManager
-from Editor.Interface import gvn_editor as gvne
-from Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
-from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
-from Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
-from Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from GVNEditor.Editor.Core.settings import Settings
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Editor.Utilities.play_manager import PlayManager
+from GVNEditor.Editor.Interface import gvn_editor as gvne
+from GVNEditor.Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
+from GVNEditor.Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
+from GVNEditor.Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
+from GVNEditor.Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 
 class GVNEditor:
     def __init__(self):
@@ -39,8 +39,8 @@ class GVNEditor:
 
         #@TODO: REMOVE EVENTUALLY
         # DEBUG - SKIPS HAVING TO CHOOSE A PROJECT EACH TIME
-        self.SetActiveProject("Hello World", "E:/GVNEngine/Projects/Hello World")  # Machine 2
-        #self.SetActiveProject("Hello World", "D:/GVNEngine/PROJECTS/Hello World")  # Machine 2
+        #self.SetActiveProject("Hello World", "E:/GVNEngine/Projects/Hello World")  # Machine 2
+        self.SetActiveProject("Hello World", "D:/GVNEngine/PROJECTS/Hello World")  # Machine 2
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then

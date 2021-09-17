@@ -1,7 +1,7 @@
 import copy
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Menus.ActionMenu.action_menu import ActionMenu
-from Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
+from GVNEditor.Editor.Interface.Menus.ActionMenu.action_menu import ActionMenu
+from GVNEditor.Editor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
 """
 The core U.I class for the dialogue sequence panel. This contains all logic for generating, moving and removing

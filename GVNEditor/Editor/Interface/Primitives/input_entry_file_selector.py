@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Primitives.input_entry_base import InputEntryBase
-from Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
+from GVNEditor.Editor.Interface.Primitives.input_entry_base import InputEntryBase
+from GVNEditor.Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class InputEntryFileSelector(InputEntryBase):

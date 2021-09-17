@@ -1,8 +1,8 @@
 from PyQt5 import QtGui, QtWidgets, QtCore
-from Editor.Interface.Primitives.input_entry_base import InputEntryBase
-from Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
-from Editor.Interface.Primitives.input_entry_container import InputEntryContainer
-from Editor.Interface.Primitives.input_entry_text import InputEntryText
+from GVNEditor.Editor.Interface.Primitives.input_entry_base import InputEntryBase
+from GVNEditor.Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
+from GVNEditor.Editor.Interface.Primitives.input_entry_container import InputEntryContainer
+from GVNEditor.Editor.Interface.Primitives.input_entry_text import InputEntryText
 
 class InputEntryChoice(InputEntryBase):
     """

@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from Editor.Interface.Primitives.input_entry_base import InputEntryBase
+from GVNEditor.Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
 class InputEntryResolution(InputEntryBase):

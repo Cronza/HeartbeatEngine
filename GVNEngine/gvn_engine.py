@@ -1,5 +1,11 @@
 import argparse
 import pygame
+import sys
+print("--------------")
+for path in sys.path:
+    print(path)
+print("--------------")
+
 from Engine.Core.scene_manager import SceneManager
 from Engine.Core.settings import Settings
 

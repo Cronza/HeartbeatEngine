@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
-from Editor.Interface.Outliner.file_system_tree import FileSystemTree
-from Editor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
+from GVNEditor.Editor.Interface.Outliner.file_system_tree import FileSystemTree
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
 
 class OutlinerUI(QtWidgets.QWidget):
     def __init__(self, core, settings):

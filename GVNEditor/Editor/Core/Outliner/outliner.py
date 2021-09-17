@@ -16,9 +16,9 @@
 """
 import os
 import shutil
-from Editor.Interface.Outliner.outliner import OutlinerUI
-from Editor.Utilities.DataTypes.file_types import FileType
-from Editor.Utilities.yaml_manager import Writer
+from GVNEditor.Editor.Interface.Outliner.outliner import OutlinerUI
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Editor.Utilities.yaml_manager import Writer
 
 class Outliner:
     def __init__(self, settings, gvn_core):

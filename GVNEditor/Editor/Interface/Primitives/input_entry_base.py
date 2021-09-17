@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from Editor.Interface.Primitives.simple_checkbox import SimpleCheckbox
+from GVNEditor.Editor.Interface.Primitives.simple_checkbox import SimpleCheckbox
 
 
 class InputEntryBase(QtWidgets.QTreeWidgetItem):

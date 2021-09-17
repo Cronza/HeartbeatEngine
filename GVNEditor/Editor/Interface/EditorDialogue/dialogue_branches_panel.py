@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from Editor.Interface.EditorDialogue.dialogue_branches_entry import BranchesEntry
-from Editor.Interface.EditorDialogue.dialogue_branches_edit_prompt import EditBranchPrompt
+from GVNEditor.Editor.Interface.EditorDialogue.dialogue_branches_entry import BranchesEntry
+from GVNEditor.Editor.Interface.EditorDialogue.dialogue_branches_edit_prompt import EditBranchPrompt
 
 class BranchesPanel(QtWidgets.QWidget):
     def __init__(self, settings, ed_core):

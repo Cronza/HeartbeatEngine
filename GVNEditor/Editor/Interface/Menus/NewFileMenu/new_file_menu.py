@@ -1,6 +1,6 @@
-from Editor.Interface.Menus.base_popup_menu import BasePopupMenu
-from Editor.Interface.Menus.NewFileMenu.file_option import FileOption
-from Editor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Editor.Interface.Menus.base_popup_menu import BasePopupMenu
+from GVNEditor.Editor.Interface.Menus.NewFileMenu.file_option import FileOption
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 

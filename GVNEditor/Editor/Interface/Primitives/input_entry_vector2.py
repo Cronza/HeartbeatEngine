@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-from Editor.Interface.Primitives.input_entry_base import InputEntryBase
+from GVNEditor.Editor.Interface.Primitives.input_entry_base import InputEntryBase
 
 class InputEntryTuple(InputEntryBase):
     def __init__(self, settings, refresh_func=None):

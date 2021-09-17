@@ -1,7 +1,7 @@
 from functools import partial
 from PyQt5 import QtWidgets, QtGui, QtCore
-from Editor.Interface.Outliner.icon_provider import FileSystemIconProvider
-from Editor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
+from GVNEditor.Editor.Interface.Outliner.icon_provider import FileSystemIconProvider
+from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
 
 
 class FileSystemTree(QtWidgets.QTreeView):
