@@ -157,3 +157,7 @@ class EditorDialogue(EditorBase):
 
                 for action in branch_data:
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
+
+            # Select the main branch by default
+            self.editor_ui.branches.ChangeBranch(0)
+

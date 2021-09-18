@@ -181,8 +181,11 @@ class BranchesPanel(QtWidgets.QWidget):
         """ Resize the provided list entry to match the size of it's contents """
         list_item_container.setSizeHint(list_item_object.sizeHint())
 
-    def ChangeBranch(self):
+    def ChangeBranch(self, new_branch_index: int = -1):
         """ A wrapper for the real SwitchBranch function. This acquires and provides the right entry references """
+        if new_branch_index > -1:
+            self.branches_list.setCurrentRow(new_branch_index)
+
         selection = self.branches_list.itemWidget(self.branches_list.currentItem())
 
         self.ed_core.SwitchBranches(
