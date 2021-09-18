@@ -967,7 +967,7 @@ class fade_scene_from_black(Action):
         self.action_data['position'] = (0, 0)
         self.action_data['key'] = 'Transition'
         self.action_data['center_align'] = False
-        self.action_data['sprite'] = "ENGINE_FILES/Content/Sprites/transition_fade_black.png"
+        self.action_data['sprite'] = "ENGINE_FILES/Content/Sprites/TransitionEffects/transition_fade_black.png"
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:

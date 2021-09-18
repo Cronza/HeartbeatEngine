@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets
 from GVNEditor.Editor.Core.settings import Settings
 from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
 from GVNEditor.Editor.Utilities.play_manager import PlayManager
+from GVNEditor.Editor.Utilities.yaml_manager import Reader, Writer
 from GVNEditor.Editor.Interface import gvn_editor as gvne
 from GVNEditor.Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from GVNEditor.Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
@@ -15,26 +16,15 @@ from GVNEditor.Editor.Core.EditorProjectSettings.editor_project_settings import 
 
 class GVNEditor:
     def __init__(self):
-
-        # The core editor settings object
-        self.settings = Settings()
-
-        # Initialize the main window and editor interface
         self.app = QtWidgets.QApplication(sys.argv)
 
-        #self.app.setStyle('Fusion')
-        # DEBUG
-        #with open("GVNEditor/Content/Styles/DarkGray/DarkGray.qss") as f:
-            #print(f.readlines())
-        #    self.app.setStyleSheet(f.read())
-
+        self.settings = Settings()
         self.main_window = QtWidgets.QMainWindow()
         self.e_ui = gvne.GVNEditorUI(self, self.settings)
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
         self.outliner = None # Assignment happens once a project is loaded
-
         self.active_editor = None
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
@@ -43,27 +33,23 @@ class GVNEditor:
 
         sys.exit(self.app.exec_())
 
-    # ****** INTERFACE MENU ACTIONS ******
-
     def NewProject(self):
         """
         Prompts the user for a directory to create a new project, and for a project name. Then creates the
         chosen project
         """
-        # Ask the user to choose a directory to create a project in
         self.logger.Log("Requesting directory for the new project...'")
-
         prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
         new_project_dir = prompt.GetDirectory(
-            str(Path.home()),
+            self.GetLastSearchPath(),
             "Choose a Directory to Create a Project",
             False
         )
+        self.UpdateSearchHistory(new_project_dir)
 
         if not new_project_dir:
             self.logger.Log("Project directory was not provided - Cancelling 'New Project' action", 3)
         else:
-            # Ask the user for a project name
             # [0] = user_input: str, [1] = value_provided: bool
             self.logger.Log("Requesting a name for the new project...'")
             user_project_name = QtWidgets.QInputDialog.getText(
@@ -117,13 +103,13 @@ class GVNEditor:
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
         self.logger.Log("Requesting path to project root...")
-
         prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
         existing_project_dir = prompt.GetDirectory(
-            str(Path.home()),
+            self.GetLastSearchPath(),
             "Choose a Project Directory",
             False
          )
+        self.UpdateSearchHistory(existing_project_dir)
 
         if not existing_project_dir:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
@@ -135,7 +121,6 @@ class GVNEditor:
                 # Since we aren't asking for the project name, let's infer it from the path
                 project_name = os.path.basename(existing_project_dir)
                 self.SetActiveProject(project_name, existing_project_dir)
-
             else:
                 self.logger.Log("An invalid GVN project was selected - Cancelling 'Open Project' action", 4)
                 QtWidgets.QMessageBox.about(
@@ -144,7 +129,7 @@ class GVNEditor:
                     "The chosen directory is not a valid GVN Project.\n"
                     "Please either choose a different project, or create a new project."
                 )
-                
+
     def NewFile(self):
         """
         Prompts the user for a type of file to create, and a location & name for the new file. Then creates that
@@ -275,17 +260,13 @@ class GVNEditor:
                             self.e_ui.main_tab_editor.currentIndex(),
                             self.active_editor.GetFileName()
                         )
-
                         self.active_editor.Export()
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
-        if not self.CheckTabLimit():
-
+        if not self.settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
             editor_classes = {
                 FileType.Scene_Dialogue: EditorDialogue,
-                #FileType.Scene_Point_And_Click: EditorScenePointAndClick,
-                #FileType.Character: EditorCharacter,
                 FileType.Project_Settings: EditorProjectSettings
              }
 
@@ -316,42 +297,6 @@ class GVNEditor:
                 "a tab before attempting to open another"
             )
 
-    def OpenProjectSettings(self):
-        """ Opens the 'Project Settings' editor """
-        if not self.settings.user_project_name:
-            self.ShowNoActiveProjectPrompt()
-        else:
-            self.OpenEditor(
-                self.settings.user_project_dir + "/" + self.settings.project_default_files['Config'],
-                FileType.Project_Settings,
-                True
-            )
-
-    # ****** UTILITY FUNCTIONS ******
-
-    def ShowNoActiveProjectPrompt(self):
-        """ Shows a simple dialog informing the user that no project is currently active """
-        QtWidgets.QMessageBox.about(
-            self.e_ui.central_widget,
-            "No Active Project",
-            "There is currently no project open.\n"
-            "Please either open an existing project, or create a new one."
-        )
-
-    def CheckIfFileOpen(self, file_path):
-        """ Checks all open editor tabs for the provided file. Returns a bool if already open """
-        for tab_index in range(0, self.e_ui.main_tab_editor.count()):
-            open_editor = self.e_ui.main_tab_editor.widget(tab_index)
-
-            if open_editor.core.file_path == file_path:
-                return open_editor
-
-        return None
-
-    def CheckTabLimit(self):
-        """ Returns true or false depending on whether we've reached the maximum number of tabs """
-        return self.settings.editor_data['EditorSettings']['max_tabs'] <= self.e_ui.main_tab_editor.count()
-
     def SetActiveProject(self, project_name, project_dir):
         """ Sets the active project, pointing the editor to the new location, and refreshing the interface """
         self.settings.user_project_name = project_name
@@ -374,9 +319,40 @@ class GVNEditor:
         # Update the outliner with the new project root
         self.outliner.UpdateRoot(self.settings.GetProjectContentDirectory())
 
+    def OpenProjectSettings(self):
+        """ Opens the 'Project Settings' editor """
+        # Normally we would have loaded this editor like the others, but since we need to bind loading this to a menu
+        # button, we need it in the form of a function
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            self.OpenEditor(
+                self.settings.user_project_dir + "/" + self.settings.project_default_files['Config'],
+                FileType.Project_Settings,
+                True
+            )
+
+    def ShowNoActiveProjectPrompt(self):
+        """ Shows a simple dialog informing the user that no project is currently active """
+        QtWidgets.QMessageBox.about(
+            self.e_ui.central_widget,
+            "No Active Project",
+            "There is currently no project open.\n"
+            "Please either open an existing project, or create a new one."
+        )
+
+    def CheckIfFileOpen(self, file_path):
+        """ Checks all open editor tabs for the provided file. Returns a bool if already open """
+        for tab_index in range(0, self.e_ui.main_tab_editor.count()):
+            open_editor = self.e_ui.main_tab_editor.widget(tab_index)
+
+            if open_editor.core.file_path == file_path:
+                return open_editor
+
+        return None
+
     def ValidateNewFileLocation(self, file_path) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """
-
         if self.settings.user_project_dir not in file_path:
             QtWidgets.QMessageBox.about(
                 self.e_ui.central_widget,
@@ -387,6 +363,57 @@ class GVNEditor:
             return False
         else:
             return True
+
+    def UpdateSearchHistory(self, new_search_dir):
+        """ Updates the record for the last location searched for in a file browser"""
+        if new_search_dir:
+            self.WriteToTemp(self.settings.temp_history_path, {"search_dir": new_search_dir})
+
+    def GetLastSearchPath(self):
+        """ Returns the current search path record, or if there is none, return the system home"""
+        search_dir = self.ReadFromTemp(self.settings.temp_history_path, "search_dir")
+        if search_dir:
+            return search_dir
+        else:
+            return str(Path.home())
+
+    def WriteToTemp(self, temp_file: str, data: dict) -> bool:
+        """ Write to the provided temp file, creating it if it doesn't already exist """
+        if not os.path.exists(temp_file):
+            try:
+                if not os.path.exists(self.settings.editor_temp_root):
+                    os.mkdir(self.settings.editor_temp_root)
+                with open(temp_file, "w"):
+                    pass
+            except Exception as exc:
+                self.logger.Log(f"Unable to create '{temp_file}'", 4)
+                self.logger.Log(str(exc), 4)
+                return False
+        temp_data = Reader.ReadAll(temp_file)
+        if not temp_data:
+            temp_data = {}
+        try:
+            for key, val in data.items():
+                temp_data[key] = val
+        except Exception as exc:
+            self.logger.Log(f"Failed to update '{temp_file}'", 4)
+            self.logger.Log(str(exc), 4)
+            return False
+        Writer.WriteFile(temp_data, temp_file)
+        return True
+
+    def ReadFromTemp(self, temp_file: str, key: str) -> str:
+        """ Read from the provided temp file using the provided key, returning the results if found """
+        if not os.path.exists(temp_file):
+            self.logger.Log(f"The temp file '{temp_file}' was not found")
+            return ""
+        try:
+            req_data = Reader.ReadAll(temp_file)[key]
+            return req_data
+        except Exception as exc:
+            self.logger.Log(f"Failed to read '{temp_file}'")
+            self.logger.Log(str(exc), 4)
+            return ""
 
 if __name__ == "__main__":
     editor = GVNEditor()

@@ -6,19 +6,18 @@ from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
 
 class Settings:
     def __init__(self):
-        self.root_dir = os.getcwd().replace("\\", "/")
-        self.editor_root = self.root_dir
+        self.editor_root = os.getcwd().replace("\\", "/") + "/" + "GVNEditor"
+        self.engine_root = self.editor_root + "/" + "GVNEngine"
 
-        # Alter the path if the user is opening just the editor project, or the full GVNEngine project
-        if "GVNEditor" not in self.root_dir:
-            self.editor_root = self.root_dir + "/" + "GVNEditor"
+        self.editor_temp_root = self.editor_root + "/" + "Temp"
+        self.temp_history_path = self.editor_temp_root + "/" + "history.yaml"
 
-        self.engine_root = self.root_dir + "/" + "GVNEngine"
         self.project_admin_dir = ".gvn"
         self.project_folder_structure = [
             "Content",
             "Config"
         ]
+
         # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
         self.project_default_files = {
             "Config": "Config/Game.yaml"
@@ -34,39 +33,28 @@ class Settings:
         self.style_data = None
         self.action_database = None
 
-        # User Project Data
         self.user_project_name = None
         self.user_project_dir = None
         self.user_project_data = None
-
-        # U.I global styling
-        self.header_1_font = None
-        self.header_2_font = None
-        self.paragraph_font = None
-        self.subtext_font = None
-        self.button_font = None
-        self.toolbar_background_color = None
-        self.toolbar_button_background_color = None
 
         self.LoadEditorSettings(f"{self.editor_root}/Config/Editor.yaml")
         self.LoadStyleSettings(f"{self.editor_root}/Config/EditorStyle.yaml")
         self.LoadActionDatabase(f"{self.editor_root}/Config/ActionsDatabase.yaml")
 
-    def LoadProjectSettings(self):
-        """ Reads the 'Game.yaml' file for the active project """
-        self.user_project_data = Reader.ReadAll(self.user_project_dir + "/" + self.project_default_files['Config'])
-
     def GetProjectContentDirectory(self):
         """ Returns the 'Content' folder for the active project """
         return self.user_project_dir + "/" + "Content"
 
-    def GetGlobalSetting(self, category, name):
-        """ Returns a value from the open project file given a category and parameter name """
-        return self.user_project_data[category][name]
-
     def GetMetadataString(self, file_type: FileType):
         """ Return the metadata string used to mark GVNEditor-exported files """
         return f"# Type: {file_type.name}\n# {self.editor_data['EditorSettings']['version_string']}"
+
+    #def GetTempContents(self, temp_file):
+    #    Reader.rea
+
+    def LoadProjectSettings(self):
+        """ Reads the 'Game.yaml' file for the active project """
+        self.user_project_data = Reader.ReadAll(self.user_project_dir + "/" + self.project_default_files['Config'])
 
     def LoadActionDatabase(self, data_path):
         """ Reads in the 'ActionsDatabase.yaml' file """
@@ -135,8 +123,6 @@ class Settings:
         # State
         self.read_only_background_color = f"background-color: rgb({self.style_data['EditorStateSettings']['read_only_background_color']})"
         self.selection_color = f"selection-background-color: rgb({self.style_data['EditorStateSettings']['selection_color']})"
-
-        # *** Utility Functions ***
 
     def ConvertPartialToAbsolutePath(self, partial_path):
         """ Given a parital path, return a absolute path """

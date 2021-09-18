@@ -80,9 +80,9 @@ Scene Transitions:
   speed: 150
   z_order: 9999
 Choice:
-  button_sprite: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_01_Normal.png
-  button_sprite_hover: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_01_Hover.png
-  button_sprite_clicked: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_01_Clicked.png
+  button_sprite: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
+  button_sprite_hover: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
+  button_sprite_clicked: ENGINE_FILES/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
   button_text_size: 24
   button_text_color:
   - 204
