@@ -1,0 +1,11 @@
+# Type: Scene_Dialogue
+# Created with GVNEditor v0.1
+
+type: Scene_Dialogue
+dialogue:
+  Main:
+  - action: play_sfx
+    key: Whistle
+    sound: Content/SFX/whistle.wav
+    volume: 1.0
+    loop: true

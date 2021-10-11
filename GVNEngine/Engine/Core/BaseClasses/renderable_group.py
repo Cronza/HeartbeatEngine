@@ -2,10 +2,8 @@ class RenderableGroup():
     def __init__(self):
         """
         This class mimics the base pygame sprite group class, but uses a dictionary for the renderable list.
+        The 'key' value in each renderable is used as the dictionary key
         """
-
-        # While the base class for pygame sprite groups track sprites in a list, we'll be using a dict for quick
-        # lookup. The renderable "key" will be the key to the sprite which will be the value
         self.renderables = {}
 
         super().__init__()

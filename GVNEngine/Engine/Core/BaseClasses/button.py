@@ -14,7 +14,7 @@ class Button(Interactable):
             self.renderable_data
         )
         self.children.append(button_text_renderable)
-        self.scene.renderables_group.Add(button_text_renderable)
+        self.scene.active_renderables.Add(button_text_renderable)
 
     def GetText(self):
         pass

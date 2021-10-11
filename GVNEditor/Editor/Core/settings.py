@@ -6,9 +6,8 @@ from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
 
 class Settings:
     def __init__(self):
+        self.engine_root = "GVNEngine"
         self.editor_root = os.getcwd().replace("\\", "/") + "/" + "GVNEditor"
-        self.engine_root = self.editor_root + "/" + "GVNEngine"
-
         self.editor_temp_root = self.editor_root + "/" + "Temp"
         self.temp_history_path = self.editor_temp_root + "/" + "history.yaml"
 
@@ -27,7 +26,8 @@ class Settings:
         self.supported_content_types = {
             "Image": "Image Files (*.png *.jpg)",
             "Data": "YAML Files (*.yaml)",
-            "Font": "Font Files (*.ttf)"
+            "Font": "Font Files (*.ttf)",
+            "Sound": "Sound Files (*.mp3 *.wav)",
         }
 
         self.style_data = None
@@ -48,9 +48,6 @@ class Settings:
     def GetMetadataString(self, file_type: FileType):
         """ Return the metadata string used to mark GVNEditor-exported files """
         return f"# Type: {file_type.name}\n# {self.editor_data['EditorSettings']['version_string']}"
-
-    #def GetTempContents(self, temp_file):
-    #    Reader.rea
 
     def LoadProjectSettings(self):
         """ Reads the 'Game.yaml' file for the active project """

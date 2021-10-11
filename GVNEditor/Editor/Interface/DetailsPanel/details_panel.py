@@ -5,6 +5,7 @@ from GVNEditor.Editor.Interface.Primitives.input_entry_bool import InputEntryBoo
 from GVNEditor.Editor.Interface.Primitives.input_entry_color import InputEntryColor
 from GVNEditor.Editor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
 from GVNEditor.Editor.Interface.Primitives.input_entry_int import InputEntryInt
+from GVNEditor.Editor.Interface.Primitives.input_entry_float import InputEntryFloat
 from GVNEditor.Editor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
 from GVNEditor.Editor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
 from GVNEditor.Editor.Interface.Primitives.input_entry_container import InputEntryContainer
@@ -234,6 +235,8 @@ class DetailsPanel(QtWidgets.QWidget):
             return InputEntryColor(self.settings, self.DetailEntryUpdated)
         elif data_type == "int":
             return InputEntryInt(self.settings, self.DetailEntryUpdated)
+        elif data_type == "float":
+            return InputEntryFloat(self.settings, self.DetailEntryUpdated)
         elif data_type == "file":
             return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated)
         elif data_type == "file_data":
@@ -242,6 +245,8 @@ class DetailsPanel(QtWidgets.QWidget):
             return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Image"], self.DetailEntryUpdated)
         elif data_type == "file_font":
             return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Font"], self.DetailEntryUpdated)
+        elif data_type == "file_sound":
+            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Sound"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
             return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
         elif data_type == "choice":

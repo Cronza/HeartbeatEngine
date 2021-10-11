@@ -18,9 +18,9 @@ class Settings:
         self.active_resolution = None
 
     def Evaluate(self, data_path):
+        """ Reads in the provided project settings file path """
         self.project_settings = Reader.ReadAll(data_path)
 
-        # *** WINDOWS SETTINGS ***
         self.resolution = self.project_settings['Window']['resolution']
         self.resolution_options = self.project_settings['Window']['resolution_options']
         self.active_resolution = tuple(self.resolution_options[self.resolution])

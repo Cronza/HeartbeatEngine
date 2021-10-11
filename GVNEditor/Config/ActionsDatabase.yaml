@@ -583,5 +583,36 @@ Scene:
           editable: True
           preview: True
 
-#- Sound: ""
+Sound:
+  icon: "Content/Icons/Dialogue.png"
+  options:
+    # Play SFX
+    - display_name: "Play SFX"
+      action_name: "play_sfx"
+      requirements:
+        - name: "key"
+          type: "str"
+          value: ""
+          editable: True
+          preview: True
+
+        - name: "sound"
+          type: "file_sound"
+          value: ""
+          editable: True
+          preview: True
+
+        - name: "volume"
+          type: "float"
+          value: 1.0
+          editable: True
+          preview: True
+
+        - name: "loop"
+          type: "bool"
+          value: False
+          editable: True
+          preview: True
+
+
 #- Effect: ""

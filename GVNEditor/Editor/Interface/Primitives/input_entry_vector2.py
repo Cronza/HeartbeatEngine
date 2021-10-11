@@ -5,6 +5,7 @@ class InputEntryTuple(InputEntryBase):
     def __init__(self, settings, refresh_func=None):
         super().__init__(settings, refresh_func)
 
+        #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
         self.input_widget_title.setFont(self.settings.paragraph_font)
         self.input_widget_title.setStyleSheet(settings.paragraph_color)

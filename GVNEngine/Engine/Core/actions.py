@@ -14,6 +14,7 @@ All actions take in two parameters:
 All actions can be designed to accept and use a variety of different parameters. To learn more, review some of the
 provided actions
 """
+import pygame.mixer
 import Engine
 from Engine.Core.BaseClasses.renderable_sprite import SpriteRenderable
 from Engine.Core.BaseClasses.renderable_text import TextRenderable
@@ -22,6 +23,7 @@ from Engine.Core.BaseClasses.button import Button
 from Engine.Core.BaseClasses.choice import Choice
 from Engine.Core.BaseClasses.renderable_container import Container
 from Engine.Core.BaseClasses.action import Action
+from Engine.Core.BaseClasses.action_sound import SoundAction
 
 class remove_renderable(Action):
     """
@@ -34,14 +36,14 @@ class remove_renderable(Action):
     """
     def Start(self):
         if "key" in self.action_data:
-            renderable = self.scene.renderables_group.renderables[self.action_data['key']]
+            renderable = self.scene.active_renderables.renderables[self.action_data['key']]
 
             # Any transitions are applied to the sprite pre-unload
             if "None" not in self.action_data["transition"]["type"]:
                 self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], renderable)
                 self.active_transition.Start()
             else:
-                self.scene.renderables_group.Remove(self.action_data["key"])
+                self.scene.active_renderables.Remove(self.action_data["key"])
                 self.scene.Draw()
                 self.Complete()
         else:
@@ -49,7 +51,7 @@ class remove_renderable(Action):
 
     def Update(self):
         if self.active_transition.complete is True:
-            self.scene.renderables_group.Remove(self.action_data["key"])
+            self.scene.active_renderables.Remove(self.action_data["key"])
             self.Complete()
         else:
             self.active_transition.Update()
@@ -70,7 +72,7 @@ class remove_container(Action):
     """
     def Start(self):
         if "key" in self.action_data:
-            container = self.scene.renderables_group.renderables[self.action_data["key"]]
+            container = self.scene.active_renderables.renderables[self.action_data["key"]]
 
             # Collect a flattened list of all children in this container
             children = container.GetAllChildren()
@@ -84,7 +86,7 @@ class remove_container(Action):
                 # Merge the surfaces, then delete the child (Grim, I know)
                 for child in list(children):
                     container.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
-                    self.scene.renderables_group.Remove(child.key)
+                    self.scene.active_renderables.Remove(child.key)
 
                 container.visible = True
                 self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], container)
@@ -92,9 +94,9 @@ class remove_container(Action):
             else:
                 # Remove all children first
                 for child in children:
-                    self.scene.renderables_group.Remove(child.key)
+                    self.scene.active_renderables.Remove(child.key)
 
-                self.scene.renderables_group.Remove(self.action_data['key'])
+                self.scene.active_renderables.Remove(self.action_data['key'])
                 self.scene.Draw()
                 self.Complete()
         else:
@@ -102,7 +104,7 @@ class remove_container(Action):
 
     def Update(self):
         if self.active_transition.complete is True:
-            self.scene.renderables_group.Remove(self.action_data['key'])
+            self.scene.active_renderables.Remove(self.action_data['key'])
             self.Complete()
         else:
             self.active_transition.Update()
@@ -151,7 +153,7 @@ class create_dialogue_interface(Action):
         )
 
         # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
-        self.scene.renderables_group.Add(dialogue_frame)
+        self.scene.active_renderables.Add(dialogue_frame)
 
         self.scene.Draw()
         self.Complete()
@@ -183,7 +185,7 @@ class create_background(Action):
             self.action_data,
         )
 
-        self.scene.renderables_group.Add(new_sprite)
+        self.scene.active_renderables.Add(new_sprite)
 
         self.scene.Draw()
         self.Complete()
@@ -230,7 +232,7 @@ class create_sprite(Action):
             if self.action_data["flip"]:
                 new_sprite.Flip()
 
-        self.scene.renderables_group.Add(new_sprite)
+        self.scene.active_renderables.Add(new_sprite)
 
         # Any transitions are applied to the sprite post-load
         if "None" not in self.action_data["transition"]["type"]:
@@ -281,7 +283,7 @@ class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE U
             if self.action_data['flip']:
                 new_renderable.Flip()
 
-        self.scene.renderables_group.Add(new_renderable)
+        self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -335,7 +337,7 @@ class create_text(Action):
 
         # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
         # not meant to be kept around long-term
-        self.scene.renderables_group.Add(new_text_renderable)
+        self.scene.active_renderables.Add(new_text_renderable)
 
         if "None" not in self.action_data["transition"]["type"]:
             self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
@@ -410,7 +412,7 @@ class create_button(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
             if self.action_data['flip']:
                 new_renderable.Flip()
 
-        self.scene.renderables_group.Add(new_renderable)
+        self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -435,7 +437,7 @@ class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDAT
             self.action_data,
         )
 
-        self.scene.renderables_group.Add(new_renderable)
+        self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -527,7 +529,7 @@ class dialogue(Action):
                 self.action_data["speaker"]
             )
             # Speaker text does not support transitions currently
-            self.scene.renderables_group.Add(new_speaker_text)
+            self.scene.active_renderables.Add(new_speaker_text)
 
         # If the user has specified a 'dialogue' block, build the speaker renderable
         if "dialogue" in self.action_data:
@@ -564,7 +566,7 @@ class dialogue(Action):
                 self.action_data["dialogue"]
             )
 
-            self.scene.renderables_group.Add(new_dialogue_text)
+            self.scene.active_renderables.Add(new_dialogue_text)
 
             # By default, dialogue text fades in. However, allow the user to override this behaviour
             if "None" not in self.action_data["dialogue"]["transition"]["type"]:
@@ -646,7 +648,7 @@ class character_dialogue(Action):
                 character_data
             )
             # Speaker text does not support transitions currently
-            self.scene.renderables_group.Add(new_character_text)
+            self.scene.active_renderables.Add(new_character_text)
 
         # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
         # information, and / or any global settings
@@ -684,7 +686,7 @@ class character_dialogue(Action):
                 self.action_data['speaker']
             )
             # Speaker text does not support transitions currently
-            self.scene.renderables_group.Add(new_speaker_text)
+            self.scene.active_renderables.Add(new_speaker_text)
 
         # If the user has specified a 'dialogue' block, build the speaker renderable
         if 'dialogue' in self.action_data:
@@ -721,7 +723,7 @@ class character_dialogue(Action):
                 self.action_data['dialogue']
             )
 
-            self.scene.renderables_group.Add(new_dialogue_text)
+            self.scene.active_renderables.Add(new_dialogue_text)
 
             # By default, dialogue text fades in. However, allow the user to override this behaviour
             if 'transition' in self.action_data['dialogue']:
@@ -800,7 +802,7 @@ class create_character(Action):
             if self.action_data['flip']:
                 new_sprite.Flip()
 
-        self.scene.renderables_group.Add(new_sprite)
+        self.scene.active_renderables.Add(new_sprite)
 
         # Any transitions are applied to the sprite post-load
         if 'transition' in self.action_data:
@@ -901,7 +903,7 @@ class choice(Action):
         for choice_data in self.action_data["choices"]:
             new_renderable.children.append(self.a_manager.PerformAction(choice_data, "create_choice_button"))
 
-        self.scene.renderables_group.Add(new_renderable)
+        self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -926,7 +928,7 @@ class create_choice_button(Action):
             if self.action_data['flip']:
                 new_renderable.Flip()
 
-        self.scene.renderables_group.Add(new_renderable)
+        self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -937,7 +939,7 @@ class choose_branch(Action):
     def Start(self):
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
-        if self.scene.renderables_group.Exists("Choice"):
+        if self.scene.active_renderables.Exists("Choice"):
             self.a_manager.PerformAction(
                 {"key": "Choice", "transition" : {"type": "None"}},
                 "remove_container"
@@ -946,6 +948,44 @@ class choose_branch(Action):
         self.scene.SwitchDialogueBranch(self.action_data['branch'])
 
         self.scene.Draw()
+        self.Complete()
+
+# -------------- SOUND ACTIONS --------------
+
+class play_sfx(SoundAction):
+    """
+    Possible Parameters:
+    - key: str
+    - sound: str
+    - volume : float
+    - loop : bool
+    """
+
+    def Start(self):
+        new_sound = pygame.mixer.Sound(self.scene.settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
+        new_sound.set_volume(self.action_data["volume"])
+
+        loop_count = 0
+        if self.action_data["loop"]:
+            loop_count = -1
+
+        # Sound objects don't have a way of checking their progress, so let's keep track and monitor
+        # the channel it was assigned to. Once it's empty, it's a good assumption that it's successfully completed
+        self.assigned_channel = new_sound.play(loop_count)
+
+        self.scene.active_sounds[self.action_data["key"]] = new_sound
+
+        return self.assigned_channel
+
+    def Update(self):
+        if not self.assigned_channel.get_busy():
+            print("SFX completed")
+            self.Complete()
+
+    def Skip(self):
+        #@TODO: How can this run in the background? Should we have a version of this for "ambient" that isn't skippable?
+        print("Skipping sound")
+        self.assigned_channel.stop()
         self.Complete()
 
 # -------------- TRANSITION ACTIONS --------------
@@ -983,7 +1023,7 @@ class fade_scene_from_black(Action):
             self.action_data
         )
 
-        self.scene.renderables_group.Add(new_sprite)
+        self.scene.active_renderables.Add(new_sprite)
         self.scene.Draw()
 
         self.renderable = new_sprite

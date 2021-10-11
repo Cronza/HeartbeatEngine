@@ -1,13 +1,8 @@
 import argparse
 import pygame
-import sys
-print("--------------")
-for path in sys.path:
-    print(path)
-print("--------------")
-
 from Engine.Core.scene_manager import SceneManager
 from Engine.Core.settings import Settings
+from pygame import mixer
 
 class GVNEngine:
     def __init__(self, project_path):
@@ -16,12 +11,8 @@ class GVNEngine:
             raise ValueError("No project path provided - Unable to launch GVNEngine")
             quit(1)
 
-        # Build a settings object to house engine & project settings
         self.settings = Settings(project_path)
-
         self.settings.Evaluate(self.settings.project_dir + "/Config/Game.yaml")
-
-        # Configure the game based on project settings
         pygame.display.set_caption(self.settings.project_settings['Game']['title'])
 
         # Declare the scene manager, but we'll initialize it during the game loop
@@ -33,12 +24,10 @@ class GVNEngine:
     def Main(self):
 
         pygame.init()
-
-        # Initialize the game window and clock
-        window = pygame.display.set_mode(self.settings.active_resolution)
+        mixer.init()
         clock = pygame.time.Clock()
+        window = pygame.display.set_mode(self.settings.active_resolution)
 
-        # Initialize the scene manager
         self.scene_manager = SceneManager(window, pygame, self.settings)
 
         # Start the game loop

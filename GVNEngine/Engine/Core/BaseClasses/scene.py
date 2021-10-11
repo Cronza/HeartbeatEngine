@@ -10,7 +10,8 @@ class Scene:
         self.pygame_lib = pygame_lib
         self.settings = settings
         self.scene_manager = scene_manager
-        self.renderables_group = RenderableGroup()
+        self.active_renderables = RenderableGroup()
+        self.active_sounds = {}
         self.a_manager = ActionManager(self, settings)
 
         self.pause_menu = None
@@ -30,7 +31,7 @@ class Scene:
         self.LoadSceneData()
 
     def Update(self, input_events):
-        self.renderables_group.Update()
+        self.active_renderables.Update()
         self.a_manager.Update()
 
         # Pause Menu
@@ -38,7 +39,7 @@ class Scene:
             if event.type == self.pygame_lib.KEYDOWN:
                 if event.key == self.pygame_lib.K_p:
                     #@TODO: TEMP HACK
-                    if self.renderables_group.Exists('Pause_Menu'):
+                    if self.active_renderables.Exists('Pause_Menu'):
                         print("Pause Menu Open")
                     else:
                         self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data,
@@ -46,7 +47,7 @@ class Scene:
 
     def Draw(self):
         # Sort the renderable elements by their z-order (Lowest to Highest)
-        renderables = sorted(self.renderables_group.renderables.values(), key=lambda renderable: renderable.z_order)
+        renderables = sorted(self.active_renderables.renderables.values(), key=lambda renderable: renderable.z_order)
 
         # Draw any renderables using the screen space multiplier to fit the new resolution
         for renderable in renderables:
@@ -61,7 +62,7 @@ class Scene:
 
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change from the scene_manager"""
-        self.renderables_group.Clear()
+        self.active_renderables.Clear()
         self.scene_manager.LoadScene(scene_file)
 
     def Resize(self):
@@ -73,7 +74,7 @@ class Scene:
         self.scene_manager.resolution_multiplier = self.resolution_multiplier
 
         # Inform each renderable of the resolution change so they can update their respective elements
-        for renderable in self.renderables_group.Get():
+        for renderable in self.active_renderables.Get():
             renderable.RecalculateSize(self.resolution_multiplier)
             # Resize any child renderables after resizing the parent
             if renderable.children:
