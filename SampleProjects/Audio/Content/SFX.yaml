@@ -9,3 +9,7 @@ dialogue:
     sound: Content/SFX/whistle.wav
     volume: 1.0
     loop: true
+  - action: play_music
+    music: Content/Music/Jazz/bensound-romantic.mp3
+    volume: 1.0
+    loop: false
