@@ -10,7 +10,7 @@ class ActionManager:
         self.active_actions = {}
         self.scene.settings = settings
 
-    def Update(self):
+    def Update(self, events):
         pending_completion = []
         if self.active_actions:
             # We can't edit the dict size while iterating, so if any actions are complete, store them and delete them
@@ -19,7 +19,7 @@ class ActionManager:
                 if action.complete is True:
                     pending_completion.append(action)
                 else:
-                    action.Update()
+                    action.Update(events)
             if pending_completion:
                 for action in pending_completion:
                     # We defer using completion delegates to here since, if actions could execute them, it might

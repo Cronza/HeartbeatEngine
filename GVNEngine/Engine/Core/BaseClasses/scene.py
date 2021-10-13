@@ -30,12 +30,12 @@ class Scene:
 
         self.LoadSceneData()
 
-    def Update(self, input_events):
+    def Update(self, events):
         self.active_renderables.Update()
-        self.a_manager.Update()
+        self.a_manager.Update(events)
 
         # Pause Menu
-        for event in input_events:
+        for event in events:
             if event.type == self.pygame_lib.KEYDOWN:
                 if event.key == self.pygame_lib.K_p:
                     #@TODO: TEMP HACK

@@ -33,10 +33,10 @@ class GVNEngine:
         # Start the game loop
         is_running = True
         while is_running is True:
-            input_events = pygame.event.get()
+            events = pygame.event.get()
 
             # Handle all system actions
-            for event in input_events:
+            for event in events:
                 if event.type == pygame.QUIT:
                     is_running = False
                 if event.type == pygame.KEYDOWN:
@@ -58,7 +58,7 @@ class GVNEngine:
                         self.show_fps = not self.show_fps
 
             # Update scene logic. This drives the core game functionality
-            self.scene_manager.active_scene.Update(input_events)
+            self.scene_manager.active_scene.Update(events)
 
             # Debug Logging
             if self.show_fps:

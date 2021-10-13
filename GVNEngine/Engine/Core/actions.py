@@ -49,7 +49,7 @@ class remove_renderable(Action):
         else:
             raise ValueError("'remove_renderable' action Failed - Key not specified")
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete is True:
             self.scene.active_renderables.Remove(self.action_data["key"])
             self.Complete()
@@ -102,7 +102,7 @@ class remove_container(Action):
         else:
             raise ValueError("'remove_renderable' action Failed - Key not specified")
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete is True:
             self.scene.active_renderables.Remove(self.action_data['key'])
             self.Complete()
@@ -244,7 +244,7 @@ class create_sprite(Action):
 
         return new_sprite
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete:
             self.Complete()
         else:
@@ -348,7 +348,7 @@ class create_text(Action):
 
         return new_text_renderable
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete is True:
             self.Complete()
         else:
@@ -584,7 +584,7 @@ class dialogue(Action):
 
         return None
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete is True:
             print("Transition Complete")
             self.Complete()
@@ -741,7 +741,7 @@ class character_dialogue(Action):
 
         return None
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete is True:
             print("Transition Complete")
             self.Complete()
@@ -814,7 +814,7 @@ class create_character(Action):
 
         return new_sprite
 
-    def Update(self):
+    def Update(self, events):
         if self.active_transition.complete:
             print("Transition Complete")
             self.Complete()
@@ -977,16 +977,38 @@ class play_sfx(SoundAction):
 
         return self.assigned_channel
 
-    def Update(self):
+    def Update(self, events):
         if not self.assigned_channel.get_busy():
             print("SFX completed")
             self.Complete()
 
-    def Skip(self):
-        #@TODO: How can this run in the background? Should we have a version of this for "ambient" that isn't skippable?
-        print("Skipping sound")
-        self.assigned_channel.stop()
-        self.Complete()
+class play_music(SoundAction):
+    """
+    Possible Parameters:
+    - sound: str
+    - volume : float
+    - loop : bool
+    """
+
+    def Start(self):
+        #@TODO: Investigate what happens if the user doesn't remove the previously active music action
+        # The pygame music system doesn't use objects, but instead uses a stream. Any changes made against music
+        # are made to the stream itself
+        self.skippable = False
+        pygame.mixer.music.load(self.scene.settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
+        pygame.mixer.music.set_volume(self.action_data["volume"])
+
+        loop_count = 0
+        if self.action_data["loop"]:
+            loop_count = -1
+
+        # Since there can only be one music item active, there is no need to use a key identifier
+        pygame.mixer.music.play(loop_count)
+
+        return True
+
+    def Update(self, events):
+        pass
 
 # -------------- TRANSITION ACTIONS --------------
 """ 
@@ -1032,7 +1054,7 @@ class fade_scene_from_black(Action):
 
         return new_sprite
 
-    def Update(self):
+    def Update(self, events):
         self.progress -= (self.speed * self.scene.delta_time)
         self.renderable.GetSurface().set_alpha(self.progress)
 
