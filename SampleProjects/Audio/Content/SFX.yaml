@@ -8,8 +8,17 @@ dialogue:
     key: Whistle
     sound: Content/SFX/whistle.wav
     volume: 1.0
-    loop: true
+    loop: false
+    post_wait: wait_until_complete
+  - action: wait
+    seconds: 3
+    post_wait: wait_until_complete
   - action: play_music
     music: Content/Music/Jazz/bensound-romantic.mp3
     volume: 1.0
     loop: false
+    post_wait: no_wait
+  - action: wait
+    seconds: 3
+    post_wait: wait_until_complete
+  - action: stop_music

@@ -25,6 +25,8 @@ from Engine.Core.BaseClasses.renderable_container import Container
 from Engine.Core.BaseClasses.action import Action
 from Engine.Core.BaseClasses.action_sound import SoundAction
 
+# -------------- GRAPHICS ACTIONS --------------
+
 class remove_renderable(Action):
     """
     Based on a given key, remove the associated renderable from the renderable stack
@@ -443,33 +445,6 @@ class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDAT
         self.Complete()
 
         return new_renderable
-
-class load_scene(Action):
-    """
-    Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
-    nothing
-    Possible Parameters:
-    - scene_file : str
-    """
-    def Start(self):
-        self.skippable = False
-
-        if "scene_file" in self.action_data:
-            self.scene.SwitchScene(self.action_data["scene_file"])
-        else:
-            raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
-
-        self.Complete()
-
-class quit_game(Action):
-    """
-    Immediately closes the game
-    This is not meant to be called during scenes, and is available as an action for inputs, buttons, etc
-    """
-    def Start(self):
-        self.skippable = False
-        self.scene.pygame_lib.quit()
-        exit()
 
 # -------------- DIALOGUE ACTIONS --------------
 
@@ -972,30 +947,56 @@ class play_sfx(SoundAction):
         # Sound objects don't have a way of checking their progress, so let's keep track and monitor
         # the channel it was assigned to. Once it's empty, it's a good assumption that it's successfully completed
         self.assigned_channel = new_sound.play(loop_count)
-
         self.scene.active_sounds[self.action_data["key"]] = new_sound
 
         return self.assigned_channel
 
     def Update(self, events):
         if not self.assigned_channel.get_busy():
-            print("SFX completed")
+            self.scene.active_sounds.pop(self.action_data["key"])
             self.Complete()
 
+    def Skip(self):
+        self.scene.active_sounds.pop(self.action_data["key"])
+        self.Complete()
+
+class stop_sfx(Action):
+    """
+    Based on a given key, stop and remove the associated sfx from the sound stack
+    Possible Parameters:
+    - key : str
+    """
+    def Start(self):
+        self.skippable = False
+
+        if "key" in self.action_data:
+            self.scene.active_sounds[self.action_data["key"]].stop()  # Stop the sound
+            del self.scene.active_sounds[self.action_data["key"]]  # Delete the sound
+            self.scene.active_sounds.pop(self.action_data["key"])  # Remove key
+
+            self.Complete()
+        else:
+            raise ValueError("'stop_sfx' action Failed - Key not specified")
+
 class play_music(SoundAction):
+    #@TODO: Implement end-event so this action completes when the song reaches last frame
     """
     Possible Parameters:
-    - sound: str
+    - music: str
     - volume : float
     - loop : bool
     """
 
     def Start(self):
-        #@TODO: Investigate what happens if the user doesn't remove the previously active music action
+        self.skippable = False
+
+        # If the user hasn't removed the previous music, forcefully remove it here without any transition
+        if self.scene.active_music:
+            pygame.mixer.music.stop()  # This will invoke the end-event on the existing music action
+
         # The pygame music system doesn't use objects, but instead uses a stream. Any changes made against music
         # are made to the stream itself
-        self.skippable = False
-        pygame.mixer.music.load(self.scene.settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
+        pygame.mixer.music.load(self.scene.settings.ConvertPartialToAbsolutePath(self.action_data["music"]))
         pygame.mixer.music.set_volume(self.action_data["volume"])
 
         loop_count = 0
@@ -1004,11 +1005,75 @@ class play_music(SoundAction):
 
         # Since there can only be one music item active, there is no need to use a key identifier
         pygame.mixer.music.play(loop_count)
+        self.scene.active_music = self
 
-        return True
+        return None
 
     def Update(self, events):
-        pass
+        if not pygame.mixer.music.get_busy():
+            print("SFX completed")
+            self.Complete()
+
+class stop_music(Action):
+    """
+    Stops the currently active music
+    Possible Parameters:
+    - key : str
+    """
+    def Start(self):
+        self.skippable = False
+
+        pygame.mixer.music.stop()  # This will invoke the end-event on the existing music action
+        self.scene.active_music.complete = True
+        self.scene.active_music = None  # DEBUG: Remove once the end-event is implemented
+        self.Complete()
+
+# -------------- UTILITY ACTIONS --------------
+
+class load_scene(Action):
+    """
+    Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
+    nothing
+    Possible Parameters:
+    - scene_file : str
+    """
+    def Start(self):
+        self.skippable = False
+
+        if "scene_file" in self.action_data:
+            self.scene.SwitchScene(self.action_data["scene_file"])
+        else:
+            raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
+
+        self.Complete()
+
+class wait(Action):
+    """
+    Waits for a set amount of time before completing
+    """
+    def Start(self):
+        self.counter = 0
+        self.target = self.action_data["seconds"]
+
+        return None
+
+    def Update(self, events):
+        self.counter += 1 * self.scene.delta_time
+        print(self.counter)
+
+        if self.counter >= self.target:
+            print("Times up!")
+            self.Complete()
+
+class quit_game(Action):
+    """
+    Immediately closes the game
+    This is not meant to be called during scenes, and is available as an action for inputs, buttons, etc
+    """
+    def Start(self):
+        self.skippable = False
+        self.scene.pygame_lib.quit()
+        exit()
 
 # -------------- TRANSITION ACTIONS --------------
 """ 

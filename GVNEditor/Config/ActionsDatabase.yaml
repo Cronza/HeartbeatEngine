@@ -614,5 +614,80 @@ Sound:
           editable: True
           preview: True
 
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_until_complete"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
+
+    # Play Music
+    - display_name: "Play Music"
+      action_name: "play_music"
+      requirements:
+        - name: "music"
+          type: "file_sound"
+          value: ""
+          editable: True
+          preview: True
+
+        - name: "volume"
+          type: "float"
+          value: 1.0
+          editable: True
+          preview: True
+
+        - name: "loop"
+          type: "bool"
+          value: False
+          editable: True
+          preview: True
+
+        - name: "post_wait"
+          type: "dropdown"
+          value: "no_wait"
+          options:
+            - "no_wait"
+            - "wait_for_input"
+            - "wait_until_complete"
+          editable: True
+          preview: True
+
+    # Stop SFX
+    - display_name: "Stop SFX"
+      action_name: "stop_sfx"
+      requirements:
+        - name: "key"
+          type: "str"
+          value: ""
+          editable: True
+          preview: True
+
+    # Stop Music
+    - display_name: "Stop Music"
+      action_name: "stop_music"
+
+Utilities:
+  icon: "Content/Icons/Dialogue.png"
+  options:
+    # Wait
+    - display_name: "Wait"
+      action_name: "wait"
+      requirements:
+        - name: "seconds"
+          type: "int"
+          value: 3
+          editable: True
+          preview: True
+        - name: "post_wait"
+          type: "dropdown"
+          value: "wait_until_complete"
+          options:
+            - "wait_until_complete"
+          editable: False
+          preview: False
 
 #- Effect: ""

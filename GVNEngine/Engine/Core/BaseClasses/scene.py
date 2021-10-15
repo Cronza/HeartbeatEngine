@@ -12,6 +12,7 @@ class Scene:
         self.scene_manager = scene_manager
         self.active_renderables = RenderableGroup()
         self.active_sounds = {}
+        self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
         self.a_manager = ActionManager(self, settings)
 
         self.pause_menu = None

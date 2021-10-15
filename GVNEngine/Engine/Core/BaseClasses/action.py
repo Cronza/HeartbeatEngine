@@ -12,7 +12,7 @@ class Action():
     def Start(self):
         pass
 
-    def Update(self):
+    def Update(self, events):
         pass
 
     def Skip(self):

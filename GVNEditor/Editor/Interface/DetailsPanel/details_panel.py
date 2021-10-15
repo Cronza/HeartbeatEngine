@@ -109,11 +109,12 @@ class DetailsPanel(QtWidgets.QWidget):
         # Update the active entry
         self.active_entry = selected_entry
 
-        # Generate each entry
-        for requirement in self.active_entry.action_data['requirements']:
+        # Generate each entry (If there are any requirements)
+        if "requirements" in self.active_entry.action_data:
+            for requirement in self.active_entry.action_data['requirements']:
 
-            # Create a new entry, and add it to the details list
-            self.AddEntry(self.CreateEntryWidget(requirement))
+                # Create a new entry, and add it to the details list
+                self.AddEntry(self.CreateEntryWidget(requirement))
 
         # Expand all dropdowns automatically
         self.details_table.expandAll()
@@ -137,31 +138,33 @@ class DetailsPanel(QtWidgets.QWidget):
                 action_data_target = action_data
             else:
                 details_entry_parent = self.details_table.invisibleRootItem()
-                action_data_target = self.active_entry.action_data["requirements"]
+                if "requirements" in self.active_entry.action_data:
+                    action_data_target = self.active_entry.action_data["requirements"]
 
             for details_entry_index in range(0, details_entry_parent.childCount()):
                 details_entry = details_entry_parent.child(details_entry_index)
                 details_entry_name = details_entry.name_widget.text()
 
-                # Since the requirements list is a list, we need to parse through for specifically for the
-                # match for this entry
-                for requirement in action_data_target:
-                    if requirement["name"] == details_entry_name:
+                # Are there any requirements to cache?
+                if action_data_target:
+                    # Since the requirements list is a list, we need to parse through for specifically for the
+                    # match for this entry
+                    for requirement in action_data_target:
+                        if requirement["name"] == details_entry_name:
+                            # If this details_entry has children (IE. It's a container), recursively update the cache for
+                            # any and all children entries
+                            if details_entry.childCount() > 0 and "children" in requirement: #@TODO: TESTING: Please review
+                                self.UpdateCache(details_entry, requirement["children"])
 
-                        # If this details_entry has children (IE. It's a container), recursively update the cache for
-                        # any and all children entries
-                        if details_entry.childCount() > 0 and "children" in requirement: #@TODO: TESTING: Please review
-                            self.UpdateCache(details_entry, requirement["children"])
+                            # Containers don't store values themselves, so the above code accounts solely for it's children
+                            # If this entry is not a container, lets cache normally
+                            else:
+                                requirement["value"] = details_entry.Get()
 
-                        # Containers don't store values themselves, so the above code accounts solely for it's children
-                        # If this entry is not a container, lets cache normally
-                        else:
-                            requirement["value"] = details_entry.Get()
-
-                            # If this entry has a global option, keep track of it's value
-                            if details_entry.show_global_toggle:
-                                global_value = details_entry.GetGlobal()
-                                requirement["global"]["active"] = global_value
+                                # If this entry has a global option, keep track of it's value
+                                if details_entry.show_global_toggle:
+                                    global_value = details_entry.GetGlobal()
+                                    requirement["global"]["active"] = global_value
 
     def CreateEntryWidget(self, data):
         """ Given an action_data dict, create a new details entry widget and return it """

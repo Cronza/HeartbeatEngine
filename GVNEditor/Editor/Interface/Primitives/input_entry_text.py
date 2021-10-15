@@ -27,7 +27,7 @@ class InputEntryText(InputEntryBase):
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def MakeUneditable(self):
-        self.input_widget.setReadOnly(True)
+        self.input_widget.setEnabled(False)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color)
 
 

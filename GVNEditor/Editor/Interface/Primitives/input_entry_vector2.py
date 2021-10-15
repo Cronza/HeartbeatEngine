@@ -23,9 +23,6 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
-        #self.validator = QtGui.QIntValidator()
-        #self.input_widget.setValidator(self.validator)
-        #self.input_widget_alt.setValidator(self.validator)
         validator = QtGui.QDoubleValidator(0, 1, 8)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
@@ -65,15 +62,15 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
     def MakeUneditable(self):
-        self.input_widget.setReadOnly(True)
-        self.input_widget_alt.setReadOnly(True)
+        self.input_widget.setEnabled(False)
+        self.input_widget_alt.setEnabled(False)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color)
         self.input_widget_alt.setStyleSheet(self.settings.read_only_background_color)
 
     def MakeEditable(self):
-        self.input_widget.setReadOnly(False)
+        self.input_widget.setEnabled(True)
         self.input_widget.setStyleSheet("")
-        self.input_widget_alt.setReadOnly(False)
+        self.input_widget_alt.setEnabled(True)
         self.input_widget_alt.setStyleSheet("")
 
 

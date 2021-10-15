@@ -45,10 +45,12 @@ class DialogueEntry(QtWidgets.QWidget):
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
-        self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
+        if "requirements" in self.action_data:
+            self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
 
     def CompileSubtextString(self, data):
         """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
+        #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
         for param in data:
             if param["preview"]:

@@ -19,7 +19,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget.setStyleSheet(settings.paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget.setReadOnly(True)
+        self.input_widget.setEnabled(True)
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()

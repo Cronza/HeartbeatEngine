@@ -16,8 +16,10 @@ class DBManager:
                 # Get the action name
                 converted_action = {'action': editor_action['action_name']}
 
-                # Collect a converted dict of all requirements for this action
-                converted_action.update(self.ConvertActionRequirementsToEngineFormat(editor_action))
+                # Collect a converted dict of all requirements for this action (If any are present)
+                converted_data = self.ConvertActionRequirementsToEngineFormat(editor_action)
+                if converted_data:
+                    converted_action.update(converted_data)
 
                 # Add it to the final list of actions
                 action_list.append(converted_action)
@@ -35,23 +37,25 @@ class DBManager:
         if has_parent:
             term = "children"
 
-        for requirement in editor_action_data[term]:
-            if requirement["type"] != "container":
+        if term in editor_action_data:
+            for requirement in editor_action_data[term]:
+                if requirement["type"] != "container":
 
-                # Exclude requirements that are pointing to a global setting. The engine will take care of this at
-                # runtime since any global value stored in a file will become outdated as soon as the global setting
-                # is changed
+                    # Exclude requirements that are pointing to a global setting. The engine will take care of this at
+                    # runtime since any global value stored in a file will become outdated as soon as the global setting
+                    # is changed
 
-                if "global" in requirement:
-                    if "active" in requirement["global"]:
-                        if not requirement["global"]["active"]:
-                            converted_action[requirement["name"]] = requirement["value"]
+                    if "global" in requirement:
+                        if "active" in requirement["global"]:
+                            if not requirement["global"]["active"]:
+                                converted_action[requirement["name"]] = requirement["value"]
+                    else:
+                        converted_action[requirement["name"]] = requirement["value"]
                 else:
-                    converted_action[requirement["name"]] = requirement["value"]
-            else:
-                converted_action[requirement["name"]] = self.ConvertActionRequirementsToEngineFormat(requirement, True)
+                    converted_action[requirement["name"]] = self.ConvertActionRequirementsToEngineFormat(requirement, True)
 
-        return converted_action
+            return converted_action
+        return None
 
     def ConvertDialogueFileToEditorFormat(self, action_data, settings):
         """
@@ -79,7 +83,7 @@ class DBManager:
 
                     if database_entry:
                         break
-
+                # Pass the entry by ref, and let the convert func edit it directly
                 self.ConvertActionRequirementsToEditorFormat(database_entry, action)
                 action_list.append(database_entry)
 
@@ -99,19 +103,21 @@ class DBManager:
         # Compare the parameters that are in the file, and those that aren't. Any that aren't are assumed to be
         # using global params, and any that are will be using custom values. Account for this difference in the
         # settings
-        for requirement in editor_action_data[term]:
-            if requirement["type"] != "container":
+        if term in editor_action_data:
+            for requirement in editor_action_data[term]:
+                if requirement["type"] != "container":
 
-                # If the requirement is present, and it does have a global option, then it's an override
-                if requirement["name"] in engine_action_data:
-                    if "global" in requirement:
-                        requirement["global"]["active"] = False
+                    # If the requirement is present, and it does have a global option, then it's an override
+                    if requirement["name"] in engine_action_data:
+                        if "global" in requirement:
+                            requirement["global"]["active"] = False
 
-                    requirement["value"] = engine_action_data[requirement["name"]]
+                        requirement["value"] = engine_action_data[requirement["name"]]
+                    else:
+                        if "global" in requirement:
+                            requirement["global"]["active"] = True
                 else:
-                    if "global" in requirement:
-                        requirement["global"]["active"] = True
-            else:
-                self.ConvertActionRequirementsToEditorFormat(requirement, engine_action_data[requirement["name"]], True)
+                    self.ConvertActionRequirementsToEditorFormat(requirement, engine_action_data[requirement["name"]], True)
 
-        return editor_action_data
+            return editor_action_data
+        return None

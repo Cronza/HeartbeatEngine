@@ -37,9 +37,9 @@ class InputEntryDropdown(InputEntryBase):
         self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
 
     def MakeUneditable(self):
-        self.input_widget.setReadOnly(True)
+        self.input_widget.setEnabled(False)
         self.input_widget.setStyleSheet(self.settings.read_only_background_color)
 
     def MakeEditable(self):
-        self.input_widget.setReadOnly(False)
+        self.input_widget.setEnabled(True)
         self.input_widget.setStyleSheet("")
