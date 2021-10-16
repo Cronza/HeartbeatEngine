@@ -493,7 +493,7 @@ Dialogue:
       requirements:
         - name: "choices"
           type: "choice"
-          value: None
+          value: ""
           editable: True
           preview: True
           template:
@@ -683,5 +683,3 @@ Utilities:
             - "wait_until_complete"
           editable: False
           preview: False
-
-#- Effect: ""

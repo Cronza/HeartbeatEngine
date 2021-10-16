@@ -82,6 +82,8 @@ class InputEntryChoice(InputEntryBase):
         Adds a choice entry to the choice list, filling it with input widgets for every item
         in the 'templates' dict. If 'data' is provided, use it to populate the input widgets
         """
+        print("OOOOO")
+        print(data)
         # Each choice is given a parent container to help organize the choice's input widgets. This is also customized
         # to have a close button which deletes the choice from the list
         new_choice_container = InputEntryContainer(self.settings, self.data)
@@ -106,13 +108,14 @@ class InputEntryChoice(InputEntryBase):
         for index in range(0, self.branches_list.count()):
             branch_names.append(self.branches_list.itemWidget(self.branches_list.item(index)).Get()[0])
 
-        # Add special options before we add the bulk
+        # Add special options before we add the requirements from the template
         branch_dropdown = InputEntryDropdown(self.settings, branch_names, None)
         branch_dropdown.name_widget.setText("branch")
         self.add_to_parent_func(branch_dropdown, new_choice_container)
         key_input = InputEntryText(self.settings, lambda change: self.UpdateChoiceName(new_choice_container))
         key_input.name_widget.setText("key")
         self.add_to_parent_func(key_input, new_choice_container)
+
         if data:
             key_input.Set(data["key"])
             branch_dropdown.Set(data["branch"])
