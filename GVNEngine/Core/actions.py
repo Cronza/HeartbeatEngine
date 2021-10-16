@@ -932,20 +932,15 @@ class play_sfx(SoundAction):
     - key: str
     - sound: str
     - volume : float
-    - loop : bool
     """
 
     def Start(self):
         new_sound = pygame.mixer.Sound(self.scene.settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
         new_sound.set_volume(self.action_data["volume"])
 
-        loop_count = 0
-        if self.action_data["loop"]:
-            loop_count = -1
-
         # Sound objects don't have a way of checking their progress, so let's keep track and monitor
         # the channel it was assigned to. Once it's empty, it's a good assumption that it's successfully completed
-        self.assigned_channel = new_sound.play(loop_count)
+        self.assigned_channel = new_sound.play(0)
         self.scene.active_sounds[self.action_data["key"]] = new_sound
 
         return self.assigned_channel
@@ -1064,10 +1059,13 @@ class wait(Action):
             print("Times up!")
             self.Complete()
 
+    def Skip(self):
+        self.Complete()
+
 class quit_game(Action):
     """
     Immediately closes the game
-    This is not meant to be called during scenes, and is available as an action for inputs, buttons, etc
+    This is not meant to be called during scenes, but is available as an action for inputs, buttons, etc
     """
     def Start(self):
         self.skippable = False

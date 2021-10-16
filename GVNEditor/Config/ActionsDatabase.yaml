@@ -608,12 +608,6 @@ Sound:
           editable: True
           preview: True
 
-        - name: "loop"
-          type: "bool"
-          value: False
-          editable: True
-          preview: True
-
         - name: "post_wait"
           type: "dropdown"
           value: "wait_until_complete"

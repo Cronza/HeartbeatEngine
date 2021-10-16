@@ -313,6 +313,9 @@ class GVNEditor:
             self.e_ui.CreateMainTabContainer()
             self.e_ui.CreateOutliner()
 
+        # Clear any open editor tabs
+        self.e_ui.main_tab_editor.clear()
+
         # Refresh U.I text using any active translations
         self.e_ui.retranslateUi(self.main_window)
 
