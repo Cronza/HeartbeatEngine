@@ -1,7 +1,7 @@
 import argparse
 import pygame
-from Engine.Core.scene_manager import SceneManager
-from Engine.Core.settings import Settings
+from Core.scene_manager import SceneManager
+from Core.settings import Settings
 from pygame import mixer
 
 class GVNEngine:

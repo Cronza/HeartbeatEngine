@@ -4,15 +4,15 @@ import shutil
 import re
 from pathlib import Path
 from PyQt5 import QtWidgets
-from GVNEditor.Editor.Core.settings import Settings
-from GVNEditor.Editor.Utilities.DataTypes.file_types import FileType
-from GVNEditor.Editor.Utilities.play_manager import PlayManager
-from GVNEditor.Editor.Utilities.yaml_manager import Reader, Writer
-from GVNEditor.Editor.Interface import gvn_editor as gvne
-from GVNEditor.Editor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
-from GVNEditor.Editor.Interface.Prompts.file_system_prompt import FileSystemPrompt
-from GVNEditor.Editor.Core.EditorDialogue.editor_dialogue import EditorDialogue
-from GVNEditor.Editor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from GVNEditor.Core.settings import Settings
+from GVNEditor.Utilities.DataTypes.file_types import FileType
+from GVNEditor.Utilities.play_manager import PlayManager
+from GVNEditor.Utilities.yaml_manager import Reader, Writer
+from GVNEditor.Interface import gvn_editor as gvne
+from GVNEditor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
+from GVNEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
+from GVNEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
+from GVNEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 
 class GVNEditor:
     def __init__(self):
