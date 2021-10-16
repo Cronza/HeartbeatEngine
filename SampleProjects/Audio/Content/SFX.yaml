@@ -8,7 +8,7 @@ dialogue:
     key: Whistle
     sound: Content/SFX/whistle.wav
     volume: 1.0
-    post_wait: wait_for_input
+    post_wait: no_wait
   - action: wait
     seconds: 3
     post_wait: wait_until_complete
