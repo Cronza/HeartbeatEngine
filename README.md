@@ -1,31 +1,31 @@
-# GVNEngine
-![ScreenShot](Images/GVNEngine_Banner.jpg?raw=true "GVNEngine Banner")
+# Heartbeat Engine
+![ScreenShot](Images/HeartbeatEngine_Banner.jpg?raw=true "Heartbeat Engine Banner")
 
-[![License](https://img.shields.io/badge/license-MIT-green?label=engine-license&style=flat-square)](./GVNEngine/LICENSE.txt)
-[![License](https://img.shields.io/badge/license-GPLv2-blue?label=editor-license&style=flat-square)](./GVNEditor/LICENSE.txt)
-[![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/GVNEngine?style=flat-square)](https://github.com/Cronza/GVNEngine/issues)
+[![License](https://img.shields.io/badge/license-MIT-green?label=engine-license&style=flat-square)](HBEngine/LICENSE.txt)
+[![License](https://img.shields.io/badge/license-GPLv2-blue?label=editor-license&style=flat-square)](HBEditor/LICENSE.txt)
+[![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/HeartbeatEngine?style=flat-square)](https://github.com/Cronza/HeartbeatEngine/issues)
 [![Python Version](https://img.shields.io/badge/python-3.8-4B8BBE?style=flat-square)](https://www.python.org/downloads/release/python-380/)
 [![Twitter Badge](https://img.shields.io/badge/Twitter-Profile-informational?style=flat-square&logo=twitter&logoColor=white&color=1CA2F1)](https://twitter.com/SomeCronzaGuy)
 
 <p align="center"><em>A Visual Novel / Dating Sim Game Engine Designed for Creative Developers</em></p>
 
-# What is the 'GVNEngine'?
+# What is the 'Heartbeat Engine'?
 
-The GVNEngine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework. It comes with a fully-fledged editor built in Pyqt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
+The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework. It comes with a fully-fledged editor built in Pyqt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
 
-# Getting Started with the GVNEngine
-Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo!
+# Getting Started with the Heartbeat Engine
+Currently, the Heartbeat Engine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo!
 
 # License
-The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
+The Heartbeat Engine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/HBEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
 
-The GVNEditor, due to its extensive usage of the Qt framework, is licensed under the Open Source GPL license. Details can be found in the `LICENSE.txt` file in `/GVNEditor`. Basically, you can use the editor in most projects besides private, proprietary ones (Where the source code is not available to the general public). This license does not extend to the GVNEngine, and as long as any edits you make to the editor are pushed back to the repo, you are covered :+1:
+The Heartbeat Editor, due to its extensive usage of the Qt framework, is licensed under the Open Source GPL license. Details can be found in the `LICENSE.txt` file in `/HBEditor`. Basically, you can use the editor in most projects besides private, proprietary ones (Where the source code is not available to the general public). This license does not extend to the Heartbeat Engine, and as long as any edits you make to the editor are pushed back to the repo, you are covered :+1:
  
 # Features
 ## Content-Driven Workflow
-![ScreenShot](Progress_Examples/v02/GVNEngine_v02_Dialogue_Scene.png?raw=true "GVNEngine Dialogue Scene")
+![ScreenShot](Images/v02_Dialogue_Scene.png?raw=true "Dialogue Scene")
 <p align="center"><em>Fig 1 - A demonstration of dialogue with a choice prompt</em></p>
-The GVNEngine leverages a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
+The Heartbeat Engine leverages a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
 
 - Scenes
 - Dialogue sequences
@@ -43,19 +43,19 @@ position:
 post_wait: no_wait
 ```
 
-While the GVNEditor acts as a wrapper for these files, anyone can edit these files directly if they need to perform a hotfix, or need to make changes through automation.
+While the Heartbeat Editor acts as a wrapper for these files, anyone can edit these files directly if they need to perform a hotfix, or need to make changes through automation.
 
-## The GVNEditor
-![ScreenShot](Progress_Examples/v02/GVNEditor_v02_Dialogue_Editor_02.png?raw=true "GVNEngine Dialogue Scene")
-<p align="center"><em>Fig 2 - The 'Dialogue Scene' editor within the GVNEditor</em></p>
+## The Heartbeat Editor
+![ScreenShot](Images/v02_Dialogue_Editor_02.png?raw=true "Dialogue Editor")
+<p align="center"><em>Fig 2 - The 'Dialogue Scene' editor within the Heartbeat Editor</em></p>
 
-Using the GVNEditor, developers can stay out of a complicated IDE or set of code files, and stick to a comfortable environment tailored for content authoring. The editor acts as a wrapper for individual editors, such as:
+Using the Heartbeat Editor, developers can stay out of a complicated IDE or set of code files, and stick to a comfortable environment tailored for content authoring. The editor acts as a wrapper for individual editors, such as:
 - Dialogue Scene
 - Point and Click Scene *TBD
 - Character Creator *TBD
 - Project Settings
 
-The GVNEditor comes bundled with the engine, and provides all the tools and functions necessary for interfacing with the GVNEngine
+The editor comes bundled with the engine, and provides all the tools and functions necessary for interfacing with the engine
 
 ## Action Manager
 The Action Manager was created in order to allow developers (and the engine) to access any number of possible in-game actions in a flexible, YAML-accessible manner.

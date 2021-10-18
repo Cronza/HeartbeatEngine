@@ -139,7 +139,7 @@ cython_debug/
 
 # User-specific stuff
 .idea/
-GVNEngine/.idea/
-GVNEditor/.idea/
-GVNEngine/venv/
-GVNEditor/venv/
+HBEngine/.idea/
+HBEditor/.idea/
+HBEngine/venv/
+HBEditor/venv/

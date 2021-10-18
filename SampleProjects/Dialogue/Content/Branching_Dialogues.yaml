@@ -1,5 +1,5 @@
 # Type: Scene_Dialogue
-# Created with GVNEditor v0.1
+# Created with HBEditor v0.1
 
 type: Scene_Dialogue
 dialogue:
@@ -19,7 +19,7 @@ dialogue:
         speed: 500
     dialogue:
       key: DialogueText
-      text: 'Hey there! Welcome to the GVNEngine
+      text: 'Hey there! Welcome to the HBEngine
 
 
         Press ''Space'' to continue'
@@ -43,7 +43,7 @@ dialogue:
       text: 'Well done! Now, I have a simple question for you:
 
 
-        Is this your first time using the GVNEngine?'
+        Is this your first time using the HBEngine?'
       transition:
         type: None
         speed: 500
