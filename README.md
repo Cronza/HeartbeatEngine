@@ -1,125 +1,72 @@
-# GVNEngine
-**Version: 0.1**
+# Heartbeat Engine
+![ScreenShot](Images/HeartbeatEngine_Banner.jpg?raw=true "Heartbeat Engine Banner")
+[![License](https://img.shields.io/badge/license-GPLv3-blue?label=license&style=flat-square)](LICENSE.txt)
+[![GitHub issues](https://img.shields.io/github/issues-raw/Cronza/HeartbeatEngine?style=flat-square)](https://github.com/Cronza/HeartbeatEngine/issues)
+[![Python Version](https://img.shields.io/badge/python-3.8-4B8BBE?style=flat-square)](https://www.python.org/downloads/release/python-380/)
+[![Twitter Badge](https://img.shields.io/badge/Twitter-Profile-informational?style=flat-square&logo=twitter&logoColor=white&color=1CA2F1)](https://twitter.com/SomeCronzaGuy)
 
-# What is the 'GVNEngine'?
-![ScreenShot](Progress_Examples/GVNEngine_v01_Dialogue_Scene.png?raw=true "GVNEngine Dialogue Scene")
-*I do not own the background in the above photo, and am merely using it as a placeholder. The rightful owner is the talented:*<br/>
-*https://www.deviantart.com/aikosanartist*
+<p align="center"><em>A Visual Novel / Dating Sim Game Engine Designed for Creative Developers</em></p>
 
-The GVNEngine is a visual novel / dating simulator game engine created in Python, using the PyGame framework. It is meant as a lightweight, user-friendly engine that offers a content-driven workflow that lets developers focus more on making games, and less on worrying about coding them.
+# What is the 'Heartbeat Engine'?
 
-# How to Use the 'GVNEngine'?
-Currently, the GVNEngine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, please contact the developer Garrett Fredley at:<br/>
-https://twitter.com/SomeCronzaGuy (Professional Twitter) :shipit: <br/>
-https://twitter.com/Nixenneth (Artist Twitter) :art:
+The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework, with a fully-fledged editor built in PyQt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
+
+# Getting Started
+Currently, the Heartbeat Engine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo!
 
 # License
-The GVNEngine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/GVNEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
+The Heartbeat Engine is licensed under the GPL version 3 (GPLv3) license. Details can be found in the `LICENSE.txt` file, but essentially any projects created with the engine are entirely, 100% yours. You may use your own license for them, keep them as private works, and release them commercially without worry. 
 
+However, if you decide to fork the engine and alter or extend its behaviour (which I wholeheartedly welcome!), then that code must abide by the GPLv3 license and remain open source.
+ 
 # Features
+## Data-Driven Workflow
+![ScreenShot](Images/v02_Dialogue_Scene.png?raw=true "Dialogue Scene")
+<p align="center"><em>Fig 1 - A demonstration of dialogue with a choice prompt</em></p>
+The Heartbeat Engine leverages a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
 
-## Content-Driven Workflow
-The GVNEngine is designed to allow developers to focus more on developing games without worrying about knowing how to code. It makes use of a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
-
-YAML is used to allow developers to design and implement the following types of content:
 - Scenes
 - Dialogue sequences
 - Renderables (Objects, interactables, buttons, etc)
 - Effects (Fades, scene transitions, etc)
 
-Here is an example of a 'Point & Click' scene created using YAML:
-![ScreenShot](Progress_Examples/GVNEngine_v02_Main_Menu_Scene_01.png?raw=true "GVNEngine Main Menu Scene")
+An example of a block of YAML representing the action to create a background sprite:
 ```
-type: 'PointAndClick'
-background: "Content/Sprites/Backgrounds/Background_Space_01_1280.jpg"
-
-interactables:
-  - type: "button"
-    data: "Content/Objects/Interface/Main_Menu_Start_Button.yaml"
-    position:
-      x: 0.5
-      y: 0.5
-    center_align: True
-    z_order: 0
-    text: "Start Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
-    text_position:
-      x: 0.5
-      y: 0.5
-    text_center_align: True
-    text_z_order: 100
-    key: "Main_Menu_Start_Button"
-    
-  - type: "button"
-    data: "Content/Objects/Interface/Main_Menu_Exit_Button.yaml"
-    position:
-      x: 0.5
-      y: 0.65
-    center_align: True
-    z_order: 0
-    text: "Quit Game"
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    font_size: 16
-    text_color: [255, 255, 255]
-    text_position:
-      x: 0.5
-      y: 0.65
-    text_center_align: True
-    text_z_order: 100
-    key: "Main_Menu_Exit_Button"
-
-text:
-  - text: "To Infinity"
-    text_size: 72
-    text_color: [240, 240, 240]
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    center_align: True
-    position:
-      x: 0.5
-      y: 0.3
-    z_order: 500
-    key: "Title"
-
-  - text: "GVNEngine v0.1 - 'To Infinity' Project Example"
-    text_size: 16
-    text_color: [255, 255, 255]
-    font: 'Content/Fonts/Comfortaa/Comfortaa-Regular.ttf'
-    center_align: False
-    position:
-      x: 0.01
-      y: 0.95
-    z_order: 9999
-    key: "VersionIdentity"
+action: create_background
+key: Background
+sprite: Content/Backgrounds/Background_Space_01_1280.jpg
+position:
+- 0.0
+- 0.0
+post_wait: no_wait
 ```
-Additional examples of how to create the various YAML files for the engine are provided as a part of the repo.
+
+While the Heartbeat Editor acts as a wrapper for these files, anyone can edit these files directly if they need to perform a hotfix, or need to make changes through automation.
+
+## The Heartbeat Editor
+![ScreenShot](Images/v02_Dialogue_Editor.png?raw=true "Dialogue Editor")
+<p align="center"><em>Fig 2 - The 'Dialogue Scene' editor within the Heartbeat Editor</em></p>
+
+Using the Heartbeat Editor, developers can stay out of a complicated IDE or set of code files, and stick to a comfortable environment tailored for content authoring. The editor acts as a wrapper for individual editors, such as:
+- Dialogue Scene
+- Point and Click Scene *TBD
+- Character Creator *TBD
+- Project Settings
+
+The editor comes bundled with the engine, and provides all the tools and functions necessary for interfacing with the engine
 
 ## Action Manager
-In order to allow developers (and the engine) to access any number of possible in-game actions in a flexible, YAML-accessible manner, the Action Manager was developed.
+The Action Manager was created in order to allow developers (and the engine) to access any number of possible in-game actions in a flexible, YAML-accessible manner.
 
-'Actions' are defined as classes in the `actions.py` file. When an action is requested, such as by a YAML file (Dialogue, clicking interactables, etc), it looks to this file for the corresponding action class. For example: `class load_scene(Action)`. Once found, it calls it, passing it any additional pieces of information provided. An example of a dialogue YAML block:
+'Actions' are defined as classes in the `actions.py` file. When an action is requested, such as by a YAML file (Dialogue, clicking interactables, etc), it looks to this file using Python's reflection capabilities for the corresponding action class. For example: `class load_scene(Action)`. Once found, it calls it, passing it any additional pieces of information provided. An example of a dialogue YAML block:
 
 ```
-- action: "load_sprite"
-  key: "Speaker_02"
-  sprite: "Content/Sprites/Characters/Rei/Rei_Idle_Smiling.png"
-  position:
-    x: 0.7
-    y: 0.7
-  flip: false
-  zOrder: 0
-  wait_for_input: False
+- action: "dialogue"
+  character: "Isea"
+  dialogue:
+    text: "Who are you?"
+  wait_for_input: True
 ```
-The above is an example of an action that loads and adds a sprite to be rendered. The action name is called 'load_sprite'. In the `actions.py` file, there is a corresponding `class load_sprite(Action)` class. The engine is capable of correlating these strings to the classes found in the `actions.py` file. 
+The above is an example of an action used to display dialogue text to the screen. The action name is called `dialogue`. In the `actions.py` file, there is a corresponding `class dialogue(Action)` class. The engine is capable of correlating these strings to the classes found in the `actions.py` file. 
 
-Additionally, each action is fed the entire data block that was provided when it was called. In the example above, we see that various parameters such as 'flip' are provided. For the above `load_sprite` action, which is one of the provided engine default actions, flip is used to flip the sprite when it is drawn to the screen.
-
-# GVNEditor
-:warning: *This feature is heavily in development, and will most likely be a while before its release
-![ScreenShot](Progress_Examples/GVNEditor_v01_Interface.png?raw=true "GVNEditor Main Interface")
-
-The GVNEditor is an editing tool for designing the YAML files used by the GVNEngine. It is built using python and the PyQt5 binding for the Qt framework. 
-
-## License
-The GVNEditor, due to its extensive usage of the Qt framework, is licensed under the Open Source GPL license. Details can be found in the `LICENSE.txt` file in `/GVNEditor`. Basically, you can use the editor in most projects besides private, proprietary ones (Where the source code is not available to the general public). This license does not extend to the GVNEngine, and as long as any edits you make to the editor are pushed back to the repo, you are covered :+1:
+Additionally, each action is fed the entire data block that was provided when it was called. In the example above, we see that various parameters such as `character` are provided. For the above `dialogue` action, which is one of the provided engine default actions, `character` is used to determine the speaker's name, the color of their name, and the font for their name text.

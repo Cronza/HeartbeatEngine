@@ -1,8 +1,0 @@
-name: "Rei_Uniform"
-sprite: "Content/Sprites/Characters/Rei/Rei_Uniform_Interactable.png"
-sprite_hover: "Content/Sprites/Characters/Rei/Rei_Uniform_Interactable_Hover.png"
-sprite_clicked: ""
-action:
-  action: "load_scene"
-  scene_file: "Content/Scenes/Test_Dialogue_Scene_02.yaml"
-  scene_type: "Dialogue"

@@ -136,3 +136,11 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# User-specific stuff
+.idea/
+HBEngine/.idea/
+HBEditor/.idea/
+HBEngine/venv/
+HBEditor/venv/
+HBEditor/Temp/
