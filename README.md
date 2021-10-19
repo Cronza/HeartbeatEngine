@@ -9,18 +9,18 @@
 
 # What is the 'Heartbeat Engine'?
 
-The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework. It comes with a fully-fledged editor built in Pyqt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
+The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework, with a fully-fledged editor built in PyQt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
 
-# Getting Started with the Heartbeat Engine
+# Getting Started
 Currently, the Heartbeat Engine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo!
 
 # License
-The Heartbeat Engine is licensed under the Open-Source MIT license. Details can be found in the `LICENSE.txt` file in `/HBEngine`. Basically, enjoy the engine to it's fullest, and make games without worrying about whether you're allowed to muck around in the source code :smiley:
+The Heartbeat Engine is licensed under the GPL version 3 (GPLv3) license. Details can be found in the `LICENSE.txt` file, but essentially any projects created with the engine are entirely, 100% yours. You may use your own license for them, keep them as private works, and release them commercially without worry. 
 
-The Heartbeat Editor, due to its extensive usage of the Qt framework, is licensed under the Open Source GPL license. Details can be found in the `LICENSE.txt` file in `/HBEditor`. Basically, you can use the editor in most projects besides private, proprietary ones (Where the source code is not available to the general public). This license does not extend to the Heartbeat Engine, and as long as any edits you make to the editor are pushed back to the repo, you are covered :+1:
+However, if you decide to fork the engine and alter or extend its behaviour (which I wholeheartedly welcome!), then that code must abide by the GPLv3 license and remain open source.
  
 # Features
-## Content-Driven Workflow
+## Data-Driven Workflow
 ![ScreenShot](Images/v02_Dialogue_Scene.png?raw=true "Dialogue Scene")
 <p align="center"><em>Fig 1 - A demonstration of dialogue with a choice prompt</em></p>
 The Heartbeat Engine leverages a data language called YAML, which was designed for human readability to simplify the process of creating all sorts of content, such as:
@@ -44,7 +44,7 @@ post_wait: no_wait
 While the Heartbeat Editor acts as a wrapper for these files, anyone can edit these files directly if they need to perform a hotfix, or need to make changes through automation.
 
 ## The Heartbeat Editor
-![ScreenShot](Images/v02_Dialogue_Editor_02.png?raw=true "Dialogue Editor")
+![ScreenShot](Images/v02_Dialogue_Editor.png?raw=true "Dialogue Editor")
 <p align="center"><em>Fig 2 - The 'Dialogue Scene' editor within the Heartbeat Editor</em></p>
 
 Using the Heartbeat Editor, developers can stay out of a complicated IDE or set of code files, and stick to a comfortable environment tailored for content authoring. The editor acts as a wrapper for individual editors, such as:
@@ -58,7 +58,7 @@ The editor comes bundled with the engine, and provides all the tools and functio
 ## Action Manager
 The Action Manager was created in order to allow developers (and the engine) to access any number of possible in-game actions in a flexible, YAML-accessible manner.
 
-'Actions' are defined as classes in the `actions.py` file. When an action is requested, such as by a YAML file (Dialogue, clicking interactables, etc), it looks to this file for the corresponding action class. For example: `class load_scene(Action)`. Once found, it calls it, passing it any additional pieces of information provided. An example of a dialogue YAML block:
+'Actions' are defined as classes in the `actions.py` file. When an action is requested, such as by a YAML file (Dialogue, clicking interactables, etc), it looks to this file using Python's reflection capabilities for the corresponding action class. For example: `class load_scene(Action)`. Once found, it calls it, passing it any additional pieces of information provided. An example of a dialogue YAML block:
 
 ```
 - action: "dialogue"
