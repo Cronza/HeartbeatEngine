@@ -1,4 +1,19 @@
 """
+    The Heartbeat Engine is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The Heartbeat Engine is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
+"""
+"""
+
 This file lists available actions that can be defined in various .yaml files throughout the HBEngine project.
 All actions take in two parameters:
 
@@ -15,14 +30,15 @@ All actions can be designed to accept and use a variety of different parameters.
 provided actions
 """
 import pygame.mixer
-from Core.BaseClasses.renderable_sprite import SpriteRenderable
-from Core.BaseClasses.renderable_text import TextRenderable
-from Core.BaseClasses.interactable import Interactable
-from Core.BaseClasses.button import Button
-from Core.BaseClasses.choice import Choice
-from Core.BaseClasses.renderable_container import Container
-from Core.BaseClasses.action import Action
-from Core.BaseClasses.action_sound import SoundAction
+from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
+from HBEngine.Core.BaseClasses.renderable_text import TextRenderable
+from HBEngine.Core.BaseClasses.interactable import Interactable
+from HBEngine.Core.BaseClasses.button import Button
+from HBEngine.Core.BaseClasses.choice import Choice
+from HBEngine.Core.BaseClasses.renderable_container import Container
+from HBEngine.Core.BaseClasses.action import Action
+from HBEngine.Core.BaseClasses.action_sound import SoundAction
+
 
 # -------------- GRAPHICS ACTIONS --------------
 
