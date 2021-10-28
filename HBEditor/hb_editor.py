@@ -28,6 +28,7 @@ from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 
+
 class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
@@ -38,7 +39,7 @@ class HBEditor:
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
-        self.outliner = None # Assignment happens once a project is loaded
+        self.outliner = None  # Assignment happens once a project is loaded
         self.active_editor = None
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command

@@ -78,7 +78,7 @@ class EditorDialogue(EditorBase):
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
-        data_to_export = {}
+        data_to_export = []
         branch_count = self.editor_ui.branches.branches_list.count()
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the containing item widget
@@ -94,25 +94,17 @@ class EditorDialogue(EditorBase):
                 self.logger.Log("Scanning dialogue entries...")
                 self.UpdateBranchData(branch)
 
-            branch_name = branch.Get()[0]
+            branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
-            data_to_export[branch_name] = branch_data
+            new_entry = {
+                "name": branch_name,
+                "description": branch_description,
+                "entries": branch_data
+            }
+
+            data_to_export.append(new_entry)
 
         return data_to_export
-
-    def Save(self):
-        super().Save()
-        self.logger.Log(f"Saving Dialogue data for: {self.file_path}")
-
-        data_to_export = self.GetAllDialogueData()
-
-        # Write the data out
-        self.logger.Log("Writing data to file...")
-        try:
-            Writer.WriteFile(data_to_export, self.file_path)
-            self.logger.Log("File Saved!", 2)
-        except:
-            self.logger.Log("Failed to Save!", 4)
 
     def Export(self):
         super().Export()
@@ -149,11 +141,11 @@ class EditorDialogue(EditorBase):
             converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
 
             # The main branch is treated specially since we don't need to create it
-            for branch_name, branch_data in converted_data.items():
-                if not branch_name == "Main":
-                    self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
+            for entry in converted_data:
+                if not entry["name"] == "Main":
+                    self.editor_ui.branches.CreateBranch(entry["name"], entry["description"])
 
-                for action in branch_data:
+                for action in entry["entries"]:
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default
