@@ -78,7 +78,7 @@ class EditorDialogue(EditorBase):
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
-        data_to_export = []
+        data_to_export = {}
         branch_count = self.editor_ui.branches.branches_list.count()
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the containing item widget
@@ -97,12 +97,12 @@ class EditorDialogue(EditorBase):
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
             new_entry = {
-                "name": branch_name,
+                #"name": branch_name,
                 "description": branch_description,
                 "entries": branch_data
             }
 
-            data_to_export.append(new_entry)
+            data_to_export[branch_name] = new_entry
 
         return data_to_export
 
@@ -141,11 +141,11 @@ class EditorDialogue(EditorBase):
             converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
 
             # The main branch is treated specially since we don't need to create it
-            for entry in converted_data:
-                if not entry["name"] == "Main":
-                    self.editor_ui.branches.CreateBranch(entry["name"], entry["description"])
+            for branch_name, branch_data in converted_data.items():
+                if not branch_name == "Main":
+                    self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])
 
-                for action in entry["entries"]:
+                for action in branch_data["entries"]:
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default

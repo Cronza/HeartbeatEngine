@@ -46,8 +46,8 @@ class DialogueScene(PointAndClickScene):
         Runs the next action specified in the dialogue file. Will recurse if the action has 'wait_for_input' set
         to False
         """
-        if len(self.dialogue_data[self.active_branch]) > self.dialogue_index:
-            action_data = self.dialogue_data[self.active_branch][self.dialogue_index]
+        if len(self.dialogue_data[self.active_branch]["entries"]) > self.dialogue_index:
+            action_data = self.dialogue_data[self.active_branch]["entries"][self.dialogue_index]
             if "post_wait" in action_data:
                 if "wait_for_input" in action_data["post_wait"]:
                     self.a_manager.PerformAction(action_data, action_data["action"])

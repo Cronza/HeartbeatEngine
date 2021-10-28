@@ -169,7 +169,7 @@ class BranchesPanel(QtWidgets.QWidget):
             new_data = prompt.Get()
 
             # Validate the branch name before we try creating the branch
-            if self.ValidateBranchName(new_data[0]):
+            if self.ValidateBranchName(new_data[0], source_branch):
 
                 # Name validated. Return the new data
                 return new_data
@@ -181,13 +181,20 @@ class BranchesPanel(QtWidgets.QWidget):
                     "The chosen branch name is already in use!\nPlease choose a new name"
                 )
 
-    def ValidateBranchName(self, name) -> bool:
-        """ Check if the provided branch name already exists """
-
+    def ValidateBranchName(self, name, source_branch) -> bool:
+        """
+        Check if the provided branch name already exists. If a source branch is provided, then exempt it from
+        being considered
+        """
         for entry_index in range(0, self.branches_list.count()):
-            entry = self.branches_list.item(entry_index)
+            entry = self.branches_list.itemWidget(self.branches_list.item(entry_index))
 
-            if self.branches_list.itemWidget(entry).Get()[0] == name:
+            print(source_branch)
+            if source_branch:
+                if entry == source_branch:
+                    continue
+
+            if entry.Get()[0] == name:
                 # Match found
                 return False
 

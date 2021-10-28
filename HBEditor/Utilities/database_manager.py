@@ -22,15 +22,14 @@ class DBManager:
         Given a full dict of dialogue file data in editor format (branches and all), convert it to the engine format
         Return the converted dict
         """
-        new_dialogue_data = []
-        for branch in action_data:
+        new_dialogue_data = {}
+        for branch_name, branch_data in action_data.items():
             converted_branch = {
-                "name": branch["name"],
-                "description": branch["description"]
+                "description": branch_data["description"]
             }
 
             converted_entries = []
-            for editor_action in branch["entries"]:
+            for editor_action in branch_data["entries"]:
                 # Get the action name
                 converted_action = {"action": editor_action["action_name"]}
 
@@ -44,7 +43,7 @@ class DBManager:
 
             # Complete the converted branch, and add it to the new dialogue data
             converted_branch["entries"] = converted_entries
-            new_dialogue_data.append(converted_branch)
+            new_dialogue_data[branch_name] = converted_branch
 
         return new_dialogue_data
 
@@ -81,11 +80,11 @@ class DBManager:
         rebuilding the structure based on lookups in the ActionDatabase
         """
         #@TODO: Investigate how to speed this up. The volume of O(n) searching is worrying
-        new_dialogue_data = []
+        new_dialogue_data = {}
 
-        for branch in action_data:
+        for branch_name, branch_data in action_data.items():
             converted_entries = []
-            for action in branch["entries"]:
+            for action in branch_data["entries"]:
                 action_name = action["action"]
 
                 # Using the name of the action, look it up in the ActionDatabase. From there, we can build the new
@@ -103,8 +102,8 @@ class DBManager:
                 self.ConvertActionRequirementsToEditorFormat(database_entry, action)
                 converted_entries.append(database_entry)
 
-            branch["entries"] = converted_entries
-            new_dialogue_data.append(branch)
+            branch_data["entries"] = converted_entries
+            new_dialogue_data[branch_name] = branch_data
 
         return new_dialogue_data
 
