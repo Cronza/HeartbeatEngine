@@ -152,8 +152,7 @@ class BranchesPanel(QtWidgets.QWidget):
             new_data = self.ConfigurePrompt(data[0], data[1], selected_branch)
 
             # If the user has changed anything, then update the entry. Otherwise, do nothing
-            if new_data:
-                # Set the data before resizing the entry to fit the new data
+            if all(new_data):
                 branch_entry.Set(new_data)
                 self.ResizeListEntry(selection, branch_entry)
 
@@ -180,6 +179,8 @@ class BranchesPanel(QtWidgets.QWidget):
                     self, "Branch Name in Use!",
                     "The chosen branch name is already in use!\nPlease choose a new name"
                 )
+        # User cancelled
+        return None, None
 
     def ValidateBranchName(self, name, source_branch) -> bool:
         """
