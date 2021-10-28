@@ -25,7 +25,7 @@ class Settings:
         self.editor_temp_root = self.editor_root + "/" + "Temp"
         self.temp_history_path = self.editor_temp_root + "/" + "history.yaml"
 
-        self.project_admin_dir = ".heartbeat"
+        self.project_file = ".heartbeat"
         self.project_folder_structure = [
             "Content",
             "Config"

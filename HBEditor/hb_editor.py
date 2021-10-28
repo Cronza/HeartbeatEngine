@@ -99,9 +99,10 @@ class HBEditor:
                         main_dir_path = project_path + "/" + main_dir
                         os.mkdir(main_dir_path)
 
-                    # Create the admin folder
-                    admin_dir_path = project_path + "/" + self.settings.project_admin_dir
-                    os.mkdir(admin_dir_path)
+                    # Create the project file
+                    project_file = project_path + "/" + self.settings.project_file
+                    with open(project_file, "w"):
+                        pass
 
                     # Clone project default files
                     for key, rel_path in self.settings.project_default_files.items():
@@ -130,7 +131,7 @@ class HBEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(existing_project_dir + "/" + self.settings.project_admin_dir):
+            if os.path.exists(existing_project_dir + "/" + self.settings.project_file):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
