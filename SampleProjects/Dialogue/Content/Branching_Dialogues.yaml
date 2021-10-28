@@ -1,9 +1,13 @@
 # Type: Scene_Dialogue
-# Created with HBEditor v0.1
+# Created with Heartbeat Editor v0.1
 
 type: Scene_Dialogue
 dialogue:
-  Main:
+- name: Main
+  description: 'This is the default, main branch
+
+    Consider this the root of your dialogue tree'
+  entries:
   - action: create_dialogue_interface
     post_wait: no_wait
   - action: dialogue
@@ -62,7 +66,9 @@ dialogue:
       - 0.7
       - 0.35
       text: I'm Experienced
-  FirstTime:
+- name: FirstTime
+  description: This is the user's first time
+  entries:
   - action: dialogue
     speaker:
       key: SpeakerText
