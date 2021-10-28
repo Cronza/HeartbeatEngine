@@ -176,7 +176,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
 
         # Since selecting the new row will cause the details panel to refresh, allow opting out in case
-        # batch entry creation is happening
+        # batch creation is happening
         if not skip_select:
             self.dialogue_table.selectRow(new_entry_row)
 

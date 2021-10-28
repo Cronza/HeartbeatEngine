@@ -140,13 +140,16 @@ class BranchesPanel(QtWidgets.QWidget):
         selection = self.branches_list.selectedItems()[0]
         branch_entry = self.branches_list.itemWidget(selection)
 
-        #Only allow editing for all entries other than the initial (main) entry
+        # Only allow editing for all entries other than the initial (main) entry
         if self.branches_list.currentRow() != 0:
-            # Retrieves the tuple data of 'branch name' and 'branch description'
-            data = self.branches_list.itemWidget(selection).Get()
+            selected_branch = self.branches_list.itemWidget(selection)
 
-            # Create the prompt object, providing the selected branch's data
-            new_data = self.ConfigurePrompt(data[0], data[1])
+            # Retrieves the tuple data of 'branch name' and 'branch description'
+            data = selected_branch.Get()
+
+            # Create the prompt object, providing the selected branch's data. Provide
+            # the branch we're editing to so we bypass having to choose a new name
+            new_data = self.ConfigurePrompt(data[0], data[1], selected_branch)
 
             # If the user has changed anything, then update the entry. Otherwise, do nothing
             if new_data:
@@ -154,7 +157,7 @@ class BranchesPanel(QtWidgets.QWidget):
                 branch_entry.Set(new_data)
                 self.ResizeListEntry(selection, branch_entry)
 
-    def ConfigurePrompt(self, branch_name="New Branch Name", branch_description="New Branch Description") -> tuple:
+    def ConfigurePrompt(self, branch_name="New Name", branch_description="New Description", source_branch=None) -> tuple:
         """ Prompts the user with a branch configuration window. Returns the new data if provided, or None if not """
         # Create the prompt object
         prompt = EditBranchPrompt(branch_name, branch_description)
