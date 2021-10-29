@@ -24,10 +24,12 @@ class Button(Interactable):
         super().__init__(scene, renderable_data)
 
         # Initialize text renderable
+
         button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data
         )
+        button_text_renderable.key = f"{self.renderable_data['key']}_Text"
         self.children.append(button_text_renderable)
         self.scene.active_renderables.Add(button_text_renderable)
 

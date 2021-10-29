@@ -41,6 +41,8 @@ class RenderableGroup():
                 del self.renderables[key]
             except KeyError as exc:
                 print(f"Key not found: {exc}")
+            except Exception as rexc:
+                print(f"Unknown error while removing: {rexc}")
 
     def Clear(self):
         pass

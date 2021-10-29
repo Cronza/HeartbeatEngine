@@ -112,7 +112,6 @@ class remove_container(Action):
                 # Remove all children first
                 for child in children:
                     self.scene.active_renderables.Remove(child.key)
-
                 self.scene.active_renderables.Remove(self.action_data['key'])
                 self.scene.Draw()
                 self.Complete()
@@ -830,7 +829,6 @@ class choice(Action):
         # All choice options use the same underlying 'create_button' action. Specify and enforce that here
         # Additionally, apply all settings determined here to each choice button
         for choice in self.action_data["choices"]:
-
             # Build the child dict that gets sent to the interact action
             choice["action"] = {
                 "action": "choose_branch",
@@ -901,7 +899,7 @@ class choice(Action):
         return new_renderable
 
 class create_choice_button(Action):
-    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable'"""
+    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable' """
     def Start(self):
         self.skippable = False
 
@@ -931,7 +929,7 @@ class choose_branch(Action):
         # into the new branch
         if self.scene.active_renderables.Exists("Choice"):
             self.a_manager.PerformAction(
-                {"key": "Choice", "transition" : {"type": "None"}},
+                {"key": "Choice", "transition": {"type": "None"}},
                 "remove_container"
             )
 
