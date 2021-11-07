@@ -138,7 +138,7 @@ class Renderable(pygame.sprite.Sprite):
             self.surface = surface
 
     def ConvertNormToScreen(self, norm_value):
-        """ Take the normalized object pos and convert it to relative screen space coordinates """
+        """ Take the normalized object pos and convert it to absolute screen space coordinates """
         screen_size = self.scene.pygame_lib.display.get_surface().get_size()
 
         return (

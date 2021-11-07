@@ -29,15 +29,63 @@ class TextRenderable(Renderable):
         super().__init__(scene, renderable_data)
 
         font = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
-        self.text = self.renderable_data['text']
-        text_size = self.renderable_data['text_size']
-        text_color = self.renderable_data['text_color']
-
+        self.text = self.renderable_data["text"]
+        self.text_color = self.renderable_data["text_color"]
+        #self.wrap_bounds = self.renderable_data["wrap_bounds"]
+        self.wrap_bounds = (0.8, 0.15) # The size in normalized range
+        text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
-        self.surface = self.font_obj.render(self.text, True, text_color)
+
+        # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's
+        # automatically wrapped until the maximum Y
+        size = self.ConvertNormToScreen(self.wrap_bounds)
+        self.surface = pygame.Surface((int(size[0]), int(size[1])), pygame.SRCALPHA)
         self.rect = self.surface.get_rect()
+
+        self.WrapText(self.surface)
 
         # For new objects, resize initially in case we're already using a scaled resolution
         self.RecalculateSize(self.scene.resolution_multiplier)
+
+    def WrapText(self, surface):
+        rect = surface.get_rect()
+        base_top = rect.top
+        line_spacing = -2
+        font_height = self.font_obj.size("Tg")[1]
+
+        # Pre-split the text based on any specified newlines
+        text_to_process = self.text.split("\n")
+        print(text_to_process)
+
+        # Process each line, applying wrapping where necessary
+        for line in text_to_process:
+
+            processing_complete = False
+            while not processing_complete:
+                i = 1
+
+                # Determine if the text will exceed the bounds height
+                if base_top + font_height > rect.bottom:
+                    break
+
+                # Parse the text until we've exceeded horizontal bounds, or we reached the end of the string
+                while self.font_obj.size(line[:i])[0] < rect.width and i < len(line):
+                    i += 1
+
+                # If we didn't reach the end of the string, grab the last occurence of a whitespace
+                if i < len(line):
+                    i = line.rfind(" ", 0, i) + 1
+
+                # Render the line and blit it to the surface
+                image = self.font_obj.render(line[:i], True, self.text_color)
+                surface.blit(image, (rect.left, base_top))
+                base_top += font_height + line_spacing
+
+                # Remove the text we just blitted
+                line = line[i:]
+
+                # Exit if we're finished processing everything in this line
+                if not line:
+                    processing_complete = True
 
 
