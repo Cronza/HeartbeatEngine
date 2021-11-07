@@ -31,18 +31,26 @@ class TextRenderable(Renderable):
         font = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data["text"]
         self.text_color = self.renderable_data["text_color"]
-        #self.wrap_bounds = self.renderable_data["wrap_bounds"]
-        self.wrap_bounds = (0.8, 0.15) # The size in normalized range
         text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
 
+        # If a size was passed (expected as screen space values), then use it for the wrap bounds
+        if "size" not in self.renderable_data:
+            assert "wrap_bounds" in self.renderable_data, print(
+                f"No 'wrap_bounds' value assigned to {self}, and no 'size' "
+                f"value provided. This makes for an impossible action!")
+            self.renderable_data["size"] = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
+
         # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's
         # automatically wrapped until the maximum Y
-        size = self.ConvertNormToScreen(self.wrap_bounds)
-        self.surface = pygame.Surface((int(size[0]), int(size[1])), pygame.SRCALPHA)
-        self.rect = self.surface.get_rect()
+        self.surface = pygame.Surface((
+                int(self.renderable_data["size"][0]),
+                int(self.renderable_data["size"][1])),
+            pygame.SRCALPHA
+        )
 
         self.WrapText(self.surface)
+        self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
         self.RecalculateSize(self.scene.resolution_multiplier)

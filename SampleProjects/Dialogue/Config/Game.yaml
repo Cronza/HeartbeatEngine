@@ -5,7 +5,7 @@ Game:
   title: Project Name
   author: Project Author
   company: Company
-  starting_scene: Content/Simple_Conversation.yaml
+  starting_scene: Content/Test.yaml
 Window:
   resolution: 0
   resolution_options:
@@ -29,6 +29,9 @@ Text:
   font: ENGINE_FILES/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
   z_order: 100
   center_align: true
+  wrap_bounds:
+  - 0.2
+  - 0.2
 Button:
   sprite: ENGINE_FILES/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
   sprite_hover: ENGINE_FILES/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
@@ -56,6 +59,9 @@ Dialogue:
   speaker_font: ENGINE_FILES/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
   speaker_z_order: 200
   speaker_center_align: true
+  speaker_wrap_bounds:
+  - 0.2
+  - 0.1
   dialogue_text_position:
   - 0.1
   - 0.77
@@ -68,6 +74,9 @@ Dialogue:
   dialogue_wait_for_input: true
   dialogue_z_order: 200
   dialogue_center_align: false
+  dialogue_wrap_bounds:
+  - 0.8
+  - 0.15
   dialogue_frame_sprite: ENGINE_FILES/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
   dialogue_frame_z_order: 100
   dialogue_frame_center_align: true

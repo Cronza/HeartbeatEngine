@@ -319,6 +319,7 @@ class create_text(Action):
     - text_color : str <GLOBAL_AVAILABLE>
     - font : str <GLOBAL_AVAILABLE>
     - z_order : int <GLOBAL_AVAILABLE>
+    - wrap-bounds: tuple <GLOBAL_AVAILABLE>
     - transition : dict
         - type: str
         - speed: int
@@ -336,6 +337,9 @@ class create_text(Action):
 
         if "center_align" not in self.action_data:
             self.action_data["center_align"] = self.scene.settings.project_settings["Text"]["center_align"]
+
+        if "wrap_bounds" not in self.action_data:
+            self.action_data["wrap_bounds"] = self.scene.settings.project_settings["Text"]["wrap_bounds"]
 
         if "font" not in self.action_data:
             self.action_data["font"] = self.scene.settings.project_settings["Text"]["font"]
@@ -487,6 +491,8 @@ class dialogue(Action):
         if "speaker" in self.action_data:
             # Dialogue-specific adjustments
             self.action_data["speaker"]['key'] = "SpeakerText"
+            self.action_data["speaker"]["wrap_bounds"] = self.scene.settings.project_settings["Dialogue"][
+                    "speaker_wrap_bounds"]
 
             # PROJECT DEFAULTS OVERRIDE
             if "position" not in self.action_data["speaker"]:
@@ -524,6 +530,8 @@ class dialogue(Action):
         if "dialogue" in self.action_data:
             # Dialogue-specific adjustments
             self.action_data["dialogue"]["key"] = "DialogueText"
+            self.action_data["dialogue"]["wrap_bounds"] = self.scene.settings.project_settings["Dialogue"][
+                "dialogue_wrap_bounds"]
 
             # PROJECT DEFAULTS OVERRIDE
             if "position" not in self.action_data["dialogue"]:
@@ -905,7 +913,6 @@ class create_choice_button(Action):
 
         # In order to avoid redundant setting scans and global setting validation, no default settings
         # are applied for this action, as its expected that the choice system will provide those details
-
         new_renderable = Button(
             self.scene,
             self.action_data
