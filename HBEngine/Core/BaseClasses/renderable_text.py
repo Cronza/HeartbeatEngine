@@ -34,7 +34,6 @@ class TextRenderable(Renderable):
         text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
 
-        size = None
         # If a size was passed (expected as screen space values), then use it for the wrap bounds
         if "size" not in self.renderable_data:
             assert "wrap_bounds" in self.renderable_data, print(
