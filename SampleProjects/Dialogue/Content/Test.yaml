@@ -16,33 +16,87 @@ dialogue:
       - 0.0
       post_wait: no_wait
     - action: create_text
-      key: TestText
+      key: Wow
       position:
-      - 0.5
-      - 0.5
-      text: 'Hello World! This is a test message to see if text wrapping works. Let''s
-        use a newline as well
-
-
-        Did it work? :D'
+      - 0.1
+      - 0.1
+      text: Much wow
+      text_size: 18
+      text_color:
+      - 255
+      - 230
+      - 39
       transition:
         type: None
         speed: 500
-      post_wait: wait_for_input
+      post_wait: no_wait
+    - action: create_text
+      key: Wower
+      position:
+      - 0.7
+      - 0.8
+      text: Look at that text
+      text_size: 18
+      text_color:
+      - 58
+      - 222
+      - 255
+      transition:
+        type: None
+        speed: 500
+      post_wait: no_wait
+    - action: create_text
+      key: TestText
+      position:
+      - 0.5
+      - 0.1
+      text: 'Hello World! This is a test message to see if text wrapping works. Let''s
+        use an explicit newline as well
+
+
+        Oh hey, it worked!'
+      wrap_bounds:
+      - 0.4
+      - 0.4
+      transition:
+        type: None
+        speed: 500
+      post_wait: no_wait
+    - action: create_text
+      key: TestTextTwo
+      position:
+      - 0.5
+      - 0.5
+      text: 'Question
+
+
+        Who shot first?'
+      text_size: 32
+      text_color:
+      - 255
+      - 119
+      - 0
+      wrap_bounds:
+      - 0.4
+      - 0.4
+      transition:
+        type: None
+        speed: 500
+      post_wait: no_wait
     - action: choice
       choices:
       - branch: TestOutcome1
         key: Choice_1
         position:
-        - 0.3
+        - 0.2
         - 0.5
-        text: Test One
+        text: Han Shot First
       - branch: TestOutcome2
         key: Choice_2
         position:
-        - 0.7
+        - 0.8
         - 0.5
-        text: Test Two
+        text: Greedo Shot First
   TestOutcome1:
     description: New Description
     entries:

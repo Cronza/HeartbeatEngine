@@ -34,6 +34,7 @@ class TextRenderable(Renderable):
         text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
 
+        size = None
         # If a size was passed (expected as screen space values), then use it for the wrap bounds
         if "size" not in self.renderable_data:
             assert "wrap_bounds" in self.renderable_data, print(
@@ -44,8 +45,8 @@ class TextRenderable(Renderable):
         # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's
         # automatically wrapped until the maximum Y
         self.surface = pygame.Surface((
-                int(self.renderable_data["size"][0]),
-                int(self.renderable_data["size"][1])),
+            int(self.renderable_data["size"][0]),
+            int(self.renderable_data["size"][1])),
             pygame.SRCALPHA
         )
 
@@ -56,6 +57,7 @@ class TextRenderable(Renderable):
         self.RecalculateSize(self.scene.resolution_multiplier)
 
     def WrapText(self, surface):
+        """ Applies text wrapping based on the provided surface area """
         rect = surface.get_rect()
         base_top = rect.top
         line_spacing = -2
@@ -63,7 +65,14 @@ class TextRenderable(Renderable):
 
         # Pre-split the text based on any specified newlines
         text_to_process = self.text.split("\n")
-        print(text_to_process)
+
+        if self.center_align:
+            num_of_lines = len(text_to_process)
+            if num_of_lines < 2:
+                num_of_lines = 2
+
+            # Vertically center the text
+            base_top += (self.surface.get_size()[1] / num_of_lines) - (font_height / 2)
 
         # Process each line, applying wrapping where necessary
         for line in text_to_process:
@@ -80,13 +89,21 @@ class TextRenderable(Renderable):
                 while self.font_obj.size(line[:i])[0] < rect.width and i < len(line):
                     i += 1
 
-                # If we didn't reach the end of the string, grab the last occurence of a whitespace
+                # If we didn't reach the end of the string, grab the last occurrence of a whitespace
                 if i < len(line):
                     i = line.rfind(" ", 0, i) + 1
 
                 # Render the line and blit it to the surface
                 image = self.font_obj.render(line[:i], True, self.text_color)
-                surface.blit(image, (rect.left, base_top))
+
+                # If applicable, center align the line based on it's unique size
+                if self.center_align:
+                    extra_space = self.surface.get_size()[0] - image.get_size()[0]
+                    centered_width = rect.left + extra_space / 2
+                    surface.blit(image, (centered_width, base_top))
+                else:
+                    surface.blit(image, (rect.left, base_top))
+
                 base_top += font_height + line_spacing
 
                 # Remove the text we just blitted

@@ -423,7 +423,7 @@ Dialogue:
             - name: "center_align"
               type: "bool"
               value: True
-              global: 
+              global:
                 active: True
               editable: True
               preview: False

@@ -8,6 +8,13 @@ dialogue:
 
       Consider this the root of your dialogue tree'
     entries:
+    - action: create_background
+      key: Background
+      sprite: Content/Backgrounds/Background_Space.jpg
+      position:
+      - 0.0
+      - 0.0
+      post_wait: no_wait
     - action: create_dialogue_interface
       post_wait: no_wait
     - action: dialogue
