@@ -5,7 +5,7 @@ Game:
   title: Project Name
   author: Project Author
   company: Company
-  starting_scene: Content/Test.yaml
+  starting_scene: Content/Branching_Dialogues.yaml
 Window:
   resolution: 0
   resolution_options:

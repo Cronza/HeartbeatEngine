@@ -49,33 +49,12 @@ dialogue:
       key: TestText
       position:
       - 0.5
-      - 0.1
+      - 0.3
       text: 'Hello World! This is a test message to see if text wrapping works. Let''s
         use an explicit newline as well
 
 
         Oh hey, it worked!'
-      wrap_bounds:
-      - 0.4
-      - 0.4
-      transition:
-        type: None
-        speed: 500
-      post_wait: no_wait
-    - action: create_text
-      key: TestTextTwo
-      position:
-      - 0.5
-      - 0.5
-      text: 'Question
-
-
-        Who shot first?'
-      text_size: 32
-      text_color:
-      - 255
-      - 119
-      - 0
       wrap_bounds:
       - 0.4
       - 0.4

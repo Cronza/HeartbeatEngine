@@ -49,8 +49,8 @@ Button:
 Dialogue:
   text_speed: 5
   speaker_text_position:
-  - 0.25
-  - 0.705
+  - 0.262
+  - 0.703
   speaker_text_size: 32
   speaker_text_color:
   - 253
@@ -60,11 +60,11 @@ Dialogue:
   speaker_z_order: 200
   speaker_center_align: true
   speaker_wrap_bounds:
-  - 0.2
-  - 0.1
+  - 0.25
+  - 0.05
   dialogue_text_position:
   - 0.1
-  - 0.77
+  - 0.75
   dialogue_text_size: 24
   dialogue_text_color:
   - 253
@@ -76,7 +76,7 @@ Dialogue:
   dialogue_center_align: false
   dialogue_wrap_bounds:
   - 0.8
-  - 0.15
+  - 0.16
   dialogue_frame_sprite: ENGINE_FILES/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
   dialogue_frame_z_order: 100
   dialogue_frame_center_align: true

@@ -193,6 +193,26 @@ class HBEditor:
         else:
             existing_file = None
 
+            # Validate whether the selected file is capable of being opened
+            if ".yaml" not in target_file_path:
+                self.logger.Log("File type does not have any interact functionality", 3)
+                return
+            """
+            # *** Re-enable this code when the supported file types all have open functionality ***
+            split_path = target_file_path.split(".")
+            if len(split_path) > 1:
+                extension = split_path[-1]
+                is_supported = False
+                for type_string in self.settings.supported_content_types.values():
+                    if f".{extension}" in type_string:
+                        is_supported = True
+                        break
+
+            if not is_supported:
+                self.logger.Log("File type does not have any interact functionality", 3)
+                pass
+            """
+
             # Is the user opening a file through the main "File->Open" mechanism?
             if not target_file_path:
                 prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
