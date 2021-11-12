@@ -26,6 +26,7 @@ from HBEditor.Interface import hb_editor as hbe
 from HBEditor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
+from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 
 
@@ -303,6 +304,7 @@ class HBEditor:
         if not self.settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
             editor_classes = {
                 FileType.Scene_Dialogue: EditorDialogue,
+                FileType.Scene_Point_And_Click: EditorPointAndClick,
                 FileType.Project_Settings: EditorProjectSettings
              }
 
