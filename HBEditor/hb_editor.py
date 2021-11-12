@@ -28,6 +28,7 @@ from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from Tools.HBBuilder.hb_builder import HBBuilder
 
 
 class HBEditor:
@@ -259,6 +260,14 @@ class HBEditor:
         else:
             p_manager = PlayManager()
             p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir)
+
+    def Build(self):
+        """ Launches the HBBuilder in order to generate an executable from the active project """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            HBBuilder.Build(self.logger, self.settings.engine_root, self.settings.user_project_dir)
 
     def Save(self):
         """ Requests the active editor to save it's data """

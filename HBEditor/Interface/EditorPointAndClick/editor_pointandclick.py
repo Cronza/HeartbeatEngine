@@ -25,6 +25,7 @@ from HBEditor.Interface.Primitives.input_entry_dropdown import InputEntryDropdow
 from HBEditor.Interface.EditorProjectSettings.input_entry_resolution import InputEntryResolution
 from HBEditor.Utilities.DataTypes.parameter_types import ParameterType
 
+
 class EditorPointAndClickUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)

@@ -27,11 +27,6 @@ class PlayManager:
         logger.Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing
-            print("Project Dir")
-            print(project_path)
-
-            print("Current Working Dir")
-            print(os.getcwd())
             result = subprocess.Popen(
                 [
                     f"venv/Scripts/python",
@@ -44,7 +39,7 @@ class PlayManager:
             result.wait()
 
             logger.Log("Engine closed - Editor functionality resumed")
-            print(result)
+
         except Exception as exc:
             QMessageBox.about(
                 parent,
