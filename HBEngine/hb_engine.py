@@ -23,8 +23,7 @@ class HBEngine:
     def __init__(self, project_path):
         #@TODO: What is the right way to handle this?
         if not project_path:
-            raise ValueError("No project path provided - Unable to launch HBEngine")
-            quit(1)
+            print("Warning: No project path provided - Defaulting to the engine root")
 
         self.settings = Settings(project_path)
         self.settings.Evaluate(self.settings.project_dir + "/Config/Game.yaml")
@@ -96,8 +95,8 @@ class HBEngine:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('project_path', type=str, help="A file path for a HBEngine Project")
+    parser.add_argument("-p", "--project_path", type=str, nargs="?", const="", help="A file path for a HBEngine Project")
     args = parser.parse_args()
-
+    print(args)
     engine = HBEngine(args.project_path)
     engine.Main()

@@ -31,10 +31,12 @@ class PlayManager:
                 [
                     f"venv/Scripts/python",
                     "HBEngine/hb_engine.py",
-                    project_path
+                    "-p",
+                     project_path
                 ],
                 stdout=True,
-                stderr=True            )
+                stderr=True
+            )
             logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 

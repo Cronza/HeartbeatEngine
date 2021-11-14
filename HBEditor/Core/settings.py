@@ -20,10 +20,11 @@ from HBEditor.Utilities.DataTypes.file_types import FileType
 
 class Settings:
     def __init__(self):
-        self.engine_root = "HBEngine"
-        self.editor_root = os.getcwd().replace("\\", "/") + "/" + "HBEditor"
-        self.editor_temp_root = self.editor_root + "/" + "Temp"
-        self.temp_history_path = self.editor_temp_root + "/" + "history.yaml"
+        root = os.getcwd().replace("\\", "/")
+        self.engine_root = f"{root}/HBEngine"
+        self.editor_root = f"{root}/HBEditor"
+        self.editor_temp_root = f"{self.editor_root}/Temp"
+        self.temp_history_path = f"{self.editor_temp_root}/history.yaml"
 
         self.project_file = ".heartbeat"
         self.project_folder_structure = [

@@ -19,12 +19,19 @@ from HBEngine.Utilities.yaml_reader import Reader
 class Settings:
     def __init__(self, project_dir):
         self.root_dir = os.getcwd().replace("\\", "/")
+        print("Root")
+        print(self.root_dir)
+        # Acquire the engine root independent of the project root (In case we're not running in a build)
+        #if "HBEngine/HBEngine" not in self.root_dir:
+        #    self.root_dir = self.root_dir + "/" + "HBEngine"
 
-        # Acquire the engine root independent of the project root
-        if "HBEngine/HBEngine" not in self.root_dir:
-            self.root_dir = self.root_dir + "/" + "HBEngine"
+        # If a project was not provided, use the engine root (Necessary for builds where project
+        # and engine are conjoined)
+        if project_dir:
+            self.project_dir = project_dir
+        else:
+            self.project_dir = self.root_dir
 
-        self.project_dir = project_dir
         self.project_settings = None
 
         # Some params need to be accessed more immediately than through the settings dict. Declare them here
@@ -59,8 +66,8 @@ class Settings:
         # the editor (Likely ill-advised)
         print(os.getcwd())
         # Idea 2: We modify this code for the build
-        if partial_path.startswith("ENGINE_FILES"):
-            return partial_path.replace("ENGINE_FILES", "HBEngine") #TEMP HACK (ごめねさい anyone who sees this)
+        if partial_path.startswith("HBEngine"):
+            return partial_path.replace("HBEngine", f"{self.root_dir}/HBEngine")
         else:
             return self.project_dir + "/" + partial_path
 
