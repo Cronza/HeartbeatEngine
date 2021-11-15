@@ -72,6 +72,7 @@ class Logger:
         # Since Qt only refreshes widgets when it regains control of the main thread, force the update here
         # as long updates are high priority in terms of visibility
         self.log_ui.log_list.repaint()
+        self.log_ui.repaint()
 
     def ClearLog(self):
         """ Deletes all log entries """

@@ -30,7 +30,7 @@ dialogue:
           speed: 500
       dialogue:
         key: DialogueText
-        text: 'Hey there! Welcome to the HBEngine
+        text: 'Hey there! Welcome to the Heartbeat Engine
 
 
           Press ''Space'' to continue'
@@ -54,7 +54,7 @@ dialogue:
         text: 'Well done! Now, I have a simple question for you:
 
 
-          Is this your first time using the HBEngine?'
+          Is this your first time using the Heartbeat Engine?'
         transition:
           type: None
           speed: 500
