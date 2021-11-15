@@ -24,9 +24,9 @@ class HBBuilder:
         """ Generate an executable based on the provided information and project """
         logger.Log(f"*** Starting build for: '{project_dir}'... ***")
 
-        build_dir = project_dir + "/build"
-        working_dir = build_dir + "/intermediate"
-        output_dir = build_dir + "/output"
+        build_dir = f"{project_dir}/build"
+        working_dir = f"{build_dir}/intermediate"
+        output_dir = f"{build_dir}/output"
 
         # Remove the build folder if it exists, just in case the state changed significantly
         HBBuilder.Clean(logger, build_dir)
@@ -58,13 +58,15 @@ class HBBuilder:
             logger.Log("*** BUILD FAILED ***", 4)
 
     @staticmethod
-    def Clean(logger, build_dir: str):
+    def Clean(logger, project_dir: str):
         """ Deletes the active project's build directory """
-
+        build_dir = f"{project_dir}/build"
         if os.path.exists(build_dir):
-            logger.Log(f"Build folder already exists - Cleaning...", 3)
+            logger.Log(f"Build folder exists - Cleaning...", 3)
             try:
                 shutil.rmtree(build_dir)
-                logger.Log(f"Build folder deleted")
+                logger.Log(f"Build folder deleted!", 2)
             except Exception as exc:
                 logger.Log(f"Failed to delete the build folder: {exc}", 4)
+        else:
+            logger.Log(f"Build folder does not exist - Skipping the clean", 3)

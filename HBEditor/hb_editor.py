@@ -274,6 +274,17 @@ class HBEditor:
                 self.settings.user_project_name
             )
 
+    def Clean(self):
+        """ Cleans the active project's build folder """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            HBBuilder.Clean(
+                self.logger,
+                self.settings.user_project_dir
+            )
+
     def Save(self):
         """ Requests the active editor to save it's data """
         # Only allow this is there is an active project

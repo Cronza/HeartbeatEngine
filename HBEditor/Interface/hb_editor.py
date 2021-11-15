@@ -122,7 +122,10 @@ class HBEditorUI:
         self.build_menu.setStyleSheet(self.settings.button_color)
         self.a_build = QtWidgets.QAction(main_window)
         self.a_build.triggered.connect(self.e_core.Build)
+        self.a_build_clean = QtWidgets.QAction(main_window)
+        self.a_build_clean.triggered.connect(self.e_core.Clean)
         self.build_menu.addAction(self.a_build)
+        self.build_menu.addAction(self.a_build_clean)
 
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
@@ -160,6 +163,7 @@ class HBEditorUI:
         self.build_menu.setTitle(_translate("MainWindow", "Build"))
         self.a_build.setText(_translate("MainWindow", "Build"))
         self.a_build.setShortcut(_translate("MainWindow", "Ctrl+Alt+B"))
+        self.a_build_clean.setText(_translate("MainWindow", "Clean"))
 
         # 'Settings Menu' Actions
         self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
