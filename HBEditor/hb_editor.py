@@ -259,7 +259,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             p_manager = PlayManager()
-            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir)
+            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir, self.settings.root)
 
     def Build(self):
         """ Launches the HBBuilder in order to generate an executable from the active project """
@@ -267,7 +267,12 @@ class HBEditor:
         if not self.settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            HBBuilder.Build(self.logger, self.settings.engine_root, self.settings.user_project_dir)
+            HBBuilder.Build(
+                self.logger,
+                self.settings.engine_root,
+                self.settings.user_project_dir,
+                self.settings.user_project_name
+            )
 
     def Save(self):
         """ Requests the active editor to save it's data """

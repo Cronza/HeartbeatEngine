@@ -23,7 +23,7 @@ class PlayManager:
     alongside the HBEditor so the subprocess call works correctly
     """
 
-    def Play(self, parent, logger,  project_path):
+    def Play(self, parent, logger,  project_path, engine_parent_root):
         logger.Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing

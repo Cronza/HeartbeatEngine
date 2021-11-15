@@ -14,8 +14,8 @@
 """
 import argparse
 import pygame
-from Core.scene_manager import SceneManager
-from Core.settings import Settings
+from HBEngine.Core.scene_manager import SceneManager
+from HBEngine.Core.settings import Settings
 from pygame import mixer
 
 

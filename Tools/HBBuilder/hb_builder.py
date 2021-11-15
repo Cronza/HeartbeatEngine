@@ -15,53 +15,56 @@
 import subprocess
 import os
 import shutil
+import time
 
 
 class HBBuilder:
     @staticmethod
-    def Build(logger, engine_dir: str, project_dir: str):
+    def Build(logger, engine_dir: str, project_dir: str, project_name: str):
         """ Generate an executable based on the provided information and project """
         logger.Log(f"*** Starting build for: '{project_dir}'... ***")
-        print(project_dir)
+
         build_dir = project_dir + "/build"
         working_dir = build_dir + "/intermediate"
         output_dir = build_dir + "/output"
 
-        #temp_build_dir = build_dir + "/temp"
+        # Remove the build folder if it exists, just in case the state changed significantly
+        HBBuilder.Clean(logger, build_dir)
 
-        if os.path.exists(build_dir):
-            shutil.rmtree(build_dir)
-
-        # We need to bring the engine and project together so we can bundle them up without
-        # having to mess with multiple places
-        #logger.Log(f"Cloning engine into: '{temp_build_dir}'...")
-        #try:
-        #    shutil.copytree(engine_dir, temp_build_dir)
-        #except Exception as exc:
-        #    logger.Log(f"Failed to copy the engine to the build directory:\n {exc}", 4)
-        #    logger.Log("*** BUILD FAILED ***", 4)
-        #    print(exc)
-
-        #"""
-        # Since pyinstaller can't be invoked within a script, invoke it from a subprocess
-        logger.Log(f"Generating executable...")
-
-        args = f"venv/Scripts/pyinstaller.exe "\
+        # Use a subprocess call to invoke PyInstaller so it can fail independently
+        args = f"venv/Scripts/pyinstaller.exe " \
+               "--noconsole " \
                f"--workpath {working_dir} "\
                f"--distpath {output_dir} "\
                f"--specpath {working_dir} "\
-               f"--add-data {project_dir}/Content;Content " \
-               f"--add-data {project_dir}/Config;Config " \
-               f"--add-data {engine_dir}/Content;HBEngine/Content " \
+               f"--add-data {project_dir}/Content;Content "\
+               f"--add-data {project_dir}/Config;Config "\
+               f"--add-data {engine_dir}/Content;HBEngine/Content "\
+               f"--name {project_name} "\
                f"HBEngine/hb_engine.py"
 
+        logger.Log(f"Generating executable...")
         result = subprocess.Popen(
             args,
             stdout=True,
             stderr=True
         )
-        print(result)
-        logger.Log("Engine Launched - Editor temporarily unavailable")
-        result.wait()
 
-        logger.Log("Engine closed - Editor functionality resumed")
+        # Wait for the build to finish, then collect and report the result
+        result_code = result.wait()
+        if result_code == 0:
+            logger.Log("*** BUILD SUCCESS ***", 2)
+        else:
+            logger.Log("*** BUILD FAILED ***", 4)
+
+    @staticmethod
+    def Clean(logger, build_dir: str):
+        """ Deletes the active project's build directory """
+
+        if os.path.exists(build_dir):
+            logger.Log(f"Build folder already exists - Cleaning...", 3)
+            try:
+                shutil.rmtree(build_dir)
+                logger.Log(f"Build folder deleted")
+            except Exception as exc:
+                logger.Log(f"Failed to delete the build folder: {exc}", 4)
