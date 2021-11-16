@@ -13,9 +13,9 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Utilities.yaml_reader import Reader
 from HBEngine.Core.BaseClasses.renderable_group import RenderableGroup
 from HBEngine.Core.action_manager import ActionManager
+from Tools.HBYaml.hb_yaml import Reader
 
 
 class Scene:

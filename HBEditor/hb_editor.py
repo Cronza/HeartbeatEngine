@@ -21,7 +21,6 @@ from PyQt5 import QtWidgets
 from HBEditor.Core.settings import Settings
 from HBEditor.Utilities.DataTypes.file_types import FileType
 from HBEditor.Utilities.play_manager import PlayManager
-from HBEditor.Utilities.yaml_manager import Reader, Writer
 from HBEditor.Interface import hb_editor as hbe
 from HBEditor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
@@ -29,6 +28,7 @@ from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 from Tools.HBBuilder.hb_builder import HBBuilder
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class HBEditor:

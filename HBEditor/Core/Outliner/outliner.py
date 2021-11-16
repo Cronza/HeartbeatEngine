@@ -16,7 +16,7 @@ import os
 import shutil
 from HBEditor.Interface.Outliner.outliner import OutlinerUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Utilities.yaml_manager import Writer
+from Tools.HBYaml.hb_yaml import Writer
 
 class Outliner:
     def __init__(self, settings, hb_core):

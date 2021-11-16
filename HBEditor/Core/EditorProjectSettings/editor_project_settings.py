@@ -15,8 +15,7 @@
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Interface.EditorProjectSettings.editor_project_settings import EditorProjectSettingsUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Utilities.yaml_manager import Writer
-from HBEditor.Utilities.yaml_manager import Reader
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class EditorProjectSettings(EditorBase):

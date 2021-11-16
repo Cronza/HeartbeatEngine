@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from HBEngine.Utilities.yaml_reader import Reader
+from Tools.HBYaml.hb_yaml import Reader
 
 
 class Settings:

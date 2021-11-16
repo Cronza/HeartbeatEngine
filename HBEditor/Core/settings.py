@@ -14,8 +14,8 @@
 """
 import os
 from PyQt5 import QtGui
-from HBEditor.Utilities.yaml_manager import Reader
 from HBEditor.Utilities.DataTypes.file_types import FileType
+from Tools.HBYaml.hb_yaml import Reader
 
 
 class Settings:

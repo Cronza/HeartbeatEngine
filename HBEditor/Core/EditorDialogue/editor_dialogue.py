@@ -15,9 +15,8 @@
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Utilities.yaml_manager import Writer
-from HBEditor.Utilities.yaml_manager import Reader
 from HBEditor.Utilities.database_manager import DBManager
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class EditorDialogue(EditorBase):
