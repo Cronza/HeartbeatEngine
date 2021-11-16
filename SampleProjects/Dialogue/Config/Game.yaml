@@ -2,9 +2,9 @@
 # Created with Heartbeat Editor v0.1
 
 Game:
-  title: Project Name
-  author: Project Author
-  company: Company
+  title: Sample Project - Dialogue
+  author: Cronza
+  company: Cloud City Stories
   starting_scene: Content/Branching_Dialogues.yaml
 Window:
   resolution: 0
