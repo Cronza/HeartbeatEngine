@@ -116,10 +116,22 @@ class HBEditorUI:
         self.a_play_game.triggered.connect(self.e_core.Play)
         self.play_menu.addAction(self.a_play_game)
 
+        # Build Menu
+        self.build_menu = QtWidgets.QMenu(self.menu_bar)
+        self.build_menu.setFont(self.settings.button_font)
+        self.build_menu.setStyleSheet(self.settings.button_color)
+        self.a_build = QtWidgets.QAction(main_window)
+        self.a_build.triggered.connect(self.e_core.Build)
+        self.a_build_clean = QtWidgets.QAction(main_window)
+        self.a_build_clean.triggered.connect(self.e_core.Clean)
+        self.build_menu.addAction(self.a_build)
+        self.build_menu.addAction(self.a_build_clean)
+
         # Add each menu to the menu bar
         self.menu_bar.addAction(self.file_menu.menuAction())
         self.menu_bar.addAction(self.settings_menu.menuAction())
         self.menu_bar.addAction(self.play_menu.menuAction())
+        self.menu_bar.addAction(self.build_menu.menuAction())
 
         # Initialize the Menu Bar
         main_window.setMenuBar(self.menu_bar)
@@ -129,13 +141,8 @@ class HBEditorUI:
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", f"Heartbeat Editor - {self.settings.user_project_name}"))
 
-        # *** Update Engine Menu Bar ***
-        # Menu Headers
-        self.file_menu.setTitle(_translate("MainWindow", "File"))
-        self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
-        self.play_menu.setTitle(_translate("MainWindow", "Play"))
-
         # 'File Menu' Actions
+        self.file_menu.setTitle(_translate("MainWindow", "File"))
         self.a_new_file.setText(_translate("MainWindow", "New File"))
         self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.a_open_file.setText(_translate("MainWindow", "Open File"))
@@ -148,10 +155,18 @@ class HBEditorUI:
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
 
         # 'Play Menu' Actions
+        self.play_menu.setTitle(_translate("MainWindow", "Play"))
         self.a_play_game.setText(_translate("MainWindow", "Play"))
         self.a_play_game.setShortcut(_translate("MainWindow", "Ctrl+Alt+P"))
 
+        # 'Build Menu' Actions
+        self.build_menu.setTitle(_translate("MainWindow", "Build"))
+        self.a_build.setText(_translate("MainWindow", "Build"))
+        self.a_build.setShortcut(_translate("MainWindow", "Ctrl+Alt+B"))
+        self.a_build_clean.setText(_translate("MainWindow", "Clean"))
+
         # 'Settings Menu' Actions
+        self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
         self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
         self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
 
