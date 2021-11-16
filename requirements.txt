@@ -1,7 +1,7 @@
 altgraph==0.17.2
 future==0.18.2
 pefile==2021.9.3
-pygame==2.0.0.dev10
+pygame==2.1.0
 pyinstaller==4.7
 pyinstaller-hooks-contrib==2021.3
 PyQt5==5.15.2
