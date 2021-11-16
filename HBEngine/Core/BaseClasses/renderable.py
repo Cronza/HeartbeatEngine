@@ -91,7 +91,7 @@ class Renderable(pygame.sprite.Sprite):
                 ]
             )
             # Generate the scaled surface
-            scaled_surface = self.scene.pygame_lib.transform.smoothscale(surface, new_size)
+            scaled_surface = pygame.transform.smoothscale(surface, new_size)
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
             if self.center_align:
@@ -137,7 +137,7 @@ class Renderable(pygame.sprite.Sprite):
 
     def ConvertNormToScreen(self, norm_value):
         """ Take the normalized object pos and convert it to absolute screen space coordinates """
-        screen_size = self.scene.pygame_lib.display.get_surface().get_size()
+        screen_size = pygame.display.get_surface().get_size()
 
         return (
             norm_value[0] * screen_size[0],
@@ -159,7 +159,7 @@ class Renderable(pygame.sprite.Sprite):
     def Flip(self):
         """ Flips the sprite horizontally. Chooses between the unscaled and scaled surface """
         if self.scaled_surface:
-            self.scaled_surface = self.scene.pygame_lib.transform.flip(self.scaled_surface, True, False)
+            self.scaled_surface = pygame.transform.flip(self.scaled_surface, True, False)
         else:
-            self.surface = self.scene.pygame_lib.transform.flip(self.surface, True, False)
+            self.surface = pygame.transform.flip(self.surface, True, False)
 

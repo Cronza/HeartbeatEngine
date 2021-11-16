@@ -42,7 +42,7 @@ class HBEngine:
         clock = pygame.time.Clock()
         window = pygame.display.set_mode(self.settings.active_resolution)
 
-        self.scene_manager = SceneManager(window, pygame, self.settings)
+        self.scene_manager = SceneManager(window, self.settings)
 
         # Start the game loop
         is_running = True

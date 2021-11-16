@@ -17,12 +17,11 @@ from HBEngine.Core.BaseClasses.scene_dialogue import DialogueScene
 from HBEngine.Utilities.DataTypes.file_types import FileType
 
 
-class SceneManager():
-    def __init__(self, window, pygame_lib, settings):
+class SceneManager:
+    def __init__(self, window, settings):
 
         # Objects
         self.settings = settings
-        self.pygame_lib = pygame_lib
         self.window = window
         self.active_scene = None
 
@@ -61,7 +60,6 @@ class SceneManager():
                 self.active_scene = self.scene_types[scene_type](
                     scene_file,
                     self.window,
-                    self.pygame_lib,
                     self.settings,
                     self
                 )

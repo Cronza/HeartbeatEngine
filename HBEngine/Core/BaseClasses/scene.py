@@ -12,16 +12,16 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import pygame
 from HBEngine.Utilities.yaml_reader import Reader
 from HBEngine.Core.BaseClasses.renderable_group import RenderableGroup
 from HBEngine.Core.action_manager import ActionManager
 
 
 class Scene:
-    def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
+    def __init__(self, scene_data_file, window, settings, scene_manager):
 
         self.window = window
-        self.pygame_lib = pygame_lib
         self.settings = settings
         self.scene_manager = scene_manager
         self.active_renderables = RenderableGroup()
@@ -51,8 +51,8 @@ class Scene:
 
         # Pause Menu
         for event in events:
-            if event.type == self.pygame_lib.KEYDOWN:
-                if event.key == self.pygame_lib.K_p:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
                     #@TODO: TEMP HACK
                     if self.active_renderables.Exists('Pause_Menu'):
                         print("Pause Menu Open")

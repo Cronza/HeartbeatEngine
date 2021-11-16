@@ -168,17 +168,17 @@ class Interactable(SpriteRenderable):
         # the active surface
 
         if self.scaled_original_surface:
-            self.scaled_original_surface = self.scene.pygame_lib.transform.flip(self.scaled_original_surface, True, False)
+            self.scaled_original_surface = pygame.transform.flip(self.scaled_original_surface, True, False)
         else:
-            self.original_surface = self.scene.pygame_lib.transform.flip(self.original_surface, True, False)
+            self.original_surface = pygame.transform.flip(self.original_surface, True, False)
 
         # Flip the interactive surfaces along with the base surface
         if self.scaled_hover_surface:
-            self.scaled_hover_surface = self.scene.pygame_lib.transform.flip(self.scaled_hover_surface, True, False)
+            self.scaled_hover_surface = pygame.transform.flip(self.scaled_hover_surface, True, False)
         else:
-            self.hover_surface = self.scene.pygame_lib.transform.flip(self.hover_surface, True, False)
+            self.hover_surface = pygame.transform.flip(self.hover_surface, True, False)
 
         if self.scaled_clicked_surface:
-            self.scaled_clicked_surface = self.scene.pygame_lib.transform.flip(self.scaled_clicked_surface, True, False)
+            self.scaled_clicked_surface = pygame.transform.flip(self.scaled_clicked_surface, True, False)
         else:
-            self.clicked_surface = self.scene.pygame_lib.transform.flip(self.clicked_surface, True, False)
+            self.clicked_surface = pygame.transform.flip(self.clicked_surface, True, False)
