@@ -12,11 +12,16 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import yaml
+from HBEditor.Core.BaseClasses.base_editor import EditorBase
+from HBEditor.Utilities.DataTypes.file_types import FileType
+from HBEditor.Interface.EditorPointAndClick.editor_pointandclick import EditorPointAndClickUI
 
 
-class Reader:
-    def ReadAll(file_path):
-        with open(file_path, "r") as f:
-            return yaml.load(f, Loader=yaml.FullLoader)
+class EditorPointAndClick(EditorBase):
+    def __init__(self, settings, logger, file_path):
+        super().__init__(settings, logger, file_path)
 
+        self.file_type = FileType.Scene_Point_And_Click
+
+        self.editor_ui = EditorPointAndClickUI(self)
+        self.logger.Log("Editor initialized")

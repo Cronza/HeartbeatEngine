@@ -22,26 +22,30 @@ class DBManager:
         Given a full dict of dialogue file data in editor format (branches and all), convert it to the engine format
         Return the converted dict
         """
-        converted_dict = {}
-        for branch in action_data.items():
-            branch_name = branch[0]
-            action_list = []
-            for editor_action in branch[1]:
+        new_dialogue_data = {}
+        for branch_name, branch_data in action_data.items():
+            converted_branch = {
+                "description": branch_data["description"]
+            }
+
+            converted_entries = []
+            for editor_action in branch_data["entries"]:
                 # Get the action name
-                converted_action = {'action': editor_action['action_name']}
+                converted_action = {"action": editor_action["action_name"]}
 
                 # Collect a converted dict of all requirements for this action (If any are present)
-                converted_data = self.ConvertActionRequirementsToEngineFormat(editor_action)
-                if converted_data:
-                    converted_action.update(converted_data)
+                converted_requirements = self.ConvertActionRequirementsToEngineFormat(editor_action)
+                if converted_requirements:
+                    converted_action.update(converted_requirements)
 
-                # Add it to the final list of actions
-                action_list.append(converted_action)
+                # Add the newly converted action
+                converted_entries.append(converted_action)
 
-            # Add the list of actions under the target branch
-            converted_dict[branch_name] = action_list
+            # Complete the converted branch, and add it to the new dialogue data
+            converted_branch["entries"] = converted_entries
+            new_dialogue_data[branch_name] = converted_branch
 
-        return converted_dict
+        return new_dialogue_data
 
     def ConvertActionRequirementsToEngineFormat(self, editor_action_data, has_parent=None):
         """ Given an editor action requirements / children data dict, convert it to a format usable by the engine"""
@@ -58,7 +62,6 @@ class DBManager:
                     # Exclude requirements that are pointing to a global setting. The engine will take care of this at
                     # runtime since any global value stored in a file will become outdated as soon as the global setting
                     # is changed
-
                     if "global" in requirement:
                         if "active" in requirement["global"]:
                             if not requirement["global"]["active"]:
@@ -77,13 +80,11 @@ class DBManager:
         rebuilding the structure based on lookups in the ActionDatabase
         """
         #@TODO: Investigate how to speed this up. The volume of O(n) searching is worrying
-        converted_dict = {}
+        new_dialogue_data = {}
 
-        for branch in action_data.items():
-            branch_name = branch[0]
-
-            action_list = []
-            for action in branch[1]:
+        for branch_name, branch_data in action_data.items():
+            converted_entries = []
+            for action in branch_data["entries"]:
                 action_name = action["action"]
 
                 # Using the name of the action, look it up in the ActionDatabase. From there, we can build the new
@@ -99,11 +100,12 @@ class DBManager:
                         break
                 # Pass the entry by ref, and let the convert func edit it directly
                 self.ConvertActionRequirementsToEditorFormat(database_entry, action)
-                action_list.append(database_entry)
+                converted_entries.append(database_entry)
 
-            converted_dict[branch_name] = action_list
+            branch_data["entries"] = converted_entries
+            new_dialogue_data[branch_name] = branch_data
 
-        return converted_dict
+        return new_dialogue_data
 
     def ConvertActionRequirementsToEditorFormat(self, editor_action_data, engine_action_data, has_parent=None):
         """

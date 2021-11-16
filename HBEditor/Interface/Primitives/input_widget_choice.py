@@ -73,7 +73,6 @@ class InputEntryChoice(InputEntryBase):
 
     def Get(self):
         # Since the choice entry is so custom, we have to build the entire dict, children included to be returned
-        print(self.childCount())
         branch_list = []
         for container_index in range(0, self.childCount()):
             choice_container = self.child(container_index)
@@ -96,8 +95,6 @@ class InputEntryChoice(InputEntryBase):
         Adds a choice entry to the choice list, filling it with input widgets for every item
         in the 'templates' dict. If 'data' is provided, use it to populate the input widgets
         """
-        print("OOOOO")
-        print(data)
         # Each choice is given a parent container to help organize the choice's input widgets. This is also customized
         # to have a close button which deletes the choice from the list
         new_choice_container = InputEntryContainer(self.settings, self.data)

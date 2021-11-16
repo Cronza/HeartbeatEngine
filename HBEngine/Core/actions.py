@@ -112,7 +112,6 @@ class remove_container(Action):
                 # Remove all children first
                 for child in children:
                     self.scene.active_renderables.Remove(child.key)
-
                 self.scene.active_renderables.Remove(self.action_data['key'])
                 self.scene.Draw()
                 self.Complete()
@@ -320,6 +319,7 @@ class create_text(Action):
     - text_color : str <GLOBAL_AVAILABLE>
     - font : str <GLOBAL_AVAILABLE>
     - z_order : int <GLOBAL_AVAILABLE>
+    - wrap-bounds: tuple <GLOBAL_AVAILABLE>
     - transition : dict
         - type: str
         - speed: int
@@ -337,6 +337,9 @@ class create_text(Action):
 
         if "center_align" not in self.action_data:
             self.action_data["center_align"] = self.scene.settings.project_settings["Text"]["center_align"]
+
+        if "wrap_bounds" not in self.action_data:
+            self.action_data["wrap_bounds"] = self.scene.settings.project_settings["Text"]["wrap_bounds"]
 
         if "font" not in self.action_data:
             self.action_data["font"] = self.scene.settings.project_settings["Text"]["font"]
@@ -488,6 +491,8 @@ class dialogue(Action):
         if "speaker" in self.action_data:
             # Dialogue-specific adjustments
             self.action_data["speaker"]['key'] = "SpeakerText"
+            self.action_data["speaker"]["wrap_bounds"] = self.scene.settings.project_settings["Dialogue"][
+                    "speaker_wrap_bounds"]
 
             # PROJECT DEFAULTS OVERRIDE
             if "position" not in self.action_data["speaker"]:
@@ -525,6 +530,8 @@ class dialogue(Action):
         if "dialogue" in self.action_data:
             # Dialogue-specific adjustments
             self.action_data["dialogue"]["key"] = "DialogueText"
+            self.action_data["dialogue"]["wrap_bounds"] = self.scene.settings.project_settings["Dialogue"][
+                "dialogue_wrap_bounds"]
 
             # PROJECT DEFAULTS OVERRIDE
             if "position" not in self.action_data["dialogue"]:
@@ -830,7 +837,6 @@ class choice(Action):
         # All choice options use the same underlying 'create_button' action. Specify and enforce that here
         # Additionally, apply all settings determined here to each choice button
         for choice in self.action_data["choices"]:
-
             # Build the child dict that gets sent to the interact action
             choice["action"] = {
                 "action": "choose_branch",
@@ -901,13 +907,12 @@ class choice(Action):
         return new_renderable
 
 class create_choice_button(Action):
-    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable'"""
+    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable' """
     def Start(self):
         self.skippable = False
 
         # In order to avoid redundant setting scans and global setting validation, no default settings
         # are applied for this action, as its expected that the choice system will provide those details
-
         new_renderable = Button(
             self.scene,
             self.action_data
@@ -931,7 +936,7 @@ class choose_branch(Action):
         # into the new branch
         if self.scene.active_renderables.Exists("Choice"):
             self.a_manager.PerformAction(
-                {"key": "Choice", "transition" : {"type": "None"}},
+                {"key": "Choice", "transition": {"type": "None"}},
                 "remove_container"
             )
 
@@ -1107,7 +1112,7 @@ class fade_scene_from_black(Action):
         self.action_data['position'] = (0, 0)
         self.action_data['key'] = 'Transition'
         self.action_data['center_align'] = False
-        self.action_data['sprite'] = "ENGINE_FILES/Content/Sprites/TransitionEffects/transition_fade_black.png"
+        self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
 
         # PROJECT DEFAULTS OVERRIDE
         if 'z_order' not in self.action_data:

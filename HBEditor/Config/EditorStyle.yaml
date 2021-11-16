@@ -55,5 +55,5 @@ EditorTextSettings:
   log_text_size: 10
   log_normal_color: 0, 0, 0
   log_success_color: 51, 153, 0
-  log_warning_color: 255, 204, 0
+  log_warning_color: 217, 173, 0
   log_error_color: 204, 51, 0

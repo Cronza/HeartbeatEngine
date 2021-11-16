@@ -14,6 +14,7 @@
 """
 from PyQt5 import QtWidgets
 
+
 class EditBranchPrompt(QtWidgets.QDialog):
     def __init__(self, branch_name, branch_description, parent=None):
         super().__init__(parent)

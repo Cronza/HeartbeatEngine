@@ -56,7 +56,8 @@ class Logger:
             converted_type = LogType(log_type)
             color = self.log_colors[converted_type]
             prefix = self.log_prefixes[converted_type]
-        except:
+        except Exception as exc:
+            print(f"Failed to determine log color type - Resorting to normal colors: {exc}")
             color = self.log_colors[LogType.Normal]
             prefix = self.log_colors[LogType.Normal]
 
@@ -67,6 +68,11 @@ class Logger:
         new_entry.setForeground(QColor(color[0], color[1], color[2]))
         new_entry.setFont(self.log_font)
         self.log_ui.log_list.addItem(new_entry)
+
+        # Since Qt only refreshes widgets when it regains control of the main thread, force the update here
+        # as long updates are high priority in terms of visibility
+        self.log_ui.log_list.repaint()
+        self.log_ui.repaint()
 
     def ClearLog(self):
         """ Deletes all log entries """

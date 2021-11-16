@@ -12,7 +12,31 @@
 The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework, with a fully-fledged editor built in PyQt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
 
 # Getting Started
-Currently, the Heartbeat Engine is heavily in development, and not setup for installation quite yet. However, if you're interested in playing with the engine while it's in development, feel free to clone the repo!
+Currently, the Heartbeat Engine is in core development, so there may be issues during the setup process. There are no official releases of the engine or editor yet, so you will need to be able to perform the following to get started.
+1. Get the Project
+
+    ```
+    git clone <https://github.com/Cronza/HeartbeatEngine.git>
+    ```
+
+2. Create a virtual environment (venv) in the repo folder
+
+    Due to the engine being in heavy development, a number of scripts rely on a local venv with the modules defined in the `requirements.txt` to function
+    ```
+    python -m venv <repo_root>/venv
+    ```
+    
+3. Install from `requirements.txt`
+
+    ```
+    <repo_root>/venv/Scripts/pip.exe install -r <repo_root>/requirements.txt
+    ```
+   
+4. Launch the Editor
+    
+   This step has a few options. There is a simple launch script in the repo root called `launch_editor.bat`. This will launch the editor with a CMD terminal for debug output
+   
+   If you want more development tools, use an IDE of your choice to launch the editor project targeting the `main.py` script (I personally use and recommend PyCharm) 
 
 # License
 The Heartbeat Engine is licensed under the GPL version 3 (GPLv3) license. Details can be found in the `LICENSE.txt` file, but essentially any projects created with the engine are entirely, 100% yours. You may use your own license for them, keep them as private works, and release them commercially without worry. 

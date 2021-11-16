@@ -151,6 +151,14 @@ Renderables:
           editable: True
           preview: True
 
+        - name: "wrap_bounds"
+          type: "vector2"
+          value: [0.2,0.2]
+          global:
+            active: True
+          editable: True
+          preview: False
+
         - name: "transition"
           type: "container"
           preview: True
@@ -415,7 +423,7 @@ Dialogue:
             - name: "center_align"
               type: "bool"
               value: True
-              global: 
+              global:
                 active: True
               editable: True
               preview: False

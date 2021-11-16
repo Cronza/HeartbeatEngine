@@ -30,6 +30,7 @@ Text:
   font: "File_Font"
   z_order: "Int"
   center_align: "Bool"
+  wrap_bounds: "Vector2"
 
 Button:
   sprite: "File_Image"
@@ -51,6 +52,7 @@ Dialogue:
   speaker_font: "File_Font"
   speaker_z_order: "Int"
   speaker_center_align: "Bool"
+  speaker_wrap_bounds: "Vector2"
   dialogue_text_position: "Vector2"
   dialogue_text_size: "Int"
   dialogue_text_color: "Color"
@@ -58,6 +60,7 @@ Dialogue:
   dialogue_wait_for_input: "Bool"
   dialogue_z_order: "Int"
   dialogue_center_align: "Bool"
+  dialogue_wrap_bounds: "Vector2"
   dialogue_frame_sprite: "File_Image"
   dialogue_frame_z_order: "Int"
   dialogue_frame_center_align: "Bool"

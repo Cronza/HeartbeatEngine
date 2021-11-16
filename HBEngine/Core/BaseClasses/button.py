@@ -23,11 +23,15 @@ class Button(Interactable):
     def __init__(self, scene, renderable_data):
         super().__init__(scene, renderable_data)
 
-        # Initialize text renderable
+        # Use the button image / surface as the wrap Bounds. Since we already have the screen space
+        # size though, provide it instead of letting the text convert it from normalized values later
+        self.renderable_data["size"] = self.surface.get_size()
+
         button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data
         )
+        button_text_renderable.key = f"{self.renderable_data['key']}_Text"
         self.children.append(button_text_renderable)
         self.scene.active_renderables.Add(button_text_renderable)
 

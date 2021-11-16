@@ -23,28 +23,25 @@ class PlayManager:
     alongside the HBEditor so the subprocess call works correctly
     """
 
-    def Play(self, parent, logger,  project_path):
+    def Play(self, parent, logger,  project_path, engine_parent_root):
         logger.Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing
-            print("Project Dir")
-            print(project_path)
-
-            print("Current Working Dir")
-            print(os.getcwd())
             result = subprocess.Popen(
                 [
                     f"venv/Scripts/python",
                     "HBEngine/hb_engine.py",
-                    project_path
+                    "-p",
+                     project_path
                 ],
                 stdout=True,
-                stderr=True            )
+                stderr=True
+            )
             logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 
             logger.Log("Engine closed - Editor functionality resumed")
-            print(result)
+
         except Exception as exc:
             QMessageBox.about(
                 parent,

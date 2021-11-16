@@ -68,9 +68,8 @@ class Renderable(pygame.sprite.Sprite):
 
         # A multiplier of 1 means this is the main resolution. Update the renderable using the unscaled surface
         if multiplier == 1:
-            #print("Multiplier provided is 1, updating using the provided surface without scaling")
 
-            # Generate a new absolute position using this renderables normalized screen position
+            # Generate a new absolute position using this renderable's normalized screen position
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
             if self.center_align:
@@ -93,7 +92,6 @@ class Renderable(pygame.sprite.Sprite):
             )
             # Generate the scaled surface
             scaled_surface = self.scene.pygame_lib.transform.smoothscale(surface, new_size)
-
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
             if self.center_align:
@@ -138,7 +136,7 @@ class Renderable(pygame.sprite.Sprite):
             self.surface = surface
 
     def ConvertNormToScreen(self, norm_value):
-        """ Take the normalized object pos and convert it to relative screen space coordinates """
+        """ Take the normalized object pos and convert it to absolute screen space coordinates """
         screen_size = self.scene.pygame_lib.display.get_surface().get_size()
 
         return (

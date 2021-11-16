@@ -94,25 +94,17 @@ class EditorDialogue(EditorBase):
                 self.logger.Log("Scanning dialogue entries...")
                 self.UpdateBranchData(branch)
 
-            branch_name = branch.Get()[0]
+            branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
-            data_to_export[branch_name] = branch_data
+            new_entry = {
+                #"name": branch_name,
+                "description": branch_description,
+                "entries": branch_data
+            }
+
+            data_to_export[branch_name] = new_entry
 
         return data_to_export
-
-    def Save(self):
-        super().Save()
-        self.logger.Log(f"Saving Dialogue data for: {self.file_path}")
-
-        data_to_export = self.GetAllDialogueData()
-
-        # Write the data out
-        self.logger.Log("Writing data to file...")
-        try:
-            Writer.WriteFile(data_to_export, self.file_path)
-            self.logger.Log("File Saved!", 2)
-        except:
-            self.logger.Log("Failed to Save!", 4)
 
     def Export(self):
         super().Export()
@@ -151,9 +143,9 @@ class EditorDialogue(EditorBase):
             # The main branch is treated specially since we don't need to create it
             for branch_name, branch_data in converted_data.items():
                 if not branch_name == "Main":
-                    self.editor_ui.branches.CreateBranch(branch_name, "Auto-Generated")
+                    self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])
 
-                for action in branch_data:
+                for action in branch_data["entries"]:
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default

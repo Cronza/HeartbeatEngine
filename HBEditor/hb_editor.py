@@ -26,7 +26,10 @@ from HBEditor.Interface import hb_editor as hbe
 from HBEditor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
+from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from Tools.HBBuilder.hb_builder import HBBuilder
+
 
 class HBEditor:
     def __init__(self):
@@ -38,7 +41,7 @@ class HBEditor:
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
-        self.outliner = None # Assignment happens once a project is loaded
+        self.outliner = None  # Assignment happens once a project is loaded
         self.active_editor = None
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
@@ -98,9 +101,10 @@ class HBEditor:
                         main_dir_path = project_path + "/" + main_dir
                         os.mkdir(main_dir_path)
 
-                    # Create the admin folder
-                    admin_dir_path = project_path + "/" + self.settings.project_admin_dir
-                    os.mkdir(admin_dir_path)
+                    # Create the project file
+                    project_file = project_path + "/" + self.settings.project_file
+                    with open(project_file, "w"):
+                        pass
 
                     # Clone project default files
                     for key, rel_path in self.settings.project_default_files.items():
@@ -129,7 +133,7 @@ class HBEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(existing_project_dir + "/" + self.settings.project_admin_dir):
+            if os.path.exists(existing_project_dir + "/" + self.settings.project_file):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
@@ -191,6 +195,26 @@ class HBEditor:
         else:
             existing_file = None
 
+            # Validate whether the selected file is capable of being opened
+            if ".yaml" not in target_file_path:
+                self.logger.Log("File type does not have any interact functionality", 3)
+                return
+            """
+            # *** Re-enable this code when the supported file types all have open functionality ***
+            split_path = target_file_path.split(".")
+            if len(split_path) > 1:
+                extension = split_path[-1]
+                is_supported = False
+                for type_string in self.settings.supported_content_types.values():
+                    if f".{extension}" in type_string:
+                        is_supported = True
+                        break
+
+            if not is_supported:
+                self.logger.Log("File type does not have any interact functionality", 3)
+                pass
+            """
+
             # Is the user opening a file through the main "File->Open" mechanism?
             if not target_file_path:
                 prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
@@ -235,7 +259,31 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             p_manager = PlayManager()
-            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir)
+            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir, self.settings.root)
+
+    def Build(self):
+        """ Launches the HBBuilder in order to generate an executable from the active project """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            HBBuilder.Build(
+                self.logger,
+                self.settings.engine_root,
+                self.settings.user_project_dir,
+                self.settings.user_project_name
+            )
+
+    def Clean(self):
+        """ Cleans the active project's build folder """
+        # Only allow this is there is an active project
+        if not self.settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            HBBuilder.Clean(
+                self.logger,
+                self.settings.user_project_dir
+            )
 
     def Save(self):
         """ Requests the active editor to save it's data """
@@ -281,6 +329,7 @@ class HBEditor:
         if not self.settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
             editor_classes = {
                 FileType.Scene_Dialogue: EditorDialogue,
+                FileType.Scene_Point_And_Click: EditorPointAndClick,
                 FileType.Project_Settings: EditorProjectSettings
              }
 

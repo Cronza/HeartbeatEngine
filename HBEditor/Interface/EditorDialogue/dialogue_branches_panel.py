@@ -140,21 +140,23 @@ class BranchesPanel(QtWidgets.QWidget):
         selection = self.branches_list.selectedItems()[0]
         branch_entry = self.branches_list.itemWidget(selection)
 
-        #Only allow editing for all entries other than the initial (main) entry
+        # Only allow editing for all entries other than the initial (main) entry
         if self.branches_list.currentRow() != 0:
-            # Retrieves the tuple data of 'branch name' and 'branch description'
-            data = self.branches_list.itemWidget(selection).Get()
+            selected_branch = self.branches_list.itemWidget(selection)
 
-            # Create the prompt object, providing the selected branch's data
-            new_data = self.ConfigurePrompt(data[0], data[1])
+            # Retrieves the tuple data of 'branch name' and 'branch description'
+            data = selected_branch.Get()
+
+            # Create the prompt object, providing the selected branch's data. Provide
+            # the branch we're editing to so we bypass having to choose a new name
+            new_data = self.ConfigurePrompt(data[0], data[1], selected_branch)
 
             # If the user has changed anything, then update the entry. Otherwise, do nothing
-            if new_data:
-                # Set the data before resizing the entry to fit the new data
+            if all(new_data):
                 branch_entry.Set(new_data)
                 self.ResizeListEntry(selection, branch_entry)
 
-    def ConfigurePrompt(self, branch_name="New Branch Name", branch_description="New Branch Description") -> tuple:
+    def ConfigurePrompt(self, branch_name="New Name", branch_description="New Description", source_branch=None) -> tuple:
         """ Prompts the user with a branch configuration window. Returns the new data if provided, or None if not """
         # Create the prompt object
         prompt = EditBranchPrompt(branch_name, branch_description)
@@ -166,7 +168,7 @@ class BranchesPanel(QtWidgets.QWidget):
             new_data = prompt.Get()
 
             # Validate the branch name before we try creating the branch
-            if self.ValidateBranchName(new_data[0]):
+            if self.ValidateBranchName(new_data[0], source_branch):
 
                 # Name validated. Return the new data
                 return new_data
@@ -177,14 +179,23 @@ class BranchesPanel(QtWidgets.QWidget):
                     self, "Branch Name in Use!",
                     "The chosen branch name is already in use!\nPlease choose a new name"
                 )
+        # User cancelled
+        return None, None
 
-    def ValidateBranchName(self, name) -> bool:
-        """ Check if the provided branch name already exists """
-
+    def ValidateBranchName(self, name, source_branch) -> bool:
+        """
+        Check if the provided branch name already exists. If a source branch is provided, then exempt it from
+        being considered
+        """
         for entry_index in range(0, self.branches_list.count()):
-            entry = self.branches_list.item(entry_index)
+            entry = self.branches_list.itemWidget(self.branches_list.item(entry_index))
 
-            if self.branches_list.itemWidget(entry).Get()[0] == name:
+            print(source_branch)
+            if source_branch:
+                if entry == source_branch:
+                    continue
+
+            if entry.Get()[0] == name:
                 # Match found
                 return False
 
