@@ -152,7 +152,9 @@ class HBEditorUI:
         self.a_save_file_as.setText(_translate("MainWindow", "Save As"))
         self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+Alt+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
+        self.a_new_project.setShortcut(_translate("MainWindow", "Ctrl+Alt+Shift+N"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
+        self.a_open_project.setShortcut(_translate("MainWindow", "Ctrl+Alt+Shift+O"))
 
         # 'Play Menu' Actions
         self.play_menu.setTitle(_translate("MainWindow", "Play"))
