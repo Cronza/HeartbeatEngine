@@ -17,19 +17,20 @@ from HBEditor.Interface.Menus.ActionMenu.action_menu_option import ActionMenuOpt
 
 #@TODO: Should this class be split into a function class & a U.I class?
 
-
+""" 
+A generic menu of categories and actions that the active editor can use. 'button' func is used when any menu option
+is clicked. 'available_actions' is a set of actions pulled from the ActionsDatabase that will represent what's available
+in the menu 
+"""
 class ActionMenu(QtWidgets.QMenu):
-    def __init__(self, settings, button_func):
+    def __init__(self, settings, button_func, available_actions):
         super().__init__()
 
         # Set the root styling for sub menus
         self.setFont(settings.button_font)
         self.setStyleSheet(settings.button_color)
 
-        # Build the list of action options
-        self.action_database = settings.action_database
-
-        for category, data in self.action_database.items():
+        for category, data in available_actions.items():
             # Build the category object and assign it
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)

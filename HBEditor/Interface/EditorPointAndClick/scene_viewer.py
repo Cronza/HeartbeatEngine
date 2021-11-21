@@ -12,16 +12,17 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
-from HBEditor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
+from HBEditor.Interface.EditorPointAndClick.scene_view import SceneView
+from HBEditor.Interface.EditorPointAndClick.scene_item import SceneItem
 
-"""
-The core scene viewer for the Point & Click editor. Allows the user to build scenes with interactable &
-non-interactable objects    
-"""
+
 class SceneViewer(QtWidgets.QWidget):
+    """
+    The core scene viewer for the Point & Click editor. Allows the user to build scenes with interactable &
+    non-interactable objects
+    """
     def __init__(self, settings, core):
         super().__init__()
 
@@ -44,7 +45,13 @@ class SceneViewer(QtWidgets.QWidget):
         self.sub_layout.setSpacing(0)
 
         self.CreateActionBar()
-        self.CreateSceneView()
+
+        # Create the core elements, and a starting background (Scenes start transparent)
+        self.scene = QtWidgets.QGraphicsScene(QtCore.QRectF(0, 0, 1280, 720))
+        self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
+        background = self.scene.addRect(QtCore.QRectF(0, 0, 1280, 720), QtGui.QPen(), QtGui.QBrush(QtCore.Qt.black))
+
+        self.view = SceneView(self.scene)
 
         # Add the core view components together
         self.sub_layout.addWidget(self.action_toolbar)
@@ -54,24 +61,16 @@ class SceneViewer(QtWidgets.QWidget):
         self.main_layout.addWidget(self.title)
         self.main_layout.addLayout(self.sub_layout)
 
+        # Signals
+        self.scene.selectionChanged.connect(self.core.UpdateActiveSceneItem)
+
         self.view.show()
-
-    def CreateSceneView(self):
-        """ Creates the core view object """
-        self.scene = QtWidgets.QGraphicsScene(0, 0, 1280, 720)
-        self.view = QtWidgets.QGraphicsView(self.scene)
-
-        # DEBUG
-        #pixmap = QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Background_Labs2_1280.jpg"))
-        #pixmapitem = self.scene.addPixmap(pixmap)
-        #pixmapitem.setPos(0, 0)
-        #print(self.scene.sceneRect())
 
     def CreateActionBar(self):
         """ Create the action bar and populate it with each editing button """
 
-        # Create an action menu to be used later on for adding entries to the scene viewer
-        self.action_menu = ActionMenu(self.core.settings, None)
+        # Build the action menu which displays the options for creating things in the editor
+        self.action_menu = ActionMenu(self.settings, self.AddRenderable, self.core.action_data)
 
         # Create the frame container
         self.action_toolbar = QtWidgets.QFrame()
@@ -130,31 +129,49 @@ class SceneViewer(QtWidgets.QWidget):
         #self.copy_entry_button.clicked.connect(self.CopyEntry)
         self.action_toolbar_layout.addWidget(self.copy_entry_button)
 
-        # Move Entry Up Button
-        self.move_entry_up_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.move_entry_up_button.setStyleSheet(button_style)
-        icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        self.move_entry_up_button.setIcon(icon)
-        #self.move_entry_up_button.clicked.connect(self.MoveEntryUp)
-        self.action_toolbar_layout.addWidget(self.move_entry_up_button)
-
-        # Move Entry Down Button
-        self.move_entry_down_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.move_entry_down_button.setStyleSheet(button_style)
-        icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        self.move_entry_down_button.setIcon(icon)
-        #self.move_entry_down_button.clicked.connect(self.MoveEntryDown)
-        self.action_toolbar_layout.addWidget(self.move_entry_down_button)
-
         # Empty Space Spacer
         spacer = QtWidgets.QSpacerItem(20, 534, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.action_toolbar_layout.addItem(spacer)
 
+    def AddRenderable(self, action_data):
+        # While most renderables have a "sprite" key, text renderables are an exception. Account for both options
+        for req in [
+            value for value in action_data["requirements"] if any([value["name"] == "sprite", value["name"] == "text"])
+        ]:
+            if req["name"] == "sprite":
+                print("Found Sprite")
+                image = QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
+                sprite = SceneItem(image, action_data)
+                self.scene.addItem(sprite)
+
+                """sprite = SceneItem(req)
+                sprite.setPos(0, 0)
+                self.scene.addItem(sprite)"""
+            else:
+                print("Found Text")
+            break
+
+    def GetSelectedItem(self):
+        """ Returns all currently selected QGraphicsItems. If there aren't any, returns None """
+        try:
+            selected_items = self.scene.selectedItems()
+        except RuntimeError:
+            # #https://bugreports.qt.io/browse/QTBUG-24667
+            # For some reason, when the HBEditor goes to close, if there is an active selection, the QGraphicsScene
+            # will deselect all active selections, causing the 'selectionChanged' signal to fire. When this happens
+            # during the close process, presumably, the scene itself is deleted at the same time as the
+            # selectionChanged code is being ran, leading to a runtime error:
+
+            # 'RuntimeError: wrapped C/C++ object of type QGraphicsScene has been deleted'
+
+            # I wasn't able to find much data on the cause for this. I can't pre-emptively validate for this as
+            # 'self.scene' is valid up until I attempt to reference it. I've tried overriding 'closeEvent' as well
+            # but without any effect
+
+            # This is an unsettling solution, but until a proper fix is discovered, I have to keep it shamefully
+            # hidden within a try / catch
+
+            # Forgive me lord for what I'm about to yabba-dabba do
+            return None
+
+        return selected_items

@@ -31,7 +31,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.settings = settings
 
         # Create an action menu to be used later on for adding entries to the sequence
-        self.action_menu = ActionMenu(self.settings, self.AddEntry)
+        self.action_menu = ActionMenu(self.settings, self.AddEntry, settings.action_database)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
