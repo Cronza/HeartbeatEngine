@@ -50,6 +50,7 @@ class SceneViewer(QtWidgets.QWidget):
         self.scene = QtWidgets.QGraphicsScene(QtCore.QRectF(0, 0, 1280, 720))
         self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
         background = self.scene.addRect(QtCore.QRectF(0, 0, 1280, 720), QtGui.QPen(), QtGui.QBrush(QtCore.Qt.black))
+        background.setZValue(-9999999999)
 
         self.view = SceneView(self.scene)
 
@@ -114,7 +115,7 @@ class SceneViewer(QtWidgets.QWidget):
             QtGui.QIcon.Off
         )
         self.remove_entry_button.setIcon(icon)
-        #self.remove_entry_button.clicked.connect(self.RemoveEntry)
+        self.remove_entry_button.clicked.connect(self.RemoveSelectedItems)
         self.action_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Copy Entry Button
@@ -141,17 +142,13 @@ class SceneViewer(QtWidgets.QWidget):
             if req["name"] == "sprite":
                 print("Found Sprite")
                 image = QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
-                sprite = SceneItem(image, action_data)
+                sprite = SceneItem(image, self.settings, action_data)
                 self.scene.addItem(sprite)
-
-                """sprite = SceneItem(req)
-                sprite.setPos(0, 0)
-                self.scene.addItem(sprite)"""
             else:
                 print("Found Text")
             break
 
-    def GetSelectedItem(self):
+    def GetSelectedItems(self):
         """ Returns all currently selected QGraphicsItems. If there aren't any, returns None """
         try:
             selected_items = self.scene.selectedItems()
@@ -175,3 +172,13 @@ class SceneViewer(QtWidgets.QWidget):
             return None
 
         return selected_items
+
+    def RemoveSelectedItems(self):
+        """ Removes all currently selected items """
+        selected_items = self.GetSelectedItems()
+
+        if selected_items:
+            for item in selected_items:
+                self.scene.removeItem(item)
+
+            self.core.UpdateActiveSceneItem()

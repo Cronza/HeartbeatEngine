@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import copy
 from PyQt5 import QtWidgets
 
 
@@ -23,4 +24,4 @@ class ActionMenuOption(QtWidgets.QWidgetAction):
         self.action_data = action_data
 
         # Hook this button up
-        self.triggered.connect(lambda button: func(self.action_data))
+        self.triggered.connect(lambda button: func(copy.deepcopy(self.action_data)))

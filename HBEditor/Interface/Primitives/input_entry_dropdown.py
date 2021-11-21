@@ -35,8 +35,6 @@ class InputEntryDropdown(InputEntryBase):
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
 
-
-
     def Get(self):
         return self.input_widget.currentText()
 
