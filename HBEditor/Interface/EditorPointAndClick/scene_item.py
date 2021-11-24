@@ -3,14 +3,18 @@ from PyQt5 import QtWidgets, QtGui
 
 
 class SceneItem(QtWidgets.QGraphicsPixmapItem):
-    def __init__(self, pixmap, settings, action_data):
+    def __init__(self, pixmap, settings, action_data, move_func, select_func):
         super().__init__(pixmap)
 
         self.settings = settings
         self.action_data = action_data
 
+        self.move_func = move_func
+        self.select_func = select_func
+
         self.setFlag(self.ItemIsMovable)
         self.setFlag(self.ItemIsSelectable)
+        self.setFlag(self.ItemSendsGeometryChanges)
 
         # Cache the index where the important action data elements are, so we don't iterate through each time
         # (This is on the assumption and knowledge that the order will never change)
@@ -43,3 +47,14 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
         # Update the z_order
         z_order = self.action_data["requirements"][self.z_order_index]["value"]
         self.setZValue(float(z_order))
+
+    def itemChange(self, change, value):
+        """
+        OVERRIDE: Called when the item has a change made to it. Currently, movement and selection changes are included
+        """
+        if change == QtWidgets.QGraphicsItem.ItemPositionChange:
+            self.move_func(self.pos())
+        elif change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
+            self.select_func()
+
+        return super().itemChange(change, value)

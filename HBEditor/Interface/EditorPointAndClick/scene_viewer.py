@@ -63,7 +63,7 @@ class SceneViewer(QtWidgets.QWidget):
         self.main_layout.addLayout(self.sub_layout)
 
         # Signals
-        self.scene.selectionChanged.connect(self.core.UpdateActiveSceneItem)
+        #self.scene.selectionChanged.connect(self.core.UpdateActiveSceneItem)
 
         self.view.show()
 
@@ -142,7 +142,13 @@ class SceneViewer(QtWidgets.QWidget):
             if req["name"] == "sprite":
                 print("Found Sprite")
                 image = QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
-                sprite = SceneItem(image, self.settings, action_data)
+                sprite = SceneItem(
+                    image,
+                    self.settings,
+                    action_data,
+                    self.ItemHasMoved,
+                    self.core.UpdateActiveSceneItem
+                )
                 self.scene.addItem(sprite)
             else:
                 print("Found Text")
@@ -150,25 +156,9 @@ class SceneViewer(QtWidgets.QWidget):
 
     def GetSelectedItems(self):
         """ Returns all currently selected QGraphicsItems. If there aren't any, returns None """
-        try:
-            selected_items = self.scene.selectedItems()
-        except RuntimeError:
-            # #https://bugreports.qt.io/browse/QTBUG-24667
-            # For some reason, when the HBEditor goes to close, if there is an active selection, the QGraphicsScene
-            # will deselect all active selections, causing the 'selectionChanged' signal to fire. When this happens
-            # during the close process, presumably, the scene itself is deleted at the same time as the
-            # selectionChanged code is being ran, leading to a runtime error:
 
-            # 'RuntimeError: wrapped C/C++ object of type QGraphicsScene has been deleted'
-
-            # I wasn't able to find much data on the cause for this. I can't pre-emptively validate for this as
-            # 'self.scene' is valid up until I attempt to reference it. I've tried overriding 'closeEvent' as well
-            # but without any effect
-
-            # This is an unsettling solution, but until a proper fix is discovered, I have to keep it shamefully
-            # hidden within a try / catch
-
-            # Forgive me lord for what I'm about to yabba-dabba do
+        selected_items = self.scene.selectedItems()
+        if not selected_items:
             return None
 
         return selected_items
@@ -182,3 +172,7 @@ class SceneViewer(QtWidgets.QWidget):
                 self.scene.removeItem(item)
 
             self.core.UpdateActiveSceneItem()
+
+    def ItemHasMoved(self, new_pos):
+        print(new_pos)
+

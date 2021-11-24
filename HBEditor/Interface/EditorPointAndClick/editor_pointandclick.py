@@ -33,12 +33,10 @@ class EditorPointAndClickUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
 
-        # Build the core editor layout object
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # Build the core editor layout object
         self.central_grid_layout = QtWidgets.QGridLayout(self)
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
