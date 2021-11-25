@@ -14,7 +14,7 @@
 """
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
-from HBEditor.Interface.EditorPointAndClick.scene_view import SceneView
+from HBEditor.Interface.EditorPointAndClick.scene_view import SceneView, Scene
 from HBEditor.Interface.EditorPointAndClick.scene_item import SceneItem
 
 
@@ -28,6 +28,8 @@ class SceneViewer(QtWidgets.QWidget):
 
         self.core = core
         self.settings = settings
+
+        self.viewer_size = (1280, 720)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -46,12 +48,8 @@ class SceneViewer(QtWidgets.QWidget):
 
         self.CreateActionBar()
 
-        # Create the core elements, and a starting background (Scenes start transparent)
-        self.scene = QtWidgets.QGraphicsScene(QtCore.QRectF(0, 0, 1280, 720))
-        self.scene.setBackgroundBrush(QtCore.Qt.darkGray)
-        background = self.scene.addRect(QtCore.QRectF(0, 0, 1280, 720), QtGui.QPen(), QtGui.QBrush(QtCore.Qt.black))
-        background.setZValue(-9999999999)
-
+        # Create the core elements
+        self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
         self.view = SceneView(self.scene)
 
         # Add the core view components together
@@ -61,9 +59,6 @@ class SceneViewer(QtWidgets.QWidget):
         # Add the top level components together
         self.main_layout.addWidget(self.title)
         self.main_layout.addLayout(self.sub_layout)
-
-        # Signals
-        #self.scene.selectionChanged.connect(self.core.UpdateActiveSceneItem)
 
         self.view.show()
 
@@ -147,7 +142,8 @@ class SceneViewer(QtWidgets.QWidget):
                     self.settings,
                     action_data,
                     self.ItemHasMoved,
-                    self.core.UpdateActiveSceneItem
+                    self.core.UpdateActiveSceneItem,
+                    self.core.UpdateDetails
                 )
                 self.scene.addItem(sprite)
             else:

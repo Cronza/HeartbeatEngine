@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 
 class SceneView(QtWidgets.QGraphicsView):
@@ -34,3 +34,20 @@ class SceneView(QtWidgets.QGraphicsView):
 
         self.scale(factor, factor)
         self.zoom *= factor
+
+
+class Scene(QtWidgets.QGraphicsScene):
+    """ A custom subclass of QGraphicsScene with extended features """
+    def __init__(self, rect):
+        super().__init__(rect)
+
+        self.scene_size = rect  # type: QtCore.QRectF
+
+        # Create a default background (since the scene is, by default, transparent)
+        self.setBackgroundBrush(QtCore.Qt.darkGray)
+        background = self.addRect(
+            QtCore.QRectF(0, 0, self.scene_size.width(), self.scene_size.height()),
+            QtGui.QPen(),
+            QtGui.QBrush(QtCore.Qt.black)
+        )
+        background.setZValue(-9999999999)
