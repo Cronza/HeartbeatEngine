@@ -29,10 +29,7 @@ class SpriteRenderable(Renderable):
         super().__init__(scene, renderable_data)
 
         # YAML Parameters
-        print("DEBUG: SPRITE PATH")
-        print(self.renderable_data['sprite'])
         sprite = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
-        print(sprite)
 
         try:
             self.surface = pygame.image.load(sprite).convert_alpha()

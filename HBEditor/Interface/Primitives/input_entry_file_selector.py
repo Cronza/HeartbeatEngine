@@ -88,7 +88,7 @@ class InputEntryFileSelector(InputEntryBase):
             selected_dir = existing_file
 
             # Remove the project dir from the path, so that the selected dir only contains a relative path
-            selected_dir.replace(self.settings.user_project_dir + "/", "")
+            selected_dir = selected_dir.replace(self.settings.user_project_dir + "/", "")
             self.input_widget.setText(selected_dir)
 
 
