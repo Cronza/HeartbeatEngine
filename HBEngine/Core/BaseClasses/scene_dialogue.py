@@ -17,14 +17,14 @@ from HBEngine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
 
 
 class DialogueScene(PointAndClickScene):
-    def __init__(self, scene_data_file, window, settings, scene_manager):
+    def __init__(self, scene_data_file, window, scene_manager):
         self.dialogue_index = 0
         self.dialogue_data = ""
         self.active_branch = "Main"
         self.character_data = {}
 
         # Update the generic data using the parent's init
-        super().__init__(scene_data_file, window, settings, scene_manager)
+        super().__init__(scene_data_file, window, scene_manager)
 
     def Update(self, events):
         super().Update(events)

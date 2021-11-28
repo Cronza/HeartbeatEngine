@@ -17,12 +17,9 @@ from HBEngine.Core import actions
 
 
 class ValueManager:
-    def __init__(self, scene, settings):
+    def __init__(self, scene):
 
         self.scene = scene
-
-        self.scene.settings = settings
-
 
     def Request(self):
         pass

@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
+from HBEngine.Core.settings import Settings
 from HBEngine.Utilities.DataTypes.input_states import State
 from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
 
@@ -117,8 +118,8 @@ class Interactable(SpriteRenderable):
         due to the speed at which they are requested when the user spams the hover or click events
         """
         state_missing_warning = " - Defaulting the state to use the 'Normal' sprite"
-        hover_sprite = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
-        clicked_sprite = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
+        hover_sprite = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
+        clicked_sprite = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
 
         if "sprite_hover" in self.renderable_data:
             if self.renderable_data['sprite_hover'] != "":

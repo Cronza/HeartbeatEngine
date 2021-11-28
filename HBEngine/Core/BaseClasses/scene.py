@@ -13,21 +13,21 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
+from HBEngine.Core.settings import Settings
 from HBEngine.Core.BaseClasses.renderable_group import RenderableGroup
 from HBEngine.Core.action_manager import ActionManager
 from Tools.HBYaml.hb_yaml import Reader
 
 
 class Scene:
-    def __init__(self, scene_data_file, window, settings, scene_manager):
+    def __init__(self, scene_data_file, window, scene_manager):
 
         self.window = window
-        self.settings = settings
         self.scene_manager = scene_manager
         self.active_renderables = RenderableGroup()
         self.active_sounds = {}
         self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
-        self.a_manager = ActionManager(self, settings)
+        self.a_manager = ActionManager(self)
 
         self.pause_menu = None
 
@@ -35,7 +35,7 @@ class Scene:
         self.delta_time = 0
 
         # Read in the active scene data
-        self.scene_data = Reader.ReadAll(self.settings.ConvertPartialToAbsolutePath(scene_data_file))
+        self.scene_data = Reader.ReadAll(Settings.getInstance().ConvertPartialToAbsolutePath(scene_data_file))
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:
@@ -84,8 +84,8 @@ class Scene:
         """ Determines a new sprite size based on the difference between the main resolution and the new resolution """
 
         # Generate the new screen size scale multiplier, then cache it in the scene manager in case scenes change
-        new_resolution = self.settings.resolution_options[self.settings.resolution]
-        self.resolution_multiplier = self.CalculateScreenSizeMultiplier(self.settings.main_resolution, new_resolution)
+        new_resolution = Settings.getInstance().resolution_options[Settings.getInstance().resolution]
+        self.resolution_multiplier = self.CalculateScreenSizeMultiplier(Settings.getInstance().main_resolution, new_resolution)
         self.scene_manager.resolution_multiplier = self.resolution_multiplier
 
         # Inform each renderable of the resolution change so they can update their respective elements
