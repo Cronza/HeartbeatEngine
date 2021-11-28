@@ -13,6 +13,8 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
+from HBEditor.Core.settings import Settings
+
 
 class DBManager:
     """ A manager dedicated to actions that interface with the ActionDatabase """
@@ -74,7 +76,7 @@ class DBManager:
             return converted_action
         return None
 
-    def ConvertDialogueFileToEditorFormat(self, action_data, settings):
+    def ConvertDialogueFileToEditorFormat(self, action_data):
         """
         Given a full dict of dialogue file data in engine format (branches and all), convert it to the editor format by
         rebuilding the structure based on lookups in the ActionDatabase
@@ -90,7 +92,7 @@ class DBManager:
                 # Using the name of the action, look it up in the ActionDatabase. From there, we can build the new
                 # structure
                 database_entry = None
-                for cat_name, cat_data in settings.action_database.items():
+                for cat_name, cat_data in Settings.getInstance().action_database.items():
                     for option in cat_data["options"]:
                         if action_name == option['action_name']:
                             database_entry = copy.deepcopy(option)
