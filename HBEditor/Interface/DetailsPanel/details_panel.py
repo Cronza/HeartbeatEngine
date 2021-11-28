@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtCore
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_text import InputEntryText
 from HBEditor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
 from HBEditor.Interface.Primitives.input_entry_bool import InputEntryBool
@@ -31,10 +32,9 @@ from HBEditor.Interface.Primitives.input_widget_choice import InputEntryChoice
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, settings, logger):
+    def __init__(self, logger):
         super().__init__()
 
-        self.settings = settings
         self.logger = logger
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
@@ -49,8 +49,8 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Create title
         self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setFont(self.settings.header_1_font)
-        self.details_title.setStyleSheet(settings.header_1_color)
+        self.details_title.setFont(Settings.getInstance().header_1_font)
+        self.details_title.setStyleSheet(Settings.getInstance().header_1_color)
         self.details_title.setText("Details")
 
         # Create the toolbar
@@ -59,7 +59,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_toolbar.setStyleSheet(
             "QFrame, QLabel, QToolTip {\n"
             "    border-radius: 4px;\n"
-            f"   background-color: rgb({self.settings.toolbar_background_color});\n"
+            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
             "}"
         )
         self.details_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -82,7 +82,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_table.setColumnCount(3)
         self.details_table.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_table.setAutoScroll(False)
-        self.details_table.header().setFont(self.settings.button_font)
+        self.details_table.header().setFont(Settings.getInstance().button_font)
         self.details_table.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_table.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.details_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
@@ -241,35 +241,35 @@ class DetailsPanel(QtWidgets.QWidget):
         data_type = data['type']
 
         if data_type == "str":
-             return InputEntryText(self.settings, self.DetailEntryUpdated)
+             return InputEntryText(self.DetailEntryUpdated)
         elif data_type == "paragraph":
-            return InputEntryParagraph(self.settings, self.DetailEntryUpdated)
+            return InputEntryParagraph(self.DetailEntryUpdated)
         elif data_type == "vector2":
-            return InputEntryTuple(self.settings, self.DetailEntryUpdated)
+            return InputEntryTuple(self.DetailEntryUpdated)
         elif data_type == "bool":
-            return InputEntryBool(self.settings, self.DetailEntryUpdated)
+            return InputEntryBool(self.DetailEntryUpdated)
         elif data_type == "color":
-            return InputEntryColor(self.settings, self.DetailEntryUpdated)
+            return InputEntryColor(self.DetailEntryUpdated)
         elif data_type == "int":
-            return InputEntryInt(self.settings, self.DetailEntryUpdated)
+            return InputEntryInt(self.DetailEntryUpdated)
         elif data_type == "float":
-            return InputEntryFloat(self.settings, self.DetailEntryUpdated)
+            return InputEntryFloat(self.DetailEntryUpdated)
         elif data_type == "file":
-            return InputEntryFileSelector(self.settings, self.logger, self, "", self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.logger, self, "", self.DetailEntryUpdated)
         elif data_type == "file_data":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Data"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Data"], self.DetailEntryUpdated)
         elif data_type == "file_image":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Image"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Image"], self.DetailEntryUpdated)
         elif data_type == "file_font":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Font"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Font"], self.DetailEntryUpdated)
         elif data_type == "file_sound":
-            return InputEntryFileSelector(self.settings, self.logger, self, self.settings.supported_content_types["Sound"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Sound"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
-            return InputEntryDropdown(self.settings, data['options'], self.DetailEntryUpdated)
+            return InputEntryDropdown(data['options'], self.DetailEntryUpdated)
         elif data_type == "choice":
-            return InputEntryChoice(self.settings, data, self.AddEntry, self.CreateEntryWidget, self.branch_list, self.DetailEntryUpdated)
+            return InputEntryChoice(data, self.AddEntry, self.CreateEntryWidget, self.branch_list, self.DetailEntryUpdated)
         elif data_type == "container":
-            new_entry = InputEntryContainer(self.settings, data['children'])
+            new_entry = InputEntryContainer(data['children'])
             for child in data['children']:
                 new_entry.addChild(self.CreateEntryWidget(child))
 

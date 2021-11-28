@@ -12,16 +12,17 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtCore import Qt
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Menus.base_popup_menu import BasePopupMenu
 from HBEditor.Interface.Menus.NewFileMenu.file_option import FileOption
 from HBEditor.Utilities.DataTypes.file_types import FileType
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt
 
 
 class NewFileMenu(BasePopupMenu):
-    def __init__(self, settings, logger, window_icon_path, window_name):
-        super().__init__(settings, logger, window_icon_path, window_name)
+    def __init__(self, logger, window_icon_path, window_name):
+        super().__init__(logger, window_icon_path, window_name)
 
         self.resize(400, 300)
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -32,12 +33,11 @@ class NewFileMenu(BasePopupMenu):
         self.options_list = QtWidgets.QListWidget()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
         FileOption(
-            settings,
             icon,
             FileType.Scene_Dialogue,
             "Scene (Dialogue)",
@@ -45,7 +45,6 @@ class NewFileMenu(BasePopupMenu):
             self.options_list
         )
         FileOption(
-            settings,
             icon,
             FileType.Scene_Point_And_Click,
             "Scene (Point & Click)",
@@ -63,7 +62,7 @@ class NewFileMenu(BasePopupMenu):
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
-        self.description.setFont(settings.paragraph_font)
+        self.description.setFont(Settings.paragraph_font)
 
         self.options_layout.addWidget(self.options_list, 2)
         self.options_layout.addWidget(self.description, 1, Qt.AlignTop)

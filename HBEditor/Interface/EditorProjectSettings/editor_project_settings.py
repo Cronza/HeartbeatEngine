@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtCore
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.BaseClasses.base_editor import EditorBaseUI
 from HBEditor.Interface.Primitives.input_entry_text import InputEntryText
 from HBEditor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
@@ -48,8 +49,8 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.categories.setLayout(self.category_layout)
 
         self.category_title = QtWidgets.QLabel(self)
-        self.category_title.setFont(self.core.settings.header_2_font)
-        self.category_title.setStyleSheet(self.core.settings.header_2_color)
+        self.category_title.setFont(Settings.getInstance().header_2_font)
+        self.category_title.setStyleSheet(Settings.getInstance().header_2_color)
         self.category_title.setText("Categories")
         self.category_list = QtWidgets.QListWidget()
         self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
@@ -63,14 +64,14 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.settings_layout.setSpacing(0)
         self.settings.setLayout(self.settings_layout)
         self.settings_title = QtWidgets.QLabel(self)
-        self.settings_title.setFont(self.core.settings.header_2_font)
-        self.settings_title.setStyleSheet(self.core.settings.header_2_color)
+        self.settings_title.setFont(Settings.header_2_font)
+        self.settings_title.setStyleSheet(Settings.header_2_color)
         self.settings_title.setText("Settings")
         self.settings_table = QtWidgets.QTreeWidget(self)
         self.settings_table.setColumnCount(2)
         self.settings_table.setHeaderLabels(['Name', 'Input'])
         self.settings_table.setAutoScroll(False)
-        self.settings_table.header().setFont(self.core.settings.button_font)
+        self.settings_table.header().setFont(Settings.button_font)
         self.settings_table.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.settings_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.settings_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -186,26 +187,26 @@ class EditorProjectSettingsUI(EditorBaseUI):
     def CreateEntryWidget(self, data, data_type):
         """ Create a specialized entry widget based on the provided ParameterType """
         if data_type == ParameterType.String:
-            return InputEntryText(self.core.settings, None)
+            return InputEntryText(None)
         elif data_type == ParameterType.Bool:
-            return InputEntryBool(self.core.settings, None)
+            return InputEntryBool(None)
         elif data_type == ParameterType.Int:
-            return InputEntryInt(self.core.settings, None)
+            return InputEntryInt(None)
         elif data_type == ParameterType.Vector2:
-            return InputEntryTuple(self.core.settings, None)
+            return InputEntryTuple(None)
         elif data_type == ParameterType.Paragraph:
-            return InputEntryParagraph(self.core.settings, None)
+            return InputEntryParagraph(None)
         elif data_type == ParameterType.Color:
-            return InputEntryColor(self.core.settings, None)
+            return InputEntryColor(None)
         elif data_type == ParameterType.File:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, "", None)
+            return InputEntryFileSelector(self.core.logger, self, "", None)
         elif data_type == ParameterType.File_Font:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Font'], None)
+            return InputEntryFileSelector(self.core.logger, self, Settings.supported_content_types['Font'], None)
         elif data_type == ParameterType.File_Image:
-            return InputEntryFileSelector(self.core.settings, self.core.logger, self, self.core.settings.supported_content_types['Image'], None)
+            return InputEntryFileSelector(self.core.logger, self, Settings.supported_content_types['Image'], None)
         elif data_type == ParameterType.Dropdown:
-            return InputEntryDropdown(self.core.settings, data, None)
+            return InputEntryDropdown(data, None)
         elif data_type == ParameterType.CUST_Resolution:
-            return InputEntryResolution(self.core.settings, data, self.core.project_settings)
+            return InputEntryResolution(data, self.core.project_settings)
         else:
             return None

@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
@@ -29,14 +30,14 @@ class InputEntryResolution(InputEntryBase):
     settings so it can go and update the former at it's leisure
     """
 
-    def __init__(self, settings, resolution_options, project_settings):
-        super().__init__(settings, None)
+    def __init__(self, resolution_options, project_settings):
+        super().__init__(None)
 
         self.project_settings = project_settings
 
         self.input_widget = QtWidgets.QComboBox()
-        self.input_widget.setFont(self.settings.paragraph_font)
-        self.input_widget.setStyleSheet(settings.paragraph_color)
+        self.input_widget.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.options = resolution_options
 
         for option in self.options:

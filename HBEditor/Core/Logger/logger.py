@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from datetime import datetime
+from HBEditor.Core.settings import Settings
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QFont
 from HBEditor.Interface.Logger.logger import LoggerUI
@@ -20,23 +21,21 @@ from HBEditor.Utilities.DataTypes.log_types import LogType
 
 
 class Logger:
-    def __init__(self, settings):
-
-        self.settings = settings
+    def __init__(self):
 
         # Build the Logger UI
         self.log_ui = LoggerUI(self)
 
         # Load styling
         self.log_font = QFont(
-            self.settings.style_data['EditorTextSettings']['log_font'],
-            self.settings.style_data['EditorTextSettings']['log_text_size']
+            Settings.getInstance().style_data['EditorTextSettings']['log_font'],
+            Settings.getInstance().style_data['EditorTextSettings']['log_text_size']
         )
         self.log_colors = {
-            LogType.Normal: self.settings.style_data['EditorTextSettings']['log_normal_color'],
-            LogType.Success: self.settings.style_data['EditorTextSettings']['log_success_color'],
-            LogType.Warning: self.settings.style_data['EditorTextSettings']['log_warning_color'],
-            LogType.Error: self.settings.style_data['EditorTextSettings']['log_error_color']
+            LogType.Normal: Settings.getInstance().style_data['EditorTextSettings']['log_normal_color'],
+            LogType.Success: Settings.getInstance().style_data['EditorTextSettings']['log_success_color'],
+            LogType.Warning: Settings.getInstance().style_data['EditorTextSettings']['log_warning_color'],
+            LogType.Error: Settings.getInstance().style_data['EditorTextSettings']['log_error_color']
         }
         self.log_prefixes = {
             LogType.Normal: "",

@@ -13,20 +13,21 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 
 # Useful Thread: https://stackoverflow.com/questions/50068802/pyqt-qfileiconprovider-class-custom-icons
 
+
 class FileSystemIconProvider(QtWidgets.QFileIconProvider):
-    def __init__(self, settings):
+    def __init__(self):
         super().__init__()
 
-        self.settings = settings
         self.recognized_image_extensions = ["png", "jpg", "jpeg", "targa"]
 
     def icon(self, fileInfo):
         # Override the icon function which returns the icon to use for each item in a QTree
         if fileInfo.isDir():
-            return QtGui.QIcon(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Folder.png"))
+            return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Folder.png"))
         elif fileInfo.suffix() in self.recognized_image_extensions:
-            return QtGui.QIcon(self.settings.ConvertPartialToAbsolutePath("Content/Icons/File_Image.png"))
-        return QtGui.QIcon(self.settings.ConvertPartialToAbsolutePath("Content/Icons/File.png"))
+            return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/File_Image.png"))
+        return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/File.png"))

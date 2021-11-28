@@ -14,12 +14,12 @@
 """
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
+from HBEditor.Core.settings import Settings
 
 
 class BranchesEntry(QtWidgets.QWidget):
-    def __init__(self, settings, select_func):
+    def __init__(self, select_func):
         super().__init__()
-        self.settings = settings
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
@@ -40,8 +40,8 @@ class BranchesEntry(QtWidgets.QWidget):
         #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(settings.header_2_font)
-        self.name_widget.setStyleSheet(settings.header_2_color)
+        self.name_widget.setFont(Settings.getInstance().header_2_font)
+        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
         self.name_widget.setSizePolicy(size_policy)
@@ -49,8 +49,8 @@ class BranchesEntry(QtWidgets.QWidget):
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
-        self.subtext_widget.setFont(settings.subtext_font)
-        self.subtext_widget.setStyleSheet(settings.subtext_color)
+        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
+        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
         self.subtext_widget.setText('Test Description')
         self.subtext_widget.setAlignment(Qt.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)

@@ -1,12 +1,11 @@
 import os
 from PyQt5 import QtWidgets, QtGui
-
+from HBEditor.Core.settings import Settings
 
 class SceneItem(QtWidgets.QGraphicsPixmapItem):
-    def __init__(self, pixmap, settings, action_data, move_func, select_func, data_changed_func):
+    def __init__(self, pixmap, action_data, move_func, select_func, data_changed_func):
         super().__init__(pixmap)
 
-        self.settings = settings
         self.action_data = action_data
 
         self.move_func = move_func

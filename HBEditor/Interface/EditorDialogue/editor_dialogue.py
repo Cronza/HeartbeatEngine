@@ -53,19 +53,19 @@ class EditorDialogueUI(EditorBaseUI):
         Create the dialogue sequence panel. Since this panel is fundamental to the dialogue editor,
         it needs a reference to the editor core to access toolbar functions
         """
-        self.dialogue_sequence = DialogueSequencePanel(self.core.settings, self.core)
+        self.dialogue_sequence = DialogueSequencePanel(self.core)
 
     def CreateBranchesPanel(self):
         """
         Create the branches panel. Since this panel is fundamental to the dialogue editor,
         it needs a reference to the editor core to access toolbar functions
         """
-        self.branches = BranchesPanel(self.core.settings, self.core)
+        self.branches = BranchesPanel(self.core)
 
     def CreateDetailsPanel(self):
         """
         Create the details panel using the generic details object. Since this panel is generic,
         it functions independently of whether it has a reference to the editor core
         """
-        self.details = DetailsPanel(self.core.settings, self.core.logger)
+        self.details = DetailsPanel(self.core.logger)
 

@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 
 
 class LoggerUI(QtWidgets.QWidget):
@@ -36,7 +37,7 @@ class LoggerUI(QtWidgets.QWidget):
         self.logger_toolbar.setStyleSheet(
             "QFrame, QLabel, QToolTip {\n"
             "    border-radius: 4px;\n"
-            f"   background-color: rgb({self.l_core.settings.toolbar_background_color});\n"
+            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
             "}")
         self.logger_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.logger_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -47,14 +48,14 @@ class LoggerUI(QtWidgets.QWidget):
         # Generic Button Settings
         icon = QtGui.QIcon()
         button_style = (
-            f"background-color: rgb({self.l_core.settings.toolbar_button_background_color});\n"
+            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
         )
 
         # Clear Log Button
         self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
         self.clear_log_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.l_core.settings.ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -68,8 +69,8 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
-        self.log_list.setFont(self.l_core.settings.paragraph_font)
-        self.log_list.setStyleSheet(self.l_core.settings.paragraph_color)
+        self.log_list.setFont(Settings.getInstance().paragraph_font)
+        self.log_list.setStyleSheet(Settings.getInstance().paragraph_color)
         self.log_list.setAutoScroll(True)
 
         # Add everything to the main container

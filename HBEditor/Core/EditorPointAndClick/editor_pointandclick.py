@@ -13,14 +13,15 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
+from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Utilities.DataTypes.file_types import FileType
 from HBEditor.Interface.EditorPointAndClick.editor_pointandclick import EditorPointAndClickUI
 
 
 class EditorPointAndClick(EditorBase):
-    def __init__(self, settings, logger, file_path):
-        super().__init__(settings, logger, file_path)
+    def __init__(self, logger, file_path):
+        super().__init__(logger, file_path)
 
         self.file_type = FileType.Scene_Point_And_Click
 
@@ -46,7 +47,7 @@ class EditorPointAndClick(EditorBase):
         for category_name, action_list in possible_actions.items():
             # Clone the entire category structure so we don't try and piecemeal it, potentially creating issues
             # in the future if we change the structure
-            category_data = copy.deepcopy(self.settings.action_database[category_name])
+            category_data = copy.deepcopy(Settings.getInstance().action_database[category_name])
 
             # Wipe the available options, as we're going to rebuild the list with only those we can use
             category_data["options"] = []
@@ -54,7 +55,7 @@ class EditorPointAndClick(EditorBase):
             # For every action we want, find the matching entry in the database and clone it
 
             for action_name in action_list:
-                for db_action in self.settings.action_database[category_name]["options"]:
+                for db_action in Settings.getInstance().action_database[category_name]["options"]:
                     if action_name == db_action["display_name"]:
                         category_data["options"].append(copy.deepcopy(db_action))
                         break

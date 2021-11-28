@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
@@ -20,8 +21,8 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class EditorDialogue(EditorBase):
-    def __init__(self, settings, logger, file_path):
-        super().__init__(settings, logger, file_path)
+    def __init__(self, logger, file_path):
+        super().__init__(logger, file_path)
 
         self.file_type = FileType.Scene_Dialogue
 
@@ -122,7 +123,7 @@ class EditorDialogue(EditorBase):
                 data_to_export,
                 self.file_path,
                 f"# Type: {FileType.Scene_Dialogue.name}\n" +
-                f"# {self.settings.editor_data['EditorSettings']['version_string']}"
+                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
             )
             self.logger.Log("File Exported!", 2)
         except:
@@ -137,7 +138,7 @@ class EditorDialogue(EditorBase):
         # Skip importing if the file has no data to load
         if file_data:
             db_manager = DBManager()
-            converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"], self.settings)
+            converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
 
             # The main branch is treated specially since we don't need to create it
             for branch_name, branch_data in converted_data.items():

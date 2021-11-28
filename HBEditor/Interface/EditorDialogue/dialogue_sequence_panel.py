@@ -14,6 +14,7 @@
 """
 import copy
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
@@ -24,14 +25,13 @@ any and all child widgets pertaining to the panel.
 This class is not meant for any destructive data changes, merely U.I actions
 """
 class DialogueSequencePanel(QtWidgets.QWidget):
-    def __init__(self, settings, ed_core):
+    def __init__(self, ed_core):
         super().__init__()
 
         self.ed_core = ed_core
-        self.settings = settings
 
         # Create an action menu to be used later on for adding entries to the sequence
-        self.action_menu = ActionMenu(self.settings, self.AddEntry, settings.action_database)
+        self.action_menu = ActionMenu(self.AddEntry, Settings.getInstance().action_database)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -39,8 +39,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Create the View title
         self.title = QtWidgets.QLabel(self)
-        self.title.setFont(self.settings.header_1_font)
-        self.title.setStyleSheet(self.settings.header_1_color)
+        self.title.setFont(Settings.getInstance().header_1_font)
+        self.title.setStyleSheet(Settings.getInstance().header_1_color)
         self.title.setText("Dialogue Sequence")
 
         # Create the toolbar
@@ -60,14 +60,14 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Generic button settings
         icon = QtGui.QIcon()
         button_style = (
-            f"background-color: rgb({self.settings.toolbar_button_background_color});\n"
+            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
         )
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -80,7 +80,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.remove_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -92,7 +92,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.copy_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         self.copy_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -104,7 +104,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.move_entry_up_button = QtWidgets.QToolButton(self.main_toolbar)
         self.move_entry_up_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -116,7 +116,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.move_entry_down_button = QtWidgets.QToolButton(self.main_toolbar)
         self.move_entry_down_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -133,8 +133,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.dialogue_table.setColumnCount(1)
         self.dialogue_table.horizontalHeader().hide()
         self.dialogue_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.dialogue_table.verticalHeader().setStyleSheet(self.settings.selection_color)
-        self.dialogue_table.setStyleSheet(self.settings.selection_color)
+        self.dialogue_table.verticalHeader().setStyleSheet(Settings.getInstance().selection_color)
+        self.dialogue_table.setStyleSheet(Settings.getInstance().selection_color)
         self.dialogue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
         self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
@@ -167,7 +167,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Create a new dialogue entry object, and add it to the sequence widget
         new_entry = DialogueEntry(
             copy.deepcopy(action_data),
-            self.settings,
             self.ed_core.UpdateActiveEntry,
             self.RefreshCurrentRowSize
         )

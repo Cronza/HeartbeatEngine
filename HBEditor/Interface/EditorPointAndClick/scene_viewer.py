@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui, QtCore
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Interface.EditorPointAndClick.scene_view import SceneView, Scene
 from HBEditor.Interface.EditorPointAndClick.scene_item import SceneItem
@@ -23,11 +24,10 @@ class SceneViewer(QtWidgets.QWidget):
     The core scene viewer for the Point & Click editor. Allows the user to build scenes with interactable &
     non-interactable objects
     """
-    def __init__(self, settings, core):
+    def __init__(self, core):
         super().__init__()
 
         self.core = core
-        self.settings = settings
 
         self.viewer_size = (1280, 720)
 
@@ -37,8 +37,8 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Create the View title
         self.title = QtWidgets.QLabel(self)
-        self.title.setFont(self.settings.header_1_font)
-        self.title.setStyleSheet(self.settings.header_1_color)
+        self.title.setFont(Settings.getInstance().header_1_font)
+        self.title.setStyleSheet(Settings.getInstance().header_1_color)
         self.title.setText("Scene Viewer")
 
         # Create a sub layout so the action bar and core view can sit side-by-side
@@ -66,7 +66,7 @@ class SceneViewer(QtWidgets.QWidget):
         """ Create the action bar and populate it with each editing button """
 
         # Build the action menu which displays the options for creating things in the editor
-        self.action_menu = ActionMenu(self.settings, self.AddRenderable, self.core.action_data)
+        self.action_menu = ActionMenu(self.AddRenderable, self.core.action_data)
 
         # Create the frame container
         self.action_toolbar = QtWidgets.QFrame()
@@ -85,14 +85,14 @@ class SceneViewer(QtWidgets.QWidget):
         # Generic button settings
         icon = QtGui.QIcon()
         button_style = (
-            f"background-color: rgb({self.core.settings.toolbar_button_background_color});\n"
+            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
         )
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -105,7 +105,7 @@ class SceneViewer(QtWidgets.QWidget):
         self.remove_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -117,7 +117,7 @@ class SceneViewer(QtWidgets.QWidget):
         self.copy_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         self.copy_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -136,10 +136,9 @@ class SceneViewer(QtWidgets.QWidget):
         ]:
             if req["name"] == "sprite":
                 print("Found Sprite")
-                image = QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
+                image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
                 sprite = SceneItem(
                     image,
-                    self.settings,
                     action_data,
                     self.ItemHasMoved,
                     self.core.UpdateActiveSceneItem,

@@ -13,27 +13,28 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 
 class InputEntryTuple(InputEntryBase):
-    def __init__(self, settings, refresh_func=None):
-        super().__init__(settings, refresh_func)
+    def __init__(self, refresh_func=None):
+        super().__init__(refresh_func)
 
         #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
-        self.input_widget_title.setFont(self.settings.paragraph_font)
-        self.input_widget_title.setStyleSheet(settings.paragraph_color)
+        self.input_widget_title.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(self.settings.paragraph_font)
-        self.input_widget.setStyleSheet(settings.paragraph_color)
+        self.input_widget.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         self.input_widget_alt_title = QtWidgets.QLabel('Y')
-        self.input_widget_alt_title.setFont(self.settings.paragraph_font)
-        self.input_widget_alt_title.setStyleSheet(settings.paragraph_color)
+        self.input_widget_alt_title.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget_alt_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget_alt = QtWidgets.QLineEdit()
-        self.input_widget_alt.setFont(self.settings.paragraph_font)
-        self.input_widget_alt.setStyleSheet(settings.paragraph_color)
+        self.input_widget_alt.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget_alt.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
@@ -78,8 +79,8 @@ class InputEntryTuple(InputEntryBase):
     def MakeUneditable(self):
         self.input_widget.setEnabled(False)
         self.input_widget_alt.setEnabled(False)
-        self.input_widget.setStyleSheet(self.settings.read_only_background_color)
-        self.input_widget_alt.setStyleSheet(self.settings.read_only_background_color)
+        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+        self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
 
     def MakeEditable(self):
         self.input_widget.setEnabled(True)

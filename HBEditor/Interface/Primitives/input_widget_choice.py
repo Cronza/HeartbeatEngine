@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtGui, QtWidgets, QtCore
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 from HBEditor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
 from HBEditor.Interface.Primitives.input_entry_container import InputEntryContainer
@@ -27,8 +28,8 @@ class InputEntryChoice(InputEntryBase):
     rendering children
     """
 
-    def __init__(self, settings, data, add_to_parent_func, create_input_widget_func, branches_list, project_settings):
-        super().__init__(settings, None)
+    def __init__(self, data, add_to_parent_func, create_input_widget_func, branches_list, project_settings):
+        super().__init__(None)
 
         # Since this class does a large amount of manual work in the creation of it's children, it needs
         # access to a number of things from it's parent:
@@ -46,11 +47,11 @@ class InputEntryChoice(InputEntryBase):
 
         self.button_styles = f"""
             QToolButton {{
-                background-color: rgb({self.settings.general_button_background_color});
+                background-color: rgb({Settings.getInstance().general_button_background_color});
                 border-style: outset;
                 border-radius: 6px;
                 border-width: 1px;
-                border-color: rgb({self.settings.general_button_border_color});
+                border-color: rgb({Settings.getInstance().general_button_border_color});
             }}
         """
 
@@ -58,7 +59,7 @@ class InputEntryChoice(InputEntryBase):
         self.add_choice_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Small_Plus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Plus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -97,13 +98,13 @@ class InputEntryChoice(InputEntryBase):
         """
         # Each choice is given a parent container to help organize the choice's input widgets. This is also customized
         # to have a close button which deletes the choice from the list
-        new_choice_container = InputEntryContainer(self.settings, self.data)
+        new_choice_container = InputEntryContainer(self.data)
 
         # Delete button
         delete_choice_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Small_Minus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Minus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -120,10 +121,10 @@ class InputEntryChoice(InputEntryBase):
             branch_names.append(self.branches_list.itemWidget(self.branches_list.item(index)).Get()[0])
 
         # Add special options before we add the requirements from the template
-        branch_dropdown = InputEntryDropdown(self.settings, branch_names, None)
+        branch_dropdown = InputEntryDropdown(branch_names, None)
         branch_dropdown.name_widget.setText("branch")
         self.add_to_parent_func(branch_dropdown, new_choice_container)
-        key_input = InputEntryText(self.settings, lambda change: self.UpdateChoiceName(new_choice_container))
+        key_input = InputEntryText(lambda change: self.UpdateChoiceName(new_choice_container))
         key_input.name_widget.setText("key")
         self.add_to_parent_func(key_input, new_choice_container)
 

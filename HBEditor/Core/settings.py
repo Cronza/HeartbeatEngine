@@ -19,7 +19,28 @@ from Tools.HBYaml.hb_yaml import Reader
 
 
 class Settings:
+    """
+    A singleton that holds user project information, editor style settings, and utility functions for navigating
+    the project folder structure
+    """
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        """
+        Static access method - Used to acquire the singleton instance, or instantiate it if it doesn't already exist
+        """
+        if Settings.__instance is None:
+            Settings()
+        return Settings.__instance
+
     def __init__(self):
+        # Enforce the use of the singleton instance
+        if Settings.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            Settings.__instance = self
+
         self.root = os.getcwd().replace("\\", "/")
         self.engine_root = f"{self.root}/HBEngine"
         self.editor_root = f"{self.root}/HBEditor"

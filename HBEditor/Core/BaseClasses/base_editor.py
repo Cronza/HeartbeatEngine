@@ -13,11 +13,10 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-
+from HBEditor.Core.settings import Settings
 
 class EditorBase:
-    def __init__(self, settings, logger, file_path):
-        self.settings = settings
+    def __init__(self, logger, file_path):
         self.logger = logger
         self.file_path = file_path
         self.file_type = None

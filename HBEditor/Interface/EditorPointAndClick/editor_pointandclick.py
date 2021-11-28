@@ -15,18 +15,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from HBEditor.Interface.BaseClasses.base_editor import EditorBaseUI
 from HBEditor.Interface.DetailsPanel.details_panel import DetailsPanel
-from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Interface.EditorPointAndClick.scene_viewer import SceneViewer
-from HBEditor.Interface.Primitives.input_entry_text import InputEntryText
-from HBEditor.Interface.Primitives.input_entry_paragraph import InputEntryParagraph
-from HBEditor.Interface.Primitives.input_entry_bool import InputEntryBool
-from HBEditor.Interface.Primitives.input_entry_color import InputEntryColor
-from HBEditor.Interface.Primitives.input_entry_vector2 import InputEntryTuple
-from HBEditor.Interface.Primitives.input_entry_int import InputEntryInt
-from HBEditor.Interface.Primitives.input_entry_file_selector import InputEntryFileSelector
-from HBEditor.Interface.Primitives.input_entry_dropdown import InputEntryDropdown
-from HBEditor.Interface.EditorProjectSettings.input_entry_resolution import InputEntryResolution
-from HBEditor.Utilities.DataTypes.parameter_types import ParameterType
 
 
 class EditorPointAndClickUI(EditorBaseUI):
@@ -61,8 +50,8 @@ class EditorPointAndClickUI(EditorBaseUI):
         Create the details panel using the generic details object. Since this panel is generic,
         it functions independently of whether it has a reference to the editor core
         """
-        self.details = DetailsPanel(self.core.settings, self.core.logger)
+        self.details = DetailsPanel(self.core.logger)
 
     def CreateSceneViewer(self):
         """ Create the scene viewer """
-        self.scene_viewer = SceneViewer(self.core.settings, self.core)
+        self.scene_viewer = SceneViewer(self.core)

@@ -13,15 +13,16 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 
 class InputEntryText(InputEntryBase):
-    def __init__(self, settings, refresh_func=None):
-        super().__init__(settings, refresh_func)
+    def __init__(self, refresh_func=None):
+        super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(self.settings.paragraph_font)
-        self.input_widget.setStyleSheet(settings.paragraph_color)
+        self.input_widget.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
@@ -42,6 +43,6 @@ class InputEntryText(InputEntryBase):
 
     def MakeUneditable(self):
         self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(self.settings.read_only_background_color)
+        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 

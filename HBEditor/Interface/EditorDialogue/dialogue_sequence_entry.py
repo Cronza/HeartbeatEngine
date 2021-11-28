@@ -13,12 +13,12 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 
 
 class DialogueEntry(QtWidgets.QWidget):
-    def __init__(self, action_data, settings, select_func, size_refresh_func):
+    def __init__(self, action_data, select_func, size_refresh_func):
         super().__init__()
-        self.settings = settings
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
@@ -37,14 +37,14 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # Name
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(settings.header_2_font)
-        self.name_widget.setStyleSheet(settings.header_2_color)
+        self.name_widget.setFont(Settings.getInstance().header_2_font)
+        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
         self.name_widget.setText(self.action_data["display_name"])
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
-        self.subtext_widget.setFont(settings.subtext_font)
-        self.subtext_widget.setStyleSheet(settings.subtext_color)
+        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
+        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
 
         # Refresh the subtext
         self.UpdateSubtext()

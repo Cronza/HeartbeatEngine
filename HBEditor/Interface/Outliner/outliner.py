@@ -17,11 +17,10 @@ from HBEditor.Interface.Outliner.file_system_tree import FileSystemTree
 
 
 class OutlinerUI(QtWidgets.QWidget):
-    def __init__(self, core, settings):
+    def __init__(self, core):
         super().__init__()
 
         self.core = core
-        self.settings = settings
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -31,7 +30,6 @@ class OutlinerUI(QtWidgets.QWidget):
         # Directory view
         self.fs_tree = FileSystemTree(
             self,
-            self.settings,
             self.core.hb_core.OpenFile,
             self.core.CreateFile,
             self.core.CreateFolder,

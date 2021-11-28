@@ -13,14 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.simple_checkbox import SimpleCheckbox
 
 
 class InputEntryBase(QtWidgets.QTreeWidgetItem):
-    def __init__(self, settings, refresh_func=None):
+    def __init__(self, refresh_func=None):
         super().__init__()
 
-        self.settings = settings
 
         # When the input widget is updated, in case another U.I element needs to refresh, allow us to execute an
         # ambiguous function
@@ -34,8 +34,8 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         # 'name_widget' and 'input_widget' are declared, but not initialized as it is up to the subclass to
         # do that
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(self.settings.paragraph_font)
-        self.name_widget.setStyleSheet(settings.paragraph_color)
+        self.name_widget.setFont(Settings.getInstance().paragraph_font)
+        self.name_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.input_widget = None
         self.input_container = QtWidgets.QWidget()

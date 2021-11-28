@@ -34,10 +34,8 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
-
-        self.settings = Settings()
         self.main_window = QtWidgets.QMainWindow()
-        self.e_ui = hbe.HBEditorUI(self, self.settings)
+        self.e_ui = hbe.HBEditorUI(self)
         self.e_ui.setupUi(self.main_window)
 
         self.logger = self.e_ui.logger
@@ -56,7 +54,7 @@ class HBEditor:
         chosen project
         """
         self.logger.Log("Requesting directory for the new project...'")
-        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        prompt = FileSystemPrompt(self.logger, self.main_window)
         new_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Directory to Create a Project",
@@ -97,19 +95,19 @@ class HBEditor:
                     os.mkdir(project_path)
 
                     # Create the pre-requisite project folders
-                    for main_dir in self.settings.project_folder_structure:
+                    for main_dir in Settings.getInstance().project_folder_structure:
                         main_dir_path = project_path + "/" + main_dir
                         os.mkdir(main_dir_path)
 
                     # Create the project file
-                    project_file = project_path + "/" + self.settings.project_file
+                    project_file = project_path + "/" + Settings.getInstance().project_file
                     with open(project_file, "w"):
                         pass
 
                     # Clone project default files
-                    for key, rel_path in self.settings.project_default_files.items():
+                    for key, rel_path in Settings.getInstance().project_default_files.items():
                         shutil.copy(
-                            self.settings.engine_root + "/" + rel_path,
+                            Settings.getInstance().engine_root + "/" + rel_path,
                             project_path + "/" + rel_path
                         )
 
@@ -121,7 +119,7 @@ class HBEditor:
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
         self.logger.Log("Requesting path to project root...")
-        prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+        prompt = FileSystemPrompt(self.logger, self.main_window)
         existing_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Project Directory",
@@ -133,7 +131,7 @@ class HBEditor:
             self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(existing_project_dir + "/" + self.settings.project_file):
+            if os.path.exists(existing_project_dir + "/" + Settings.getInstance().project_file):
                 self.logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
@@ -154,11 +152,10 @@ class HBEditor:
         file, and loads the respective editor
         """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             new_file_prompt = NewFileMenu(
-                self.settings,
                 self.logger,
                 "Content/Icons/Engine_Logo.png",
                 "Choose a File Type"
@@ -168,10 +165,10 @@ class HBEditor:
             if new_file_prompt.exec():
 
                 selected_type = new_file_prompt.GetSelection()
-                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.logger, self.main_window)
                 result = prompt.SaveFile(
-                    self.settings.supported_content_types['Data'],
-                    self.settings.GetProjectContentDirectory(),
+                    Settings.getInstance().supported_content_types['Data'],
+                    Settings.getInstance().GetProjectContentDirectory(),
                     "Save File As"
                 )
 
@@ -190,7 +187,7 @@ class HBEditor:
     def OpenFile(self, target_file_path=None):
         """ Prompt the user to choose a file, then load the respective editor using the data found """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             existing_file = None
@@ -205,7 +202,7 @@ class HBEditor:
             if len(split_path) > 1:
                 extension = split_path[-1]
                 is_supported = False
-                for type_string in self.settings.supported_content_types.values():
+                for type_string in self.Settings.getInstance().supported_content_types.values():
                     if f".{extension}" in type_string:
                         is_supported = True
                         break
@@ -217,10 +214,10 @@ class HBEditor:
 
             # Is the user opening a file through the main "File->Open" mechanism?
             if not target_file_path:
-                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.logger, self.main_window)
                 existing_file = prompt.GetFile(
-                    self.settings.GetProjectContentDirectory(),
-                    self.settings.supported_content_types['Data'],
+                    Settings.getInstance().GetProjectContentDirectory(),
+                    Settings.getInstance().supported_content_types['Data'],
                     "Choose a File to Open"
                 )
             # Most likely the outliner requested a file be opened. Use the provided path
@@ -255,40 +252,40 @@ class HBEditor:
     def Play(self):
         """ Launches the HBEngine, temporarily suspending the HBEditor """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             p_manager = PlayManager()
-            p_manager.Play(self.e_ui.central_widget, self.logger, self.settings.user_project_dir, self.settings.root)
+            p_manager.Play(self.e_ui.central_widget, self.logger, Settings.getInstance().user_project_dir, Settings.getInstance().root)
 
     def Build(self):
         """ Launches the HBBuilder in order to generate an executable from the active project """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             HBBuilder.Build(
                 self.logger,
-                self.settings.engine_root,
-                self.settings.user_project_dir,
-                self.settings.user_project_name
+                Settings.getInstance().engine_root,
+                Settings.getInstance().user_project_dir,
+                Settings.getInstance().user_project_name
             )
 
     def Clean(self):
         """ Cleans the active project's build folder """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             HBBuilder.Clean(
                 self.logger,
-                self.settings.user_project_dir
+                Settings.getInstance().user_project_dir
             )
 
     def Save(self):
         """ Requests the active editor to save it's data """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             if self.active_editor:
@@ -297,16 +294,16 @@ class HBEditor:
     def SaveAs(self):
         """ Prompts the user for a new location and file name to save the active editor's data """
         # Only allow this is there is an active project
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             # The user is not allowed to rename the project settings file due to the number of dependencies on it
             if self.active_editor.file_type is FileType.Project_Settings:
                 self.logger.Log("Project Settings can not be renamed or saved to a new location", 3)
             else:
-                prompt = FileSystemPrompt(self.settings, self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.logger, self.main_window)
                 new_file_path = prompt.SaveFile(
-                    self.settings.supported_content_types['Data'],
+                    Settings.getInstance().supported_content_types['Data'],
                     self.active_editor.GetFilePath(),
                     "Choose a Location to Save the File",
                     True
@@ -326,7 +323,7 @@ class HBEditor:
 
     def OpenEditor(self, target_file_path, editor_type, import_file=False):
         """ Creates an editor tab based on the provided file information """
-        if not self.settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
+        if not Settings.getInstance().editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
             editor_classes = {
                 FileType.Scene_Dialogue: EditorDialogue,
                 FileType.Scene_Point_And_Click: EditorPointAndClick,
@@ -341,7 +338,7 @@ class HBEditor:
                 self.e_ui.main_tab_editor.setCurrentWidget(result)
             else:
                 # Initialize the Editor
-                self.active_editor = editor_classes[editor_type](self.settings, self.logger, target_file_path)
+                self.active_editor = editor_classes[editor_type](self.logger, target_file_path)
 
                 # Allow the caller to load the provided file instead of just marking it as the export target
                 if import_file:
@@ -362,9 +359,9 @@ class HBEditor:
 
     def SetActiveProject(self, project_name, project_dir):
         """ Sets the active project, pointing the editor to the new location, and refreshing the interface """
-        self.settings.user_project_name = project_name
-        self.settings.user_project_dir = project_dir.replace("\\", "/")
-        self.settings.LoadProjectSettings()
+        Settings.getInstance().user_project_name = project_name
+        Settings.getInstance().user_project_dir = project_dir.replace("\\", "/")
+        Settings.getInstance().LoadProjectSettings()
 
         # If this is the first time a user is loading a project after opening the editor, delete the 'Getting Started'
         # display
@@ -383,17 +380,17 @@ class HBEditor:
         self.e_ui.retranslateUi(self.main_window)
 
         # Update the outliner with the new project root
-        self.outliner.UpdateRoot(self.settings.GetProjectContentDirectory())
+        self.outliner.UpdateRoot(Settings.getInstance().GetProjectContentDirectory())
 
     def OpenProjectSettings(self):
         """ Opens the 'Project Settings' editor """
         # Normally we would have loaded this editor like the others, but since we need to bind loading this to a menu
         # button, we need it in the form of a function
-        if not self.settings.user_project_name:
+        if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             self.OpenEditor(
-                self.settings.user_project_dir + "/" + self.settings.project_default_files['Config'],
+                Settings.getInstance().user_project_dir + "/" + Settings.getInstance().project_default_files['Config'],
                 FileType.Project_Settings,
                 True
             )
@@ -419,7 +416,7 @@ class HBEditor:
 
     def ValidateNewFileLocation(self, file_path) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid path based on the active editor """
-        if self.settings.user_project_dir not in file_path:
+        if Settings.getInstance().user_project_dir not in file_path:
             QtWidgets.QMessageBox.about(
                 self.e_ui.central_widget,
                 "Invalid Directory",
@@ -433,11 +430,11 @@ class HBEditor:
     def UpdateSearchHistory(self, new_search_dir):
         """ Updates the record for the last location searched for in a file browser"""
         if new_search_dir:
-            self.WriteToTemp(self.settings.temp_history_path, {"search_dir": new_search_dir})
+            self.WriteToTemp(Settings.getInstance().temp_history_path, {"search_dir": new_search_dir})
 
     def GetLastSearchPath(self):
         """ Returns the current search path record, or if there is none, return the system home"""
-        search_dir = self.ReadFromTemp(self.settings.temp_history_path, "search_dir")
+        search_dir = self.ReadFromTemp(Settings.getInstance().temp_history_path, "search_dir")
         if search_dir:
             return search_dir
         else:
@@ -447,8 +444,8 @@ class HBEditor:
         """ Write to the provided temp file, creating it if it doesn't already exist """
         if not os.path.exists(temp_file):
             try:
-                if not os.path.exists(self.settings.editor_temp_root):
-                    os.mkdir(self.settings.editor_temp_root)
+                if not os.path.exists(Settings.editor_temp_root):
+                    os.mkdir(Settings.editor_temp_root)
                 with open(temp_file, "w"):
                     pass
             except Exception as exc:

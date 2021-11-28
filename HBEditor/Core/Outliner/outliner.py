@@ -14,20 +14,19 @@
 """
 import os
 import shutil
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Outliner.outliner import OutlinerUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
 from Tools.HBYaml.hb_yaml import Writer
 
 class Outliner:
-    def __init__(self, settings, hb_core):
-
-        self.settings = settings
+    def __init__(self, hb_core):
 
         # We need an explicit reference to the Heartbeat core in order to access file commands
         self.hb_core = hb_core
 
         # Build the Logger UI
-        self.ui = OutlinerUI(self, settings)
+        self.ui = OutlinerUI(self)
 
     def UpdateRoot(self, new_root):
         """ Requests that the FileSystemTree refresh it's tree using a new root """
@@ -54,7 +53,7 @@ class Outliner:
                 Writer.WriteFile(
                     "",
                     full_file_path,
-                    self.settings.GetMetadataString(FileType[file_type])
+                    Settings.getInstance().GetMetadataString(FileType[file_type])
                 )
                 return full_file_path
 

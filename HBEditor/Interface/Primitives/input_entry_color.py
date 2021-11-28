@@ -14,12 +14,13 @@
 """
 import re
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 
 
 class InputEntryColor(InputEntryBase):
-    def __init__(self, settings, refresh_func=None):
-        super().__init__(settings, refresh_func)
+    def __init__(self, refresh_func=None):
+        super().__init__(refresh_func)
         # NOTE FOR THE LOGIC IN THIS FILE
         # So for some unholy reason, Qt doesn't really have a great way of changing widget colors. While stylesheets
         # are nice, retrieving data from a stylesheet is a lesson in pain (You get ALL of the data, not just a part
@@ -38,7 +39,7 @@ class InputEntryColor(InputEntryBase):
         self.color_select_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )

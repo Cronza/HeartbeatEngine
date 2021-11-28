@@ -13,13 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Primitives.input_entry_base import InputEntryBase
 from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, settings, logger, details_panel, type_filter, refresh_func=None):
-        super().__init__(settings, refresh_func)
+    def __init__(self, logger, details_panel, type_filter, refresh_func=None):
+        super().__init__(refresh_func)
 
         # This type requires the logger and a direct ref to the owning QWidget for filesystem operations
         self.logger = logger
@@ -29,8 +30,8 @@ class InputEntryFileSelector(InputEntryBase):
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(self.settings.paragraph_font)
-        self.input_widget.setStyleSheet(settings.paragraph_color)
+        self.input_widget.setFont(Settings.getInstance().paragraph_font)
+        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
         self.input_widget.setEnabled(True)
@@ -39,7 +40,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.file_select_button = QtWidgets.QToolButton()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -67,7 +68,7 @@ class InputEntryFileSelector(InputEntryBase):
 
     def MakeUneditable(self):
         self.file_select_button.setEnabled(False)
-        self.input_widget.setStyleSheet(self.settings.read_only_background_color)
+        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
     def MakeEditable(self):
         self.file_select_button.setEnabled(True)
@@ -76,9 +77,9 @@ class InputEntryFileSelector(InputEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-        prompt = FileSystemPrompt(self.settings, self.logger, self.details_panel)
+        prompt = FileSystemPrompt(self.logger, self.details_panel)
         existing_file = prompt.GetFile(
-            self.settings.GetProjectContentDirectory(),
+            Settings.getInstance().GetProjectContentDirectory(),
             self.type_filter,
             "Choose a File to Open"
         )
@@ -88,7 +89,7 @@ class InputEntryFileSelector(InputEntryBase):
             selected_dir = existing_file
 
             # Remove the project dir from the path, so that the selected dir only contains a relative path
-            selected_dir = selected_dir.replace(self.settings.user_project_dir + "/", "")
+            selected_dir = selected_dir.replace(Settings.getInstance().user_project_dir + "/", "")
             self.input_widget.setText(selected_dir)
 
 

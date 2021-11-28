@@ -13,14 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+from HBEditor.Core.settings import Settings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
 class FileSystemPrompt(QFileDialog):
-    def __init__(self, settings, logger, parent):
+    def __init__(self, logger, parent):
         super().__init__(parent)
 
-        self.settings = settings
         self.logger = logger
 
     def SaveFile(self, type_filter, starting_dir, prompt_title="Save File", project_only=True) -> str:
@@ -41,7 +41,7 @@ class FileSystemPrompt(QFileDialog):
             selected_dir = file_path[0]
 
             if project_only:
-                if self.settings.user_project_dir in selected_dir:
+                if Settings.getInstance().user_project_dir in selected_dir:
                     self.logger.Log("Valid file chosen")
                     return selected_dir
                 else:
@@ -66,7 +66,7 @@ class FileSystemPrompt(QFileDialog):
 
         if dir_path:
             if project_only:
-                if self.settings.user_project_dir in dir_path:
+                if Settings.getInstance().user_project_dir in dir_path:
                     self.logger.Log("Valid directory chosen")
                     return dir_path
                 else:
@@ -95,7 +95,7 @@ class FileSystemPrompt(QFileDialog):
             selected_dir = file_path[0]
 
             if project_only:
-                if self.settings.user_project_dir in selected_dir:
+                if Settings.getInstance().user_project_dir in selected_dir:
                     self.logger.Log("Valid file chosen")
                     return selected_dir
                 else:

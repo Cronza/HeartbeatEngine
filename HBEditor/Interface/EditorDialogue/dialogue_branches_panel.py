@@ -13,15 +13,15 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.EditorDialogue.dialogue_branches_entry import BranchesEntry
 from HBEditor.Interface.EditorDialogue.dialogue_branches_edit_prompt import EditBranchPrompt
 
 class BranchesPanel(QtWidgets.QWidget):
-    def __init__(self, settings, ed_core):
+    def __init__(self, ed_core):
         super().__init__()
 
         self.ed_core = ed_core
-        self.settings = settings
 
         # Keep track of the active branch as we're switching between entries so we know where
         # to store dialogue entry data
@@ -33,8 +33,8 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Create title
         self.branches_title = QtWidgets.QLabel(self)
-        self.branches_title.setFont(self.settings.header_1_font)
-        self.branches_title.setStyleSheet(self.settings.header_1_color)
+        self.branches_title.setFont(Settings.getInstance().header_1_font)
+        self.branches_title.setStyleSheet(Settings.getInstance().header_1_color)
         self.branches_title.setText("Branches")
 
         # Create the toolbar
@@ -43,7 +43,7 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_toolbar.setStyleSheet(
             "QFrame, QLabel, QToolTip {\n"
             "    border-radius: 4px;\n"
-            f"   background-color: rgb({self.settings.toolbar_background_color});\n"
+            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
             "}"
         )
         self.branches_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -55,14 +55,14 @@ class BranchesPanel(QtWidgets.QWidget):
         # Generic button settings
         icon = QtGui.QIcon()
         button_style = (
-            f"background-color: rgb({self.settings.toolbar_button_background_color});\n"
+            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
         )
 
         # Add Branch Button
         self.add_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
         self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -75,7 +75,7 @@ class BranchesPanel(QtWidgets.QWidget):
         self.remove_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
         self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(self.settings.ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
+            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -109,7 +109,7 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_list.addItem(list_item)
 
         # Create the core part of the entry
-        new_entry = BranchesEntry(self.settings, None)
+        new_entry = BranchesEntry(None)
         self.branches_list.setItemWidget(list_item, new_entry)
         new_entry.Set((branch_name, branch_description))
 

@@ -14,15 +14,15 @@
 """
 from functools import partial
 from PyQt5 import QtWidgets, QtCore
+from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Outliner.icon_provider import FileSystemIconProvider
 from HBEditor.Utilities.DataTypes.file_types import FileType, FileTypeDescriptions
 
 
 class FileSystemTree(QtWidgets.QTreeView):
-    def __init__(self, parent, settings, double_click_func, create_file_func, create_dir_func, delete_file_func, delete_dir_func):
+    def __init__(self, parent, double_click_func, create_file_func, create_dir_func, delete_file_func, delete_dir_func):
         super().__init__(parent)
 
-        self.settings = settings
 
         # Signal Functions
         self.double_click_func = double_click_func
@@ -47,7 +47,7 @@ class FileSystemTree(QtWidgets.QTreeView):
         self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
         # Create and use a custom icon provider to override tree icons
-        self.model.setIconProvider(FileSystemIconProvider(self.settings))
+        self.model.setIconProvider(FileSystemIconProvider())
 
         self.customContextMenuRequested.connect(self.CreateContextMenu)
         self.doubleClicked.connect(self.ItemDoubleClicked)
