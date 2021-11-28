@@ -14,17 +14,7 @@
 """
 from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.settings import Settings
-from HBEditor.Core.Primitives.input_entry_text import InputEntryText
-from HBEditor.Core.Primitives.input_entry_paragraph import InputEntryParagraph
-from HBEditor.Core.Primitives.input_entry_bool import InputEntryBool
-from HBEditor.Core.Primitives.input_entry_color import InputEntryColor
-from HBEditor.Core.Primitives.input_entry_vector2 import InputEntryTuple
-from HBEditor.Core.Primitives.input_entry_int import InputEntryInt
-from HBEditor.Core.Primitives.input_entry_float import InputEntryFloat
-from HBEditor.Core.Primitives.input_entry_file_selector import InputEntryFileSelector
-from HBEditor.Core.Primitives.input_entry_dropdown import InputEntryDropdown
-from HBEditor.Core.Primitives.input_entry_container import InputEntryContainer
-from HBEditor.Core.Primitives.input_widget_choice import InputEntryChoice
+from HBEditor.Core.Primitives.input_entries import *
 
 
 # @TODO: Split this file up into a functions class & U.I class

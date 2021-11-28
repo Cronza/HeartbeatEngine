@@ -15,16 +15,10 @@
 from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
-from HBEditor.Core.Primitives.input_entry_text import InputEntryText
-from HBEditor.Core.Primitives.input_entry_paragraph import InputEntryParagraph
-from HBEditor.Core.Primitives.input_entry_bool import InputEntryBool
-from HBEditor.Core.Primitives.input_entry_color import InputEntryColor
-from HBEditor.Core.Primitives.input_entry_vector2 import InputEntryTuple
-from HBEditor.Core.Primitives.input_entry_int import InputEntryInt
-from HBEditor.Core.Primitives.input_entry_file_selector import InputEntryFileSelector
-from HBEditor.Core.Primitives.input_entry_dropdown import InputEntryDropdown
+from HBEditor.Core.Primitives.input_entries import *
 from HBEditor.Core.EditorProjectSettings.input_entry_resolution import InputEntryResolution
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
+
 
 class EditorProjectSettingsUI(EditorBaseUI):
     def __init__(self, core_ref):

@@ -14,7 +14,7 @@
 """
 from PyQt5 import QtWidgets
 from HBEditor.Core.settings import Settings
-from HBEditor.Core.Primitives.input_entry_base import InputEntryBase
+from HBEditor.Core.Primitives.input_entries import InputEntryBase
 
 
 class InputEntryResolution(InputEntryBase):
