@@ -16,8 +16,8 @@ from datetime import datetime
 from HBEditor.Core.settings import Settings
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QFont
-from HBEditor.Interface.Logger.logger import LoggerUI
-from HBEditor.Utilities.DataTypes.log_types import LogType
+from HBEditor.Core.Logger.logger_ui import LoggerUI
+from HBEditor.Core.DataTypes.log_types import LogType
 
 
 class Logger:

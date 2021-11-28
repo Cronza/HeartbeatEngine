@@ -15,8 +15,8 @@
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
-from HBEditor.Interface.EditorProjectSettings.editor_project_settings import EditorProjectSettingsUI
-from HBEditor.Utilities.DataTypes.file_types import FileType
+from HBEditor.Core.EditorProjectSettings.editor_project_settings_ui import EditorProjectSettingsUI
+from HBEditor.Core.DataTypes.file_types import FileType
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 

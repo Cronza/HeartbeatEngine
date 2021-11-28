@@ -20,11 +20,11 @@ from pathlib import Path
 from PyQt5 import QtWidgets
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
-from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Utilities.play_manager import PlayManager
-from HBEditor.Interface import hb_editor as hbe
-from HBEditor.Interface.Menus.NewFileMenu.new_file_menu import NewFileMenu
-from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
+from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.play_manager import PlayManager
+from HBEditor import hb_editor_ui as hbe
+from HBEditor.Core.Menus.NewFileMenu.new_file_menu import NewFileMenu
+from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings

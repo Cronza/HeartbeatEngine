@@ -14,7 +14,7 @@
 """
 import pygame
 from HBEngine.Core.settings import Settings
-from HBEngine.Utilities.DataTypes.input_states import State
+from HBEngine.Core.DataTypes.input_states import State
 from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
 
 

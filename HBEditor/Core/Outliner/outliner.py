@@ -16,8 +16,8 @@ import os
 import shutil
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
-from HBEditor.Interface.Outliner.outliner import OutlinerUI
-from HBEditor.Utilities.DataTypes.file_types import FileType
+from HBEditor.Core.Outliner.outliner_ui import OutlinerUI
+from HBEditor.Core.DataTypes.file_types import FileType
 from Tools.HBYaml.hb_yaml import Writer
 
 class Outliner:

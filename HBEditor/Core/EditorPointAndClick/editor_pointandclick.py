@@ -16,8 +16,8 @@ import copy
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
-from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Interface.EditorPointAndClick.editor_pointandclick import EditorPointAndClickUI
+from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
 
 
 class EditorPointAndClick(EditorBase):

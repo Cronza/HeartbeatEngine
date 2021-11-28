@@ -15,7 +15,7 @@
 from HBEngine.Core.settings import Settings
 from HBEngine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
 from HBEngine.Core.BaseClasses.scene_dialogue import DialogueScene
-from HBEngine.Utilities.DataTypes.file_types import FileType
+from HBEngine.Core.DataTypes.file_types import FileType
 
 
 class SceneManager:
