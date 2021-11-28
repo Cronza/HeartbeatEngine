@@ -19,11 +19,9 @@ from HBEditor.Interface.Prompts.file_system_prompt import FileSystemPrompt
 
 
 class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, logger, details_panel, type_filter, refresh_func=None):
+    def __init__(self, details_panel, type_filter, refresh_func=None):
         super().__init__(refresh_func)
 
-        # This type requires the logger and a direct ref to the owning QWidget for filesystem operations
-        self.logger = logger
         self.details_panel = details_panel
 
         # Store a type filter to restrict what files can be chosen in the browser
@@ -77,7 +75,7 @@ class InputEntryFileSelector(InputEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-        prompt = FileSystemPrompt(self.logger, self.details_panel)
+        prompt = FileSystemPrompt(self.details_panel)
         existing_file = prompt.GetFile(
             Settings.getInstance().GetProjectContentDirectory(),
             self.type_filter,

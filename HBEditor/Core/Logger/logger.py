@@ -21,7 +21,23 @@ from HBEditor.Utilities.DataTypes.log_types import LogType
 
 
 class Logger:
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        """
+        Static access method - Used to acquire the singleton instance, or instantiate it if it doesn't already exist
+        """
+        if Logger.__instance is None:
+            Logger()
+        return Logger.__instance
+
     def __init__(self):
+        # Enforce the use of the singleton instance
+        if Logger.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            Logger.__instance = self
 
         # Build the Logger UI
         self.log_ui = LoggerUI(self)

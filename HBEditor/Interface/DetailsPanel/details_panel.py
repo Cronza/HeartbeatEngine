@@ -32,10 +32,8 @@ from HBEditor.Interface.Primitives.input_widget_choice import InputEntryChoice
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, logger):
+    def __init__(self):
         super().__init__()
-
-        self.logger = logger
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
         self.active_entry = None
@@ -255,15 +253,15 @@ class DetailsPanel(QtWidgets.QWidget):
         elif data_type == "float":
             return InputEntryFloat(self.DetailEntryUpdated)
         elif data_type == "file":
-            return InputEntryFileSelector(self.logger, self, "", self.DetailEntryUpdated)
+            return InputEntryFileSelector(self, "", self.DetailEntryUpdated)
         elif data_type == "file_data":
-            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Data"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Data"], self.DetailEntryUpdated)
         elif data_type == "file_image":
-            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Image"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Image"], self.DetailEntryUpdated)
         elif data_type == "file_font":
-            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Font"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Font"], self.DetailEntryUpdated)
         elif data_type == "file_sound":
-            return InputEntryFileSelector(self.logger, self, Settings.getInstance().supported_content_types["Sound"], self.DetailEntryUpdated)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Sound"], self.DetailEntryUpdated)
         elif data_type == "dropdown":
             return InputEntryDropdown(data['options'], self.DetailEntryUpdated)
         elif data_type == "choice":

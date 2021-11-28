@@ -21,8 +21,8 @@ from HBEditor.Utilities.DataTypes.file_types import FileType
 
 
 class NewFileMenu(BasePopupMenu):
-    def __init__(self, logger, window_icon_path, window_name):
-        super().__init__(logger, window_icon_path, window_name)
+    def __init__(self, window_icon_path, window_name):
+        super().__init__(window_icon_path, window_name)
 
         self.resize(400, 300)
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -62,7 +62,7 @@ class NewFileMenu(BasePopupMenu):
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
-        self.description.setFont(Settings.paragraph_font)
+        self.description.setFont(Settings.getInstance().paragraph_font)
 
         self.options_layout.addWidget(self.options_list, 2)
         self.options_layout.addWidget(self.description, 1, Qt.AlignTop)

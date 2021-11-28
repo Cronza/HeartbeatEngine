@@ -14,6 +14,7 @@
 """
 import copy
 from PyQt5 import QtWidgets, QtGui
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Interface.EditorDialogue.dialogue_sequence_entry import DialogueEntry
@@ -205,7 +206,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
             # Only allow moving up if we're not already at the top of the sequence
             if selection == 0:
-                self.ed_core.logger.Log("Can't move entry up as we're at the top of the sequence", 3)
+                Logger.getInstance().Log("Can't move entry up as we're at the top of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry
@@ -229,7 +230,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
             # Only allow moving down if we're not already at the bottom of the sequence
             if selection + 1 >= self.dialogue_table.rowCount():
-                self.ed_core.logger.Log("Can't move entry down as we're at the bottom of the sequence", 3)
+                Logger.getInstance().Log("Can't move entry down as we're at the bottom of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry

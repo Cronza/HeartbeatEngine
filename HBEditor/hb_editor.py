@@ -18,6 +18,7 @@ import shutil
 import re
 from pathlib import Path
 from PyQt5 import QtWidgets
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Utilities.DataTypes.file_types import FileType
 from HBEditor.Utilities.play_manager import PlayManager
@@ -38,7 +39,6 @@ class HBEditor:
         self.e_ui = hbe.HBEditorUI(self)
         self.e_ui.setupUi(self.main_window)
 
-        self.logger = self.e_ui.logger
         self.outliner = None  # Assignment happens once a project is loaded
         self.active_editor = None
 
@@ -53,8 +53,8 @@ class HBEditor:
         Prompts the user for a directory to create a new project, and for a project name. Then creates the
         chosen project
         """
-        self.logger.Log("Requesting directory for the new project...'")
-        prompt = FileSystemPrompt(self.logger, self.main_window)
+        Logger.getInstance().Log("Requesting directory for the new project...'")
+        prompt = FileSystemPrompt(self.main_window)
         new_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Directory to Create a Project",
@@ -63,10 +63,10 @@ class HBEditor:
         self.UpdateSearchHistory(new_project_dir)
 
         if not new_project_dir:
-            self.logger.Log("Project directory was not provided - Cancelling 'New Project' action", 3)
+            Logger.getInstance().Log("Project directory was not provided - Cancelling 'New Project' action", 3)
         else:
             # [0] = user_input: str, [1] = value_provided: bool
-            self.logger.Log("Requesting a name for the new project...'")
+            Logger.getInstance().Log("Requesting a name for the new project...'")
             user_project_name = QtWidgets.QInputDialog.getText(
                 self.e_ui.central_widget,
                 "New Project",
@@ -74,11 +74,11 @@ class HBEditor:
             )[0]
 
             if not user_project_name:
-                self.logger.Log("Project name was not provided - Cancelling 'New Project' action", 3)
+                Logger.getInstance().Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
                 if os.path.exists(new_project_dir + "/" + user_project_name):
-                    self.logger.Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
+                    Logger.getInstance().Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
                     QtWidgets.QMessageBox.about(
                         self.e_ui.central_widget,
                         "Project Already Exists!",
@@ -88,7 +88,7 @@ class HBEditor:
 
                 # Everything is good to go. Create a new project!
                 else:
-                    self.logger.Log("Valid project destination chosen! Creating project folder structure...")
+                    Logger.getInstance().Log("Valid project destination chosen! Creating project folder structure...")
 
                     # Create the project directory
                     project_path = new_project_dir + "/" + user_project_name
@@ -111,15 +111,15 @@ class HBEditor:
                             project_path + "/" + rel_path
                         )
 
-                    self.logger.Log(f"Project Created at: {project_path}", 2)
+                    Logger.getInstance().Log(f"Project Created at: {project_path}", 2)
 
                     # Set this as the active project
                     self.SetActiveProject(user_project_name, project_path)
 
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
-        self.logger.Log("Requesting path to project root...")
-        prompt = FileSystemPrompt(self.logger, self.main_window)
+        Logger.getInstance().Log("Requesting path to project root...")
+        prompt = FileSystemPrompt(self.main_window)
         existing_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Project Directory",
@@ -128,17 +128,17 @@ class HBEditor:
         self.UpdateSearchHistory(existing_project_dir)
 
         if not existing_project_dir:
-            self.logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
+            Logger.getInstance().Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
             if os.path.exists(existing_project_dir + "/" + Settings.getInstance().project_file):
-                self.logger.Log("Valid project selected - Setting as Active Project...")
+                Logger.getInstance().Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
                 project_name = os.path.basename(existing_project_dir)
                 self.SetActiveProject(project_name, existing_project_dir)
             else:
-                self.logger.Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
+                Logger.getInstance().Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
                 QtWidgets.QMessageBox.about(
                     self.e_ui.central_widget,
                     "Not a Valid Project Directory!",
@@ -156,7 +156,6 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_file_prompt = NewFileMenu(
-                self.logger,
                 "Content/Icons/Engine_Logo.png",
                 "Choose a File Type"
             )
@@ -165,7 +164,7 @@ class HBEditor:
             if new_file_prompt.exec():
 
                 selected_type = new_file_prompt.GetSelection()
-                prompt = FileSystemPrompt(self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.main_window)
                 result = prompt.SaveFile(
                     Settings.getInstance().supported_content_types['Data'],
                     Settings.getInstance().GetProjectContentDirectory(),
@@ -176,13 +175,13 @@ class HBEditor:
                 if result:
                     with open(result, 'w') as new_file:
                         pass
-                        self.logger.Log(f"File created - {result}", 2)
+                        Logger.getInstance().Log(f"File created - {result}", 2)
 
                     # Create the editor, then export to initially populate the new file
                     self.OpenEditor(result, selected_type)
                     self.active_editor.Export()
                 else:
-                    self.logger.Log("File information was not provided - Cancelling 'New File' action", 3)
+                    Logger.getInstance().Log("File information was not provided - Cancelling 'New File' action", 3)
 
     def OpenFile(self, target_file_path=None):
         """ Prompt the user to choose a file, then load the respective editor using the data found """
@@ -194,7 +193,7 @@ class HBEditor:
 
             # Validate whether the selected file is capable of being opened
             if ".yaml" not in target_file_path:
-                self.logger.Log("File type does not have any interact functionality", 3)
+                Logger.getInstance().Log("File type does not have any interact functionality", 3)
                 return
             """
             # *** Re-enable this code when the supported file types all have open functionality ***
@@ -208,13 +207,13 @@ class HBEditor:
                         break
 
             if not is_supported:
-                self.logger.Log("File type does not have any interact functionality", 3)
+                Logger.getInstance().Log("File type does not have any interact functionality", 3)
                 pass
             """
 
             # Is the user opening a file through the main "File->Open" mechanism?
             if not target_file_path:
-                prompt = FileSystemPrompt(self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.main_window)
                 existing_file = prompt.GetFile(
                     Settings.getInstance().GetProjectContentDirectory(),
                     Settings.getInstance().supported_content_types['Data'],
@@ -226,7 +225,7 @@ class HBEditor:
 
             # Does the file actually exist?
             if not existing_file:
-                self.logger.Log("File path was not provided - Cancelling 'Open File' action", 3)
+                Logger.getInstance().Log("File path was not provided - Cancelling 'Open File' action", 3)
             else:
                 # Read the first line to determine the type of file
                 with open(existing_file) as f:
@@ -240,7 +239,7 @@ class HBEditor:
                         file_type = FileType[search.group(1)]
                         self.OpenEditor(existing_file, file_type, True)
                     else:
-                        self.logger.Log("An invalid file was selected - Cancelling 'Open File' action", 4)
+                        Logger.getInstance().Log("An invalid file was selected - Cancelling 'Open File' action", 4)
                         QtWidgets.QMessageBox.about(
                             self.e_ui.central_widget,
                             "Not a Valid File!",
@@ -256,7 +255,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             p_manager = PlayManager()
-            p_manager.Play(self.e_ui.central_widget, self.logger, Settings.getInstance().user_project_dir, Settings.getInstance().root)
+            p_manager.Play(self.e_ui.central_widget, Settings.getInstance().user_project_dir, Settings.getInstance().root)
 
     def Build(self):
         """ Launches the HBBuilder in order to generate an executable from the active project """
@@ -265,7 +264,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             HBBuilder.Build(
-                self.logger,
+                Logger.getInstance(),
                 Settings.getInstance().engine_root,
                 Settings.getInstance().user_project_dir,
                 Settings.getInstance().user_project_name
@@ -278,7 +277,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             HBBuilder.Clean(
-                self.logger,
+                Logger.getInstance(),
                 Settings.getInstance().user_project_dir
             )
 
@@ -299,9 +298,9 @@ class HBEditor:
         else:
             # The user is not allowed to rename the project settings file due to the number of dependencies on it
             if self.active_editor.file_type is FileType.Project_Settings:
-                self.logger.Log("Project Settings can not be renamed or saved to a new location", 3)
+                Logger.getInstance().Log("Project Settings can not be renamed or saved to a new location", 3)
             else:
-                prompt = FileSystemPrompt(self.logger, self.main_window)
+                prompt = FileSystemPrompt(self.main_window)
                 new_file_path = prompt.SaveFile(
                     Settings.getInstance().supported_content_types['Data'],
                     self.active_editor.GetFilePath(),
@@ -310,7 +309,7 @@ class HBEditor:
                 )
 
                 if not new_file_path:
-                    self.logger.Log("File path was not provided - Cancelling 'SaveAs' action", 3)
+                    Logger.getInstance().Log("File path was not provided - Cancelling 'SaveAs' action", 3)
                 else:
                     can_save = self.ValidateNewFileLocation(new_file_path)
                     if can_save:
@@ -334,11 +333,11 @@ class HBEditor:
             result = self.CheckIfFileOpen(target_file_path)
             if result:
                 #@TODO: Should there be a reimport if the user tries to open an opened file? Or maybe a refesh button?
-                self.logger.Log("An editor for the selected file is already open - Switching to the open editor ", 3)
+                Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
                 self.e_ui.main_tab_editor.setCurrentWidget(result)
             else:
                 # Initialize the Editor
-                self.active_editor = editor_classes[editor_type](self.logger, target_file_path)
+                self.active_editor = editor_classes[editor_type](target_file_path)
 
                 # Allow the caller to load the provided file instead of just marking it as the export target
                 if import_file:
@@ -449,8 +448,8 @@ class HBEditor:
                 with open(temp_file, "w"):
                     pass
             except Exception as exc:
-                self.logger.Log(f"Unable to create '{temp_file}'", 4)
-                self.logger.Log(str(exc), 4)
+                Logger.getInstance().Log(f"Unable to create '{temp_file}'", 4)
+                Logger.getInstance().Log(str(exc), 4)
                 return False
         temp_data = Reader.ReadAll(temp_file)
         if not temp_data:
@@ -459,8 +458,8 @@ class HBEditor:
             for key, val in data.items():
                 temp_data[key] = val
         except Exception as exc:
-            self.logger.Log(f"Failed to update '{temp_file}'", 4)
-            self.logger.Log(str(exc), 4)
+            Logger.getInstance().Log(f"Failed to update '{temp_file}'", 4)
+            Logger.getInstance().Log(str(exc), 4)
             return False
         Writer.WriteFile(temp_data, temp_file)
         return True
@@ -468,14 +467,14 @@ class HBEditor:
     def ReadFromTemp(self, temp_file: str, key: str) -> str:
         """ Read from the provided temp file using the provided key, returning the results if found """
         if not os.path.exists(temp_file):
-            self.logger.Log(f"The temp file '{temp_file}' was not found")
+            Logger.getInstance().Log(f"The temp file '{temp_file}' was not found")
             return ""
         try:
             req_data = Reader.ReadAll(temp_file)[key]
             return req_data
         except Exception as exc:
-            self.logger.Log(f"Failed to read '{temp_file}'")
-            self.logger.Log(str(exc), 4)
+            Logger.getInstance().Log(f"Failed to read '{temp_file}'")
+            Logger.getInstance().Log(str(exc), 4)
             return ""
 
 if __name__ == "__main__":

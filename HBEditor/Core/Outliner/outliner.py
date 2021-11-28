@@ -14,6 +14,7 @@
 """
 import os
 import shutil
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Interface.Outliner.outliner import OutlinerUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
@@ -58,7 +59,7 @@ class Outliner:
                 return full_file_path
 
         # Somehow the user has all versions of the default name covered...Inform the user
-        self.hb_core.logger.Log("Unable to create file as all default name iterations are taken", 4)
+        Logger.getInstance().Log("Unable to create file as all default name iterations are taken", 4)
         return None
 
     def CreateFolder(self, path: str) -> bool:
@@ -75,16 +76,16 @@ class Outliner:
                 return full_folder_path
 
         # Somehow the user has all versions of the default name covered...Inform the user
-        self.hb_core.logger.Log("Unable to create folder as all default name iterations are taken", 4)
+        Logger.getInstance().Log("Unable to create folder as all default name iterations are taken", 4)
         return None
 
     def DeleteFile(self, path):
         """ Delete the provided file. Editor will remain open if the user wishes to resave """
         try:
             os.remove(path)
-            self.hb_core.logger.Log(f"Successfully deleted file '{path}'", 2)
+            Logger.getInstance().Log(f"Successfully deleted file '{path}'", 2)
         except Exception as exc:
-            self.hb_core.logger.Log(f"Failed to delete file '{path}' - Please review the exception to understand more", 4)
+            Logger.getInstance().Log(f"Failed to delete file '{path}' - Please review the exception to understand more", 4)
 
     def DeleteFolder(self, path):
         """ Delete the provided folder recursively. Editors will remain open if the user wishes to resave """
@@ -92,7 +93,7 @@ class Outliner:
         try:
             print(path)
             shutil.rmtree(path)
-            self.hb_core.logger.Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
+            Logger.getInstance().Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
         except Exception as exc:
-            self.hb_core.logger.Log(f"Failed to delete folder '{path}' - Please review the exception to understand more", 4)
+            Logger.getInstance().Log(f"Failed to delete folder '{path}' - Please review the exception to understand more", 4)
             print(exc)

@@ -45,9 +45,6 @@ class HBEditorUI:
         # Initialize the Menu Bar
         self.CreateMenuBar(MainWindow)
 
-        # Initialize the logger from the very beginning
-        self.logger = Logger()
-
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
         self.main_resize_container.setOrientation(Qt.Vertical)
@@ -56,7 +53,7 @@ class HBEditorUI:
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
         self.CreateGettingStartedDisplay()
         self.CreateBottomTabContainer()
-        self.AddTab(self.logger.GetUI(), "Logger", self.bottom_tab_editor)
+        self.AddTab(Logger.getInstance().GetUI(), "Logger", self.bottom_tab_editor)
 
         # Adjust the main editor container so it takes up as much space as possible
         self.main_resize_container.setStretchFactor(0, 10)
@@ -68,7 +65,7 @@ class HBEditorUI:
         # through a common point where localization can take place
         self.retranslateUi(MainWindow)
 
-        self.logger.Log("Initialized Editor Interface")
+        Logger.getInstance().Log("Initialized Editor Interface")
 
     def CreateMenuBar(self, main_window):
         # *** Build the Menu Bar ***
@@ -243,13 +240,13 @@ class HBEditorUI:
     def RemoveEditorTab(self, index):
         """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg) """
         #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
-        self.logger.Log("Closing editor...")
+        Logger.getInstance().Log("Closing editor...")
 
         editor_widget = self.main_tab_editor.widget(index)
         del editor_widget
         self.main_tab_editor.removeTab(index)
 
-        self.logger.Log("Editor closed")
+        Logger.getInstance().Log("Editor closed")
 
 #if __name__ == "__main__":
 #    import sys

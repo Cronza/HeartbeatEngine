@@ -67,5 +67,5 @@ class EditorDialogueUI(EditorBaseUI):
         Create the details panel using the generic details object. Since this panel is generic,
         it functions independently of whether it has a reference to the editor core
         """
-        self.details = DetailsPanel(self.core.logger)
+        self.details = DetailsPanel()
 

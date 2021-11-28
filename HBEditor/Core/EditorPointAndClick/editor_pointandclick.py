@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Utilities.DataTypes.file_types import FileType
@@ -20,8 +21,8 @@ from HBEditor.Interface.EditorPointAndClick.editor_pointandclick import EditorPo
 
 
 class EditorPointAndClick(EditorBase):
-    def __init__(self, logger, file_path):
-        super().__init__(logger, file_path)
+    def __init__(self, file_path):
+        super().__init__(file_path)
 
         self.file_type = FileType.Scene_Point_And_Click
 
@@ -35,7 +36,7 @@ class EditorPointAndClick(EditorBase):
 
         # Initialize the editor U.I
         self.editor_ui = EditorPointAndClickUI(self)
-        self.logger.Log("Editor initialized")
+        Logger.getInstance().Log("Editor initialized")
 
     def BuildActionDataDict(self, possible_actions: dict) -> dict:
         """

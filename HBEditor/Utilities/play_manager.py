@@ -15,6 +15,7 @@
 import subprocess
 import os
 from PyQt5.QtWidgets import QMessageBox
+from HBEditor.Core.Logger.logger import Logger
 
 
 class PlayManager:
@@ -23,8 +24,8 @@ class PlayManager:
     alongside the HBEditor so the subprocess call works correctly
     """
 
-    def Play(self, parent, logger,  project_path, engine_parent_root):
-        logger.Log("Launching engine...")
+    def Play(self, parent, project_path, engine_parent_root):
+        Logger.getInstance().Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing
             result = subprocess.Popen(
@@ -37,10 +38,10 @@ class PlayManager:
                 stdout=True,
                 stderr=True
             )
-            logger.Log("Engine Launched - Editor temporarily unavailable")
+            Logger.getInstance().Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 
-            logger.Log("Engine closed - Editor functionality resumed")
+            Logger.getInstance().Log("Engine closed - Editor functionality resumed")
 
         except Exception as exc:
             QMessageBox.about(

@@ -199,11 +199,11 @@ class EditorProjectSettingsUI(EditorBaseUI):
         elif data_type == ParameterType.Color:
             return InputEntryColor(None)
         elif data_type == ParameterType.File:
-            return InputEntryFileSelector(self.core.logger, self, "", None)
+            return InputEntryFileSelector(self, "", None)
         elif data_type == ParameterType.File_Font:
-            return InputEntryFileSelector(self.core.logger, self, Settings.getInstance().supported_content_types['Font'], None)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types['Font'], None)
         elif data_type == ParameterType.File_Image:
-            return InputEntryFileSelector(self.core.logger, self, Settings.getInstance().supported_content_types['Image'], None)
+            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types['Image'], None)
         elif data_type == ParameterType.Dropdown:
             return InputEntryDropdown(data, None)
         elif data_type == ParameterType.CUST_Resolution:

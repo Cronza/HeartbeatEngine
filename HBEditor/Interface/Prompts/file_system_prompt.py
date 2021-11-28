@@ -13,15 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
 class FileSystemPrompt(QFileDialog):
-    def __init__(self, logger, parent):
+    def __init__(self, parent):
         super().__init__(parent)
-
-        self.logger = logger
 
     def SaveFile(self, type_filter, starting_dir, prompt_title="Save File", project_only=True) -> str:
         """
@@ -42,21 +41,21 @@ class FileSystemPrompt(QFileDialog):
 
             if project_only:
                 if Settings.getInstance().user_project_dir in selected_dir:
-                    self.logger.Log("Valid file chosen")
+                    Logger.getInstance().Log("Valid file chosen")
                     return selected_dir
                 else:
                     self.ShowPathOutsideProjectMessage()
                     return ""
             else:
-                self.logger.Log("Valid file chosen")
+                Logger.getInstance().Log("Valid file chosen")
                 return selected_dir
         else:
-            self.logger.Log("File name and path not provided", 3)
+            Logger.getInstance().Log("File name and path not provided", 3)
             return ""
 
     def GetDirectory(self, starting_dir, prompt_title="Choose a Directory", project_only=True) -> str:
         """ Opens up a prompt for choosing an existing directory. If nothing is selected, return an empty string"""
-        self.logger.Log("Requesting directory path...")
+        Logger.getInstance().Log("Requesting directory path...")
 
         dir_path = self.getExistingDirectory(
             self.parent(),
@@ -67,21 +66,21 @@ class FileSystemPrompt(QFileDialog):
         if dir_path:
             if project_only:
                 if Settings.getInstance().user_project_dir in dir_path:
-                    self.logger.Log("Valid directory chosen")
+                    Logger.getInstance().Log("Valid directory chosen")
                     return dir_path
                 else:
                     self.ShowPathOutsideProjectMessage()
                     return ""
             else:
-                self.logger.Log("Valid directory chosen")
+                Logger.getInstance().Log("Valid directory chosen")
                 return dir_path
         else:
-            self.logger.Log("No directory chosen", 3)
+            Logger.getInstance().Log("No directory chosen", 3)
             return ""
 
     def GetFile(self, starting_dir, type_filter, prompt_title="Choose a File", project_only=True) -> str:
         """ Opens up a prompt for choosing an existing file. If nothing is selected, return an empty string"""
-        self.logger.Log("Requesting file path...")
+        Logger.getInstance().Log("Requesting file path...")
 
         file_path = self.getOpenFileName(
             self.parent(),
@@ -96,16 +95,16 @@ class FileSystemPrompt(QFileDialog):
 
             if project_only:
                 if Settings.getInstance().user_project_dir in selected_dir:
-                    self.logger.Log("Valid file chosen")
+                    Logger.getInstance().Log("Valid file chosen")
                     return selected_dir
                 else:
                     self.ShowPathOutsideProjectMessage()
                     return ""
             else:
-                self.logger.Log("Valid file chosen")
+                Logger.getInstance().Log("Valid file chosen")
                 return selected_dir
         else:
-            self.logger.Log("File name and path not provided", 3)
+            Logger.getInstance().Log("File name and path not provided", 3)
             return ""
 
     def ShowPathOutsideProjectMessage(self):

@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEditor.Core.settings import Settings
+from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Interface.EditorDialogue.editor_dialogue import EditorDialogueUI
 from HBEditor.Utilities.DataTypes.file_types import FileType
@@ -21,8 +22,8 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class EditorDialogue(EditorBase):
-    def __init__(self, logger, file_path):
-        super().__init__(logger, file_path)
+    def __init__(self, file_path):
+        super().__init__(file_path)
 
         self.file_type = FileType.Scene_Dialogue
 
@@ -31,7 +32,7 @@ class EditorDialogue(EditorBase):
             "Main",
             "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
-        self.logger.Log("Editor initialized")
+        Logger.getInstance().Log("Editor initialized")
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
@@ -91,7 +92,7 @@ class EditorDialogue(EditorBase):
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
             # differently by scanning the current dialogue entries
             if branch is self.editor_ui.branches.active_branch:
-                self.logger.Log("Scanning dialogue entries...")
+                Logger.getInstance().Log("Scanning dialogue entries...")
                 self.UpdateBranchData(branch)
 
             branch_name, branch_description = branch.Get()
@@ -108,7 +109,7 @@ class EditorDialogue(EditorBase):
 
     def Export(self):
         super().Export()
-        self.logger.Log(f"Exporting Dialogue data for: {self.file_path}")
+        Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
         data_to_export = self.GetAllDialogueData()
         db_manager = DBManager()
         data_to_export = {
@@ -117,7 +118,7 @@ class EditorDialogue(EditorBase):
         }
 
         # Write the data out
-        self.logger.Log("Writing data to file...")
+        Logger.getInstance().Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 data_to_export,
@@ -125,13 +126,13 @@ class EditorDialogue(EditorBase):
                 f"# Type: {FileType.Scene_Dialogue.name}\n" +
                 f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
             )
-            self.logger.Log("File Exported!", 2)
+            Logger.getInstance().Log("File Exported!", 2)
         except:
-            self.logger.Log("Failed to Export!", 4)
+            Logger.getInstance().Log("Failed to Export!", 4)
 
     def Import(self):
         super().Import()
-        self.logger.Log(f"Importing Dialogue data for: {self.file_path}")
+        Logger.getInstance().Log(f"Importing Dialogue data for: {self.file_path}")
 
         file_data = Reader.ReadAll(self.file_path)
 
