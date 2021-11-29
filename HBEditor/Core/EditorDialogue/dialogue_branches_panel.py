@@ -12,10 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
-from HBEditor.Core.EditorDialogue.dialogue_branches_entry import BranchesEntry
-from HBEditor.Core.EditorDialogue.dialogue_branches_edit_prompt import EditBranchPrompt
+
 
 class BranchesPanel(QtWidgets.QWidget):
     def __init__(self, ed_core):
@@ -220,3 +219,118 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Update the active branch to point to the newly selected branch
         self.active_branch = selection
+
+
+class BranchesEntry(QtWidgets.QWidget):
+    def __init__(self, select_func):
+        super().__init__()
+
+        # Store a func object that is used when this entry is selected
+        self.select_func = select_func
+
+        # Store all dialogue entries associated with this branch
+        self.branch_data = []
+
+        # ****** DISPLAY WIDGETS ******
+        # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use
+        # the minimum where possible
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum,
+                                           QtWidgets.QSizePolicy.Minimum)
+
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
+        #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
+        # Name
+        self.name_widget = QtWidgets.QLabel()
+        self.name_widget.setFont(Settings.getInstance().header_2_font)
+        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
+        self.name_widget.setWordWrap(True)
+        self.name_widget.setText("Test Name")
+        self.name_widget.setSizePolicy(size_policy)
+        self.name_widget.heightForWidth(0)
+
+        # Details
+        self.subtext_widget = QtWidgets.QLabel()
+        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
+        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
+        self.subtext_widget.setText('Test Description')
+        self.subtext_widget.setAlignment(QtCore.Qt.AlignTop)
+        self.subtext_widget.setSizePolicy(size_policy)
+
+        # Add everything to the layout
+        self.main_layout.addWidget(self.name_widget)
+        self.main_layout.addWidget(self.subtext_widget)
+
+    def Get(self):
+        """ Returns a tuple of 'branch name', 'branch description' """
+        return self.name_widget.text(), self.subtext_widget.text()
+
+    def Set(self, data):
+        """ Given a tuple of 'branch name' and 'branch description', update the relevant widgets """
+        self.name_widget.setText(data[0])
+        self.subtext_widget.setText(data[1])
+
+    def GetData(self) -> list:
+        """ Returns a list of dialogue entry data stored in this branch entry """
+        return self.branch_data
+
+    def Refresh(self):
+        """
+        Refresh is the common function used by elements that need refreshing when an important U.I change is made
+        """
+
+        pass
+
+
+class EditBranchPrompt(QtWidgets.QDialog):
+    def __init__(self, branch_name, branch_description, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Branch Configuration")
+
+        # Create layout and add widgets
+        self.main_layout = QtWidgets.QVBoxLayout()
+
+        # Branch name
+        self.branch_name_header = QtWidgets.QLabel("Branch Name:")
+        self.branch_name_input = QtWidgets.QLineEdit(branch_name)
+
+        # Branch description
+        self.branch_description_header = QtWidgets.QLabel("Branch Description:")
+        self.branch_description_input = QtWidgets.QPlainTextEdit(branch_description)
+
+        # Cancel & Accept
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.cancel_button = QtWidgets.QPushButton("Cancel")
+        self.accept_button = QtWidgets.QPushButton("Accept")
+        self.button_layout.addWidget(self.accept_button)
+        self.button_layout.addWidget(self.cancel_button)
+
+        # Add everything together
+        self.main_layout.addWidget(self.branch_name_header)
+        self.main_layout.addWidget(self.branch_name_input)
+        self.main_layout.addWidget(self.branch_description_header)
+        self.main_layout.addWidget(self.branch_description_input)
+        self.main_layout.addLayout(self.button_layout)
+        # Set dialog layout
+        self.setLayout(self.main_layout)
+
+        # Connect buttons
+        self.accept_button.clicked.connect(self.Accept)
+        self.cancel_button.clicked.connect(self.Cancel)
+
+
+    def Cancel(self):
+        self.reject()
+
+    def Accept(self):
+        if self.branch_name_input.text() == "":
+            print("No branch name provided - Cancelling prompt")
+            self.reject()
+        else:
+            self.accept()
+
+    def Get(self):
+        """ Returns the branch name and description as a tuple """
+        return self.branch_name_input.text(), self.branch_description_input.toPlainText()

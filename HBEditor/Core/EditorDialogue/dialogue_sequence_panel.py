@@ -17,15 +17,15 @@ from PyQt5 import QtWidgets, QtGui
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
-from HBEditor.Core.EditorDialogue.dialogue_sequence_entry import DialogueEntry
 
-"""
-The core U.I class for the dialogue sequence panel. This contains all logic for generating, moving and removing
-any and all child widgets pertaining to the panel.
 
-This class is not meant for any destructive data changes, merely U.I actions
-"""
 class DialogueSequencePanel(QtWidgets.QWidget):
+    """
+    The core U.I class for the dialogue sequence panel. This contains all logic for generating, moving and removing
+    any and all child widgets pertaining to the panel.
+
+    This class is not meant for any destructive data changes, merely U.I actions
+    """
     def __init__(self, ed_core):
         super().__init__()
 
@@ -155,7 +155,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         for row in range(self.dialogue_table.rowCount(), 0, -1):
             self.dialogue_table.removeRow(row - 1)
 
-    def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False) -> DialogueEntry:
+    def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False):
         """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
         # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
         new_entry_row = self.dialogue_table.rowCount()
@@ -247,7 +247,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
                 new_entry.action_data = taken_entry.action_data
                 self.ed_core.UpdateActiveEntry()
 
-    def GetSelectedEntry(self) -> DialogueEntry:
+    def GetSelectedEntry(self):
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """
         selected_entry = self.dialogue_table.selectedIndexes()
 
@@ -265,3 +265,81 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             return selected_row[0].row()
         else:
             return None
+
+
+class DialogueEntry(QtWidgets.QWidget):
+    def __init__(self, action_data, select_func, size_refresh_func):
+        super().__init__()
+
+        # Store a func object that is used when this entry is selected
+        self.select_func = select_func
+
+        # Store a func object that is used when the row containing this object should be resized based on the
+        # subtext data in this object
+        self.size_refresh_func = size_refresh_func
+
+        # Store this entries action data
+        self.action_data = action_data
+
+        # ****** DISPLAY WIDGETS ******
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.main_layout.setSpacing(0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Name
+        self.name_widget = QtWidgets.QLabel()
+        self.name_widget.setFont(Settings.getInstance().header_2_font)
+        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
+        self.name_widget.setText(self.action_data["display_name"])
+
+        # Details
+        self.subtext_widget = QtWidgets.QLabel()
+        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
+        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
+
+        # Refresh the subtext
+        self.UpdateSubtext()
+
+        # Add everything to the layout
+        self.main_layout.addWidget(self.name_widget)
+        self.main_layout.addWidget(self.subtext_widget)
+
+    def Get(self) -> dict:
+        """ Returns the action data stored in this object """
+        return self.action_data
+
+    def UpdateSubtext(self):
+        """ Updates the subtext displaying entry parameters """
+        if "requirements" in self.action_data:
+            self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
+
+    def CompileSubtextString(self, data):
+        """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
+        #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
+        cur_string = ""
+        for param in data:
+            if param["preview"]:
+
+                param_name = param["name"]
+                param_data = None
+
+                if param["type"] == "container":
+                    # Recurse, searching the children as well
+                    cur_string += f"{param_name}: ["
+                    cur_string += self.CompileSubtextString(param['children'])
+                    cur_string += "], "
+
+                else:
+                    param_data = param["value"]
+                    cur_string += f"{param_name}: {param_data}, "
+
+        # Due to how the comma formatting is, strip it from the end of the string
+        return cur_string.strip(', ')
+
+    def Refresh(self):
+        """
+        Refresh is the common function used by elements that need refreshing when an important U.I change is made
+        """
+
+        self.UpdateSubtext()
+        self.size_refresh_func()
