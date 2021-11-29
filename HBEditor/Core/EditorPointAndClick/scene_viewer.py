@@ -145,6 +145,7 @@ class SceneViewer(QtWidgets.QWidget):
                     self.core.UpdateDetails
                 )
                 self.scene.addItem(sprite)
+                sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
             else:
                 print("Found Text")
             break

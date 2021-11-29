@@ -340,6 +340,5 @@ class DialogueEntry(QtWidgets.QWidget):
         """
         Refresh is the common function used by elements that need refreshing when an important U.I change is made
         """
-
         self.UpdateSubtext()
         self.size_refresh_func()

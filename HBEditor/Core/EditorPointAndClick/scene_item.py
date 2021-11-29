@@ -1,6 +1,7 @@
 import os
 from PyQt5 import QtWidgets, QtGui
 from HBEditor.Core.settings import Settings
+from HBEditor.Core.Logger.logger import Logger
 
 class SceneItem(QtWidgets.QGraphicsPixmapItem):
     def __init__(self, pixmap, action_data, move_func, select_func, data_changed_func):
@@ -17,9 +18,12 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
         self.setFlag(self.ItemSendsGeometryChanges)
         self.setAcceptDrops(True)
 
-        self.setTransformOriginPoint(64, 64)
         # Cache the index where the important action data elements are, so we don't iterate through each time
         # (This is on the assumption and knowledge that the order will never change)
+        self.position_index = None
+        self.sprite_index = None
+        self.z_order_index = None
+        self.center_align_index = None
         for index, req in enumerate(self.action_data["requirements"]):
             if req["name"] == "position":
                 self.position_index = index
@@ -27,6 +31,8 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
                 self.sprite_index = index
             elif req["name"] == "z_order":
                 self.z_order_index = index
+            elif req["name"] == "center_align":
+                self.center_align_index = index
 
     def Refresh(self):
         """
@@ -42,18 +48,29 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
             float(new_pos[1]) * self.scene().height()
         )
         # *** Update the sprite ***
-        sprite_path = self.action_data["requirements"][self.sprite_index]["value"]
+        sprite_path = Settings.getInstance().user_project_dir + "/" + \
+                      self.action_data["requirements"][self.sprite_index]["value"]
+
         if sprite_path != "None":
             if os.path.exists(sprite_path):
                 image = QtGui.QPixmap(sprite_path)
                 self.setPixmap(image)
             else:
-                print("File does not Exist")
-                # Implement logger call here
+                Logger.getInstance().Log(f"File does not Exist: '{sprite_path}'", 3)
 
         # *** Update the z_order ***
         z_order = self.action_data["requirements"][self.z_order_index]["value"]
         self.setZValue(float(z_order))
+
+        # *** (OPTIONAL) Update center align ***
+        if self.center_align_index is not None:
+            center_align = self.action_data["requirements"][self.center_align_index]["value"]
+            if center_align:
+                self.setTransform(
+                    self.transform().translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2))
+            else:
+                self.resetTransform()
+
 
     def itemChange(self, change, value):
         """

@@ -21,6 +21,16 @@ from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 """
 List of available entries:
     - InputEntryBool
+    - InputEntryColor
+    - InputEntryContainer
+    - InputEntryDropdown
+    - InputEntryFileSelector
+    - InputEntryFloat
+    - InputEntryInt
+    - InputEntryParagraph
+    - InputEntryText
+    - InputEntryTuple
+    - InputEntryChoice
 """
 
 
@@ -86,6 +96,7 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         When the global checkbox is toggled on, call a provided function, passing a reference to this class
         This function is not meant to be overridden
         """
+
         if self.global_toggle.Get():
             self.MakeUneditable()
         else:
@@ -365,7 +376,6 @@ class InputEntryInt(InputEntryBase):
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setFont(Settings.getInstance().paragraph_font)
         self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
         self.validator = QtGui.QIntValidator()
@@ -373,6 +383,9 @@ class InputEntryInt(InputEntryBase):
 
         # Assign default value
         self.input_widget.setText("0")
+
+        # Signal
+        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
@@ -481,7 +494,6 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setFont(Settings.getInstance().paragraph_font)
         self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         self.input_widget_alt_title = QtWidgets.QLabel('Y')
         self.input_widget_alt_title.setFont(Settings.getInstance().paragraph_font)
@@ -489,7 +501,6 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt = QtWidgets.QLineEdit()
         self.input_widget_alt.setFont(Settings.getInstance().paragraph_font)
         self.input_widget_alt.setStyleSheet(Settings.getInstance().paragraph_color)
-        self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to int only
         validator = QtGui.QDoubleValidator(0, 1, 8)
@@ -499,6 +510,10 @@ class InputEntryTuple(InputEntryBase):
         # Assign default value
         self.input_widget.setText("0")
         self.input_widget_alt.setText("0")
+
+        # Signals
+        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget_title)
