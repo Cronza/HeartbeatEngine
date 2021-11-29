@@ -12,25 +12,26 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import pygame
 from HBEngine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
 
 
 class DialogueScene(PointAndClickScene):
-    def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
+    def __init__(self, scene_data_file, window, scene_manager):
         self.dialogue_index = 0
         self.dialogue_data = ""
         self.active_branch = "Main"
         self.character_data = {}
 
         # Update the generic data using the parent's init
-        super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
+        super().__init__(scene_data_file, window, scene_manager)
 
     def Update(self, events):
         super().Update(events)
 
         for event in events:
-            if event.type == self.pygame_lib.KEYUP:
-                if event.key == self.pygame_lib.K_SPACE:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
                     # Skip the running action if its able to be skipped
                     if self.a_manager.active_actions:
                         for action in self.a_manager.active_actions:

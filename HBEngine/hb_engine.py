@@ -25,9 +25,10 @@ class HBEngine:
         if not project_path:
             print("Warning: No project path provided - Defaulting to the engine root")
 
-        self.settings = Settings(project_path)
-        self.settings.Evaluate(self.settings.project_dir + "/Config/Game.yaml")
-        pygame.display.set_caption(self.settings.project_settings['Game']['title'])
+        Settings.getInstance().SetProjectRoot(project_path)
+        Settings.getInstance().Evaluate(Settings.getInstance().project_dir + "/Config/Game.yaml")
+
+        pygame.display.set_caption(Settings.getInstance().project_settings['Game']['title'])
 
         # Declare the scene manager, but we'll initialize it during the game loop
         self.scene_manager = None
@@ -40,9 +41,9 @@ class HBEngine:
         pygame.init()
         mixer.init()
         clock = pygame.time.Clock()
-        window = pygame.display.set_mode(self.settings.active_resolution)
+        window = pygame.display.set_mode(Settings.getInstance().active_resolution)
 
-        self.scene_manager = SceneManager(window, pygame, self.settings)
+        self.scene_manager = SceneManager(window)
 
         # Start the game loop
         is_running = True
@@ -87,9 +88,9 @@ class HBEngine:
 
     def UpdateResolution(self, new_size_index, flag=0):
         # Use the given, but always add HWSURFACE and DOUBLEBUF
-        if not self.settings.resolution == new_size_index:
-            self.settings.resolution = new_size_index
-            pygame.display.set_mode(self.settings.resolution_options[new_size_index], flag)
+        if not Settings.getInstance().resolution == new_size_index:
+            Settings.getInstance().resolution = new_size_index
+            pygame.display.set_mode(Settings.getInstance().resolution_options[new_size_index], flag)
 
             self.scene_manager.active_scene.Draw()
 

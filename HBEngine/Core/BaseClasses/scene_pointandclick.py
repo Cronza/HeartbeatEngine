@@ -16,8 +16,8 @@ from HBEngine.Core.BaseClasses.scene import Scene
 
 
 class PointAndClickScene(Scene):
-    def __init__(self, scene_data_file, window, pygame_lib, settings, scene_manager):
-        super().__init__(scene_data_file, window, pygame_lib, settings, scene_manager)
+    def __init__(self, scene_data_file, window, scene_manager):
+        super().__init__(scene_data_file, window, scene_manager)
 
     def LoadSceneData(self):
         super().LoadSceneData()

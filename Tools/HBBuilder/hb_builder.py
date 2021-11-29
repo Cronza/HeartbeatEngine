@@ -23,7 +23,7 @@ class HBBuilder:
     def Build(logger, engine_dir: str, project_dir: str, project_name: str):
         """ Generate an executable based on the provided information and project """
         logger.Log(f"*** Starting build for: '{project_dir}'... ***")
-
+        print(project_dir)
         build_dir = f"{project_dir}/build"
         working_dir = f"{build_dir}/intermediate"
         output_dir = f"{build_dir}/output"
@@ -34,13 +34,13 @@ class HBBuilder:
         # Use a subprocess call to invoke PyInstaller so it can fail independently
         args = f"venv/Scripts/pyinstaller.exe " \
                "--noconsole " \
-               f"--workpath {working_dir} "\
-               f"--distpath {output_dir} "\
-               f"--specpath {working_dir} "\
-               f"--add-data {project_dir}/Content;Content "\
-               f"--add-data {project_dir}/Config;Config "\
-               f"--add-data {engine_dir}/Content;HBEngine/Content "\
-               f"--name {project_name} "\
+               f"--workpath \"{working_dir}\" "\
+               f"--distpath \"{output_dir}\" "\
+               f"--specpath \"{working_dir}\" "\
+               f"--add-data \"{project_dir}/Content;Content\" "\
+               f"--add-data \"{project_dir}/Config;Config\" "\
+               f"--add-data \"{engine_dir}/Content;HBEngine/Content\" "\
+               f"--name \"{project_name}\" "\
                f"HBEngine/hb_engine.py"
 
         logger.Log(f"Generating executable...")

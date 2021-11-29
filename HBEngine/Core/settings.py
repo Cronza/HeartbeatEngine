@@ -13,12 +13,40 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from HBEngine.Utilities.yaml_reader import Reader
+from Tools.HBYaml.hb_yaml import Reader
 
 
 class Settings:
+    """ A singleton that holds global project information, and path utility functions """
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        """
+        Static access method - Used to acquire the singleton instance, or instantiate it if it doesn't already exist
+        """
+        if Settings.__instance is None:
+            Settings("")
+        return Settings.__instance
+
     def __init__(self, project_dir):
+        # Enforce the use of the singleton instance
+        if Settings.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            Settings.__instance = self
+
         self.root_dir = os.getcwd().replace("\\", "/")
+
+        self.project_dir = ""
+        self.project_settings = None
+
+        # Some params need to be accessed more immediately than through the settings dict. Declare them here
+        self.resolution = None
+        self.resolution_options = None
+        self.active_resolution = None
+
+    def SetProjectRoot(self, project_dir):
 
         # If a project was not provided, use the engine root (Necessary for builds where project
         # and engine are conjoined)
@@ -26,13 +54,6 @@ class Settings:
             self.project_dir = project_dir
         else:
             self.project_dir = self.root_dir
-
-        self.project_settings = None
-
-        # Some params need to be accessed more immediately than through the settings dict. Declare them here
-        self.resolution = None
-        self.resolution_options = None
-        self.active_resolution = None
 
     def Evaluate(self, data_path):
         """ Reads in the provided project settings file path """

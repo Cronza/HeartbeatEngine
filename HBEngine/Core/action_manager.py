@@ -13,15 +13,15 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import inspect
+from HBEngine.Core.settings import Settings
 from HBEngine.Core import transitions, actions
 
 
 class ActionManager:
-    def __init__(self, scene, settings):
+    def __init__(self, scene):
 
         self.scene = scene
         self.active_actions = {}
-        self.scene.settings = settings
 
     def Update(self, events):
         pending_completion = []

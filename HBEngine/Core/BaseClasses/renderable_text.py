@@ -14,6 +14,7 @@
 """
 import pygame
 from HBEngine.Core.BaseClasses.renderable import Renderable
+from HBEngine.Core.settings import Settings
 
 
 class TextRenderable(Renderable):
@@ -28,7 +29,7 @@ class TextRenderable(Renderable):
     def __init__(self, scene, renderable_data):
         super().__init__(scene, renderable_data)
 
-        font = self.scene.settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
+        font = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data["text"]
         self.text_color = self.renderable_data["text_color"]
         text_size = self.renderable_data["text_size"]

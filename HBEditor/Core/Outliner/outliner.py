@@ -14,20 +14,20 @@
 """
 import os
 import shutil
-from HBEditor.Interface.Outliner.outliner import OutlinerUI
-from HBEditor.Utilities.DataTypes.file_types import FileType
-from HBEditor.Utilities.yaml_manager import Writer
+from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.settings import Settings
+from HBEditor.Core.Outliner.outliner_ui import OutlinerUI
+from HBEditor.Core.DataTypes.file_types import FileType
+from Tools.HBYaml.hb_yaml import Writer
 
 class Outliner:
-    def __init__(self, settings, hb_core):
-
-        self.settings = settings
+    def __init__(self, hb_core):
 
         # We need an explicit reference to the Heartbeat core in order to access file commands
         self.hb_core = hb_core
 
         # Build the Logger UI
-        self.ui = OutlinerUI(self, settings)
+        self.ui = OutlinerUI(self)
 
     def UpdateRoot(self, new_root):
         """ Requests that the FileSystemTree refresh it's tree using a new root """
@@ -54,12 +54,12 @@ class Outliner:
                 Writer.WriteFile(
                     "",
                     full_file_path,
-                    self.settings.GetMetadataString(FileType[file_type])
+                    Settings.getInstance().GetMetadataString(FileType[file_type])
                 )
                 return full_file_path
 
         # Somehow the user has all versions of the default name covered...Inform the user
-        self.hb_core.logger.Log("Unable to create file as all default name iterations are taken", 4)
+        Logger.getInstance().Log("Unable to create file as all default name iterations are taken", 4)
         return None
 
     def CreateFolder(self, path: str) -> bool:
@@ -76,16 +76,16 @@ class Outliner:
                 return full_folder_path
 
         # Somehow the user has all versions of the default name covered...Inform the user
-        self.hb_core.logger.Log("Unable to create folder as all default name iterations are taken", 4)
+        Logger.getInstance().Log("Unable to create folder as all default name iterations are taken", 4)
         return None
 
     def DeleteFile(self, path):
         """ Delete the provided file. Editor will remain open if the user wishes to resave """
         try:
             os.remove(path)
-            self.hb_core.logger.Log(f"Successfully deleted file '{path}'", 2)
+            Logger.getInstance().Log(f"Successfully deleted file '{path}'", 2)
         except Exception as exc:
-            self.hb_core.logger.Log(f"Failed to delete file '{path}' - Please review the exception to understand more", 4)
+            Logger.getInstance().Log(f"Failed to delete file '{path}' - Please review the exception to understand more", 4)
 
     def DeleteFolder(self, path):
         """ Delete the provided folder recursively. Editors will remain open if the user wishes to resave """
@@ -93,7 +93,7 @@ class Outliner:
         try:
             print(path)
             shutil.rmtree(path)
-            self.hb_core.logger.Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
+            Logger.getInstance().Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
         except Exception as exc:
-            self.hb_core.logger.Log(f"Failed to delete folder '{path}' - Please review the exception to understand more", 4)
+            Logger.getInstance().Log(f"Failed to delete folder '{path}' - Please review the exception to understand more", 4)
             print(exc)
