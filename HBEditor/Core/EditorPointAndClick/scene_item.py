@@ -19,8 +19,8 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
         self.setAcceptDrops(True)
 
         # States
-        #self.is_centered = False
-        #self.is_flipped = False
+        self.is_centered = False
+        self.is_flipped = False
 
         # Cache the index where the important action data elements are, so we don't iterate through each time
         # (This is on the assumption and knowledge that the order will never change)
@@ -50,8 +50,6 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
         # Start with a fresh state, so any transforms apply properly
         self.resetTransform()
         new_transform = QtGui.QTransform()
-        hori_translation = new_transform.m31()
-        vert_translation = new_transform.m32()
 
         # Update the position
         new_pos = self.action_data["requirements"][self.position_index]["value"]
@@ -80,32 +78,33 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
         if self.center_align_index is not None:
             center_align = self.action_data["requirements"][self.center_align_index]["value"]
             if center_align:
-                print("Centering")
                 new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
-                hori_translation = new_transform.m31()
-                vert_translation = new_transform.m32()
-                print(hori_translation)
-                print(vert_translation)
+                self.is_centered = True
+            else:
+                self.is_centered = False
 
         # (OPTIONAL) Update flip
         if self.flip_index is not None:
             flip = self.action_data["requirements"][self.flip_index]["value"]
             if flip:
-                print("Flipping")
-                new_transform.scale(-1, 1)
-                print(new_transform.m31())
-                print(new_transform.m32())
-
-                if hori_translation == 0 and vert_translation == 0:
-                    pass
+                # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
+                # fact you can't change the origin, we have a hard dependency on knowing whether center align
+                # is active, so we know how to counter the movement from the scaling
+                if self.is_centered:
+                    # We need to reverse the movement from center_align in the X (we don't flip in the Y).
+                    # m31 represents the amount of horizontal translation that has been applied so far
+                    new_transform.translate(-new_transform.m31() * 2, 0)
                 else:
-                    new_transform.translate(
-                        hori_translation + new_transform.m31(),
-                        vert_translation - new_transform.m32()
-                    )
+                    new_transform.translate(self.boundingRect().width(), 0)
+
+                new_transform.scale(-1, 1)
+                self.is_flipped = True
+            else:
+                self.is_flipped = False
 
         # Apply the new transform, and any changes made to it
         self.setTransform(new_transform)
+
     def itemChange(self, change, value):
         """
         OVERRIDE: Called when the item has a change made to it. Currently, only selection changes are included
