@@ -345,10 +345,16 @@ class InputEntryFloat(InputEntryBase):
 
     def Get(self) -> float:
         value = self.input_widget.text()
-        if value:
-            return float(value)
-        else:
-            return 0.0
+
+        # Since editing inputs can lead to live updates, the values must always be float castable. Since, as the user
+        # edits, it might lead to an empty string or '-', always use 0 as a baseline instead of checking every scenario
+        conv_val = 0
+        try:
+            conv_val = float(value)
+        except:
+            pass
+
+        return conv_val
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
@@ -392,10 +398,16 @@ class InputEntryInt(InputEntryBase):
 
     def Get(self) -> int:
         value = self.input_widget.text()
-        if value:
-            return int(value)
-        else:
-            return 0
+
+        # Since editing inputs can lead to live updates, the values must always be int castable. Since, as the user
+        # edits, it might lead to an empty string or '-', always use 0 as a baseline instead of checking every scenario
+        conv_val = 0
+        try:
+            conv_val = int(value)
+        except:
+            pass
+
+        return conv_val
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
@@ -503,7 +515,7 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.setStyleSheet(Settings.getInstance().paragraph_color)
 
         # Limit entered values to int only
-        validator = QtGui.QDoubleValidator(0, 1, 8)
+        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.StandardNotation)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
 
@@ -525,12 +537,22 @@ class InputEntryTuple(InputEntryBase):
         text_x = self.input_widget.text()
         text_y = self.input_widget_alt.text()
 
-        if text_x == "":
-            text_x = 0
-        if text_y == "":
-            text_y = 0
+        conv_x = 0
+        conv_y = 0
 
-        return [float(text_x), float(text_y)]
+        # Since editing inputs can lead to live updates, the values must always be float castable. Since, as the user
+        # edits, it might lead to an empty string or '-', always use 0 as a baseline instead of checking every scenario
+        try:
+            conv_x = float(text_x)
+        except:
+            pass
+
+        try:
+            conv_y = float(text_y)
+        except:
+            pass
+
+        return [conv_x, conv_y]
 
     def Set(self, data) -> None:
         # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
