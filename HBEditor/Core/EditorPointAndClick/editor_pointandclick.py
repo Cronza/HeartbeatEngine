@@ -29,10 +29,14 @@ class EditorPointAndClick(EditorBase):
         # Since the Point & Click editor doesn't make use of all actions, but only those that can be rendered
         # (interactables, sprites, text, etc), we need to compile a custom action_data dict with only the options
         # we'll allow
-        possible_actions = {
+        self.possible_actions = {
             "Renderables": ["Create Sprite", "Create Text", "Create Background"],
         }
-        self.action_data = self.BuildActionDataDict(possible_actions)
+
+        # Like the actions themselves, there are some properties that are explicitly not used by this editor
+        self.excluded_properties = ["transition", "post_wait"]
+
+        self.action_data = self.BuildActionDataDict(self.possible_actions)
 
         # Initialize the editor U.I
         self.editor_ui = EditorPointAndClickUI(self)

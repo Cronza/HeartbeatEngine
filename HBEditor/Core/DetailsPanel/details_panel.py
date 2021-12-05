@@ -22,7 +22,7 @@ from HBEditor.Core.Primitives.input_entries import *
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, excluded_properties: list = None):
         super().__init__()
 
         # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
@@ -30,6 +30,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Optional dependencies (Some input widgets might need certain references depending on the owner)
         self.branch_list = None
+
+        # Allow the filtering of what properties can possibly appear
+        self.excluded_properties = excluded_properties
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -114,6 +117,10 @@ class DetailsPanel(QtWidgets.QWidget):
         # Generate each entry (If there are any requirements)
         if "requirements" in self.active_entry.action_data:
             for requirement in self.active_entry.action_data['requirements']:
+
+                if self.excluded_properties:
+                    if requirement["name"] in self.excluded_properties:
+                        continue
 
                 # Create a new entry, and add it to the details list
                 self.AddEntry(self.CreateEntryWidget(requirement))
