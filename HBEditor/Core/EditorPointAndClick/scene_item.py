@@ -60,10 +60,12 @@ class SceneItem(QtWidgets.QGraphicsPixmapItem):
             float(new_pos[1]) * self.scene().height()
         )
         # Update the sprite
-        sprite_path = Settings.getInstance().user_project_dir + "/" + \
-                      self.action_data["requirements"][self.sprite_index]["value"]
+        sprite_rel_path = self.action_data["requirements"][self.sprite_index]["value"]
 
-        if sprite_path != "None":
+        if sprite_rel_path != "None":
+            sprite_path = Settings.getInstance().user_project_dir + "/" + \
+                          self.action_data["requirements"][self.sprite_index]["value"]
+
             if os.path.exists(sprite_path):
                 image = QtGui.QPixmap(sprite_path)
                 self.setPixmap(image)

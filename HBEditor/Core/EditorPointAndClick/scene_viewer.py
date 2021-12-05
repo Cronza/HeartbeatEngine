@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
@@ -122,7 +123,7 @@ class SceneViewer(QtWidgets.QWidget):
             QtGui.QIcon.Off
         )
         self.copy_entry_button.setIcon(icon)
-        #self.copy_entry_button.clicked.connect(self.CopyEntry)
+        self.copy_entry_button.clicked.connect(self.CopyRenderable)
         self.action_toolbar_layout.addWidget(self.copy_entry_button)
 
         # Empty Space Spacer
@@ -150,6 +151,15 @@ class SceneViewer(QtWidgets.QWidget):
                 print("Found Text")
             break
 
+    def CopyRenderable(self):
+        """ Clones the active renderable. If multiple are selected, clone each one """
+        selected_items = self.scene.selectedItems()
+
+        if selected_items:
+            for item in selected_items:
+                self.AddRenderable(copy.deepcopy(item.action_data))
+
+
     def GetSelectedItems(self):
         """ Returns all currently selected QGraphicsItems. If there aren't any, returns None """
 
@@ -171,4 +181,3 @@ class SceneViewer(QtWidgets.QWidget):
 
     def ItemHasMoved(self, new_pos):
         print(new_pos)
-
