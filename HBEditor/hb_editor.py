@@ -250,9 +250,10 @@ class HBEditor:
 
     def Play(self):
         """ Launches the HBEngine, temporarily suspending the HBEditor """
-        # Only allow this is there is an active project
         if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
+        elif not Settings.getInstance().user_project_data["Game"]["starting_scene"]:
+            self.ShowNoStartingScenePrompt()
         else:
             p_manager = PlayManager()
             p_manager.Play(self.e_ui.central_widget, Settings.getInstance().user_project_dir, Settings.getInstance().root)
@@ -262,6 +263,8 @@ class HBEditor:
         # Only allow this is there is an active project
         if not Settings.getInstance().user_project_name:
             self.ShowNoActiveProjectPrompt()
+        elif not Settings.getInstance().user_project_data["Game"]["starting_scene"]:
+            self.ShowNoStartingScenePrompt()
         else:
             HBBuilder.Build(
                 Logger.getInstance(),
@@ -401,6 +404,15 @@ class HBEditor:
             "No Active Project",
             "There is currently no project open.\n"
             "Please either open an existing project, or create a new one."
+        )
+
+    def ShowNoStartingScenePrompt(self):
+        """ Shows a simple dialog informing the user that the active project has no assigned starting scene """
+        QtWidgets.QMessageBox.about(
+            self.e_ui.central_widget,
+            "No Starting Scene",
+            "There is currently no starting scene.\n"
+            "Please open the project settings and choose a starting scene."
         )
 
     def CheckIfFileOpen(self, file_path):
