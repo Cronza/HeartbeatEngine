@@ -29,8 +29,15 @@ class EditorPointAndClick(EditorBase):
         # Since the Point & Click editor doesn't make use of all actions, but only those that can be rendered
         # (interactables, sprites, text, etc), we need to compile a custom action_data dict with only the options
         # we'll allow
+
+        # Additionally, since scene items functionally differ depending on the type of information they present (text
+        # graphics fundamentally differ from sprite graphics), we need a map of what action leads to what item type
         self.possible_actions = {
-            "Renderables": ["Create Sprite", "Create Text", "Create Background"],
+            "Renderables": {
+                "create_sprite": "sprite",
+                "create_text": "text",
+                "create_background": "sprite"
+            }
         }
 
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
@@ -61,7 +68,7 @@ class EditorPointAndClick(EditorBase):
 
             for action_name in action_list:
                 for db_action in Settings.getInstance().action_database[category_name]["options"]:
-                    if action_name == db_action["display_name"]:
+                    if action_name == db_action["action_name"]:
                         category_data["options"].append(copy.deepcopy(db_action))
                         break
 

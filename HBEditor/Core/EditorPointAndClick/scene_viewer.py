@@ -17,7 +17,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
-from HBEditor.Core.EditorPointAndClick.scene_item import SceneItem
+from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem
 
 
 class SceneViewer(QtWidgets.QWidget):
@@ -130,26 +130,39 @@ class SceneViewer(QtWidgets.QWidget):
         spacer = QtWidgets.QSpacerItem(20, 534, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.action_toolbar_layout.addItem(spacer)
 
-    def AddRenderable(self, action_data):
-        # While most renderables have a "sprite" key, text renderables are an exception. Account for both options
-        for req in [
-            value for value in action_data["requirements"] if any([value["name"] == "sprite", value["name"] == "text"])
-        ]:
-            if req["name"] == "sprite":
-                print("Found Sprite")
-                image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
-                sprite = SceneItem(
-                    image,
-                    action_data,
-                    self.ItemHasMoved,
-                    self.core.UpdateActiveSceneItem,
-                    self.core.UpdateDetails
-                )
-                self.scene.addItem(sprite)
-                sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
-            else:
-                print("Found Text")
-            break
+    def AddRenderable(self, action_data) -> bool:
+
+        for actions in self.core.possible_actions.values():
+            if action_data["action_name"] in actions:
+                item_type = actions[action_data["action_name"]]
+                print(item_type)
+                if item_type == "sprite":
+                    print("Found Sprite")
+                    image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
+                    sprite = SpriteItem(
+                        image,
+                        action_data,
+                        self.ItemHasMoved,
+                        self.core.UpdateActiveSceneItem,
+                        self.core.UpdateDetails
+                    )
+                    self.scene.addItem(sprite)
+                    sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
+                    return True
+                elif item_type == "text":
+                    print("Found Text")
+                    sprite = TextItem(
+                        image,
+                        action_data,
+                        self.ItemHasMoved,
+                        self.core.UpdateActiveSceneItem,
+                        self.core.UpdateDetails
+                    )
+                    self.scene.addItem(sprite)
+                    sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
+                    return True
+
+        return False
 
     def CopyRenderable(self):
         """ Clones the active renderable. If multiple are selected, clone each one """

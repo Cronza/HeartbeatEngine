@@ -3,7 +3,13 @@ from PyQt5 import QtWidgets, QtGui
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Logger.logger import Logger
 
-class SceneItem(QtWidgets.QGraphicsPixmapItem):
+
+class SceneItem(QtWidgets.QGraphicsItem):
+    def __init__(self, parent):
+        super().__init__(parent)
+        print("ohoh la la")
+
+class SpriteItem(QtWidgets.QGraphicsPixmapItem):
     def __init__(self, pixmap, action_data, move_func, select_func, data_changed_func):
         super().__init__(pixmap)
 

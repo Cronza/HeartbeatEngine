@@ -128,8 +128,6 @@ class DetailsPanel(QtWidgets.QWidget):
         # Expand all dropdowns automatically
         self.details_table.expandAll()
 
-        #print(self.settings.action_database)
-
     def UpdateCache(self, parent_entry=None, action_data=None):
         """
         Collect all inputs for all detail entries, and cache them in the active entry's action data
