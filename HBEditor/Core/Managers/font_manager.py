@@ -53,7 +53,6 @@ class FontManager:
             # Does the provided style exist?
             available_styles = QtGui.QFontDatabase().styles(name)
             if style:
-                print('no style')
                 if style in available_styles:
                     new_font = QtGui.QFont(name)
                     FontManager.ApplyStyle(style, new_font)
