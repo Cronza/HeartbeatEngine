@@ -137,7 +137,6 @@ class SceneViewer(QtWidgets.QWidget):
                 item_type = actions[action_data["action_name"]]
                 print(item_type)
                 if item_type == "sprite":
-                    print("Found Sprite")
                     image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
                     sprite = SpriteItem(
                         image,
@@ -149,17 +148,17 @@ class SceneViewer(QtWidgets.QWidget):
                     self.scene.addItem(sprite)
                     sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
                     return True
+
                 elif item_type == "text":
-                    print("Found Text")
-                    sprite = TextItem(
+                    text = TextItem(
                         "Default",
                         action_data,
                         self.ItemHasMoved,
                         self.core.UpdateActiveSceneItem,
                         self.core.UpdateDetails
                     )
-                    self.scene.addItem(sprite)
-                    sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
+                    self.scene.addItem(text)
+                    text.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
                     return True
 
         return False

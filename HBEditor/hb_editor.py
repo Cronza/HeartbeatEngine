@@ -21,7 +21,7 @@ from PyQt5 import QtWidgets
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.play_manager import PlayManager
+from HBEditor.Core.Managers.play_manager import PlayManager
 from HBEditor import hb_editor_ui as hbe
 from HBEditor.Core.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt

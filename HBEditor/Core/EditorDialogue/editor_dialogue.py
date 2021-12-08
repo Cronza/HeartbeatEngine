@@ -17,7 +17,7 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.EditorDialogue.editor_dialogue_ui import EditorDialogueUI
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.database_manager import DBManager
+from HBEditor.Core.Managers.database_manager import DBManager
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
