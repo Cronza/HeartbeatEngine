@@ -127,9 +127,9 @@ class InputEntryBool(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
         elif state == 2:
-            self.input_widget.setEnabled(False)
+            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 
 
 class InputEntryColor(InputEntryBase):
@@ -245,6 +245,7 @@ class InputEntryDropdown(InputEntryBase):
             self.input_widget.setEnabled(False)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
+
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
         super().__init__(refresh_func)
@@ -294,9 +295,11 @@ class InputEntryFileSelector(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.file_select_button.setEnabled(True)
+            self.input_widget.setReadOnly(False)
             self.input_widget.setStyleSheet("")
         elif state == 2:
             self.file_select_button.setEnabled(False)
+            self.input_widget.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
     def OpenFilePrompt(self) -> str:
@@ -362,11 +365,12 @@ class InputEntryFloat(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setReadOnly(False)
             self.input_widget.setStyleSheet("")
         elif state == 2:
-            self.input_widget.setEnabled(False)
+            self.input_widget.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
 
 class InputEntryInt(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -414,11 +418,12 @@ class InputEntryInt(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setReadOnly(False)
             self.input_widget.setStyleSheet("")
         elif state == 2:
-            self.input_widget.setEnabled(False)
+            self.input_widget.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -450,11 +455,13 @@ class InputEntryParagraph(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setReadOnly(False)
             self.input_widget.setStyleSheet("")
+
         elif state == 2:
-            self.input_widget.setEnabled(False)
+            self.input_widget.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
 
 class InputEntryText(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -483,11 +490,12 @@ class InputEntryText(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setReadOnly(False)
             self.input_widget.setStyleSheet("")
         elif state == 2:
-            self.input_widget.setEnabled(False)
+            self.input_widget.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
 
 class InputEntryTuple(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -563,15 +571,16 @@ class InputEntryTuple(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setEnabled(True)
+            self.input_widget.setReadOnly(False)
+            self.input_widget_alt.setReadOnly(False)
             self.input_widget.setStyleSheet("")
-            self.input_widget_alt.setEnabled(True)
             self.input_widget_alt.setStyleSheet("")
         elif state == 2:
-            self.input_widget.setEnabled(False)
-            self.input_widget_alt.setEnabled(False)
+            self.input_widget.setReadOnly(True)
+            self.input_widget_alt.setReadOnly(True)
             self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
             self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
+
 
 class InputEntryChoice(InputEntryBase):
     """
