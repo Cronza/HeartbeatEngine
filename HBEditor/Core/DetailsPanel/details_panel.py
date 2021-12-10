@@ -69,31 +69,31 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_toolbar_layout.addItem(spacer)
 
         # Create Details List
-        self.details_table = QtWidgets.QTreeWidget(self)
-        self.details_table.setColumnCount(3)
-        self.details_table.setHeaderLabels(['Name', 'Input', 'G'])
-        self.details_table.setAutoScroll(False)
-        self.details_table.header().setFont(Settings.getInstance().button_font)
-        self.details_table.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_table.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.details_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.details_table.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
-        self.details_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.details_tree = QtWidgets.QTreeWidget(self)
+        self.details_tree.setColumnCount(3)
+        self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
+        self.details_tree.setAutoScroll(False)
+        self.details_tree.header().setFont(Settings.getInstance().button_font)
+        self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
+        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
-        self.details_table.header().setMinimumSectionSize(round(self.details_table.header().width() / 4))
+        self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
         # 2. Force the last column to be barely larger than a standard checkbox
-        self.details_table.setColumnWidth(2, round(self.details_table.header().width() / 5))
+        self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
 
         # 3. Align the column header text to match the alignment of the checkbox
-        self.details_table.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
+        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
         self.details_layout.addWidget(self.details_toolbar)
-        self.details_layout.addWidget(self.details_table)
+        self.details_layout.addWidget(self.details_tree)
 
     def PopulateDetails(self, selected_entry):
         """
@@ -126,7 +126,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 self.AddEntry(self.CreateEntryWidget(requirement))
 
         # Expand all dropdowns automatically
-        self.details_table.expandAll()
+        self.details_tree.expandAll()
 
     def UpdateCache(self, parent_entry=None, action_data=None):
         """
@@ -144,7 +144,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 details_entry_parent = parent_entry
                 action_data_target = action_data
             else:
-                details_entry_parent = self.details_table.invisibleRootItem()
+                details_entry_parent = self.details_tree.invisibleRootItem()
                 if "requirements" in self.active_entry.action_data:
                     action_data_target = self.active_entry.action_data["requirements"]
 
@@ -203,7 +203,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
             # Make the option read-only if applicable
             if not data["editable"]:
-                details_widget.MakeUneditable()
+                details_widget.SetEditable(2)
 
         return details_widget
 
@@ -215,12 +215,12 @@ class DetailsPanel(QtWidgets.QWidget):
         if parent:
             parent.addChild(entry)
         else:
-            self.details_table.addTopLevelItem(entry)
+            self.details_tree.addTopLevelItem(entry)
 
-        self.details_table.setItemWidget(entry, 0, entry.name_widget)
-        self.details_table.setItemWidget(entry, 1, entry.input_container)
+        self.details_tree.setItemWidget(entry, 0, entry.name_widget)
+        self.details_tree.setItemWidget(entry, 1, entry.input_container)
         if entry.show_global_toggle:
-            self.details_table.setItemWidget(entry, 2, entry.global_toggle)
+            self.details_tree.setItemWidget(entry, 2, entry.global_toggle)
 
         # If the entry has any children, add them all via recursion
         if entry.childCount() > 0:
@@ -270,7 +270,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
     def Clear(self):
         """ Deletes all data in the details table """
-        self.details_table.clear()
+        self.details_tree.clear()
 
     def DetailEntryUpdated(self, details_entry):
         """

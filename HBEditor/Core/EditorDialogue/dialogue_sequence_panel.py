@@ -205,7 +205,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             selection = self.GetSelectedRow()
 
             # Only allow moving up if we're not already at the top of the sequence
-            if selection == 0:
+            if not selection:
+                Logger.getInstance().Log("No entry selected", 3)
+            elif selection == 0:
                 Logger.getInstance().Log("Can't move entry up as we're at the top of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
@@ -229,7 +231,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             selection = self.GetSelectedRow()
 
             # Only allow moving down if we're not already at the bottom of the sequence
-            if selection + 1 >= self.dialogue_table.rowCount():
+            if not selection:
+                Logger.getInstance().Log("No entry selected", 3)
+            elif selection + 1 >= self.dialogue_table.rowCount():
                 Logger.getInstance().Log("Can't move entry down as we're at the bottom of the sequence", 3)
             else:
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead

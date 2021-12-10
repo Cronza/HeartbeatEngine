@@ -455,8 +455,8 @@ class HBEditor:
         """ Write to the provided temp file, creating it if it doesn't already exist """
         if not os.path.exists(temp_file):
             try:
-                if not os.path.exists(Settings.editor_temp_root):
-                    os.mkdir(Settings.editor_temp_root)
+                if not os.path.exists(Settings.getInstance().editor_temp_root):
+                    os.mkdir(Settings.getInstance().editor_temp_root)
                 with open(temp_file, "w"):
                     pass
             except Exception as exc:

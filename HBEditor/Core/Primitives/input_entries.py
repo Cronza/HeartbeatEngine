@@ -74,12 +74,11 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         """ Returns the current value of the global checkbox """
         return self.global_toggle.Get()
 
-    def MakeUneditable(self):
-        """ Makes any relevant input widgets unable to be used """
-        pass
-
-    def MakeEditable(self):
-        """ Makes any relevant input widgets able to be used """
+    def SetEditable(self, state: int):
+        """
+        Enables or disables editability of relevant input widgets based on the provided state
+        0 = Enabled, 2 = Disabled
+        """
         pass
 
     def InputValueUpdated(self):
@@ -96,12 +95,10 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         When the global checkbox is toggled on, call a provided function, passing a reference to this class
         This function is not meant to be overridden
         """
-
         if self.global_toggle.Get():
-            self.MakeUneditable()
+            self.SetEditable(2)
         else:
-            self.MakeEditable()
-
+            self.SetEditable(0)
 
 class InputEntryBool(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -128,25 +125,23 @@ class InputEntryBool(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.stateChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+        elif state == 2:
+            self.input_widget.setEnabled(False)
 
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, refresh_func=None):
         super().__init__(refresh_func)
         # NOTE FOR THE LOGIC IN THIS FILE
-        # So for some unholy reason, Qt doesn't really have a great way of changing widget colors. While stylesheets
-        # are nice, retrieving data from a stylesheet is a lesson in pain (You get ALL of the data, not just a part
-        # you actually want
+        # Qt doesn't really have a great way of changing widget colors. While stylesheets are nice, retrieving data
+        # from a stylesheet is a lesson in pain (You get ALL of the data, not just a part you actually want
 
         # Additionally, to my knowledge, changing stylesheets don't cause a signal change unless you hook onto the
         # underlying events. I try to avoid this complexity, so the way this file handles detecting changes is different
         # than other detail types
-
         self.input_widget = QtWidgets.QFrame()
         self.input_widget.setFrameStyle(QtWidgets.QFrame.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
@@ -178,11 +173,11 @@ class InputEntryColor(InputEntryBase):
         # Change the data without causing any signal calls
         self.input_widget.setStyleSheet(f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})")
 
-    def MakeUneditable(self):
-        self.color_select_button.setEnabled(False)
-
-    def MakeEditable(self):
-        self.color_select_button.setEnabled(True)
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.color_select_button.setEnabled(True)
+        elif state == 2:
+            self.color_select_button.setEnabled(False)
 
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog.getColor()
@@ -242,14 +237,13 @@ class InputEntryDropdown(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
-        self.input_widget.setStyleSheet("")
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
@@ -297,13 +291,13 @@ class InputEntryFileSelector(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.file_select_button.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.file_select_button.setEnabled(True)
-        self.input_widget.setStyleSheet("")
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.file_select_button.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.file_select_button.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
@@ -366,14 +360,13 @@ class InputEntryFloat(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
-        self.input_widget.setStyleSheet("")
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryInt(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -419,14 +412,13 @@ class InputEntryInt(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
-        self.input_widget.setStyleSheet("")
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -456,14 +448,13 @@ class InputEntryParagraph(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
-        self.input_widget.setStyleSheet("")
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryText(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -490,10 +481,13 @@ class InputEntryText(InputEntryBase):
         # Now that the input is changed, reconnect
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryTuple(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -567,18 +561,17 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget.textChanged.connect(self.InputValueUpdated)
         self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
-    def MakeUneditable(self):
-        self.input_widget.setEnabled(False)
-        self.input_widget_alt.setEnabled(False)
-        self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-        self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
-
-    def MakeEditable(self):
-        self.input_widget.setEnabled(True)
-        self.input_widget.setStyleSheet("")
-        self.input_widget_alt.setEnabled(True)
-        self.input_widget_alt.setStyleSheet("")
-
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+            self.input_widget.setStyleSheet("")
+            self.input_widget_alt.setEnabled(True)
+            self.input_widget_alt.setStyleSheet("")
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+            self.input_widget_alt.setEnabled(False)
+            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+            self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 class InputEntryChoice(InputEntryBase):
     """
