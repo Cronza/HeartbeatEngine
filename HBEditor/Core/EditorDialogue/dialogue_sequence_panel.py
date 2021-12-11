@@ -40,18 +40,10 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Create the View title
         self.title = QtWidgets.QLabel(self)
-        self.title.setFont(Settings.getInstance().header_1_font)
-        self.title.setStyleSheet(Settings.getInstance().header_1_color)
         self.title.setText("Dialogue Sequence")
 
         # Create the toolbar
         self.main_toolbar = QtWidgets.QFrame()
-        self.main_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            "    background-color: rgb(44,53,57);\n"
-            "}"
-        )
         self.main_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.main_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.main_toolbar_layout = QtWidgets.QHBoxLayout(self.main_toolbar)
@@ -60,13 +52,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Generic button settings
         icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
-        self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
@@ -79,7 +67,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Remove Entry Button
         self.remove_entry_button = QtWidgets.QToolButton(self.main_toolbar)
-        self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
@@ -91,7 +78,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Copy Entry Button
         self.copy_entry_button = QtWidgets.QToolButton(self.main_toolbar)
-        self.copy_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
             QtGui.QIcon.Normal,
@@ -103,7 +89,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Move Entry Up Button
         self.move_entry_up_button = QtWidgets.QToolButton(self.main_toolbar)
-        self.move_entry_up_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
             QtGui.QIcon.Normal,
@@ -115,7 +100,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Move Entry Down Button
         self.move_entry_down_button = QtWidgets.QToolButton(self.main_toolbar)
-        self.move_entry_down_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
             QtGui.QIcon.Normal,
@@ -134,8 +118,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.dialogue_table.setColumnCount(1)
         self.dialogue_table.horizontalHeader().hide()
         self.dialogue_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.dialogue_table.verticalHeader().setStyleSheet(Settings.getInstance().selection_color)
-        self.dialogue_table.setStyleSheet(Settings.getInstance().selection_color)
         self.dialogue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
         self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
@@ -292,14 +274,10 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # Name
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(Settings.getInstance().header_2_font)
-        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
         self.name_widget.setText(self.action_data["display_name"])
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
-        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
-        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
 
         # Refresh the subtext
         self.UpdateSubtext()

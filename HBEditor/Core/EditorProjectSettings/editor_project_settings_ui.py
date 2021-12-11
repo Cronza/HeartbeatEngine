@@ -43,8 +43,6 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.categories.setLayout(self.category_layout)
 
         self.category_title = QtWidgets.QLabel(self)
-        self.category_title.setFont(Settings.getInstance().header_2_font)
-        self.category_title.setStyleSheet(Settings.getInstance().header_2_color)
         self.category_title.setText("Categories")
         self.category_list = QtWidgets.QListWidget()
         self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
@@ -58,14 +56,11 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.settings_layout.setSpacing(0)
         self.settings.setLayout(self.settings_layout)
         self.settings_title = QtWidgets.QLabel(self)
-        self.settings_title.setFont(Settings.getInstance().header_2_font)
-        self.settings_title.setStyleSheet(Settings.getInstance().header_2_color)
         self.settings_title.setText("Settings")
         self.settings_table = QtWidgets.QTreeWidget(self)
         self.settings_table.setColumnCount(2)
         self.settings_table.setHeaderLabels(['Name', 'Input'])
         self.settings_table.setAutoScroll(False)
-        self.settings_table.header().setFont(Settings.getInstance().button_font)
         self.settings_table.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.settings_table.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.settings_table.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)

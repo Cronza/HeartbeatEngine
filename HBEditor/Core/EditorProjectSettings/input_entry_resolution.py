@@ -36,8 +36,6 @@ class InputEntryResolution(InputEntryBase):
         self.project_settings = project_settings
 
         self.input_widget = QtWidgets.QComboBox()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.options = resolution_options
 
         for option in self.options:

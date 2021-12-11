@@ -40,21 +40,13 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Create title
         self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setFont(Settings.getInstance().header_1_font)
-        self.details_title.setStyleSheet(Settings.getInstance().header_1_color)
         self.details_title.setText("Details")
 
         # Create the toolbar
         self.details_toolbar = QtWidgets.QFrame(self)
         self.details_toolbar.setAutoFillBackground(False)
-        self.details_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
-            "}"
-        )
-        self.details_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.details_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
+        #self.details_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        #self.details_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.details_toolbar_layout = QtWidgets.QHBoxLayout(self.details_toolbar)
         self.details_toolbar_layout.setContentsMargins(2, 2, 2, 2)
         self.details_toolbar_layout.setSpacing(0)

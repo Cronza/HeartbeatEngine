@@ -29,21 +29,16 @@ class ActionMenu(QtWidgets.QMenu):
 
         # Set the root styling for sub menus
         self.setFont(Settings.getInstance().button_font)
-        self.setStyleSheet(Settings.getInstance().button_color)
 
         for category, data in available_actions.items():
             # Build the category object and assign it
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
             cat_menu.setIcon(QtGui.QIcon(Settings.getInstance().editor_root + "/" + data["icon"]))
-            cat_menu.setFont(Settings.getInstance().button_font)
-            cat_menu.setStyleSheet(Settings.getInstance().button_color)
             self.addMenu(cat_menu)
 
             # Generate a list of options for this category
             for action in data['options']:
                 option = ActionMenuOption(self, action, button_func)
-                option.setFont(Settings.getInstance().button_font)
-                #option.setStyleSheet(Settings.getInstance().button_color) @TODO: Find out why this doesn't work
                 option.setText(action['display_name'])
                 cat_menu.addAction(option)

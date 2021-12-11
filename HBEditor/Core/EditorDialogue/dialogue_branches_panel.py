@@ -32,19 +32,11 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Create title
         self.branches_title = QtWidgets.QLabel(self)
-        self.branches_title.setFont(Settings.getInstance().header_1_font)
-        self.branches_title.setStyleSheet(Settings.getInstance().header_1_color)
         self.branches_title.setText("Branches")
 
         # Create the toolbar
         self.branches_toolbar = QtWidgets.QFrame(self)
         self.branches_toolbar.setAutoFillBackground(False)
-        self.branches_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
-            "}"
-        )
         self.branches_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.branches_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.branches_toolbar_layout = QtWidgets.QHBoxLayout(self.branches_toolbar)
@@ -53,13 +45,9 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Generic button settings
         icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
 
         # Add Branch Button
         self.add_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
-        self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
@@ -72,7 +60,6 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Remove Branch Button
         self.remove_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
-        self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
@@ -244,8 +231,6 @@ class BranchesEntry(QtWidgets.QWidget):
         #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(Settings.getInstance().header_2_font)
-        self.name_widget.setStyleSheet(Settings.getInstance().header_2_color)
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
         self.name_widget.setSizePolicy(size_policy)
@@ -253,8 +238,6 @@ class BranchesEntry(QtWidgets.QWidget):
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
-        self.subtext_widget.setFont(Settings.getInstance().subtext_font)
-        self.subtext_widget.setStyleSheet(Settings.getInstance().subtext_color)
         self.subtext_widget.setText('Test Description')
         self.subtext_widget.setAlignment(QtCore.Qt.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)

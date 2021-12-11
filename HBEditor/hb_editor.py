@@ -35,6 +35,11 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
+
+        editor_style = Settings.getInstance().ConvertPartialToAbsolutePath("Content/Styles/Test_Dark/Dark.css")
+        print(editor_style)
+        with open(editor_style, "r") as es:
+            self.app.setStyleSheet(es.read())
         self.main_window = QtWidgets.QMainWindow()
         self.e_ui = hbe.HBEditorUI(self)
         self.e_ui.setupUi(self.main_window)

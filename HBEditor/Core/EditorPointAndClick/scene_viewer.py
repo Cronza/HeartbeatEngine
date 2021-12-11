@@ -38,8 +38,6 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Create the View title
         self.title = QtWidgets.QLabel(self)
-        self.title.setFont(Settings.getInstance().header_1_font)
-        self.title.setStyleSheet(Settings.getInstance().header_1_color)
         self.title.setText("Scene Viewer")
 
         # Create a sub layout so the action bar and core view can sit side-by-side
@@ -71,12 +69,6 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Create the frame container
         self.action_toolbar = QtWidgets.QFrame()
-        self.action_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            "    background-color: rgb(44,53,57);\n"
-            "}"
-        )
         self.action_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.action_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.action_toolbar_layout = QtWidgets.QVBoxLayout(self.action_toolbar)
@@ -85,13 +77,9 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Generic button settings
         icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
@@ -104,7 +92,6 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Remove Entry Button
         self.remove_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.remove_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
             QtGui.QIcon.Normal,
@@ -116,7 +103,6 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Copy Entry Button
         self.copy_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.copy_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
             QtGui.QIcon.Normal,

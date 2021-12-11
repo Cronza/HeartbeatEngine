@@ -50,8 +50,6 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         # 'name_widget' and 'input_widget' are declared, but not initialized as it is up to the subclass to
         # do that
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(Settings.getInstance().paragraph_font)
-        self.name_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.input_widget = None
         self.input_container = QtWidgets.QWidget()
@@ -210,8 +208,6 @@ class InputEntryDropdown(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QComboBox()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.options = options
 
@@ -240,11 +236,8 @@ class InputEntryDropdown(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setEnabled(True)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setEnabled(False)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-
 
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
@@ -256,8 +249,6 @@ class InputEntryFileSelector(InputEntryBase):
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
         self.input_widget.setEnabled(True)
@@ -296,11 +287,9 @@ class InputEntryFileSelector(InputEntryBase):
         if state == 0:
             self.file_select_button.setEnabled(True)
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.file_select_button.setEnabled(False)
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
@@ -326,8 +315,6 @@ class InputEntryFloat(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to float only
@@ -366,10 +353,8 @@ class InputEntryFloat(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryInt(InputEntryBase):
@@ -377,8 +362,6 @@ class InputEntryInt(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         # Limit entered values to int only
         self.validator = QtGui.QIntValidator()
@@ -419,10 +402,8 @@ class InputEntryInt(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryParagraph(InputEntryBase):
@@ -432,8 +413,6 @@ class InputEntryParagraph(InputEntryBase):
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
 
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
@@ -456,11 +435,9 @@ class InputEntryParagraph(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
 
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryText(InputEntryBase):
@@ -468,8 +445,6 @@ class InputEntryText(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
@@ -491,10 +466,8 @@ class InputEntryText(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryTuple(InputEntryBase):
@@ -503,18 +476,10 @@ class InputEntryTuple(InputEntryBase):
 
         #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
-        self.input_widget_title.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.input_widget_alt_title = QtWidgets.QLabel('Y')
-        self.input_widget_alt_title.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_alt_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget_alt = QtWidgets.QLineEdit()
-        self.input_widget_alt.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_alt.setStyleSheet(Settings.getInstance().paragraph_color)
 
         # Limit entered values to int only
         validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.StandardNotation)
@@ -573,13 +538,9 @@ class InputEntryTuple(InputEntryBase):
         if state == 0:
             self.input_widget.setReadOnly(False)
             self.input_widget_alt.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
-            self.input_widget_alt.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
             self.input_widget_alt.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-            self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryChoice(InputEntryBase):
@@ -627,7 +588,6 @@ class InputEntryChoice(InputEntryBase):
             QtGui.QIcon.Off
         )
         self.add_choice_button.setIcon(icon)
-        self.add_choice_button.setStyleSheet(self.button_styles)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.add_choice_button)
@@ -672,7 +632,6 @@ class InputEntryChoice(InputEntryBase):
             QtGui.QIcon.Off
         )
         delete_choice_button.setIcon(icon)
-        delete_choice_button.setStyleSheet(self.button_styles)
         new_choice_container.input_widget = delete_choice_button
         new_choice_container.input_widget.clicked.connect(lambda delete: self.DeleteChoice(new_choice_container))
         new_choice_container.main_layout.addWidget(new_choice_container.input_widget)

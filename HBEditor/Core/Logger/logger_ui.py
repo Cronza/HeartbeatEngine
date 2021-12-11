@@ -34,11 +34,6 @@ class LoggerUI(QtWidgets.QWidget):
         # Toolbar
         self.logger_toolbar = QtWidgets.QFrame(self)
         self.logger_toolbar.setAutoFillBackground(False)
-        self.logger_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
-            "}")
         self.logger_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.logger_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
         self.logger_toolbar_layout = QtWidgets.QHBoxLayout(self.logger_toolbar)
@@ -53,7 +48,6 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Clear Log Button
         self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
-        self.clear_log_button.setStyleSheet(button_style)
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
             QtGui.QIcon.Normal,
@@ -69,8 +63,6 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
-        self.log_list.setFont(Settings.getInstance().paragraph_font)
-        self.log_list.setStyleSheet(Settings.getInstance().paragraph_color)
         self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
