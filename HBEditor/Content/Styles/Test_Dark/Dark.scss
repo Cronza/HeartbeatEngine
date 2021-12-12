@@ -13,8 +13,17 @@
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$col_primary: #2E2E2E;
-$col_secondary: #323232;
+$col_primary: #2A2A2B;
+$col_secondary: #3F4245;
+$col_tertiary: #484B4F;
+$col_selection: #213D54;
+$col_highlight: #264661;
+$col_highlight_edge: #1C5A8C;
+$col_text_color: rgba(255, 255, 255, 0.87);
+
+$standard_border_size: 1px;
+$icon_size: 18px;
+
 QMainWindow{
     background-color: $col_primary;
 }
@@ -23,8 +32,64 @@ QWidget{
     background-color: $col_primary;
 }
 
-QFrame{
+QToolBar{
+    icon-size: $icon_size; /* maximum icon size */
     background-color: $col_secondary;
+    margin-top: 0;
+
+    QToolButton{
+        background-color: $col_secondary;
+        padding: 1px;
+
+        &:hover {
+            background-color: $col_highlight;
+            border-color: $col_highlight_edge;
+            border-width: $standard_border_size;
+            border-style: solid;
+        }
+
+        &:pressed {
+            background-color: $col_selection;
+        }
+    }
+}
+
+
+
+QTabWidget{
+    &:pane{ /* The tab widget frame */
+        border-color: $col_secondary;
+        border-top: $standard_border_size solid $col_tertiary;
+        padding: 0px;
+    }
+}
+
+QTabBar{
+    &:tab{
+        border: $standard_border_size solid;
+        border-bottom-color: $col_secondary;
+        background-color: $col_secondary;
+        color: $col_text_color;
+        min-width: 50px;
+        min-height: 20px;
+    }
+}
+
+QAbstractItemView {
+    border: $standard_border_size solid $col_secondary;
+    &:item{
+        color: $col_text_color;
+        selection-color: $col_selection;
+    }
+}
+
+QHeaderView{
+    &:section{
+        background-color: $col_secondary
+    }
+}
+QTreeView{
+    alternate-background-color: yellow;
 }
 
 QMenuBar{
@@ -32,9 +97,9 @@ QMenuBar{
 }
 
 QMenuBar::item{
-    color: rgba(255, 255, 255, 0.87);
+    color: $col_text_color;
 }
 
 QLabel{
-    color: rgba(255, 255, 255, 0.87);
+    color: $col_text_color;
 }

@@ -43,18 +43,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.title.setText("Dialogue Sequence")
 
         # Create the toolbar
-        self.main_toolbar = QtWidgets.QFrame()
-        self.main_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.main_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.main_toolbar_layout = QtWidgets.QHBoxLayout(self.main_toolbar)
-        self.main_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.main_toolbar_layout.setSpacing(0)
-
-        # Generic button settings
-        icon = QtGui.QIcon()
+        self.main_toolbar = QtWidgets.QToolBar()
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
+        icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
             QtGui.QIcon.Normal,
@@ -63,55 +56,51 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setMenu(self.action_menu)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.main_toolbar_layout.addWidget(self.add_entry_button)
+        self.main_toolbar.addWidget(self.add_entry_button)
 
         # Remove Entry Button
-        self.remove_entry_button = QtWidgets.QToolButton(self.main_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.main_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png"),
+                )
+            ),
+            "Remove Entry",
+            self.RemoveEntry
         )
-        self.remove_entry_button.setIcon(icon)
-        self.remove_entry_button.clicked.connect(self.RemoveEntry)
-        self.main_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Copy Entry Button
-        self.copy_entry_button = QtWidgets.QToolButton(self.main_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.main_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png"),
+                )
+            ),
+            "Copy Entry",
+            self.CopyEntry
         )
-        self.copy_entry_button.setIcon(icon)
-        self.copy_entry_button.clicked.connect(self.CopyEntry)
-        self.main_toolbar_layout.addWidget(self.copy_entry_button)
 
         # Move Entry Up Button
-        self.move_entry_up_button = QtWidgets.QToolButton(self.main_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Up.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.main_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Up.png"),
+                )
+            ),
+            "Move Entry Up",
+            self.MoveEntryUp
         )
-        self.move_entry_up_button.setIcon(icon)
-        self.move_entry_up_button.clicked.connect(self.MoveEntryUp)
-        self.main_toolbar_layout.addWidget(self.move_entry_up_button)
 
         # Move Entry Down Button
-        self.move_entry_down_button = QtWidgets.QToolButton(self.main_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Down.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.main_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Down.png"),
+                )
+            ),
+            "Move Entry Up",
+            self.MoveEntryDown
         )
-        self.move_entry_down_button.setIcon(icon)
-        self.move_entry_down_button.clicked.connect(self.MoveEntryDown)
-        self.main_toolbar_layout.addWidget(self.move_entry_down_button)
-
-        # Empty Space Spacer
-        spacer = QtWidgets.QSpacerItem(534, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.main_toolbar_layout.addItem(spacer)
 
         # Build the Action Sequence
         self.dialogue_table = QtWidgets.QTableWidget(self)

@@ -28,38 +28,25 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 2, 4, 2)
+        self.main_layout.setContentsMargins(2, 2, 2, 2)
         self.main_layout.setSpacing(0)
 
         # Toolbar
-        self.logger_toolbar = QtWidgets.QFrame(self)
-        self.logger_toolbar.setAutoFillBackground(False)
-        self.logger_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.logger_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.logger_toolbar_layout = QtWidgets.QHBoxLayout(self.logger_toolbar)
-        self.logger_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.logger_toolbar_layout.setSpacing(0)
+        self.logger_toolbar = QtWidgets.QToolBar(self)
 
         # Generic Button Settings
         icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
 
         # Clear Log Button
-        self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.logger_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png"),
+                )
+            ),
+            "Clear Log",
+            self.l_core.ClearLog
         )
-        self.clear_log_button.setIcon(icon)
-        self.clear_log_button.clicked.connect(self.l_core.ClearLog)
-
-        # Add buttons to toolbar
-        self.logger_toolbar_layout.addWidget(self.clear_log_button)
-        toolbar_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.logger_toolbar_layout.addItem(toolbar_spacer)
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)

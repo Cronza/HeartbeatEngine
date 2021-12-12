@@ -13,16 +13,55 @@
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
 QMainWindow {
-  background-color: #2E2E2E; }
+  background-color: #2A2A2B; }
 
 QWidget {
-  background-color: #2E2E2E; }
+  background-color: #2A2A2B; }
 
-QFrame {
-  background-color: #323232; }
+QToolBar {
+  icon-size: 18px;
+  /* maximum icon size */
+  background-color: #3F4245;
+  margin-top: 0; }
+  QToolBar QToolButton {
+    background-color: #3F4245;
+    padding: 1px; }
+    QToolBar QToolButton:hover {
+      background-color: #264661;
+      border-color: #1C5A8C;
+      border-width: 1px;
+      border-style: solid; }
+    QToolBar QToolButton:pressed {
+      background-color: #213D54; }
+
+QTabWidget:pane {
+  /* The tab widget frame */
+  border-color: #3F4245;
+  border-top: 1px solid #484B4F;
+  padding: 0px; }
+
+QTabBar:tab {
+  border: 1px solid;
+  border-bottom-color: #3F4245;
+  background-color: #3F4245;
+  color: rgba(255, 255, 255, 87%);
+  min-width: 50px;
+  min-height: 20px; }
+
+QAbstractItemView {
+  border: 1px solid #3F4245; }
+  QAbstractItemView:item {
+    color: rgba(255, 255, 255, 87%);
+    selection-color: #213D54; }
+
+QHeaderView:section {
+  background-color: #3F4245; }
+
+QTreeView {
+  alternate-background-color: yellow; }
 
 QMenuBar {
-  background-color: #323232; }
+  background-color: #3F4245; }
 
 QMenuBar::item {
   color: rgba(255, 255, 255, 87%); }

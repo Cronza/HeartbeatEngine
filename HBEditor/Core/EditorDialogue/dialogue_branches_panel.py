@@ -35,48 +35,34 @@ class BranchesPanel(QtWidgets.QWidget):
         self.branches_title.setText("Branches")
 
         # Create the toolbar
-        self.branches_toolbar = QtWidgets.QFrame(self)
-        self.branches_toolbar.setAutoFillBackground(False)
-        self.branches_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.branches_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.branches_toolbar_layout = QtWidgets.QHBoxLayout(self.branches_toolbar)
-        self.branches_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.branches_toolbar_layout.setSpacing(0)
-
-        # Generic button settings
-        icon = QtGui.QIcon()
+        self.branches_toolbar = QtWidgets.QToolBar(self)
 
         # Add Branch Button
-        self.add_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.branches_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png"),
+                )
+            ),
+            "Add Branch",
+            self.AddBranch
         )
-        self.add_entry_button.setIcon(icon)
-        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.add_entry_button.clicked.connect(self.AddBranch)
-        self.branches_toolbar_layout.addWidget(self.add_entry_button)
 
         # Remove Branch Button
-        self.remove_entry_button = QtWidgets.QToolButton(self.branches_toolbar)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.branches_toolbar.addAction(
+            QtGui.QIcon(
+                QtGui.QPixmap(
+                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png"),
+                )
+            ),
+            "Remove Branch",
+            self.RemoveBranch
         )
-        self.remove_entry_button.setIcon(icon)
-        self.remove_entry_button.clicked.connect(self.RemoveBranch)
-        self.branches_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Create search filter
         #self.branches_filter = QtWidgets.QLineEdit(self.branches_toolbar)
         #self.branches_filter.setPlaceholderText("filter...")
         #self.branches_toolbar_layout.addWidget(self.branches_filter)
-
-        # Create Empty Space Spacer
-        spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.branches_toolbar_layout.addItem(spacer)
 
         # Create Details List
         self.branches_list = QtWidgets.QListWidget(self)

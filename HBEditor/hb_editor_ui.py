@@ -188,7 +188,6 @@ class HBEditorUI:
     def CreateBottomTabContainer(self):
         """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
         self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
-        self.bottom_tab_editor.setFont(Settings.getInstance().button_font)
         self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
 
     def CreateGettingStartedDisplay(self):

@@ -38,8 +38,7 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
     def __init__(self, refresh_func=None):
         super().__init__()
 
-        # When the input widget is updated, in case another U.I element needs to refresh, allow us to execute an
-        # ambiguous function
+        # When the input widget is updated, in case another U.I element needs to refresh, use a callback
         self.refresh_func = refresh_func
 
         # Details entries have three main widgets: 'name_widget', 'input_widget' and 'global_toggle'.
