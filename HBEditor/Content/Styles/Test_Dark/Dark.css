@@ -12,11 +12,11 @@
  *   You should have received a copy of the GNU General Public License
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
-QMainWindow {
-  background-color: #2A2A2B; }
-
+/*  Colors */
+/* Text */
+/* Misc */
 QWidget {
-  background-color: #2A2A2B; }
+  background-color: #3F4245; }
 
 QToolBar {
   icon-size: 18px;
@@ -27,8 +27,7 @@ QToolBar {
     background-color: #3F4245;
     padding: 1px; }
     QToolBar QToolButton:hover {
-      background-color: #264661;
-      border-color: #1C5A8C;
+      background-color: #2D5373;
       border-width: 1px;
       border-style: solid; }
     QToolBar QToolButton:pressed {
@@ -36,35 +35,109 @@ QToolBar {
 
 QTabWidget:pane {
   /* The tab widget frame */
-  border-color: #3F4245;
-  border-top: 1px solid #484B4F;
+  border-color: #2A2A2B;
+  border-top: 1px solid #2A2A2B;
   padding: 0px; }
 
 QTabBar:tab {
-  border: 1px solid;
-  border-bottom-color: #3F4245;
+  border: 1px solid #2A2A2B;
+  border-bottom: #3F4245;
   background-color: #3F4245;
-  color: rgba(255, 255, 255, 87%);
+  color: rgba(255, 255, 255, 80%);
   min-width: 50px;
   min-height: 20px; }
+  QTabBar:tab:hover {
+    background-color: #4F5357; }
+  QTabBar:tab:selected {
+    background-color: #54585C; }
 
 QAbstractItemView {
-  border: 1px solid #3F4245; }
+  background-color: #2A2A2B;
+  border: 1px solid #2A2A2B; }
   QAbstractItemView:item {
-    color: rgba(255, 255, 255, 87%);
-    selection-color: #213D54; }
+    color: rgba(255, 255, 255, 80%);
+    selection-color: #54585C; }
 
 QHeaderView:section {
   background-color: #3F4245; }
 
 QTreeView {
-  alternate-background-color: yellow; }
+  background-color: #2A2A2B; }
+
+QScrollBar {
+  /*border: $size_border solid $col_secondary*/ }
+  QScrollBar:vertical {
+    border: 2px solid #3F4245;
+    background: #2A2A2B;
+    width: 15px;
+    margin: 22px 0 22px 0; }
+  QScrollBar:handle:vertical {
+    background: red;
+    min-height: 20px; }
+  QScrollBar:add-line:vertical {
+    border: 2px solid grey;
+    background: #32CC99;
+    height: 20px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin; }
+  QScrollBar:sub-line:vertical {
+    border: 2px solid grey;
+    background: #32CC99;
+    height: 20px;
+    subcontrol-position: top;
+    subcontrol-origin: margin; }
+  QScrollBar:up-arrow:vertical, QScrollBar:down-arrow:vertical {
+    border: 2px solid #0000FF;
+    width: 3px;
+    height: 3px;
+    background: yellow; }
 
 QMenuBar {
-  background-color: #3F4245; }
+  background-color: #3F4245;
+  border-bottom: 1px solid #2A2A2B; }
+  QMenuBar:item {
+    background-color: #3F4245;
+    color: rgba(255, 255, 255, 80%);
+    padding: 4px 8px 4px 8px; }
+    QMenuBar:item:selected {
+      background-color: #4F5357; }
+    QMenuBar:item:pressed {
+      background-color: #54585C; }
 
-QMenuBar::item {
-  color: rgba(255, 255, 255, 87%); }
+QMenu {
+  border: 1px solid #2A2A2B;
+  background-color: #46494D;
+  color: rgba(255, 255, 255, 80%); }
+  QMenu:item {
+    box-shadow: 0px 0px; }
+    QMenu:item:selected {
+      background-color: #2D5373; }
 
 QLabel {
-  color: rgba(255, 255, 255, 87%); }
+  color: rgba(255, 255, 255, 80%);
+  font-size: 9pt; }
+  QLabel#h1 {
+    color: rgba(255, 255, 255, 80%);
+    font-size: 12pt; }
+  QLabel#text-soft {
+    color: rgba(255, 255, 255, 70%);
+    font-size: 9pt; }
+  QLabel#text-soft-h1 {
+    color: rgba(255, 255, 255, 70%);
+    font-size: 12pt; }
+
+/* QProperties - Custom overrides referenced in code */
+QWidget[model-entry] {
+  background-color: #2A2A2B; }
+
+QWidget[model-entry="text-normal"] {
+  color: rgba(255, 255, 255, 80%); }
+
+QWidget[model-entry="text-success"] {
+  color: rgba(51, 153, 0, 100%); }
+
+QWidget[model-entry="text-warning"] {
+  color: rgba(217, 173, 0, 100%); }
+
+QWidget[model-entry="text-error"] {
+  color: rgba(204, 51, 0, 100%); }

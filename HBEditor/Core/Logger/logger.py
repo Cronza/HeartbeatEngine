@@ -42,17 +42,14 @@ class Logger:
         # Build the Logger UI
         self.log_ui = LoggerUI(self)
 
-        # Load styling
-        self.log_font = QFont(
-            Settings.getInstance().style_data['EditorTextSettings']['log_font'],
-            Settings.getInstance().style_data['EditorTextSettings']['log_text_size']
-        )
-        self.log_colors = {
-            LogType.Normal: Settings.getInstance().style_data['EditorTextSettings']['log_normal_color'],
-            LogType.Success: Settings.getInstance().style_data['EditorTextSettings']['log_success_color'],
-            LogType.Warning: Settings.getInstance().style_data['EditorTextSettings']['log_warning_color'],
-            LogType.Error: Settings.getInstance().style_data['EditorTextSettings']['log_error_color']
+        # Values refer to QProperties defined in the active .qss file
+        self.log_styles = {
+            LogType.Normal: "text-normal",
+            LogType.Success: "text-success",
+            LogType.Warning: "text-warning",
+            LogType.Error: "text-error"
         }
+
         self.log_prefixes = {
             LogType.Normal: "",
             LogType.Success: "Success: ",
@@ -60,34 +57,26 @@ class Logger:
             LogType.Error: "Error: "
         }
 
-        self.Log("Initializing Logger...")
+        self.Log("Logger Initialized!")
 
     def Log(self, log_text, log_type=LogType.Normal):
         prefix = ""
 
         # Since the expectation is that the user provides ints that are converted to the respective log type, this
         # can lead to an invalid log type. If this ever happens, just default to the normal style
+        style = self.log_styles[LogType.Normal]
+        prefix = self.log_styles[LogType.Normal]
         try:
             converted_type = LogType(log_type)
-            color = self.log_colors[converted_type]
+            style = self.log_styles[converted_type]
             prefix = self.log_prefixes[converted_type]
         except Exception as exc:
             print(f"Failed to determine log color type - Resorting to normal colors: {exc}")
-            color = self.log_colors[LogType.Normal]
-            prefix = self.log_colors[LogType.Normal]
 
-        # Convert the string list structure we use to a int list using some sketchy conversions
-        color = list(map(int, color.split(", ")))
-
-        new_entry = QListWidgetItem(datetime.now().strftime("%H:%M:%S") + ": " + prefix + log_text)
-        new_entry.setForeground(QColor(color[0], color[1], color[2]))
-        new_entry.setFont(self.log_font)
-        self.log_ui.log_list.addItem(new_entry)
-
-        # Since Qt only refreshes widgets when it regains control of the main thread, force the update here
-        # as long updates are high priority in terms of visibility
-        self.log_ui.log_list.repaint()
-        self.log_ui.repaint()
+        self.log_ui.AddEntry(
+            datetime.now().strftime("%H:%M:%S") + ": " + prefix + log_text,
+            style
+        )
 
     def ClearLog(self):
         """ Deletes all log entries """

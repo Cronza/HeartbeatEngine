@@ -13,93 +13,192 @@
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$col_primary: #2A2A2B;
-$col_secondary: #3F4245;
-$col_tertiary: #484B4F;
-$col_selection: #213D54;
-$col_highlight: #264661;
-$col_highlight_edge: #1C5A8C;
-$col_text_color: rgba(255, 255, 255, 0.87);
+/*  Colors */
+$col_primary: #3F4245;
+$col_secondary: #2A2A2B;
+$col_tertiary: #46494D;
 
-$standard_border_size: 1px;
-$icon_size: 18px;
+$col_hover: #4F5357;
+$col_active: #54585C;
 
-QMainWindow{
-    background-color: $col_primary;
-}
+$col_button_hover: #2D5373;
+$col_button_pressed: #213D54;
+$col_button_edge: #1C5A8C;
+
+/* Text */
+$size_text: 9pt;
+$col_text: rgba(255, 255, 255, 0.80);
+
+$size_text_soft: 9pt;
+$size_text_soft_h1: 12pt;
+$col_text_soft: rgba(255, 255, 255, 0.70);
+
+$size_text_h1: 12pt;
+$col_text_h1: rgba(255, 255, 255, 0.80);
+
+/* Misc */
+$size_border: 1px;
+$size_icon: 18px;
 
 QWidget{
     background-color: $col_primary;
 }
-
 QToolBar{
-    icon-size: $icon_size; /* maximum icon size */
-    background-color: $col_secondary;
+    icon-size: $size_icon; /* maximum icon size */
+    background-color: $col_primary;
     margin-top: 0;
 
     QToolButton{
-        background-color: $col_secondary;
+        background-color: $col_primary;
         padding: 1px;
 
         &:hover {
-            background-color: $col_highlight;
-            border-color: $col_highlight_edge;
-            border-width: $standard_border_size;
+            background-color: $col_button_hover;
+            border-width: $size_border;
             border-style: solid;
         }
 
         &:pressed {
-            background-color: $col_selection;
+            background-color: $col_button_pressed;
         }
     }
 }
-
-
-
 QTabWidget{
     &:pane{ /* The tab widget frame */
         border-color: $col_secondary;
-        border-top: $standard_border_size solid $col_tertiary;
+        border-top: $size_border solid $col_secondary;
         padding: 0px;
     }
 }
-
 QTabBar{
     &:tab{
-        border: $standard_border_size solid;
-        border-bottom-color: $col_secondary;
-        background-color: $col_secondary;
-        color: $col_text_color;
+        border: $size_border solid $col_secondary;
+        border-bottom: $col_primary;
+        background-color: $col_primary;
+        color: $col_text;
         min-width: 50px;
         min-height: 20px;
+        &:hover {
+            background-color: $col_hover;
+        }
+        &:selected {
+            background-color: $col_active;
+        }
+
     }
 }
 
 QAbstractItemView {
-    border: $standard_border_size solid $col_secondary;
+    background-color: $col_secondary;
+    border: $size_border solid $col_secondary;
     &:item{
-        color: $col_text_color;
-        selection-color: $col_selection;
+        color: $col_text;
+        selection-color: $col_active;
     }
 }
-
 QHeaderView{
     &:section{
-        background-color: $col_secondary
+        background-color: $col_primary
     }
 }
 QTreeView{
-    alternate-background-color: yellow;
+    background-color: $col_secondary
 }
+QScrollBar{
+    &:vertical {
+        border: 2px solid $col_primary;
+        background: $col_secondary;
+        width: 15px;
+        margin: 22px 0 22px 0;
+    }
+    &:handle:vertical {
+        background: red;
+        min-height: 20px;
+    }
+     &:add-line:vertical {
+         border: 2px solid grey;
+         background: #32CC99;
+         height: 20px;
+         subcontrol-position: bottom;
+         subcontrol-origin: margin;
+     }
 
+     &:sub-line:vertical {
+         border: 2px solid grey;
+         background: #32CC99;
+         height: 20px;
+         subcontrol-position: top;
+         subcontrol-origin: margin;
+     }
+    &:up-arrow:vertical, &:down-arrow:vertical {
+        border: 2px solid #0000FF;
+        width: 3px;
+        height: 3px;
+        background: yellow;
+    }
+
+    /*border: $size_border solid $col_secondary*/
+
+}
 QMenuBar{
-    background-color: $col_secondary;
-}
+    background-color: $col_primary;
+    border-bottom: $size_border solid $col_secondary;
 
-QMenuBar::item{
-    color: $col_text_color;
-}
+    &:item {
+        background-color: $col_primary;
+        color: $col_text;
+        padding: 4px 8px 4px 8px;
+        &:selected  {
+            background-color: $col_hover;
+        }
+        &:pressed {
+            background-color: $col_active;
+        }
+    }
 
+}
+QMenu{
+    border: 1px solid $col_secondary;
+    background-color: $col_tertiary;
+    color: $col_text;
+    &:item {
+        box-shadow: 0px 0px;
+        &:selected {
+            background-color: $col_button_hover;
+        }
+    }
+}
 QLabel{
-    color: $col_text_color;
+    color: $col_text;
+    font-size: $size_text;
+    &#h1{
+        color: $col_text_h1;
+        font-size: $size_text_h1;
+    }
+    &#text-soft{
+        color: $col_text_soft;
+        font-size: $size_text;
+    }
+    &#text-soft-h1{
+        color: $col_text_soft;
+        font-size: $size_text_h1;
+    }
+}
+
+
+/* QProperties - Custom overrides referenced in code */
+QWidget[model-entry]{
+    background-color: $col_secondary
+}
+QWidget[model-entry="text-normal"]{
+    color: $col_text;
+}
+QWidget[model-entry="text-success"]{
+    color: rgba(51, 153, 0, 1.0);
+}
+QWidget[model-entry="text-warning"]{
+    color: rgba(217, 173, 0, 1.0);
+}
+QWidget[model-entry="text-error"]{
+    color: rgba(204, 51, 0, 1.0);
 }

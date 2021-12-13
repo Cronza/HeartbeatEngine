@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu_option import ActionMenuOption
 
@@ -26,6 +26,8 @@ in the menu
 class ActionMenu(QtWidgets.QMenu):
     def __init__(self, button_func, available_actions):
         super().__init__()
+
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
 
         # Set the root styling for sub menus
         self.setFont(Settings.getInstance().button_font)

@@ -75,6 +75,7 @@ class HBEditorUI:
 
         # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
+        self.file_menu.setWindowFlags(self.file_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_new_file = QtWidgets.QAction(main_window)
         self.a_new_file.triggered.connect(self.e_core.NewFile)
         self.a_open_file = QtWidgets.QAction(main_window)
@@ -96,18 +97,21 @@ class HBEditorUI:
 
         # Settings Menu
         self.settings_menu = QtWidgets.QMenu(self.menu_bar)
+        self.settings_menu.setWindowFlags(self.settings_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_open_project_settings = QtWidgets.QAction(main_window)
         self.a_open_project_settings.triggered.connect(self.e_core.OpenProjectSettings)
         self.settings_menu.addAction(self.a_open_project_settings)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self.menu_bar)
+        self.play_menu.setWindowFlags(self.play_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_play_game = QtWidgets.QAction(main_window)
         self.a_play_game.triggered.connect(self.e_core.Play)
         self.play_menu.addAction(self.a_play_game)
 
         # Build Menu
         self.build_menu = QtWidgets.QMenu(self.menu_bar)
+        self.build_menu.setWindowFlags(self.build_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_build = QtWidgets.QAction(main_window)
         self.a_build.triggered.connect(self.e_core.Build)
         self.a_build_clean = QtWidgets.QAction(main_window)
@@ -196,8 +200,10 @@ class HBEditorUI:
         self.getting_started_layout = QtWidgets.QVBoxLayout(self.getting_started_container)
 
         getting_started_title = QtWidgets.QLabel("Getting Started")
+        getting_started_title.setObjectName("text-soft-h1")
 
         getting_started_message = QtWidgets.QLabel()
+        getting_started_message.setObjectName("text-soft")
         getting_started_message.setText(
             "To access editor features, please open a Heartbeat project: \n\n"
             "1) Go to 'File' -> 'New Project' to Create a new Heartbeat project\n"
