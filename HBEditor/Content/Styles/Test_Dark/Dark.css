@@ -67,30 +67,39 @@ QTreeView {
 QScrollBar {
   /*border: $size_border solid $col_secondary*/ }
   QScrollBar:vertical {
-    border: 2px solid #3F4245;
+    border: 1px solid #3F4245;
     background: #2A2A2B;
     width: 15px;
     margin: 22px 0 22px 0; }
   QScrollBar:handle:vertical {
-    background: red;
+    background: #46494D;
     min-height: 20px; }
   QScrollBar:add-line:vertical {
-    border: 2px solid grey;
-    background: #32CC99;
-    height: 20px;
+    border: 1px solid #0000FF;
+    background: #FF0000;
+    height: 15px;
     subcontrol-position: bottom;
     subcontrol-origin: margin; }
   QScrollBar:sub-line:vertical {
-    border: 2px solid grey;
-    background: #32CC99;
-    height: 20px;
+    border: 1px solid #0000FF;
+    background: #FF0000;
+    height: 15px;
     subcontrol-position: top;
     subcontrol-origin: margin; }
-  QScrollBar:up-arrow:vertical, QScrollBar:down-arrow:vertical {
-    border: 2px solid #0000FF;
+  QScrollBar:up-arrow:vertical {
+    border: 2px solid #3F4245;
     width: 3px;
     height: 3px;
-    background: yellow; }
+    background: white; }
+  QScrollBar:down-arrow:vertical {
+    border: 2px solid #3F4245;
+    width: 3px;
+    height: 3px;
+    background: white; }
+  QScrollBar:add-page:vertical {
+    background: none; }
+  QScrollBar:sub-page:vertical {
+    background: none; }
 
 QMenuBar {
   background-color: #3F4245;

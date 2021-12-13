@@ -105,37 +105,50 @@ QTreeView{
     background-color: $col_secondary
 }
 QScrollBar{
-    &:vertical {
-        border: 2px solid $col_primary;
+     &:vertical {
+        border: $size_border solid $col_primary;
         background: $col_secondary;
         width: 15px;
         margin: 22px 0 22px 0;
-    }
-    &:handle:vertical {
-        background: red;
+     }
+     &:handle:vertical {
+        background: $col_tertiary;
         min-height: 20px;
-    }
+     }
      &:add-line:vertical {
-         border: 2px solid grey;
-         background: #32CC99;
-         height: 20px;
-         subcontrol-position: bottom;
-         subcontrol-origin: margin;
+        border: $size_border solid #0000FF;
+        background: #FF0000;
+        height: 15px;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
      }
 
      &:sub-line:vertical {
-         border: 2px solid grey;
-         background: #32CC99;
-         height: 20px;
-         subcontrol-position: top;
-         subcontrol-origin: margin;
+        border: $size_border solid #0000FF;
+        background: #FF0000;
+        height: 15px;
+        subcontrol-position: top;
+        subcontrol-origin: margin;
      }
-    &:up-arrow:vertical, &:down-arrow:vertical {
-        border: 2px solid #0000FF;
+     &:up-arrow:vertical {
+        border: 2px solid $col_primary;
         width: 3px;
         height: 3px;
-        background: yellow;
-    }
+        background: white;
+     }
+     &:down-arrow:vertical {
+        border: 2px solid $col_primary;
+        width: 3px;
+        height: 3px;
+        background: white;
+     }
+
+     &:add-page:vertical {
+        background: none;
+     }
+     &:sub-page:vertical {
+        background: none;
+     }
 
     /*border: $size_border solid $col_secondary*/
 
