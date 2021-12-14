@@ -55,6 +55,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
+        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
         self.details_tree.header().setFont(Settings.getInstance().button_font)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)

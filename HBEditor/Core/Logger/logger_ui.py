@@ -49,6 +49,7 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
+        self.log_list.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
         self.log_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
         self.log_list.setAutoScroll(True)
 

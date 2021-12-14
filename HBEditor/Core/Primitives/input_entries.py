@@ -78,6 +78,10 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         """
         pass
 
+    def RefreshStyle(self):
+        """ Refreshes the stylesheet to update any dynamic properties """
+        pass
+
     def InputValueUpdated(self):
         """ When the input value for this entry is changed, call the refresh function provided to this class """
         # Any change to detail entries while the global toggle is enabled will toggle it off
@@ -128,6 +132,7 @@ class InputEntryBool(InputEntryBase):
         elif state == 2:
             self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
 
+        self.input_widget.style().polish(self.input_widget)
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -146,6 +151,7 @@ class InputEntryColor(InputEntryBase):
         # @TODO: Replace style sheet assignment with a QPalette to retain button state styles
         # Create the color selector button, and style it accordingly
         self.color_select_button = QtWidgets.QToolButton()
+        self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
@@ -175,6 +181,8 @@ class InputEntryColor(InputEntryBase):
             self.color_select_button.setEnabled(True)
         elif state == 2:
             self.color_select_button.setEnabled(False)
+
+        self.input_widget.style().polish(self.input_widget)
 
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog.getColor()
@@ -207,7 +215,6 @@ class InputEntryDropdown(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QComboBox()
-
         self.options = options
 
         # Pre-load the list of dropdown options
@@ -238,6 +245,8 @@ class InputEntryDropdown(InputEntryBase):
         elif state == 2:
             self.input_widget.setEnabled(False)
 
+        self.input_widget.style().polish(self.input_widget)
+
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
         super().__init__(refresh_func)
@@ -250,10 +259,11 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget.setEnabled(True)
+        self.input_widget.setReadOnly(False)
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
+        self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
@@ -289,6 +299,8 @@ class InputEntryFileSelector(InputEntryBase):
         elif state == 2:
             self.file_select_button.setEnabled(False)
             self.input_widget.setReadOnly(True)
+
+        self.input_widget.style().polish(self.input_widget)
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
@@ -355,6 +367,8 @@ class InputEntryFloat(InputEntryBase):
         elif state == 2:
             self.input_widget.setReadOnly(True)
 
+        self.input_widget.style().polish(self.input_widget)
+
 
 class InputEntryInt(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -404,6 +418,7 @@ class InputEntryInt(InputEntryBase):
         elif state == 2:
             self.input_widget.setReadOnly(True)
 
+        self.input_widget.style().polish(self.input_widget)
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -467,6 +482,8 @@ class InputEntryText(InputEntryBase):
             self.input_widget.setReadOnly(False)
         elif state == 2:
             self.input_widget.setReadOnly(True)
+
+        self.input_widget.style().polish(self.input_widget)
 
 
 class InputEntryTuple(InputEntryBase):
@@ -541,6 +558,9 @@ class InputEntryTuple(InputEntryBase):
             self.input_widget.setReadOnly(True)
             self.input_widget_alt.setReadOnly(True)
 
+        self.input_widget.style().polish(self.input_widget)
+        self.input_widget_alt.style().polish(self.input_widget_alt)
+
 
 class InputEntryChoice(InputEntryBase):
     """
@@ -568,18 +588,9 @@ class InputEntryChoice(InputEntryBase):
         self.main_layout.setAlignment(QtCore.Qt.AlignLeft)
         self.project_settings = project_settings
 
-        self.button_styles = f"""
-            QToolButton {{
-                background-color: rgb({Settings.getInstance().general_button_background_color});
-                border-style: outset;
-                border-radius: 6px;
-                border-width: 1px;
-                border-color: rgb({Settings.getInstance().general_button_border_color});
-            }}
-        """
-
         # Add Choice Button
         self.add_choice_button = QtWidgets.QToolButton()
+        self.add_choice_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Plus.png")),
@@ -624,6 +635,7 @@ class InputEntryChoice(InputEntryBase):
 
         # Delete button
         delete_choice_button = QtWidgets.QToolButton()
+        delete_choice_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Minus.png")),

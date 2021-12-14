@@ -22,6 +22,7 @@ class FileSystemTree(QtWidgets.QTreeView):
     def __init__(self, parent, double_click_func, create_file_func, create_dir_func, delete_file_func, delete_dir_func):
         super().__init__(parent)
 
+        self.setObjectName("outliner")
 
         # Signal Functions
         self.double_click_func = double_click_func
