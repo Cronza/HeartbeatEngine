@@ -264,6 +264,7 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # Name
         self.name_widget = QtWidgets.QLabel()
+        self.name_widget.setObjectName("h1")
         self.name_widget.setText(self.action_data["display_name"])
 
         # Details
