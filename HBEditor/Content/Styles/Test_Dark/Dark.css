@@ -12,9 +12,13 @@
  *   You should have received a copy of the GNU General Public License
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
-/*  Colors */
+/* *** Colors *** */
 /*Used for things like scroll bars, where active elements need differentiation*/
-/* Text */
+/* Used for input fields, for editable fields */
+/* Used for tabs, menu dropdowns (just the top-most parent), etc*/
+/* Used for tool buttons, push buttons, etc */
+/* Used for dialogue entries, branch entries, etc */
+/* *** Text *** */
 /* Misc */
 QMainWindow {
   background-color: #3F4245; }
@@ -67,9 +71,10 @@ QTabBar:tab {
   min-width: 50px;
   min-height: 20px;
   min-width: 8ex;
-  padding: 2px 4px 2px 4px; }
+  padding: 2px 4px 2px 4px;
+  border-left: 0px solid transparent; }
   QTabBar:tab:hover {
-    background-color: #54585C; }
+    background-color: #2D5373; }
   QTabBar:tab:selected {
     background-color: #585D61; }
 
@@ -88,10 +93,21 @@ QHeaderView {
     border: 1px solid #2A2A2B;
     border-left: 0px solid transparent;
     padding-left: 4px; }
+    QHeaderView:section:last {
+      border-right: 0px solid transparent; }
   QHeaderView#outliner {
     /* The outliner doesn't use a top border */ }
     QHeaderView#outliner:section {
       border-top: 0px solid transparent; }
+
+QTableView {
+  border: 0px solid red;
+  border-right: 0px solid transparent;
+  background-color: #2A2A2B;
+  outline: none;
+  color: rgba(255, 255, 255, 80%);
+  selection-background-color: #1E384D;
+  selection-color: rgba(255, 255, 255, 80%); }
 
 QTreeView {
   border: 0px solid transparent;
@@ -108,10 +124,10 @@ QTreeView {
       selection-background-color: #585D61;
       selection-color: rgba(255, 255, 255, 80%); }
       QTreeView#outliner:item:hover {
-        background-color: #54585C;
+        background-color: #2D5373;
         color: rgba(255, 255, 255, 80%); }
       QTreeView#outliner:item:selected:active {
-        background-color: #585D61;
+        background-color: #1E384D;
         color: red; }
   QTreeView:item {
     padding: 3px;
@@ -239,7 +255,8 @@ QPlainTextEdit {
 QLineEdit {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
-  border: 1px solid #3F4245; }
+  border: 1px solid #3F4245;
+  selection-background-color: #2D5373; }
 
 QLineEdit[readOnly="true"] {
   background-color: #343436;

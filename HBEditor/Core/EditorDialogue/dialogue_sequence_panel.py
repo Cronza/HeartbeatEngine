@@ -262,12 +262,9 @@ class DialogueEntry(QtWidgets.QWidget):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # Name
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h1")
         self.name_widget.setText(self.action_data["display_name"])
-
-        # Details
         self.subtext_widget = QtWidgets.QLabel()
 
         # Refresh the subtext

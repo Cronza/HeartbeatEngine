@@ -13,36 +13,43 @@
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*  Colors */
+/* *** Colors *** */
 $col_primary: #3F4245;
 $col_secondary: #2A2A2B;
 $col_tertiary: #46494D;
 $col_special: #585C61; /*Used for things like scroll bars, where active elements need differentiation*/
 
+/* Used for input fields, for editable fields */
 $col_input: #4E4E52;
 $col_input_hover: #5C5C61;
 $col_input_pressed: #3F3F42;
 $col_input_inactive: #343436;
 
+/* Used for tabs, menu dropdowns (just the top-most parent), etc*/
 $col_hover: #54585C;
 $col_active: #585D61;
 
+/* Used for tool buttons, push buttons, etc */
 $col_button_hover: #2D5373;
 $col_button_pressed: #213D54;
-$col_button_edge: #1C5A8C;
 
-/* Text */
+/* Used for dialogue entries, branch entries, etc */
+$col_entry_active: #1E384D;
+
+/* *** Text *** */
 $size_text: 9pt;
 $col_text: rgba(255, 255, 255, 0.80);
 $col_text_read_only: rgba(150, 150, 150, 0.80);
 
-$size_text_soft: 9pt;
-$size_text_soft_h1: 12pt;
-$col_text_soft: rgba(255, 255, 255, 0.70);
-
 $size_text_h1: 11pt;
 $col_text_h1: rgba(255, 255, 255, 0.80);
 
+$size_text_h2: 10pt;
+$col_text_h2: rgba(255, 255, 255, 0.80);
+
+$size_text_soft: 9pt;
+$size_text_soft_h1: 12pt;
+$col_text_soft: rgba(255, 255, 255, 0.70);
 
 /* Misc */
 $size_border: 1px;
@@ -117,11 +124,14 @@ QTabBar{
         min-width: 8ex;
         padding: 2px 4px 2px 4px;
         &:hover {
-            background-color: $col_hover;
+            background-color: $col_button_hover;
         }
         &:selected {
             background-color: $col_active;
         }
+
+        border-left: 0px solid transparent;
+
     }
 }
 QAbstractItemView {
@@ -141,6 +151,10 @@ QHeaderView{
         border: $size_border solid $col_secondary;
         border-left: 0px solid transparent;
         padding-left: 4px;
+
+        &:last{
+            border-right: 0px solid transparent;
+        }
     }
 
     &#outliner{ /* The outliner doesn't use a top border */
@@ -148,6 +162,15 @@ QHeaderView{
             border-top: 0px solid transparent;
         }
     }
+}
+QTableView{
+    border: 0px solid red;
+    border-right: 0px solid transparent;
+    background-color: $col_secondary;
+    outline: none;
+    color: $col_text;
+    selection-background-color: $col_entry_active;
+    selection-color: $col_text;
 }
 QTreeView{
     border: 0px solid transparent;
@@ -164,11 +187,11 @@ QTreeView{
             selection-color: $col_text;
 
             &:hover{
-                background-color: $col_hover;
+                background-color: $col_button_hover;
                 color: $col_text;
             }
             &:selected:active{
-                background-color: $col_active;
+                background-color: $col_entry_active;
                 color: red;
             }
         }
@@ -327,6 +350,7 @@ QLineEdit{
     background-color: $col_input;
     color: $col_text;
     border: $size_border solid $col_primary;
+    selection-background-color: $col_button_hover;
 }
 QLineEdit[readOnly="true"]{
     background-color: $col_input_inactive;
