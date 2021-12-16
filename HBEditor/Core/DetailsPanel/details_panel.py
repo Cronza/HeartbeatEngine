@@ -40,6 +40,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Create title
         self.details_title = QtWidgets.QLabel(self)
+        self.details_title.setObjectName("h1")
         self.details_title.setText("Details")
 
         # Create the toolbar
@@ -56,9 +57,8 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
-        self.details_tree.header().setFont(Settings.getInstance().button_font)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
         self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)

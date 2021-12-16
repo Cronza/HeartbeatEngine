@@ -16,18 +16,6 @@
 /*Used for things like scroll bars, where active elements need differentiation*/
 /* Text */
 /* Misc */
-QWidget#background {
-  /* Allow specification of backgrounds instead of a blanket styling */
-  background-color: #3F4245; }
-
-/*
-*QWidget{
-*    background-color: $col_primary;
-*}
-*QWidget#alt{
-*    background-color: $col_secondary;
-*}
-*/
 QMainWindow {
   background-color: #3F4245; }
 
@@ -35,12 +23,18 @@ QToolBar {
   icon-size: 18px;
   /* maximum icon size */
   background-color: #3F4245;
-  margin-top: 0; }
+  border-top: 1px solid #2A2A2B; }
+  QToolBar QToolButton {
+    padding: 2px;
+    border: 0px solid transparent; }
+  QToolBar#logger {
+    /* The logger is pressed against another border above it */
+    border-top: 0px solid transparent; }
 
 QToolButton {
   background-color: #3F4245;
-  padding: 1px;
-  border: 1px solid #3F4245; }
+  border: 1px solid #3F4245;
+  padding: 2px; }
   QToolButton:hover {
     background-color: #2D5373; }
   QToolButton:pressed {
@@ -48,7 +42,7 @@ QToolButton {
   QToolButton:menu-indicator {
     image: none; }
   QToolButton#non-toolbar {
-    /*Buttons that are used outside of a toolbar*/
+    /* ToolButtons that are used outside of a toolbar */
     background-color: #4E4E52;
     padding: 1px;
     border: 1px solid #3F4245; }
@@ -62,16 +56,18 @@ QToolButton {
 QTabWidget:pane {
   /* The tab widget frame */
   border-color: #2A2A2B;
-  border-top: 1px solid #2A2A2B;
-  padding: 0px; }
+  border-top: 1px solid #2A2A2B; }
 
 QTabBar:tab {
   border: 1px solid #2A2A2B;
   border-bottom: #3F4245;
+  border-top: 0px solid transparent;
   background-color: #3F4245;
   color: rgba(255, 255, 255, 80%);
   min-width: 50px;
-  min-height: 20px; }
+  min-height: 20px;
+  min-width: 8ex;
+  padding: 2px 4px 2px 4px; }
   QTabBar:tab:hover {
     background-color: #54585C; }
   QTabBar:tab:selected {
@@ -84,27 +80,55 @@ QAbstractItemView {
     color: rgba(255, 255, 255, 80%);
     selection-color: #585D61; }
 
-QAbstractScrollAreaselected:item {
+QHeaderView {
   border: 0px solid transparent; }
-
-QHeaderView:section {
-  background-color: #3F4245; }
+  QHeaderView:section {
+    background-color: #3F4245;
+    color: rgba(255, 255, 255, 80%);
+    border: 1px solid #2A2A2B;
+    border-left: 0px solid transparent;
+    padding-left: 4px; }
+  QHeaderView#outliner {
+    /* The outliner doesn't use a top border */ }
+    QHeaderView#outliner:section {
+      border-top: 0px solid transparent; }
 
 QTreeView {
+  border: 0px solid transparent;
   background-color: #2A2A2B;
   outline: none; }
   QTreeView#outliner {
     /* The outliner doesn't use any padding */
+    border: 0px solid transparent;
     background-color: #2A2A2B; }
     QTreeView#outliner:item {
       padding: 0px;
-      background-color: #2A2A2B; }
+      background-color: #2A2A2B;
+      color: rgba(255, 255, 255, 80%);
+      selection-background-color: #585D61;
+      selection-color: rgba(255, 255, 255, 80%); }
+      QTreeView#outliner:item:hover {
+        background-color: #54585C;
+        color: rgba(255, 255, 255, 80%); }
+      QTreeView#outliner:item:selected:active {
+        background-color: #585D61;
+        color: red; }
   QTreeView:item {
     padding: 3px;
     background-color: #2A2A2B; }
 
+QGraphicsView {
+  border: 1px solid #2A2A2B;
+  color: red; }
+  QGraphicsView#scene-viewer {
+    border-bottom: 0px solid transparent;
+    border-right: 0px solid transparent; }
+
+QAbstractScrollAreaselected:item {
+  border: 0px solid transparent; }
+
 QScrollBar:vertical {
-  border: 1px solid #3F4245;
+  border-left: 1px solid #3F4245;
   background: #2A2A2B;
   width: 10px; }
 
@@ -156,18 +180,26 @@ QLabel {
   font-size: 9pt; }
   QLabel#h1 {
     color: rgba(255, 255, 255, 80%);
-    font-size: 12pt; }
+    font-size: 11pt;
+    padding: 1px; }
   QLabel#text-soft {
     color: rgba(255, 255, 255, 70%);
     font-size: 9pt; }
   QLabel#text-soft-h1 {
     color: rgba(255, 255, 255, 70%);
-    font-size: 12pt; }
+    font-size: 11pt; }
 
 QSplitter:handle {
   width: 3px;
   height: 3px;
-  background-color: #3F4245; }
+  background-color: #3F4245;
+  border: 1px solid #2A2A2B; }
+  QSplitter:handle:horizontal {
+    border-top: 0px solid transparent;
+    border-bottom: 0px solid transparent; }
+  QSplitter:handle:vertical {
+    border-left: 0px solid transparent;
+    border-right: 0px solid transparent; }
 
 QComboBox {
   background-color: #4E4E52;
@@ -229,6 +261,24 @@ QCheckBox:indicator {
   QCheckBox:indicator:checked:hover {
     /*image: url(:/images/checkbox_unchecked.png);*/
     background-color: #2D5373; }
+
+QDialog {
+  background-color: #3F4245;
+  color: rgba(255, 255, 255, 80%); }
+
+QDialogButtonBox QPushButton {
+  background-color: #4E4E52;
+  color: rgba(255, 255, 255, 80%);
+  padding: 4px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border: 1px solid #2A2A2B; }
+  QDialogButtonBox QPushButton:hover {
+    background-color: #2D5373; }
+  QDialogButtonBox QPushButton:pressed {
+    background-color: #213D54; }
+  QDialogButtonBox QPushButton:disabled {
+    background-color: #343436; }
 
 /* QProperties - Custom overrides referenced in code */
 QWidget[model-entry] {

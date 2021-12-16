@@ -41,6 +41,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Create the View title
         self.title = QtWidgets.QLabel(self)
         self.title.setText("Dialogue Sequence")
+        self.title.setObjectName("h1")
 
         # Create the toolbar
         self.main_toolbar = QtWidgets.QToolBar()

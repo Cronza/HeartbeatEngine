@@ -44,6 +44,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
 
         self.category_title = QtWidgets.QLabel(self)
         self.category_title.setText("Categories")
+        self.category_title.setObjectName("h1")
         self.category_list = QtWidgets.QListWidget()
         self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
         self.category_layout.addWidget(self.category_title)
@@ -57,6 +58,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.settings.setLayout(self.settings_layout)
         self.settings_title = QtWidgets.QLabel(self)
         self.settings_title.setText("Settings")
+        self.settings_title.setObjectName("h1")
         self.settings_table = QtWidgets.QTreeWidget(self)
         self.settings_table.setColumnCount(2)
         self.settings_table.setHeaderLabels(['Name', 'Input'])

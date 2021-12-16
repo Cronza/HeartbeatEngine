@@ -18,11 +18,21 @@ from HBEditor.Core.Outliner.icon_provider import FileSystemIconProvider
 from HBEditor.Core.DataTypes.file_types import FileType, FileTypeDescriptions
 
 
+class FileSystemModel(QtWidgets.QFileSystemModel):
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: int = ...):
+        if role == QtCore.Qt.TextAlignmentRole:
+            return QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft
+
+        else:
+            return QtWidgets.QFileSystemModel.headerData(self, section, orientation, role)
+
+
 class FileSystemTree(QtWidgets.QTreeView):
     def __init__(self, parent, double_click_func, create_file_func, create_dir_func, delete_file_func, delete_dir_func):
         super().__init__(parent)
 
         self.setObjectName("outliner")
+        self.header().setObjectName("outliner")
 
         # Signal Functions
         self.double_click_func = double_click_func
@@ -32,7 +42,7 @@ class FileSystemTree(QtWidgets.QTreeView):
         self.delete_dir_func = delete_dir_func
 
         # Directory view
-        self.model = QtWidgets.QFileSystemModel()
+        self.model = FileSystemModel()
         self.model.setRootPath(QtCore.QDir.rootPath())
         self.model.setReadOnly(False)
         self.setSortingEnabled(True)
@@ -45,6 +55,7 @@ class FileSystemTree(QtWidgets.QTreeView):
         self.setEditTriggers(QtWidgets.QTreeView.NoEditTriggers)
         self.setModel(self.model)
         self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        print(type(self.header()))
 
         # Create and use a custom icon provider to override tree icons
         self.model.setIconProvider(FileSystemIconProvider())

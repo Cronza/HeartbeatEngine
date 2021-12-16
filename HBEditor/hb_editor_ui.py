@@ -47,6 +47,7 @@ class HBEditorUI:
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
+        self.main_resize_container.setContentsMargins(0, 0, 0, 0)
         self.main_resize_container.setOrientation(Qt.Vertical)
 
         # ****** Add everything to the interface ******
@@ -168,9 +169,11 @@ class HBEditorUI:
         """ Creates the main tab editor window, allowing specific editors to be added to it """
         self.main_editor_container = QtWidgets.QWidget()
         self.main_editor_layout = QtWidgets.QVBoxLayout(self.main_editor_container)
-        self.main_editor_layout.setContentsMargins(2,2,2,2)
+        self.main_editor_layout.setContentsMargins(0, 0, 0, 0)
         self.main_editor_layout.setSpacing(0)
         self.main_tab_editor = QtWidgets.QTabWidget(self.main_editor_container)
+        self.main_tab_editor.setVisible(False)
+        self.main_tab_editor.setElideMode(0)
         self.main_tab_editor.setTabsClosable(True)
         self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
         self.main_tab_editor.currentChanged.connect(self.ChangeTab)
@@ -186,12 +189,16 @@ class HBEditorUI:
         """ Updates the active editor when the tab selection changes """
         if index != -1:
             self.e_core.active_editor = self.main_tab_editor.widget(index).core
+            if not self.main_tab_editor.isVisible():
+                self.main_tab_editor.setVisible(True)
         else:
             self.e_core.active_editor = None
+            self.main_tab_editor.setVisible(False)
 
     def CreateBottomTabContainer(self):
         """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
         self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
+        self.bottom_tab_editor.setContentsMargins(0, 0, 0, 0)
         self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
 
     def CreateGettingStartedDisplay(self):

@@ -32,6 +32,7 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Create title
         self.branches_title = QtWidgets.QLabel(self)
+        self.branches_title.setObjectName("h1")
         self.branches_title.setText("Branches")
 
         # Create the toolbar

@@ -40,40 +40,37 @@ $size_text_soft: 9pt;
 $size_text_soft_h1: 12pt;
 $col_text_soft: rgba(255, 255, 255, 0.70);
 
-$size_text_h1: 12pt;
+$size_text_h1: 11pt;
 $col_text_h1: rgba(255, 255, 255, 0.80);
+
 
 /* Misc */
 $size_border: 1px;
 $size_icon: 18px;
 
-
-QWidget#background{ /* Allow specification of backgrounds instead of a blanket styling */
-    background-color: $col_primary;
-}
-/*
-*QWidget{
-*    background-color: $col_primary;
-*}
-*QWidget#alt{
-*    background-color: $col_secondary;
-*}
-*/
 QMainWindow{
     background-color: $col_primary;
 }
 QToolBar{
     icon-size: $size_icon; /* maximum icon size */
     background-color: $col_primary;
-    margin-top: 0;
+    border-top: $size_border solid $col_secondary;
+
+    QToolButton{
+    padding: 2px;
+        border: 0px solid transparent;
+    }
+
+    &#logger{ /* The logger is pressed against another border above it */
+        border-top: 0px solid transparent;
+    }
 }
 QToolButton{
     background-color: $col_primary;
-    padding: 1px;
     border: $size_border solid $col_primary;
-
+    padding: 2px;
     &:hover {
-        background-color: $col_button_hover;;
+        background-color: $col_button_hover;
     }
 
     &:pressed {
@@ -84,7 +81,7 @@ QToolButton{
         image: none;
     }
 
-    &#non-toolbar{ /*Buttons that are used outside of a toolbar*/
+    &#non-toolbar{ /* ToolButtons that are used outside of a toolbar */
         background-color: $col_input;
         padding: 1px;
         border: $size_border solid $col_primary;
@@ -106,24 +103,25 @@ QTabWidget{
     &:pane{ /* The tab widget frame */
         border-color: $col_secondary;
         border-top: $size_border solid $col_secondary;
-        padding: 0px;
     }
 }
 QTabBar{
     &:tab{
         border: $size_border solid $col_secondary;
         border-bottom: $col_primary;
+        border-top: 0px solid transparent;
         background-color: $col_primary;
         color: $col_text;
         min-width: 50px;
         min-height: 20px;
+        min-width: 8ex;
+        padding: 2px 4px 2px 4px;
         &:hover {
             background-color: $col_hover;
         }
         &:selected {
             background-color: $col_active;
         }
-
     }
 }
 QAbstractItemView {
@@ -134,25 +132,45 @@ QAbstractItemView {
         selection-color: $col_active;
     }
 }
-QAbstractScrollArea{
-    &selected:item{
-        border: 0px solid transparent;
-    }
-}
 QHeaderView{
+    border: 0px solid transparent;
+
     &:section{
-        background-color: $col_primary
+        background-color: $col_primary;
+        color: $col_text;
+        border: $size_border solid $col_secondary;
+        border-left: 0px solid transparent;
+        padding-left: 4px;
+    }
+
+    &#outliner{ /* The outliner doesn't use a top border */
+        &:section{
+            border-top: 0px solid transparent;
+        }
     }
 }
 QTreeView{
+    border: 0px solid transparent;
     background-color: $col_secondary;
     outline: none;
     &#outliner{ /* The outliner doesn't use any padding */
-    background-color: $col_secondary;
-
+        border: 0px solid transparent;
+        background-color: $col_secondary;
         &:item {
             padding: 0px;
             background-color: $col_secondary;
+            color: $col_text;
+            selection-background-color: $col_active;
+            selection-color: $col_text;
+
+            &:hover{
+                background-color: $col_hover;
+                color: $col_text;
+            }
+            &:selected:active{
+                background-color: $col_active;
+                color: red;
+            }
         }
     }
     &:item {
@@ -160,10 +178,22 @@ QTreeView{
         background-color: $col_secondary;
     }
 }
-
+QGraphicsView{
+    border: $size_border solid $col_secondary;
+    color: red;
+    &#scene-viewer{
+        border-bottom: 0px solid transparent;
+        border-right: 0px solid transparent;
+    }
+}
+QAbstractScrollArea{
+    &selected:item{
+        border: 0px solid transparent;
+    }
+}
 QScrollBar{
      &:vertical {
-        border: $size_border solid $col_primary;
+        border-left: $size_border solid $col_primary;
         background: $col_secondary;
         width: 10px;
      }
@@ -193,7 +223,6 @@ QScrollBar{
 QMenuBar{
     background-color: $col_primary;
     border-bottom: $size_border solid $col_secondary;
-
     &:item {
         background-color: $col_primary;
         color: $col_text;
@@ -224,6 +253,7 @@ QLabel{
     &#h1{
         color: $col_text_h1;
         font-size: $size_text_h1;
+        padding: 1px;
     }
     &#text-soft{
         color: $col_text_soft;
@@ -239,6 +269,17 @@ QSplitter{
         width: 3px;
         height: 3px;
         background-color: $col_primary;
+        border: $size_border solid $col_secondary;
+
+        &:horizontal {
+            border-top: 0px solid transparent;
+            border-bottom: 0px solid transparent;
+
+        }
+        &:vertical {
+            border-left: 0px solid transparent;
+            border-right: 0px solid transparent;
+        }
     }
 
 }
@@ -310,6 +351,32 @@ QCheckBox{
         &:checked:hover {
             /*image: url(:/images/checkbox_unchecked.png);*/
             background-color: $col_button_hover
+        }
+    }
+}
+QDialog{
+    background-color: $col_primary;
+    color: $col_text;
+}
+QDialogButtonBox{
+    QPushButton{
+        background-color: $col_input;
+        color: $col_text;
+        padding: 4px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border: $size_border solid $col_secondary;
+
+        &:hover {
+            background-color: $col_button_hover;
+        }
+
+        &:pressed {
+            background-color: $col_button_pressed;
+        }
+
+        &:disabled{
+            background-color: $col_input_inactive;
         }
     }
 }
