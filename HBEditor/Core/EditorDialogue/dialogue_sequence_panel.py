@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
@@ -105,13 +105,20 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Build the Action Sequence
         self.dialogue_table = QtWidgets.QTableWidget(self)
+        self.dialogue_table.verticalHeader().setObjectName("vertical")
         self.dialogue_table.setColumnCount(1)
+        self.dialogue_table.setShowGrid(False)
         self.dialogue_table.horizontalHeader().hide()
         self.dialogue_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.dialogue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
         self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
+        self.dialogue_table.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
         self.dialogue_table.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
+
+        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
+        # focus border. Thus, we do it the slightly more tragic way
+        self.dialogue_table.setFocusPolicy(QtCore.Qt.NoFocus)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
@@ -259,13 +266,13 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # ****** DISPLAY WIDGETS ******
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setContentsMargins(4, 0, 0, 0)
 
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h1")
         self.name_widget.setText(self.action_data["display_name"])
         self.subtext_widget = QtWidgets.QLabel()
+        self.subtext_widget.setObjectName("text-soft-italic")
 
         # Refresh the subtext
         self.UpdateSubtext()

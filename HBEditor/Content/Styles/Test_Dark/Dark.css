@@ -13,7 +13,6 @@
  *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
  */
 /* *** Colors *** */
-/*Used for things like scroll bars, where active elements need differentiation*/
 /* Used for input fields, for editable fields */
 /* Used for tabs, menu dropdowns (just the top-most parent), etc*/
 /* Used for tool buttons, push buttons, etc */
@@ -95,14 +94,25 @@ QHeaderView {
     padding-left: 4px; }
     QHeaderView:section:last {
       border-right: 0px solid transparent; }
+    QHeaderView:section#vertical {
+      padding-left: 0px; }
   QHeaderView#outliner {
     /* The outliner doesn't use a top border */ }
     QHeaderView#outliner:section {
       border-top: 0px solid transparent; }
 
+QListView#dialogue-branch-panel:item {
+  border: 0px solid transparent;
+  background-color: #2A2A2B;
+  outline: none;
+  color: rgba(255, 255, 255, 80%);
+  selection-background-color: #1E384D;
+  selection-color: rgba(255, 255, 255, 80%); }
+  QListView#dialogue-branch-panel:item:selected {
+    background-color: #1E384D; }
+
 QTableView {
-  border: 0px solid red;
-  border-right: 0px solid transparent;
+  border: 0px solid transparent;
   background-color: #2A2A2B;
   outline: none;
   color: rgba(255, 255, 255, 80%);
@@ -124,11 +134,9 @@ QTreeView {
       selection-background-color: #585D61;
       selection-color: rgba(255, 255, 255, 80%); }
       QTreeView#outliner:item:hover {
-        background-color: #2D5373;
-        color: rgba(255, 255, 255, 80%); }
+        background-color: #2D5373; }
       QTreeView#outliner:item:selected:active {
-        background-color: #1E384D;
-        color: red; }
+        background-color: #1E384D; }
   QTreeView:item {
     padding: 3px;
     background-color: #2A2A2B; }
@@ -149,7 +157,7 @@ QScrollBar:vertical {
   width: 10px; }
 
 QScrollBar:handle:vertical {
-  background: #585C61;
+  background: #4E4E52;
   min-height: 20px; }
 
 QScrollBar:add-line:vertical {
@@ -197,9 +205,16 @@ QLabel {
   QLabel#h1 {
     color: rgba(255, 255, 255, 80%);
     font-size: 11pt;
-    padding: 1px; }
+    margin: 0px;
+    padding: 2px 0px 2px 0px;
+    qproperty-indent: 0;
+    /* Removes the auto-magic indent that's applied when using padding */ }
   QLabel#text-soft {
     color: rgba(255, 255, 255, 70%);
+    font-size: 9pt; }
+  QLabel#text-soft-italic {
+    color: rgba(255, 255, 255, 70%);
+    font-style: italic;
     font-size: 9pt; }
   QLabel#text-soft-h1 {
     color: rgba(255, 255, 255, 70%);

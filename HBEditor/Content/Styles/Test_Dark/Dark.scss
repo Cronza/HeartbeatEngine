@@ -17,7 +17,6 @@
 $col_primary: #3F4245;
 $col_secondary: #2A2A2B;
 $col_tertiary: #46494D;
-$col_special: #585C61; /*Used for things like scroll bars, where active elements need differentiation*/
 
 /* Used for input fields, for editable fields */
 $col_input: #4E4E52;
@@ -155,6 +154,10 @@ QHeaderView{
         &:last{
             border-right: 0px solid transparent;
         }
+
+        &#vertical{
+            padding-left: 0px;
+        }
     }
 
     &#outliner{ /* The outliner doesn't use a top border */
@@ -163,9 +166,24 @@ QHeaderView{
         }
     }
 }
+QListView{
+    &#dialogue-branch-panel{
+        &:item{
+            border: 0px solid transparent;
+            background-color: $col_secondary;
+            outline: none;
+            color: $col_text;
+            selection-background-color: $col_entry_active;
+            selection-color: $col_text;
+
+            &:selected{
+                background-color: $col_entry_active;
+            }
+        }
+    }
+}
 QTableView{
-    border: 0px solid red;
-    border-right: 0px solid transparent;
+    border: 0px solid transparent;
     background-color: $col_secondary;
     outline: none;
     color: $col_text;
@@ -188,11 +206,9 @@ QTreeView{
 
             &:hover{
                 background-color: $col_button_hover;
-                color: $col_text;
             }
             &:selected:active{
                 background-color: $col_entry_active;
-                color: red;
             }
         }
     }
@@ -221,7 +237,7 @@ QScrollBar{
         width: 10px;
      }
      &:handle:vertical {
-        background: $col_special;
+        background: $col_input;
         min-height: 20px;
      }
      &:add-line:vertical {
@@ -276,10 +292,17 @@ QLabel{
     &#h1{
         color: $col_text_h1;
         font-size: $size_text_h1;
-        padding: 1px;
+        margin: 0px;
+        padding: 2px 0px 2px 0px;
+        qproperty-indent:0; /* Removes the auto-magic indent that's applied when using padding */
     }
     &#text-soft{
         color: $col_text_soft;
+        font-size: $size_text;
+    }
+    &#text-soft-italic{
+        color: $col_text_soft;
+        font-style: italic;
         font-size: $size_text;
     }
     &#text-soft-h1{

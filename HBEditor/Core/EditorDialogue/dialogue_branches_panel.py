@@ -67,8 +67,13 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Create Details List
         self.branches_list = QtWidgets.QListWidget(self)
+        self.branches_list.setObjectName("dialogue-branch-panel")
         self.branches_list.itemDoubleClicked.connect(self.EditBranch)
         self.branches_list.itemSelectionChanged.connect(self.ChangeBranch)
+
+        # 'outline: none;' doesn't work for list widgets seemingly, so I can't use CSS to disable the
+        # focus border. Thus, we do it the slightly more tragic way
+        self.branches_list.setFocusPolicy(QtCore.Qt.NoFocus)
 
         # ********** Add All Major Pieces to details layout **********
         self.branches_layout.addWidget(self.branches_title)
@@ -212,12 +217,12 @@ class BranchesEntry(QtWidgets.QWidget):
                                            QtWidgets.QSizePolicy.Minimum)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setContentsMargins(4, 0, 0, 0)
 
         #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
         self.name_widget = QtWidgets.QLabel()
+        self.name_widget.setObjectName("h1")
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
         self.name_widget.setSizePolicy(size_policy)
@@ -225,6 +230,7 @@ class BranchesEntry(QtWidgets.QWidget):
 
         # Details
         self.subtext_widget = QtWidgets.QLabel()
+        self.subtext_widget.setObjectName("text-soft-italic")
         self.subtext_widget.setText('Test Description')
         self.subtext_widget.setAlignment(QtCore.Qt.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)
