@@ -20,12 +20,12 @@
 /* *** Text *** */
 /* Misc */
 QMainWindow {
-  background-color: red; }
+  background-color: #3F4245; }
 
 QToolBar {
   icon-size: 18px;
   /* maximum icon size */
-  background-color: red;
+  background-color: #3F4245;
   border-top: 1px solid #2A2A2B; }
   QToolBar QToolButton {
     padding: 2px;
@@ -35,8 +35,8 @@ QToolBar {
     border-top: 0px solid transparent; }
 
 QToolButton {
-  background-color: red;
-  border: 1px solid red;
+  background-color: #3F4245;
+  border: 1px solid #3F4245;
   padding: 2px; }
   QToolButton:hover {
     background-color: #2D5373; }
@@ -48,7 +48,7 @@ QToolButton {
     /* ToolButtons that are used outside of a toolbar */
     background-color: #4E4E52;
     padding: 1px;
-    border: 1px solid red; }
+    border: 1px solid #3F4245; }
     QToolButton#non-toolbar:hover {
       background-color: #2D5373; }
     QToolButton#non-toolbar:pressed {
@@ -63,9 +63,9 @@ QTabWidget:pane {
 
 QTabBar:tab {
   border: 1px solid #2A2A2B;
-  border-bottom: red;
+  border-bottom: #3F4245;
   border-top: 0px solid transparent;
-  background-color: red;
+  background-color: #3F4245;
   color: rgba(255, 255, 255, 80%);
   min-width: 50px;
   min-height: 20px;
@@ -87,7 +87,7 @@ QAbstractItemView {
 QHeaderView {
   border: 0px solid transparent; }
   QHeaderView:section {
-    background-color: red;
+    background-color: #3F4245;
     color: rgba(255, 255, 255, 80%);
     border: 1px solid #2A2A2B;
     border-left: 0px solid transparent;
@@ -152,7 +152,7 @@ QAbstractScrollAreaselected:item {
   border: 0px solid transparent; }
 
 QScrollBar:vertical {
-  border-left: 1px solid red;
+  border-left: 1px solid #3F4245;
   background: #2A2A2B;
   width: 10px; }
 
@@ -179,10 +179,10 @@ QScrollBar:sub-page:vertical {
   background: none; }
 
 QMenuBar {
-  background-color: red;
+  background-color: #3F4245;
   border-bottom: 1px solid #2A2A2B; }
   QMenuBar:item {
-    background-color: red;
+    background-color: #3F4245;
     color: rgba(255, 255, 255, 80%);
     padding: 4px 8px 4px 8px; }
     QMenuBar:item:selected {
@@ -223,7 +223,7 @@ QLabel {
 QSplitter:handle {
   width: 3px;
   height: 3px;
-  background-color: red;
+  background-color: #3F4245;
   border: 1px solid #2A2A2B; }
   QSplitter:handle:horizontal {
     border-top: 0px solid transparent;
@@ -234,7 +234,7 @@ QSplitter:handle {
 
 QComboBox {
   background-color: #4E4E52;
-  border: 1px solid red;
+  border: 1px solid #3F4245;
   color: rgba(255, 255, 255, 80%); }
   QComboBox:hover {
     background-color: #5C5C61;
@@ -250,7 +250,7 @@ QComboBox {
     /* just a single line */
     border-bottom-right-radius: 3px; }
   QComboBox QAbstractItemView {
-    border: QComboBox QAbstractItemView size_border solid red;
+    border: QComboBox QAbstractItemView size_border solid #3F4245;
     background-color: #46494D;
     color: rgba(255, 255, 255, 80%);
     selection-background-color: #2D5373; }
@@ -270,7 +270,7 @@ QPlainTextEdit {
 QLineEdit {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
-  border: 1px solid red;
+  border: 1px solid #3F4245;
   selection-background-color: #2D5373; }
 
 QLineEdit[readOnly="true"] {
@@ -280,12 +280,12 @@ QLineEdit[readOnly="true"] {
 QLineEdit[readOnly="false"] {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
-  border: 1px solid red; }
+  border: 1px solid #3F4245; }
 
 QCheckBox:indicator {
   width: 13px;
   height: 13px;
-  border: 1px solid red;
+  border: 1px solid #3F4245;
   background-color: #4E4E52; }
   QCheckBox:indicator:unchecked:hover {
     /*image: url(:/images/checkbox_unchecked.png);*/
@@ -295,7 +295,7 @@ QCheckBox:indicator {
     background-color: #2D5373; }
 
 QDialog {
-  background-color: red;
+  background-color: #3F4245;
   color: rgba(255, 255, 255, 80%); }
 
 QPushButton {

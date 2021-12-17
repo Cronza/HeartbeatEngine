@@ -20,8 +20,6 @@ class FileOption(QListWidgetItem):
     def __init__(self, icon, file_type, display_text, description_text, parent):
         super().__init__(icon, display_text, parent)
 
-        self.setFont(Settings.getInstance().paragraph_font)
-
         self.file_type = file_type
         self.description_text = description_text
 

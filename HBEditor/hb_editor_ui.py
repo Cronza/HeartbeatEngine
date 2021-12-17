@@ -73,7 +73,6 @@ class HBEditorUI:
         # *** Build the Menu Bar ***
         self.menu_bar = QtWidgets.QMenuBar(main_window)
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1024, 21))
-        self.menu_bar.setFont(Settings.getInstance().button_font)
 
         # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)

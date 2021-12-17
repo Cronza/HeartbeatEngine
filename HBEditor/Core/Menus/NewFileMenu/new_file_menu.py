@@ -62,7 +62,6 @@ class NewFileMenu(BasePopupMenu):
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
-        self.description.setFont(Settings.getInstance().paragraph_font)
 
         self.options_layout.addWidget(self.options_list, 2)
         self.options_layout.addWidget(self.description, 1, Qt.AlignTop)
