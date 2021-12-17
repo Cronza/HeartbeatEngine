@@ -57,7 +57,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, SceneItemUtilities):
 
         sprite_path = ""
         if sprite_rel_path == "None":
-            sprite_path = Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png")
+            sprite_path = ":/Sprites/Placeholder.png"
         else:
             sprite_path = f"{Settings.getInstance().user_project_dir}/{sprite_rel_path}"
 
@@ -180,7 +180,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, SceneItemUtilities):
         new_font = None
         if font == "None" or not font:
             # Use the default editor-kept font if the user did not assign a font
-            font = f"{Settings.getInstance().editor_root}/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
+            font = ":/Fonts/Comfortaa-Regular.ttf"
             new_font = FontManager.LoadCustomFont(font)
 
         #@ TODO: Review whether this is the optimal way of differentiating this case and the next one
@@ -192,9 +192,9 @@ class TextItem(QtWidgets.QGraphicsTextItem, SceneItemUtilities):
         else:
             # This might be the user trying to load a system font
             split_str = font.split("|", 1)
-            if len(split_str) == 2:
+            if len(split_str) == 2 and new_font:
                 new_font = FontManager.LoadFont(split_str[0], split_str[1])  # Format: <name> <style>
-            else:
+            elif new_font:
                 new_font = FontManager.LoadFont(split_str[0])
 
         # Enforce a minimum text size

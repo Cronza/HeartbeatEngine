@@ -33,7 +33,7 @@ class NewFileMenu(BasePopupMenu):
         self.options_list = QtWidgets.QListWidget()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png")),
+            QtGui.QPixmap(":/Icons/Engine_Logo.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )

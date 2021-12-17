@@ -27,7 +27,7 @@ class FileSystemIconProvider(QtWidgets.QFileIconProvider):
     def icon(self, fileInfo):
         # Override the icon function which returns the icon to use for each item in a QTree
         if fileInfo.isDir():
-            return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Folder.png"))
+            return QtGui.QIcon(":/Icons/Folder.png")
         elif fileInfo.suffix() in self.recognized_image_extensions:
-            return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/File_Image.png"))
-        return QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/File.png"))
+            return QtGui.QIcon(":/Icons/File_Image.png")
+        return QtGui.QIcon(":/Icons/File.png")

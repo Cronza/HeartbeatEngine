@@ -20,12 +20,12 @@
 /* *** Text *** */
 /* Misc */
 QMainWindow {
-  background-color: #3F4245; }
+  background-color: red; }
 
 QToolBar {
   icon-size: 18px;
   /* maximum icon size */
-  background-color: #3F4245;
+  background-color: red;
   border-top: 1px solid #2A2A2B; }
   QToolBar QToolButton {
     padding: 2px;
@@ -35,8 +35,8 @@ QToolBar {
     border-top: 0px solid transparent; }
 
 QToolButton {
-  background-color: #3F4245;
-  border: 1px solid #3F4245;
+  background-color: red;
+  border: 1px solid red;
   padding: 2px; }
   QToolButton:hover {
     background-color: #2D5373; }
@@ -48,7 +48,7 @@ QToolButton {
     /* ToolButtons that are used outside of a toolbar */
     background-color: #4E4E52;
     padding: 1px;
-    border: 1px solid #3F4245; }
+    border: 1px solid red; }
     QToolButton#non-toolbar:hover {
       background-color: #2D5373; }
     QToolButton#non-toolbar:pressed {
@@ -63,9 +63,9 @@ QTabWidget:pane {
 
 QTabBar:tab {
   border: 1px solid #2A2A2B;
-  border-bottom: #3F4245;
+  border-bottom: red;
   border-top: 0px solid transparent;
-  background-color: #3F4245;
+  background-color: red;
   color: rgba(255, 255, 255, 80%);
   min-width: 50px;
   min-height: 20px;
@@ -87,7 +87,7 @@ QAbstractItemView {
 QHeaderView {
   border: 0px solid transparent; }
   QHeaderView:section {
-    background-color: #3F4245;
+    background-color: red;
     color: rgba(255, 255, 255, 80%);
     border: 1px solid #2A2A2B;
     border-left: 0px solid transparent;
@@ -152,7 +152,7 @@ QAbstractScrollAreaselected:item {
   border: 0px solid transparent; }
 
 QScrollBar:vertical {
-  border-left: 1px solid #3F4245;
+  border-left: 1px solid red;
   background: #2A2A2B;
   width: 10px; }
 
@@ -179,10 +179,10 @@ QScrollBar:sub-page:vertical {
   background: none; }
 
 QMenuBar {
-  background-color: #3F4245;
+  background-color: red;
   border-bottom: 1px solid #2A2A2B; }
   QMenuBar:item {
-    background-color: #3F4245;
+    background-color: red;
     color: rgba(255, 255, 255, 80%);
     padding: 4px 8px 4px 8px; }
     QMenuBar:item:selected {
@@ -223,7 +223,7 @@ QLabel {
 QSplitter:handle {
   width: 3px;
   height: 3px;
-  background-color: #3F4245;
+  background-color: red;
   border: 1px solid #2A2A2B; }
   QSplitter:handle:horizontal {
     border-top: 0px solid transparent;
@@ -234,7 +234,7 @@ QSplitter:handle {
 
 QComboBox {
   background-color: #4E4E52;
-  border: 1px solid #3F4245;
+  border: 1px solid red;
   color: rgba(255, 255, 255, 80%); }
   QComboBox:hover {
     background-color: #5C5C61;
@@ -250,7 +250,7 @@ QComboBox {
     /* just a single line */
     border-bottom-right-radius: 3px; }
   QComboBox QAbstractItemView {
-    border: QComboBox QAbstractItemView size_border solid #3F4245;
+    border: QComboBox QAbstractItemView size_border solid red;
     background-color: #46494D;
     color: rgba(255, 255, 255, 80%);
     selection-background-color: #2D5373; }
@@ -270,7 +270,7 @@ QPlainTextEdit {
 QLineEdit {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
-  border: 1px solid #3F4245;
+  border: 1px solid red;
   selection-background-color: #2D5373; }
 
 QLineEdit[readOnly="true"] {
@@ -280,12 +280,12 @@ QLineEdit[readOnly="true"] {
 QLineEdit[readOnly="false"] {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
-  border: 1px solid #3F4245; }
+  border: 1px solid red; }
 
 QCheckBox:indicator {
   width: 13px;
   height: 13px;
-  border: 1px solid #3F4245;
+  border: 1px solid red;
   background-color: #4E4E52; }
   QCheckBox:indicator:unchecked:hover {
     /*image: url(:/images/checkbox_unchecked.png);*/
@@ -295,21 +295,21 @@ QCheckBox:indicator {
     background-color: #2D5373; }
 
 QDialog {
-  background-color: #3F4245;
+  background-color: red;
   color: rgba(255, 255, 255, 80%); }
 
-QDialogButtonBox QPushButton {
+QPushButton {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
   padding: 4px;
   padding-left: 12px;
   padding-right: 12px;
   border: 1px solid #2A2A2B; }
-  QDialogButtonBox QPushButton:hover {
+  QPushButton:hover {
     background-color: #2D5373; }
-  QDialogButtonBox QPushButton:pressed {
+  QPushButton:pressed {
     background-color: #213D54; }
-  QDialogButtonBox QPushButton:disabled {
+  QPushButton:disabled {
     background-color: #343436; }
 
 /* QProperties - Custom overrides referenced in code */

@@ -26,12 +26,13 @@ class HBEditorUI:
         self.e_core = e_core
 
     def setupUi(self, MainWindow):
+
+        self.LoadTheme(":/Themes/Dark.css")
+
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-        MainWindow.setWindowIcon(
-            QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png"))
-        )
+        MainWindow.setWindowIcon(QtGui.QIcon(":/Icons/Engine_Logo.png"))
 
         # Build the core window widget object
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -244,6 +245,15 @@ class HBEditorUI:
         self.main_tab_editor.removeTab(index)
 
         Logger.getInstance().Log("Editor closed")
+
+    def LoadTheme(self, theme_path) -> None:
+        """ Given the resource path to a theme .css file, load it and apply it to the editor application """
+        theme_file = QtCore.QFile(theme_path)
+        if theme_file.open(QtCore.QFile.ReadOnly):
+            self.e_core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
+        else:
+            Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
+            print(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}")
 
 #if __name__ == "__main__":
 #    import sys

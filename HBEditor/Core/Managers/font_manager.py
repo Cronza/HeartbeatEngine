@@ -13,8 +13,9 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+from io import BytesIO
 from PIL import ImageFont
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 
 
@@ -22,24 +23,39 @@ class FontManager:
 
     @staticmethod
     def LoadCustomFont(file_path):
-        """ Loads and creates a font using the provided file path, apply any style used by that font """
-        if os.path.exists(file_path) and not os.path.isdir(file_path):
-
-            # PyQt5 doesn't allow direct loading of fonts by file path, so we need to go through the FontDatabase system
+        """
+        Loads and creates a font using the provided file path (either absolute, or a Qt resource path),
+        applying any style used by that font
+        """
+        if file_path.startswith(":/") or os.path.exists(file_path) and not os.path.isdir(file_path):
             QtGui.QFontDatabase.addApplicationFont(file_path)
 
-            # For some insane reason, 'QFontDatabase.addApplicationFont' doesn't return anything that would give you
-            # information on what type of style the loaded font used (Bold, Italic, etc). All you get is an (int) ID
-            # that lets you access the family name. This is only half of what we need.
-            #
-            # In order to get the style, we're using a font lib to get it directly from the file
-            name, style = ImageFont.truetype(file_path).getname()
-            new_font = QtGui.QFont(name)
+            font_file = QtCore.QFile(file_path)
+            if font_file.open(QtCore.QFile.ReadOnly):
+                # 1:
+                # For some insane reason, 'QFontDatabase.addApplicationFont' doesn't return anything that would give us
+                # information on what type of style the loaded font used (Bold, Italic, etc). All we get is an (int) ID
+                # that lets us access the family name. This is only half of what we need.
+                #
+                # In order to get the style, we're using a font lib to get it directly from the file
 
-            # Apply any style used by the loaded font
-            FontManager.ApplyStyle(style, new_font)
+                # 2:
+                # Only Qt can understand data stored by the resource system. Attempting to load a font resource with PIL
+                # leads to an exception. Instead of passing PIL the file path (which it can't read), pass it the file's
+                # data in byte form instead
+                byte_data = BytesIO(font_file.readAll())
+                name, style = ImageFont.truetype(byte_data).getname()
+                new_font = QtGui.QFont(name)
 
-            return new_font
+                # Apply any style used by the loaded font
+                FontManager.ApplyStyle(style, new_font)
+
+                font_file.close()
+                return new_font
+            else:
+                print(font_file.errorString())
+                return None
+
 
         else:
             Logger.getInstance().Log(f"File does not Exist: '{file_path}'", 3)
@@ -80,3 +96,7 @@ class FontManager:
         # 'in' check, instead of '=='
         font.setBold("Bold" in style_string)
         font.setItalic("Italic" in style_string)
+
+    @staticmethod
+    def ReadAsBytes(font_qfile):
+        return BytesIO(font_qfile.readAll())()

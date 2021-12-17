@@ -78,7 +78,7 @@ class SceneViewer(QtWidgets.QWidget):
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(":/Icons/Plus.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -89,22 +89,14 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Remove Entry Button
         self.action_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
             "Remove Entry",
             self.RemoveSelectedItems
         )
 
         # Copy Entry Button
         self.action_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
             "Copy Entry",
             self.CopyRenderable
         )
@@ -116,7 +108,7 @@ class SceneViewer(QtWidgets.QWidget):
                 item_type = actions[action_data["action_name"]]
                 print(item_type)
                 if item_type == "sprite":
-                    image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
+                    image = QtGui.QPixmap(":/Sprites/Placeholder.png")
                     sprite = SpriteItem(
                         image,
                         action_data,

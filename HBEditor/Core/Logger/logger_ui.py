@@ -39,11 +39,7 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Clear Log Button
         self.logger_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Trash.png")),
             "Clear Log",
             self.l_core.ClearLog
         )

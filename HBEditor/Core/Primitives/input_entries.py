@@ -154,7 +154,7 @@ class InputEntryColor(InputEntryBase):
         self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
+            QtGui.QPixmap(":/Icons/Color_Wheel.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -266,7 +266,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
+            QtGui.QPixmap(":/Icons/Open_Folder.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -593,7 +593,7 @@ class InputEntryChoice(InputEntryBase):
         self.add_choice_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Plus.png")),
+            QtGui.QPixmap(":/Icons/Small_Plus.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -638,7 +638,7 @@ class InputEntryChoice(InputEntryBase):
         delete_choice_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Minus.png")),
+            QtGui.QPixmap(":/Icons/Small_Minus.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )

@@ -41,6 +41,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Create the View title
         self.title = QtWidgets.QLabel(self)
         self.title.setText("Dialogue Sequence")
+        print(QtGui.QFontDatabase.addApplicationFont(":/Fonts/Comfortaa-Bold.ttf"))
+        self.title.setFont(QtGui.QFont("Comfortaa"))
         self.title.setObjectName("h1")
 
         # Create the toolbar
@@ -50,7 +52,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(":/Icons/Plus.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -61,44 +63,28 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Remove Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
             "Remove Entry",
             self.RemoveEntry
         )
 
         # Copy Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
             "Copy Entry",
             self.CopyEntry
         )
 
         # Move Entry Up Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Up.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Up.png")),
             "Move Entry Up",
             self.MoveEntryUp
         )
 
         # Move Entry Down Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Down.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Down.png")),
             "Move Entry Up",
             self.MoveEntryDown
         )

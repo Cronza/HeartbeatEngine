@@ -36,7 +36,7 @@ class ActionMenu(QtWidgets.QMenu):
             # Build the category object and assign it
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
-            cat_menu.setIcon(QtGui.QIcon(Settings.getInstance().editor_root + "/" + data["icon"]))
+            cat_menu.setIcon(QtGui.QIcon(data["icon"]))
             self.addMenu(cat_menu)
 
             # Generate a list of options for this category

@@ -14,7 +14,7 @@
  */
 
 /* *** Colors *** */
-$col_primary: #3F4245;
+$col_primary: red;
 $col_secondary: #2A2A2B;
 $col_tertiary: #46494D;
 
@@ -405,26 +405,24 @@ QDialog{
     background-color: $col_primary;
     color: $col_text;
 }
-QDialogButtonBox{
-    QPushButton{
-        background-color: $col_input;
-        color: $col_text;
-        padding: 4px;
-        padding-left: 12px;
-        padding-right: 12px;
-        border: $size_border solid $col_secondary;
+QPushButton{
+    background-color: $col_input;
+    color: $col_text;
+    padding: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border: $size_border solid $col_secondary;
 
-        &:hover {
-            background-color: $col_button_hover;
-        }
+    &:hover {
+        background-color: $col_button_hover;
+    }
 
-        &:pressed {
-            background-color: $col_button_pressed;
-        }
+    &:pressed {
+        background-color: $col_button_pressed;
+    }
 
-        &:disabled{
-            background-color: $col_input_inactive;
-        }
+    &:disabled{
+        background-color: $col_input_inactive;
     }
 }
 /* QProperties - Custom overrides referenced in code */

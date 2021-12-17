@@ -40,22 +40,14 @@ class BranchesPanel(QtWidgets.QWidget):
 
         # Add Branch Button
         self.branches_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Plus.png")),
             "Add Branch",
             self.AddBranch
         )
 
         # Remove Branch Button
         self.branches_toolbar.addAction(
-            QtGui.QIcon(
-                QtGui.QPixmap(
-                    Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png"),
-                )
-            ),
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
             "Remove Branch",
             self.RemoveBranch
         )
