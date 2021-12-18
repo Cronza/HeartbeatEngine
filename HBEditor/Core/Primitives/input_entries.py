@@ -128,9 +128,9 @@ class InputEntryBool(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
+            self.input_widget.setEnabled(True)
         elif state == 2:
-            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+            self.input_widget.setEnabled(False)
 
         self.input_widget.style().polish(self.input_widget)
 
@@ -153,11 +153,8 @@ class InputEntryColor(InputEntryBase):
         self.color_select_button = QtWidgets.QToolButton()
         self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Color_Wheel.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel.png"), QtGui.QIcon.Normal)
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Disabled)
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 
@@ -265,11 +262,8 @@ class InputEntryFileSelector(InputEntryBase):
         self.file_select_button = QtWidgets.QToolButton()
         self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Open_Folder.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder.png"), QtGui.QIcon.Normal)
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder_Disabled.png"), QtGui.QIcon.Disabled)
         self.file_select_button.setIcon(icon)
 
         # Add input elements to the layout

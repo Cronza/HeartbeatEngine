@@ -33,8 +33,8 @@ class FontManager:
             font_file = QtCore.QFile(file_path)
             if font_file.open(QtCore.QFile.ReadOnly):
                 # 1:
-                # For some insane reason, 'QFontDatabase.addApplicationFont' doesn't return anything that would give us
-                # information on what type of style the loaded font used (Bold, Italic, etc). All we get is an (int) ID
+                # 'QFontDatabase.addApplicationFont' doesn't return anything that would give us information on
+                #  what type of style the loaded font used (Bold, Italic, etc). All we get is an (int) ID
                 # that lets us access the family name. This is only half of what we need.
                 #
                 # In order to get the style, we're using a font lib to get it directly from the file
@@ -65,6 +65,8 @@ class FontManager:
     def LoadFont(name, style=""):
         """ Creates a font using the name of an already loaded family, and a pre-existing style """
         # Does this font exist?
+        print(style)
+        print(QtGui.QFontDatabase().styles(name))
         if QtGui.QFontDatabase().styles(name):
             # Does the provided style exist?
             available_styles = QtGui.QFontDatabase().styles(name)

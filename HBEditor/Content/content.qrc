@@ -10,15 +10,19 @@
     </qresource>
     <qresource prefix="Icons">
         <file alias="Checkmark.png">Icons/Checkmark.png</file>
+        <file alias="Checkmark_Disabled.png">Icons/Checkmark_Disabled.png</file>
         <file alias="Color_Wheel.png">Icons/Color_Wheel.png</file>
+        <file alias="Color_Wheel_Disabled.png">Icons/Color_Wheel_Disabled.png</file>
         <file alias="Copy.png">Icons/Copy.png</file>
         <file alias="Dialogue.png">Icons/Dialogue.png</file>
         <file alias="Down.png">Icons/Down.png</file>
         <file alias="Up.png">Icons/Up.png</file>
+        <file alias="Close.png">Icons/Close.png</file>
+        <file alias="Close_Hover.png">Icons/Close_Hover.png</file>
         <file alias="File.png">Icons/File.png</file>
         <file alias="File_Image.png">Icons/File_Image.png</file>
         <file alias="Folder.png">Icons/Folder.png</file>
-        <file alias="Open_Folder.png">Icons/Open_Folder.png</file>
+        <file alias="Folder_Disabled.png">Icons/Folder_Disabled.png</file>
         <file alias="Minus.png">Icons/Minus.png</file>
         <file alias="Plus.png">Icons/Plus.png</file>
         <file alias="Small_Minus.png">Icons/Small_Minus.png</file>

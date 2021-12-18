@@ -57,6 +57,9 @@ $size_icon: 18px;
 QMainWindow{
     background-color: $col_primary;
 }
+QWidget{
+    font-family: "Comfortaa";
+}
 QToolBar{
     icon-size: $size_icon; /* maximum icon size */
     background-color: $col_primary;
@@ -106,6 +109,7 @@ QToolButton{
     }
 }
 QTabWidget{
+    icon-size: 24px;
     &:pane{ /* The tab widget frame */
         border-color: $col_secondary;
         border-top: $size_border solid $col_secondary;
@@ -120,7 +124,6 @@ QTabBar{
         color: $col_text;
         min-width: 50px;
         min-height: 20px;
-        min-width: 8ex;
         padding: 2px 4px 2px 4px;
         &:hover {
             background-color: $col_button_hover;
@@ -131,6 +134,13 @@ QTabBar{
 
         border-left: 0px solid transparent;
 
+    }
+    &:close-button {
+        image: url(":/Icons/Close.png");
+        padding: 2px;
+        &:hover {
+            image: url(":/Icons/Close_Hover.png");
+        }
     }
 }
 QAbstractItemView {
@@ -240,23 +250,20 @@ QScrollBar{
         background: $col_input;
         min-height: 20px;
      }
-     &:add-line:vertical {
+     &:horizontal {
+        border-left: $size_border solid $col_primary;
+        background: $col_secondary;
+        height: 10px;
+     }
+     &:handle:horizontal {
+        background: $col_input;
+        min-width: 20px;
+     }
+     &:add-line:vertical, &:sub-line:vertical, &:up-arrow:vertical, &:down-arrow:vertical, &:add-page:vertical, &:sub-page:vertical {
         background: none
      }
-     &:sub-line:vertical {
+     &:add-line:horizontal, &:sub-line:horizontal, &:up-arrow:horizontal, &:down-arrow:horizontal, &:add-page:horizontal, &:sub-page:horizontal {
         background: none
-     }
-     &:up-arrow:vertical {
-        background: none
-     }
-     &:down-arrow:vertical {
-        background: none
-     }
-     &:add-page:vertical {
-        background: none;
-     }
-     &:sub-page:vertical {
-        background: none;
      }
 }
 QMenuBar{
@@ -289,6 +296,7 @@ QMenu{
 QLabel{
     color: $col_text;
     font-size: $size_text;
+
     &#h1{
         color: $col_text_h1;
         font-size: $size_text_h1;
@@ -392,12 +400,18 @@ QCheckBox{
         background-color: $col_input;
 
         &:unchecked:hover {
-            /*image: url(:/images/checkbox_unchecked.png);*/
-            background-color: $col_button_hover
+            background-color: $col_button_hover;
+        }
+        &:checked {
+            background-color: $col_input;
+            image: url(:/Icons/Checkmark.png);
         }
         &:checked:hover {
-            /*image: url(:/images/checkbox_unchecked.png);*/
             background-color: $col_button_hover
+        }
+        &:disabled{
+            image: url(:/Icons/Checkmark_Disabled.png);
+            background-color: $col_input_inactive;
         }
     }
 }
@@ -423,6 +437,11 @@ QPushButton{
 
     &:disabled{
         background-color: $col_input_inactive;
+    }
+    &#file{
+        &:disabled{
+            image: url(:/Icons/Folder.png);
+        }
     }
 }
 /* QProperties - Custom overrides referenced in code */

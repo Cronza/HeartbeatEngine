@@ -41,8 +41,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Create the View title
         self.title = QtWidgets.QLabel(self)
         self.title.setText("Dialogue Sequence")
-        print(QtGui.QFontDatabase.addApplicationFont(":/Fonts/Comfortaa-Bold.ttf"))
-        self.title.setFont(QtGui.QFont("Comfortaa"))
         self.title.setObjectName("h1")
 
         # Create the toolbar

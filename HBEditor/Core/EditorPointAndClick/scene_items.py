@@ -192,9 +192,9 @@ class TextItem(QtWidgets.QGraphicsTextItem, SceneItemUtilities):
         else:
             # This might be the user trying to load a system font
             split_str = font.split("|", 1)
-            if len(split_str) == 2 and new_font:
+            if len(split_str) == 2:
                 new_font = FontManager.LoadFont(split_str[0], split_str[1])  # Format: <name> <style>
-            elif new_font:
+            else:
                 new_font = FontManager.LoadFont(split_str[0])
 
         # Enforce a minimum text size

@@ -27,7 +27,8 @@ class HBEditorUI:
 
     def setupUi(self, MainWindow):
 
-        self.LoadTheme(":/Themes/Dark.css")
+        self.LoadFonts(Settings.getInstance().editor_data['EditorSettings']["fonts"])
+        self.LoadTheme(Settings.getInstance().editor_data['EditorSettings']["theme"])
 
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
@@ -253,6 +254,12 @@ class HBEditorUI:
         else:
             Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
             print(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}")
+
+    def LoadFonts(self, fonts):
+        """ Given a list of resource paths to font files, load them so they're available throughout the editor """
+        for font in fonts:
+            if QtGui.QFontDatabase.addApplicationFont(font) < 0:
+                Logger.getInstance().Log(f"Failed to load font '{font}'", 4)
 
 #if __name__ == "__main__":
 #    import sys
