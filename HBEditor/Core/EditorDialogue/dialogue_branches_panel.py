@@ -209,7 +209,8 @@ class BranchesEntry(QtWidgets.QWidget):
                                            QtWidgets.QSizePolicy.Minimum)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 0, 0, 0)
+        self.main_layout.setContentsMargins(4, 4, 0, 4)
+        self.main_layout.setSpacing(0)
 
         #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
