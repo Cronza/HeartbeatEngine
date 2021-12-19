@@ -214,7 +214,7 @@ class BranchesEntry(QtWidgets.QWidget):
         #@TODO: Investigate why QLabel size hint includes newlines needed for wordwrap
         # Name
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setObjectName("h1")
+        self.name_widget.setObjectName("h2")
         self.name_widget.setWordWrap(True)
         self.name_widget.setText("Test Name")
         self.name_widget.setSizePolicy(size_policy)

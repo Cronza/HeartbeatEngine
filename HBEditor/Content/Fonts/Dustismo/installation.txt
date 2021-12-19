@@ -1,0 +1,70 @@
+Check out http://www.dustismo.com/ for more fonts.
+Release 1.9
+
+News:  Just added a roman face, I am not done with the italics yet but otherwise I think this is a very good face.  Over 470 glyphs! 
+
+Current glyph count 363
+files included in this archive:
+Dustismo_Sans.ttf
+Dustismo_Roman.ttf
+dustismo_italic.ttf
+dustismo_bold.ttf
+dustismo_bold_italic.ttf
+
+
+
+Installation instructions:
+
+To install on Windows:
+
+Go to control panel
+Open fonts directory
+go to 'file' 'install new font'
+
+
+To install on Redhat 8.0:
+
+make new directory:
+/usr/share/fonts/Dustismo
+
+copy the following files into the new directory:
+dustismo_bold_italic.ttf
+dustismo_bold.ttf
+dustismo_italic.ttf
+Dustismo.ttf
+Dustismo_Roman.ttf
+
+in the new directory do:
+$ ttmkfdir >fonts.dir
+
+Then run chkfontpath:
+$ /usr/sbin/chkfontpath
+---you will see: ----------
+Current directories in font path:
+1: /usr/X11R6/lib/X11/fonts/misc:unscaled
+2: /usr/X11R6/lib/X11/fonts/75dpi:unscaled
+3: /usr/X11R6/lib/X11/fonts/100dpi:unscaled
+4: /usr/X11R6/lib/X11/fonts/misc
+5: /usr/X11R6/lib/X11/fonts/Type1
+6: /usr/X11R6/lib/X11/fonts/Speedo
+7: /usr/X11R6/lib/X11/fonts/cyrillic
+8: /usr/X11R6/lib/X11/fonts/TTF
+9: /usr/share/fonts/default/Type1
+10: /usr/share/fonts/msttcorefonts
+11:
+12: /usr/lib/openoffice/share/fonts/truetype
+--------- end ------------
+
+Now you have to add the new directory to the font path:
+$ chkfontpath –add=/usr/share/fonts/Dustismo
+
+Now restart the font server so the changes take effect:
+$ /etc/init.d/xfs restart
+
+Then type
+$ xset fp rehash
+
+Thats it! Enjoy.
+
+-Dustin Norlander
+dustin@dustismo.com

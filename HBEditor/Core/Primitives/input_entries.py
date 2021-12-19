@@ -584,14 +584,7 @@ class InputEntryChoice(InputEntryBase):
 
         # Add Choice Button
         self.add_choice_button = QtWidgets.QToolButton()
-        self.add_choice_button.setObjectName("non-toolbar")
-        icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Small_Plus.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        self.add_choice_button.setIcon(icon)
+        self.add_choice_button.setObjectName("choice-add")
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.add_choice_button)
@@ -629,14 +622,8 @@ class InputEntryChoice(InputEntryBase):
 
         # Delete button
         delete_choice_button = QtWidgets.QToolButton()
-        delete_choice_button.setObjectName("non-toolbar")
-        icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Small_Minus.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        delete_choice_button.setIcon(icon)
+        delete_choice_button.setObjectName("choice-remove")
+
         new_choice_container.input_widget = delete_choice_button
         new_choice_container.input_widget.clicked.connect(lambda delete: self.DeleteChoice(new_choice_container))
         new_choice_container.main_layout.addWidget(new_choice_container.input_widget)

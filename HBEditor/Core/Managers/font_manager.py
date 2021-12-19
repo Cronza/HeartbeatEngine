@@ -65,8 +65,6 @@ class FontManager:
     def LoadFont(name, style=""):
         """ Creates a font using the name of an already loaded family, and a pre-existing style """
         # Does this font exist?
-        print(style)
-        print(QtGui.QFontDatabase().styles(name))
         if QtGui.QFontDatabase().styles(name):
             # Does the provided style exist?
             available_styles = QtGui.QFontDatabase().styles(name)

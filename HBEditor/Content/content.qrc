@@ -4,6 +4,18 @@
         <file alias="Comfortaa-Regular.ttf">Fonts/Comfortaa/Comfortaa-Regular.ttf</file>
         <file alias="Comfortaa-Light.ttf">Fonts/Comfortaa/Comfortaa-Light.ttf</file>
         <file alias="Comfortaa-Bold.ttf">Fonts/Comfortaa/Comfortaa-Bold.ttf</file>
+        <file alias="Cabin-Regular.ttf">Fonts/Cabin/Cabin-Regular.ttf</file>
+        <file alias="Cabin-Medium.ttf">Fonts/Cabin/Cabin-Medium.ttf</file>
+        <file alias="Cabin-Medium-Italic.ttf">Fonts/Cabin/Cabin-MediumItalic.ttf</file>
+        <file alias="Cabin-Bold.ttf">Fonts/Cabin/Cabin-Bold.ttf</file>
+        <file alias="Cabin-Bold-Italic.ttf">Fonts/Cabin/Cabin-BoldItalic.ttf</file>
+        <file alias="Cabin-SemiBold.ttf">Fonts/Cabin/Cabin-SemiBold.ttf</file>
+        <file alias="Cabin-SemiBold-Italic.ttf">Fonts/Cabin/Cabin-SemiBoldItalic.ttf</file>
+        <file alias="Dustismo-Regular.ttf">Fonts/Dustismo/Dustismo.ttf</file>
+        <file alias="Dustismo-Italic.ttf">Fonts/Dustismo/dustismo_italic.ttf</file>
+        <file alias="Dustismo-Bold.ttf">Fonts/Dustismo/dustismo_bold.ttf</file>
+        <file alias="Dustismo-Bold-Italic.ttf">Fonts/Dustismo/dustismo_bold_italic.ttf</file>
+
     </qresource>
     <qresource prefix="Sprites">
         <file alias="Placeholder.png">Sprites/Placeholder.png</file>
@@ -26,13 +38,19 @@
         <file alias="Minus.png">Icons/Minus.png</file>
         <file alias="Plus.png">Icons/Plus.png</file>
         <file alias="Small_Minus.png">Icons/Small_Minus.png</file>
+        <file alias="Small_Minus_Hover.png">Icons/Small_Minus_Hover.png</file>
         <file alias="Small_Plus.png">Icons/Small_Plus.png</file>
+        <file alias="Small_Plus_Hover.png">Icons/Small_Plus_Hover.png</file>
         <file alias="Renderable.png">Icons/Renderable.png</file>
         <file alias="Engine_Logo.png">Icons/Engine_Logo.png</file>
         <file alias="Trash.png">Icons/Trash.png</file>
+        <file alias="Arrow_Down.png">Icons/Arrow_Down.png</file>
+        <file alias="Arrow_Down_Hover.png">Icons/Arrow_Down_Hover.png</file>
+        <file alias="Arrow_Right.png">Icons/Arrow_Right.png</file>
+        <file alias="Arrow_Right_Hover.png">Icons/Arrow_Right_Hover.png</file>
     </qresource>
     <qresource prefix="Themes">
-        <file alias="Dark.css">Themes/Test_Dark/Dark.css</file>
+        <file alias="Dark.css">Themes/Dark/Dark.css</file>
     </qresource>
 </RCC>
 

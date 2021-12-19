@@ -250,10 +250,11 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # ****** DISPLAY WIDGETS ******
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 0, 0, 0)
+        self.main_layout.setContentsMargins(4, 4, 0, 4)
+        self.main_layout.setSpacing(0)
 
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setObjectName("h1")
+        self.name_widget.setObjectName("h2")
         self.name_widget.setText(self.action_data["display_name"])
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")

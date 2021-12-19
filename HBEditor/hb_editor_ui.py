@@ -260,6 +260,7 @@ class HBEditorUI:
         for font in fonts:
             if QtGui.QFontDatabase.addApplicationFont(font) < 0:
                 Logger.getInstance().Log(f"Failed to load font '{font}'", 4)
+        print(QtGui.QFontDatabase().families())
 
 #if __name__ == "__main__":
 #    import sys
