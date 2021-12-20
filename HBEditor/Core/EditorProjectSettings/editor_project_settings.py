@@ -54,3 +54,6 @@ class EditorProjectSettings(EditorBase):
             Logger.getInstance().Log("File Exported!", 2)
         except:
             Logger.getInstance().Log("Failed to Export!", 4)
+
+        # Reload the project settings
+        Settings.getInstance().LoadProjectSettings()

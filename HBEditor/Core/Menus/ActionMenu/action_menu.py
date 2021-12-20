@@ -12,38 +12,33 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu_option import ActionMenuOption
 
 #@TODO: Should this class be split into a function class & a U.I class?
 
-""" 
-A generic menu of categories and actions that the active editor can use. 'button' func is used when any menu option
-is clicked. 'available_actions' is a set of actions pulled from the ActionsDatabase that will represent what's available
-in the menu 
-"""
+
 class ActionMenu(QtWidgets.QMenu):
+    """
+    A generic menu of categories and actions that the active editor can use. 'button' func is used when any menu option
+    is clicked. 'available_actions' is a set of actions pulled from the ActionsDatabase that will represent what's available
+    in the menu
+    """
     def __init__(self, button_func, available_actions):
         super().__init__()
 
-        # Set the root styling for sub menus
-        self.setFont(Settings.getInstance().button_font)
-        self.setStyleSheet(Settings.getInstance().button_color)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
 
         for category, data in available_actions.items():
             # Build the category object and assign it
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
-            cat_menu.setIcon(QtGui.QIcon(Settings.getInstance().editor_root + "/" + data["icon"]))
-            cat_menu.setFont(Settings.getInstance().button_font)
-            cat_menu.setStyleSheet(Settings.getInstance().button_color)
+            cat_menu.setIcon(QtGui.QIcon(data["icon"]))
             self.addMenu(cat_menu)
 
             # Generate a list of options for this category
             for action in data['options']:
                 option = ActionMenuOption(self, action, button_func)
-                option.setFont(Settings.getInstance().button_font)
-                #option.setStyleSheet(Settings.getInstance().button_color) @TODO: Find out why this doesn't work
                 option.setText(action['display_name'])
                 cat_menu.addAction(option)

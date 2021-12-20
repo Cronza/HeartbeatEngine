@@ -6,6 +6,8 @@ class SceneView(QtWidgets.QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.setObjectName("scene-viewer")
+
         self.zoom_min = 0.4  # Zoom Out
         self.zoom_max = 4  # Zoom In
         self.zoom = 1  # Tracks the amount we've zoomed in

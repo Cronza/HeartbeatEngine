@@ -38,8 +38,7 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
     def __init__(self, refresh_func=None):
         super().__init__()
 
-        # When the input widget is updated, in case another U.I element needs to refresh, allow us to execute an
-        # ambiguous function
+        # When the input widget is updated, in case another U.I element needs to refresh, use a callback
         self.refresh_func = refresh_func
 
         # Details entries have three main widgets: 'name_widget', 'input_widget' and 'global_toggle'.
@@ -50,8 +49,6 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         # 'name_widget' and 'input_widget' are declared, but not initialized as it is up to the subclass to
         # do that
         self.name_widget = QtWidgets.QLabel()
-        self.name_widget.setFont(Settings.getInstance().paragraph_font)
-        self.name_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.input_widget = None
         self.input_container = QtWidgets.QWidget()
@@ -79,6 +76,10 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         Enables or disables editability of relevant input widgets based on the provided state
         0 = Enabled, 2 = Disabled
         """
+        pass
+
+    def RefreshStyle(self):
+        """ Refreshes the stylesheet to update any dynamic properties """
         pass
 
     def InputValueUpdated(self):
@@ -127,10 +128,11 @@ class InputEntryBool(InputEntryBase):
 
     def SetEditable(self, state: int):
         if state == 0:
-            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
+            self.input_widget.setEnabled(True)
         elif state == 2:
-            self.input_widget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+            self.input_widget.setEnabled(False)
 
+        self.input_widget.style().polish(self.input_widget)
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -149,12 +151,10 @@ class InputEntryColor(InputEntryBase):
         # @TODO: Replace style sheet assignment with a QPalette to retain button state styles
         # Create the color selector button, and style it accordingly
         self.color_select_button = QtWidgets.QToolButton()
+        self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Color_Wheel.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel.png"), QtGui.QIcon.Normal)
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Disabled)
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 
@@ -178,6 +178,8 @@ class InputEntryColor(InputEntryBase):
             self.color_select_button.setEnabled(True)
         elif state == 2:
             self.color_select_button.setEnabled(False)
+
+        self.input_widget.style().polish(self.input_widget)
 
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog.getColor()
@@ -210,9 +212,6 @@ class InputEntryDropdown(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QComboBox()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
-
         self.options = options
 
         # Pre-load the list of dropdown options
@@ -240,11 +239,10 @@ class InputEntryDropdown(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setEnabled(True)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setEnabled(False)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
+        self.input_widget.style().polish(self.input_widget)
 
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
@@ -256,20 +254,16 @@ class InputEntryFileSelector(InputEntryBase):
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget.setEnabled(True)
+        self.input_widget.setReadOnly(False)
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
+        self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Open_Folder.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder.png"), QtGui.QIcon.Normal)
+        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder_Disabled.png"), QtGui.QIcon.Disabled)
         self.file_select_button.setIcon(icon)
 
         # Add input elements to the layout
@@ -296,11 +290,11 @@ class InputEntryFileSelector(InputEntryBase):
         if state == 0:
             self.file_select_button.setEnabled(True)
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.file_select_button.setEnabled(False)
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
+        self.input_widget.style().polish(self.input_widget)
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
@@ -326,8 +320,6 @@ class InputEntryFloat(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Limit entered values to float only
@@ -366,10 +358,10 @@ class InputEntryFloat(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
+        self.input_widget.style().polish(self.input_widget)
 
 
 class InputEntryInt(InputEntryBase):
@@ -377,8 +369,6 @@ class InputEntryInt(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         # Limit entered values to int only
         self.validator = QtGui.QIntValidator()
@@ -419,11 +409,10 @@ class InputEntryInt(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
+        self.input_widget.style().polish(self.input_widget)
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -432,8 +421,6 @@ class InputEntryParagraph(InputEntryBase):
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
 
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
@@ -456,11 +443,9 @@ class InputEntryParagraph(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
 
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
 
 
 class InputEntryText(InputEntryBase):
@@ -468,8 +453,6 @@ class InputEntryText(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
@@ -491,10 +474,10 @@ class InputEntryText(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
+
+        self.input_widget.style().polish(self.input_widget)
 
 
 class InputEntryTuple(InputEntryBase):
@@ -503,18 +486,10 @@ class InputEntryTuple(InputEntryBase):
 
         #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
-        self.input_widget_title.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget.setStyleSheet(Settings.getInstance().paragraph_color)
 
         self.input_widget_alt_title = QtWidgets.QLabel('Y')
-        self.input_widget_alt_title.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_alt_title.setStyleSheet(Settings.getInstance().paragraph_color)
         self.input_widget_alt = QtWidgets.QLineEdit()
-        self.input_widget_alt.setFont(Settings.getInstance().paragraph_font)
-        self.input_widget_alt.setStyleSheet(Settings.getInstance().paragraph_color)
 
         # Limit entered values to int only
         validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.StandardNotation)
@@ -573,13 +548,12 @@ class InputEntryTuple(InputEntryBase):
         if state == 0:
             self.input_widget.setReadOnly(False)
             self.input_widget_alt.setReadOnly(False)
-            self.input_widget.setStyleSheet("")
-            self.input_widget_alt.setStyleSheet("")
         elif state == 2:
             self.input_widget.setReadOnly(True)
             self.input_widget_alt.setReadOnly(True)
-            self.input_widget.setStyleSheet(Settings.getInstance().read_only_background_color)
-            self.input_widget_alt.setStyleSheet(Settings.getInstance().read_only_background_color)
+
+        self.input_widget.style().polish(self.input_widget)
+        self.input_widget_alt.style().polish(self.input_widget_alt)
 
 
 class InputEntryChoice(InputEntryBase):
@@ -608,26 +582,9 @@ class InputEntryChoice(InputEntryBase):
         self.main_layout.setAlignment(QtCore.Qt.AlignLeft)
         self.project_settings = project_settings
 
-        self.button_styles = f"""
-            QToolButton {{
-                background-color: rgb({Settings.getInstance().general_button_background_color});
-                border-style: outset;
-                border-radius: 6px;
-                border-width: 1px;
-                border-color: rgb({Settings.getInstance().general_button_border_color});
-            }}
-        """
-
         # Add Choice Button
         self.add_choice_button = QtWidgets.QToolButton()
-        icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Plus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        self.add_choice_button.setIcon(icon)
-        self.add_choice_button.setStyleSheet(self.button_styles)
+        self.add_choice_button.setObjectName("choice-add")
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.add_choice_button)
@@ -665,14 +622,8 @@ class InputEntryChoice(InputEntryBase):
 
         # Delete button
         delete_choice_button = QtWidgets.QToolButton()
-        icon = QtGui.QIcon()
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Small_Minus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
-        )
-        delete_choice_button.setIcon(icon)
-        delete_choice_button.setStyleSheet(self.button_styles)
+        delete_choice_button.setObjectName("choice-remove")
+
         new_choice_container.input_widget = delete_choice_button
         new_choice_container.input_widget.clicked.connect(lambda delete: self.DeleteChoice(new_choice_container))
         new_choice_container.main_layout.addWidget(new_choice_container.input_widget)

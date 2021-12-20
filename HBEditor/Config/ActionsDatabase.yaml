@@ -15,7 +15,7 @@
 #          global: (OPTIONAL) (Whether the param has a global setting available in the project settings)
 
 Renderables:
-  icon: "Content/Icons/Renderable.png"
+  icon: ":/Icons/Renderable.png"
   options:
     # Create Sprite
     - display_name: "Create Sprite"
@@ -266,7 +266,7 @@ Renderables:
           preview: True
 
 Dialogue:
-  icon: "Content/Icons/Dialogue.png"
+  icon: ":/Icons/Dialogue.png"
   options:
     # Create Dialogue Interface
     - display_name: "Create Dialogue Interface"
@@ -550,7 +550,7 @@ Dialogue:
               preview: True
 
 Scene:
-  icon: "Content/Icons/Dialogue.png"
+  icon: ":/Icons/Dialogue.png"
   options:
     # Load Scene
     - display_name: "Load Scene"
@@ -592,7 +592,7 @@ Scene:
           preview: True
 
 Sound:
-  icon: "Content/Icons/Dialogue.png"
+  icon: ":/Icons/Dialogue.png"
   options:
     # Play SFX
     - display_name: "Play SFX"
@@ -673,7 +673,7 @@ Sound:
       action_name: "stop_music"
 
 Utilities:
-  icon: "Content/Icons/Dialogue.png"
+  icon: ":/Icons/Dialogue.png"
   options:
     # Wait
     - display_name: "Wait"

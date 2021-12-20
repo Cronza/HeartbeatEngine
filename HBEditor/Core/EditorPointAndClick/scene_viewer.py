@@ -38,9 +38,8 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Create the View title
         self.title = QtWidgets.QLabel(self)
-        self.title.setFont(Settings.getInstance().header_1_font)
-        self.title.setStyleSheet(Settings.getInstance().header_1_color)
         self.title.setText("Scene Viewer")
+        self.title.setObjectName("h1")
 
         # Create a sub layout so the action bar and core view can sit side-by-side
         self.sub_layout = QtWidgets.QHBoxLayout()
@@ -70,78 +69,49 @@ class SceneViewer(QtWidgets.QWidget):
         self.action_menu = ActionMenu(self.AddRenderable, self.core.action_data)
 
         # Create the frame container
-        self.action_toolbar = QtWidgets.QFrame()
-        self.action_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            "    background-color: rgb(44,53,57);\n"
-            "}"
-        )
-        self.action_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.action_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.action_toolbar_layout = QtWidgets.QVBoxLayout(self.action_toolbar)
-        self.action_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.action_toolbar_layout.setSpacing(0)
+        self.action_toolbar = QtWidgets.QToolBar()
+        self.action_toolbar.setOrientation(QtCore.Qt.Vertical)
 
         # Generic button settings
         icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
 
         # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.add_entry_button.setStyleSheet(button_style)
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Plus.png")),
+            QtGui.QPixmap(":/Icons/Plus.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setMenu(self.action_menu)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.action_toolbar_layout.addWidget(self.add_entry_button)
+        self.action_toolbar.addWidget(self.add_entry_button)
 
         # Remove Entry Button
-        self.remove_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.remove_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Minus.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.action_toolbar.addAction(
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            "Remove Entry",
+            self.RemoveSelectedItems
         )
-        self.remove_entry_button.setIcon(icon)
-        self.remove_entry_button.clicked.connect(self.RemoveSelectedItems)
-        self.action_toolbar_layout.addWidget(self.remove_entry_button)
 
         # Copy Entry Button
-        self.copy_entry_button = QtWidgets.QToolButton(self.action_toolbar)
-        self.copy_entry_button.setStyleSheet(button_style)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Copy.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.action_toolbar.addAction(
+            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
+            "Copy Entry",
+            self.CopyRenderable
         )
-        self.copy_entry_button.setIcon(icon)
-        self.copy_entry_button.clicked.connect(self.CopyRenderable)
-        self.action_toolbar_layout.addWidget(self.copy_entry_button)
-
-        # Empty Space Spacer
-        spacer = QtWidgets.QSpacerItem(20, 534, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.action_toolbar_layout.addItem(spacer)
 
     def AddRenderable(self, action_data) -> bool:
 
         for actions in self.core.possible_actions.values():
             if action_data["action_name"] in actions:
                 item_type = actions[action_data["action_name"]]
-                print(item_type)
+
                 if item_type == "sprite":
-                    image = QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Sprites/Placeholder.png"))
+                    image = QtGui.QPixmap(":/Sprites/Placeholder.png")
                     sprite = SpriteItem(
                         image,
                         action_data,
-                        self.ItemHasMoved,
                         self.core.UpdateActiveSceneItem,
                         self.core.UpdateDetails
                     )
@@ -153,7 +123,6 @@ class SceneViewer(QtWidgets.QWidget):
                     text = TextItem(
                         "Default",
                         action_data,
-                        self.ItemHasMoved,
                         self.core.UpdateActiveSceneItem,
                         self.core.UpdateDetails
                     )
@@ -190,6 +159,3 @@ class SceneViewer(QtWidgets.QWidget):
                 self.scene.removeItem(item)
 
             self.core.UpdateActiveSceneItem()
-
-    def ItemHasMoved(self, new_pos):
-        print(new_pos)

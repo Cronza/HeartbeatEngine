@@ -2,4 +2,19 @@ EditorSettings:
   version: 0.1
   version_string: Created with Heartbeat Editor v0.1
   max_tabs: 3
-
+  theme: ":/Themes/Dark.css"
+  fonts:
+    - ":/Fonts/Comfortaa-Regular.ttf"
+    - ":/Fonts/Comfortaa-Light.ttf"
+    - ":/Fonts/Comfortaa-Bold.ttf"
+    - ":/Fonts/Cabin-Regular.ttf"
+    - ":/Fonts/Cabin-Medium.ttf"
+    - ":/Fonts/Cabin-Medium-Italic.ttf"
+    - ":/Fonts/Cabin-Bold.ttf"
+    - ":/Fonts/Cabin-Bold-Italic.ttf"
+    - ":/Fonts/Cabin-SemiBold.ttf"
+    - ":/Fonts/Cabin-SemiBold-Italic.ttf"
+    - ":/Fonts/Dustismo-Regular.ttf"
+    - ":/Fonts/Dustismo-Italic.ttf"
+    - ":/Fonts/Dustismo-Bold.ttf"
+    - ":/Fonts/Dustismo-Bold-Italic.ttf"

@@ -26,12 +26,14 @@ class HBEditorUI:
         self.e_core = e_core
 
     def setupUi(self, MainWindow):
+
+        self.LoadFonts(Settings.getInstance().editor_data['EditorSettings']["fonts"])
+        self.LoadTheme(Settings.getInstance().editor_data['EditorSettings']["theme"])
+
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-        MainWindow.setWindowIcon(
-            QtGui.QIcon(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png"))
-        )
+        MainWindow.setWindowIcon(QtGui.QIcon(":/Icons/Engine_Logo.png"))
 
         # Build the core window widget object
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -47,6 +49,7 @@ class HBEditorUI:
 
         # Allow the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
+        self.main_resize_container.setContentsMargins(0, 0, 0, 0)
         self.main_resize_container.setOrientation(Qt.Vertical)
 
         # ****** Add everything to the interface ******
@@ -71,13 +74,10 @@ class HBEditorUI:
         # *** Build the Menu Bar ***
         self.menu_bar = QtWidgets.QMenuBar(main_window)
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 1024, 21))
-        self.menu_bar.setFont(Settings.getInstance().button_font)
-        self.menu_bar.setStyleSheet(Settings.getInstance().button_color)
 
         # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
-        self.file_menu.setFont(Settings.getInstance().button_font)
-        self.file_menu.setStyleSheet(Settings.getInstance().button_color)
+        self.file_menu.setWindowFlags(self.file_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_new_file = QtWidgets.QAction(main_window)
         self.a_new_file.triggered.connect(self.e_core.NewFile)
         self.a_open_file = QtWidgets.QAction(main_window)
@@ -99,24 +99,21 @@ class HBEditorUI:
 
         # Settings Menu
         self.settings_menu = QtWidgets.QMenu(self.menu_bar)
-        self.settings_menu.setFont(Settings.getInstance().button_font)
-        self.settings_menu.setStyleSheet(Settings.getInstance().button_color)
+        self.settings_menu.setWindowFlags(self.settings_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_open_project_settings = QtWidgets.QAction(main_window)
         self.a_open_project_settings.triggered.connect(self.e_core.OpenProjectSettings)
         self.settings_menu.addAction(self.a_open_project_settings)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self.menu_bar)
-        self.play_menu.setFont(Settings.getInstance().button_font)
-        self.play_menu.setStyleSheet(Settings.getInstance().button_color)
+        self.play_menu.setWindowFlags(self.play_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_play_game = QtWidgets.QAction(main_window)
         self.a_play_game.triggered.connect(self.e_core.Play)
         self.play_menu.addAction(self.a_play_game)
 
         # Build Menu
         self.build_menu = QtWidgets.QMenu(self.menu_bar)
-        self.build_menu.setFont(Settings.getInstance().button_font)
-        self.build_menu.setStyleSheet(Settings.getInstance().button_color)
+        self.build_menu.setWindowFlags(self.build_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_build = QtWidgets.QAction(main_window)
         self.a_build.triggered.connect(self.e_core.Build)
         self.a_build_clean = QtWidgets.QAction(main_window)
@@ -173,11 +170,11 @@ class HBEditorUI:
         """ Creates the main tab editor window, allowing specific editors to be added to it """
         self.main_editor_container = QtWidgets.QWidget()
         self.main_editor_layout = QtWidgets.QVBoxLayout(self.main_editor_container)
-        self.main_editor_layout.setContentsMargins(2,2,2,2)
+        self.main_editor_layout.setContentsMargins(0, 0, 0, 0)
         self.main_editor_layout.setSpacing(0)
         self.main_tab_editor = QtWidgets.QTabWidget(self.main_editor_container)
-        self.main_tab_editor.setFont(Settings.getInstance().button_font)
-        self.main_tab_editor.setStyleSheet(Settings.getInstance().button_color)
+        self.main_tab_editor.setVisible(False)
+        self.main_tab_editor.setElideMode(0)
         self.main_tab_editor.setTabsClosable(True)
         self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
         self.main_tab_editor.currentChanged.connect(self.ChangeTab)
@@ -193,13 +190,16 @@ class HBEditorUI:
         """ Updates the active editor when the tab selection changes """
         if index != -1:
             self.e_core.active_editor = self.main_tab_editor.widget(index).core
+            if not self.main_tab_editor.isVisible():
+                self.main_tab_editor.setVisible(True)
         else:
             self.e_core.active_editor = None
+            self.main_tab_editor.setVisible(False)
 
     def CreateBottomTabContainer(self):
         """ Creates the bottom tab editor window, allowing sub editors such as the logger to be added to it """
         self.bottom_tab_editor = QtWidgets.QTabWidget(self.main_resize_container)
-        self.bottom_tab_editor.setFont(Settings.getInstance().button_font)
+        self.bottom_tab_editor.setContentsMargins(0, 0, 0, 0)
         self.main_resize_container.insertWidget(1, self.bottom_tab_editor)
 
     def CreateGettingStartedDisplay(self):
@@ -208,17 +208,15 @@ class HBEditorUI:
         self.getting_started_layout = QtWidgets.QVBoxLayout(self.getting_started_container)
 
         getting_started_title = QtWidgets.QLabel("Getting Started")
-        getting_started_title.setFont(Settings.getInstance().editor_info_title_font)
-        getting_started_title.setStyleSheet(Settings.getInstance().editor_info_title_color)
+        getting_started_title.setObjectName("text-soft-h1")
 
         getting_started_message = QtWidgets.QLabel()
+        getting_started_message.setObjectName("text-soft")
         getting_started_message.setText(
             "To access editor features, please open a Heartbeat project: \n\n"
             "1) Go to 'File' -> 'New Project' to Create a new Heartbeat project\n"
             "2) Go to 'File' -> 'Open Project' to Open an existing Heartbeat project"
         )
-        getting_started_message.setFont(Settings.getInstance().editor_info_paragraph_font)
-        getting_started_message.setStyleSheet(Settings.getInstance().editor_info_paragraph_color)
 
         self.getting_started_layout.setAlignment(Qt.AlignCenter)
         self.getting_started_layout.addWidget(getting_started_title)
@@ -247,6 +245,21 @@ class HBEditorUI:
         self.main_tab_editor.removeTab(index)
 
         Logger.getInstance().Log("Editor closed")
+
+    def LoadTheme(self, theme_path) -> None:
+        """ Given the resource path to a theme .css file, load it and apply it to the editor application """
+        theme_file = QtCore.QFile(theme_path)
+        if theme_file.open(QtCore.QFile.ReadOnly):
+            self.e_core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
+        else:
+            Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
+            print(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}")
+
+    def LoadFonts(self, fonts):
+        """ Given a list of resource paths to font files, load them so they're available throughout the editor """
+        for font in fonts:
+            if QtGui.QFontDatabase.addApplicationFont(font) < 0:
+                Logger.getInstance().Log(f"Failed to load font '{font}'", 4)
 
 #if __name__ == "__main__":
 #    import sys

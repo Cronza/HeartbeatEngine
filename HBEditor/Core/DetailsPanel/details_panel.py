@@ -40,42 +40,25 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # Create title
         self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setFont(Settings.getInstance().header_1_font)
-        self.details_title.setStyleSheet(Settings.getInstance().header_1_color)
+        self.details_title.setObjectName("h1")
         self.details_title.setText("Details")
 
         # Create the toolbar
-        self.details_toolbar = QtWidgets.QFrame(self)
-        self.details_toolbar.setAutoFillBackground(False)
-        self.details_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
-            "}"
-        )
-        self.details_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.details_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.details_toolbar_layout = QtWidgets.QHBoxLayout(self.details_toolbar)
-        self.details_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.details_toolbar_layout.setSpacing(0)
+        #self.details_toolbar = QtWidgets.QToolBar(self)
 
         # Create search filter
-        self.details_filter = QtWidgets.QLineEdit(self.details_toolbar)
-        self.details_filter.setPlaceholderText("filter...")
-        self.details_toolbar_layout.addWidget(self.details_filter)
-
-        # Create Empty Space Spacer
-        spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.details_toolbar_layout.addItem(spacer)
+        #self.details_filter = QtWidgets.QLineEdit(self.details_toolbar)
+        #self.details_filter.setPlaceholderText("filter...")
+        #self.details_toolbar.addWidget(self.details_filter)
 
         # Create Details List
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
-        self.details_tree.header().setFont(Settings.getInstance().button_font)
+        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
         self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -92,7 +75,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
-        self.details_layout.addWidget(self.details_toolbar)
+        #self.details_layout.addWidget(self.details_toolbar)
         self.details_layout.addWidget(self.details_tree)
 
     def PopulateDetails(self, selected_entry):

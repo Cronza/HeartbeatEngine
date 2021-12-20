@@ -28,6 +28,7 @@ from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from HBEditor.Content import content
 from Tools.HBBuilder.hb_builder import HBBuilder
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
@@ -35,6 +36,7 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
+
         self.main_window = QtWidgets.QMainWindow()
         self.e_ui = hbe.HBEditorUI(self)
         self.e_ui.setupUi(self.main_window)
@@ -156,7 +158,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_file_prompt = NewFileMenu(
-                "Content/Icons/Engine_Logo.png",
+                ":/Icons/Engine_Logo.png",
                 "Choose a File Type"
             )
 

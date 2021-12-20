@@ -33,7 +33,7 @@ class NewFileMenu(BasePopupMenu):
         self.options_list = QtWidgets.QListWidget()
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Engine_Logo.png")),
+            QtGui.QPixmap(":/Icons/Engine_Logo.png"),
             QtGui.QIcon.Normal,
             QtGui.QIcon.Off
         )
@@ -62,7 +62,6 @@ class NewFileMenu(BasePopupMenu):
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
-        self.description.setFont(Settings.getInstance().paragraph_font)
 
         self.options_layout.addWidget(self.options_list, 2)
         self.options_layout.addWidget(self.description, 1, Qt.AlignTop)
