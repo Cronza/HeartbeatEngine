@@ -51,6 +51,7 @@
     </qresource>
     <qresource prefix="Themes">
         <file alias="Dark.css">Themes/Dark/Dark.css</file>
+        <file alias="Light.css">Themes/Light/Light.css</file>
     </qresource>
 </RCC>
 

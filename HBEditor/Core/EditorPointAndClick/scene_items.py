@@ -16,12 +16,11 @@ class SceneItemUtilities:
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, SceneItemUtilities):
-    def __init__(self, pixmap, action_data, move_func, select_func, data_changed_func):
+    def __init__(self, pixmap, action_data, select_func, data_changed_func):
         super().__init__(pixmap)
 
         self.action_data = action_data
 
-        self.move_func = move_func
         self.select_func = select_func
         self.data_changed_func = data_changed_func
 
@@ -131,12 +130,11 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, SceneItemUtilities):
 
 
 class TextItem(QtWidgets.QGraphicsTextItem, SceneItemUtilities):
-    def __init__(self, text, action_data, move_func, select_func, data_changed_func):
+    def __init__(self, text, action_data, select_func, data_changed_func):
         super().__init__(text)
 
         self.action_data = action_data
 
-        self.move_func = move_func
         self.select_func = select_func
         self.data_changed_func = data_changed_func
 

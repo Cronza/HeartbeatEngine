@@ -106,13 +106,12 @@ class SceneViewer(QtWidgets.QWidget):
         for actions in self.core.possible_actions.values():
             if action_data["action_name"] in actions:
                 item_type = actions[action_data["action_name"]]
-                print(item_type)
+
                 if item_type == "sprite":
                     image = QtGui.QPixmap(":/Sprites/Placeholder.png")
                     sprite = SpriteItem(
                         image,
                         action_data,
-                        self.ItemHasMoved,
                         self.core.UpdateActiveSceneItem,
                         self.core.UpdateDetails
                     )
@@ -124,7 +123,6 @@ class SceneViewer(QtWidgets.QWidget):
                     text = TextItem(
                         "Default",
                         action_data,
-                        self.ItemHasMoved,
                         self.core.UpdateActiveSceneItem,
                         self.core.UpdateDetails
                     )
@@ -161,6 +159,3 @@ class SceneViewer(QtWidgets.QWidget):
                 self.scene.removeItem(item)
 
             self.core.UpdateActiveSceneItem()
-
-    def ItemHasMoved(self, new_pos):
-        print(new_pos)

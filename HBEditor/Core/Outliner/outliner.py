@@ -91,7 +91,6 @@ class Outliner:
         """ Delete the provided folder recursively. Editors will remain open if the user wishes to resave """
         print("Deleting folder")
         try:
-            print(path)
             shutil.rmtree(path)
             Logger.getInstance().Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
         except Exception as exc:
