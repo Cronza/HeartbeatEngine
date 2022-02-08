@@ -15,6 +15,8 @@
 from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Primitives.input_entries import *
+from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
+from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 
 # @TODO: Split this file up into a functions class & U.I class
@@ -80,7 +82,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
     def PopulateDetails(self, selected_entry):
         """
-        Populates the details table with an entry for all relevant action_data parameters of the given entry.
+        Populates the details tree with an entry for all relevant action_data parameters of the given entry.
         If an entry is already selected, cache the values of all detail entries in the previously selected entry,
         and load the cache from the new selection if applicable
 
@@ -130,24 +132,22 @@ class DetailsPanel(QtWidgets.QWidget):
                 details_entry_parent = self.details_tree.invisibleRootItem()
                 if "requirements" in self.active_entry.action_data:
                     action_data_target = self.active_entry.action_data["requirements"]
-
             for details_entry_index in range(0, details_entry_parent.childCount()):
                 details_entry = details_entry_parent.child(details_entry_index)
                 details_entry_name = details_entry.name_widget.text()
-
                 # Are there any requirements to cache?
                 if action_data_target:
                     # Since the requirements list is a list, we need to parse through for specifically for the
                     # match for this entry
                     for requirement in action_data_target:
                         if requirement["name"] == details_entry_name:
-                            # If this details_entry has children (IE. It's a container), recursively update the cache for
-                            # any and all children entries
+                            # If this details_entry has children (IE. It's a container), recursively update the
+                            # cache for any and all children entries
                             if details_entry.childCount() > 0 and "children" in requirement: #@TODO: TESTING: Please review
                                 self.UpdateCache(details_entry, requirement["children"])
 
-                            # Containers don't store values themselves, so the above code accounts solely for it's children
-                            # If this entry is not a container, lets cache normally
+                            # Containers don't store values themselves, so the above code accounts solely for
+                            # it's children. If this entry is not a container, lets cache normally
                             else:
                                 requirement["value"] = details_entry.Get()
 
@@ -165,7 +165,7 @@ class DetailsPanel(QtWidgets.QWidget):
         details_widget.name_widget.setText(data["name"])
 
         # Containers are special in that they don't hold data, so generally ignore them for certain actions
-        if not data["type"] == "container":
+        if "children" not in data:
 
             # Only show the global toggle if this detail has a global setting. By default, all settings with global
             # values use the global toggle
@@ -175,14 +175,15 @@ class DetailsPanel(QtWidgets.QWidget):
                 # Keep the global toggle off if the user previously turned it off
                 if "active" in data["global"]:
                     if data["global"]["active"]:
-                        details_widget.global_toggle.Set(True)
+
+                        details_widget.global_toggle.checkbox.setChecked(True)
                     else:
-                        details_widget.global_toggle.Set(False)
+                        details_widget.global_toggle.checkbox.setChecked(False)
                 else:
-                    details_widget.global_toggle.Set(True)
+                    details_widget.global_toggle.checkbox.setChecked(True)
 
             # Update the contents of the entry
-            details_widget.Set(data["value"])
+            EntryUpdater.Set(details_widget, data["value"])
 
             # Make the option read-only if applicable
             if not data["editable"]:
@@ -214,37 +215,35 @@ class DetailsPanel(QtWidgets.QWidget):
         """ Given an action data dict, create and return the relevant details widget """
         #@TODO: Can this be converted to use an enum?
 
-        data_type = data['type']
+        data_type = ParameterType[data["type"]]
 
-        if data_type == "str":
+        if data_type == ParameterType.String:
              return InputEntryText(self.DetailEntryUpdated)
-        elif data_type == "paragraph":
+        elif data_type == ParameterType.Paragraph:
             return InputEntryParagraph(self.DetailEntryUpdated)
-        elif data_type == "vector2":
+        elif data_type == ParameterType.Vector2:
             return InputEntryTuple(self.DetailEntryUpdated)
-        elif data_type == "bool":
+        elif data_type == ParameterType.Bool:
             return InputEntryBool(self.DetailEntryUpdated)
-        elif data_type == "color":
+        elif data_type == ParameterType.Color:
             return InputEntryColor(self.DetailEntryUpdated)
-        elif data_type == "int":
+        elif data_type == ParameterType.Int:
             return InputEntryInt(self.DetailEntryUpdated)
-        elif data_type == "float":
+        elif data_type == ParameterType.Float:
             return InputEntryFloat(self.DetailEntryUpdated)
-        elif data_type == "file":
-            return InputEntryFileSelector(self, "", self.DetailEntryUpdated)
-        elif data_type == "file_data":
+        elif data_type == ParameterType.File_Data:
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Data"], self.DetailEntryUpdated)
-        elif data_type == "file_image":
+        elif data_type == ParameterType.File_Image:
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Image"], self.DetailEntryUpdated)
-        elif data_type == "file_font":
+        elif data_type == ParameterType.File_Font:
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Font"], self.DetailEntryUpdated)
-        elif data_type == "file_sound":
+        elif data_type == ParameterType.File_Sound:
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Sound"], self.DetailEntryUpdated)
-        elif data_type == "dropdown":
+        elif data_type == ParameterType.Dropdown:
             return InputEntryDropdown(data['options'], self.DetailEntryUpdated)
-        elif data_type == "choice":
+        elif data_type == ParameterType.Choice:
             return InputEntryChoice(data, self.AddEntry, self.CreateEntryWidget, self.branch_list, self.DetailEntryUpdated)
-        elif data_type == "container":
+        elif data_type == ParameterType.Container:
             new_entry = InputEntryContainer(data['children'])
             for child in data['children']:
                 new_entry.addChild(self.CreateEntryWidget(child))

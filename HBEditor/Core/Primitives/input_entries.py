@@ -55,8 +55,10 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
 
         # 'global_toggle' is not supposed to be shown for all entries. It's only used for entries that need it
         self.show_global_toggle = False
+        ##########################################################
         self.global_toggle = SimpleCheckbox(self.GlobalToggle)
         self.global_toggle.setToolTip("Whether to use the global value specified in the project file for this entry")
+        ##########################################################
 
         self.main_layout = QtWidgets.QHBoxLayout(self.input_container)
         self.main_layout.setContentsMargins(0,0,0,0)
@@ -64,8 +66,13 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
     def Get(self):
         pass
 
-    def Set(self, data) -> None:
+    def Connect(self):
+        """ Establish the signal for when the input_widget is updated """
         pass
+
+    def Disconnect(self):
+        """ Dismantle the signal that monitors the input_widget changes """
+        self.input_widget.disconnect()
 
     def GetGlobal(self) -> bool:
         """ Returns the current value of the global checkbox """
@@ -101,6 +108,7 @@ class InputEntryBase(QtWidgets.QTreeWidgetItem):
         else:
             self.SetEditable(0)
 
+
 class InputEntryBool(InputEntryBase):
     def __init__(self, refresh_func=None):
         super().__init__(refresh_func)
@@ -116,14 +124,7 @@ class InputEntryBool(InputEntryBase):
     def Get(self) -> bool:
         return self.input_widget.isChecked()
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setChecked(data)
-
-        # Now that the input is changed, reconnect
+    def Connect(self):
         self.input_widget.stateChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
@@ -133,6 +134,7 @@ class InputEntryBool(InputEntryBase):
             self.input_widget.setEnabled(False)
 
         self.input_widget.style().polish(self.input_widget)
+
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, refresh_func=None):
@@ -169,10 +171,6 @@ class InputEntryColor(InputEntryBase):
         color = re.search(pattern, raw_style_sheet).group(1)
         return list(map(int, color.split(",")))
 
-    def Set(self, data) -> None:
-        # Change the data without causing any signal calls
-        self.input_widget.setStyleSheet(f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})")
-
     def SetEditable(self, state: int):
         if state == 0:
             self.color_select_button.setEnabled(True)
@@ -202,9 +200,6 @@ class InputEntryContainer(InputEntryBase):
     def Get(self):
         pass
 
-    def Set(self, data, toggle_global=True) -> None:
-        pass
-
 
 class InputEntryDropdown(InputEntryBase):
     def __init__(self, options, refresh_func=None):
@@ -226,14 +221,7 @@ class InputEntryDropdown(InputEntryBase):
     def Get(self):
         return self.input_widget.currentText()
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setCurrentIndex(self.input_widget.findText(data))
-
-        # Now that the input is changed, reconnect
+    def Connect(self):
         self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
@@ -243,6 +231,7 @@ class InputEntryDropdown(InputEntryBase):
             self.input_widget.setEnabled(False)
 
         self.input_widget.style().polish(self.input_widget)
+
 
 class InputEntryFileSelector(InputEntryBase):
     def __init__(self, details_panel, type_filter, refresh_func=None):
@@ -256,7 +245,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
         self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget.setReadOnly(False)
+        self.input_widget.setReadOnly(True)
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -276,23 +265,13 @@ class InputEntryFileSelector(InputEntryBase):
     def Get(self):
         return self.input_widget.text()
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setText(data)
-
-        # Now that the input is changed, reconnect
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
-
     def SetEditable(self, state: int):
         if state == 0:
             self.file_select_button.setEnabled(True)
-            self.input_widget.setReadOnly(False)
+            #self.input_widget.setReadOnly(False)
         elif state == 2:
             self.file_select_button.setEnabled(False)
-            self.input_widget.setReadOnly(True)
+            #self.input_widget.setReadOnly(True)
 
         self.input_widget.style().polish(self.input_widget)
 
@@ -320,7 +299,7 @@ class InputEntryFloat(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textEdited.connect(self.InputValueUpdated)
 
         # Limit entered values to float only
         self.validator = QtGui.QDoubleValidator()
@@ -345,16 +324,6 @@ class InputEntryFloat(InputEntryBase):
 
         return conv_val
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setText(str(data))
-
-        # Now that the input is changed, reconnect
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
-
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
@@ -378,7 +347,7 @@ class InputEntryInt(InputEntryBase):
         self.input_widget.setText("0")
 
         # Signal
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textEdited.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
@@ -395,16 +364,6 @@ class InputEntryInt(InputEntryBase):
             pass
 
         return conv_val
-
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setText(str(data))
-
-        # Now that the input is changed, reconnect
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -429,15 +388,7 @@ class InputEntryParagraph(InputEntryBase):
     def Get(self) -> str:
         return self.input_widget.toPlainText()
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        #self.input_widget.setPlainText("This is a test string\nI wonder if the line break worked") # DEBUG
-        self.input_widget.setPlainText(data)
-
-        # Now that the input is changed, reconnect
+    def Connect(self):
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
@@ -453,7 +404,7 @@ class InputEntryText(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textEdited.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
@@ -461,14 +412,7 @@ class InputEntryText(InputEntryBase):
     def Get(self) -> str:
         return self.input_widget.text()
 
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setText(data)
-
-        # Now that the input is changed, reconnect
+    def Connect(self):
         self.input_widget.textChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
@@ -501,8 +445,8 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.setText("0")
 
         # Signals
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textEdited.connect(self.InputValueUpdated)
+        self.input_widget_alt.textEdited.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget_title)
@@ -530,19 +474,6 @@ class InputEntryTuple(InputEntryBase):
             pass
 
         return [conv_x, conv_y]
-
-    def Set(self, data) -> None:
-        # Disconnect the input change signal to allow us to perform the change without flipping the global toggle
-        self.input_widget.disconnect()
-        self.input_widget_alt.disconnect()
-
-        # Change the data without causing any signal calls
-        self.input_widget.setText(str(data[0]))
-        self.input_widget_alt.setText(str(data[1]))
-
-        # Now that the input is changed, reconnect
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
-        self.input_widget_alt.textChanged.connect(self.InputValueUpdated)
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -642,11 +573,12 @@ class InputEntryChoice(InputEntryBase):
         key_input.name_widget.setText("key")
         self.add_to_parent_func(key_input, new_choice_container)
 
+        from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
         if data:
-            key_input.Set(data["key"])
-            branch_dropdown.Set(data["branch"])
+            EntryUpdater.Set(key_input, data["key"])
+            EntryUpdater.Set(branch_dropdown, data["branch"])
         else:
-            key_input.Set(f"Choice_{self.childCount()}")
+            EntryUpdater.Set(key_input, f"Choice_{self.childCount()}")
 
         # Add an input widget for each item in the 'template' dict
         for item in self.data["template"]:
@@ -654,7 +586,7 @@ class InputEntryChoice(InputEntryBase):
             self.add_to_parent_func(new_choice_detail, new_choice_container)
             if data:
                 if item["name"] in data:
-                    new_choice_detail.Set(data[item["name"]])
+                    EntryUpdater.Set(new_choice_detail, data[item["name"]])
 
         # Change the entry to use the key name (Faster than using the update function since we already have the ref)
         new_choice_container.name_widget.setText(key_input.Get())

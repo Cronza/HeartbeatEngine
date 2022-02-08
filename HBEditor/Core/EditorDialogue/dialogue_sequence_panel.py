@@ -17,6 +17,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
+from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 
 class DialogueSequencePanel(QtWidgets.QWidget):
@@ -285,7 +286,7 @@ class DialogueEntry(QtWidgets.QWidget):
                 param_name = param["name"]
                 param_data = None
 
-                if param["type"] == "container":
+                if ParameterType[param["type"]] == ParameterType.Container:
                     # Recurse, searching the children as well
                     cur_string += f"{param_name}: ["
                     cur_string += self.CompileSubtextString(param['children'])

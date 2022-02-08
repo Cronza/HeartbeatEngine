@@ -491,5 +491,12 @@ class HBEditor:
             Logger.getInstance().Log(str(exc), 4)
             return ""
 
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
+
+
+sys.excepthook = except_hook
+
+print(sys.excepthook)
 if __name__ == "__main__":
     editor = HBEditor()

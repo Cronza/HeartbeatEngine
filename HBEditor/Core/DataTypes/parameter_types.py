@@ -23,9 +23,11 @@ class ParameterType(Enum):
     Vector2 = 5
     Paragraph = 6
     Color = 7
-    File = 8
+    File_Data = 8
     File_Font = 9
     File_Image = 10
-    Dropdown = 11
-    Container = 12
-    CUST_Resolution = 13
+    File_Sound = 11
+    Dropdown = 12
+    Container = 13
+    Choice = 14
+    CUST_Resolution = 15

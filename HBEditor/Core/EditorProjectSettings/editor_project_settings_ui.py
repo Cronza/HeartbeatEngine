@@ -18,6 +18,7 @@ from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
 from HBEditor.Core.Primitives.input_entries import *
 from HBEditor.Core.EditorProjectSettings.input_entry_resolution import InputEntryResolution
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
+from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
 
 
 class EditorProjectSettingsUI(EditorBaseUI):
@@ -159,7 +160,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
 
             # Dropdown widgets initialize earlier with a list, and accept single strings through 'Set'. Skip this init
             if data_type != ParameterType.CUST_Resolution:
-                new_entry.Set(data)
+                EntryUpdater.Set(new_entry, data)
 
             if not parent:
                 self.settings_table.addTopLevelItem(new_entry)
@@ -189,7 +190,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
             return InputEntryParagraph(None)
         elif data_type == ParameterType.Color:
             return InputEntryColor(None)
-        elif data_type == ParameterType.File:
+        elif data_type == ParameterType.File_Data:
             return InputEntryFileSelector(self, "", None)
         elif data_type == ParameterType.File_Font:
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types['Font'], None)

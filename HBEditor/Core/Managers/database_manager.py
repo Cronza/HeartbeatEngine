@@ -14,6 +14,7 @@
 """
 import copy
 from HBEditor.Core.settings import Settings
+from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 
 class DBManager:
@@ -59,7 +60,7 @@ class DBManager:
 
         if term in editor_action_data:
             for requirement in editor_action_data[term]:
-                if requirement["type"] != "container":
+                if ParameterType[requirement["type"]] != ParameterType.Container:
 
                     # Exclude requirements that are pointing to a global setting. The engine will take care of this at
                     # runtime since any global value stored in a file will become outdated as soon as the global setting
@@ -123,7 +124,7 @@ class DBManager:
         # settings
         if term in editor_action_data:
             for requirement in editor_action_data[term]:
-                if requirement["type"] != "container":
+                if ParameterType[requirement["type"]] != ParameterType.Container:
 
                     # If the requirement is present, and it does have a global option, then it's an override
                     if requirement["name"] in engine_action_data:

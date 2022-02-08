@@ -160,7 +160,6 @@ class BranchesPanel(QtWidgets.QWidget):
         for entry_index in range(0, self.branches_list.count()):
             entry = self.branches_list.itemWidget(self.branches_list.item(entry_index))
 
-            print(source_branch)
             if source_branch:
                 if entry == source_branch:
                     continue

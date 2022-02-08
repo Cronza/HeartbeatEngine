@@ -22,25 +22,25 @@ Renderables:
       action_name: "create_sprite"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: ""
           editable: True
           preview: True
 
         - name: "sprite"
-          type: "file_image"
+          type: "File_Image"
           value: "None"
           editable: True
           preview: True
 
         - name: "position"
-          type: "vector2"
+          type: "Vector2"
           value: [0.5, 0.5]
           editable: True
           preview: True
 
         - name: "center_align"
-          type: "bool"
+          type: "Bool"
           value: True
           global: 
             active: True
@@ -48,13 +48,13 @@ Renderables:
           preview: True
 
         - name: "flip"
-          type: "bool"
+          type: "Bool"
           value: False
           editable: True
           preview: False
 
         - name: "z_order"
-          type: "int"
+          type: "Int"
           value: 0
           global: 
             active: True
@@ -62,11 +62,11 @@ Renderables:
           preview: True
 
         - name: "transition"
-          type: "container"
+          type: "Container"
           preview: True
           children:
             - name: "type"
-              type: "dropdown"
+              type: "Dropdown"
               value: "None"
               options:
                 - "None"
@@ -75,13 +75,13 @@ Renderables:
               preview: True
 
             - name: "speed"
-              type: "int"
+              type: "Int"
               value: 500
               editable: True
               preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_for_input"
           options:
             - "no_wait"
@@ -94,19 +94,19 @@ Renderables:
       action_name: "create_text"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: ""
           editable: True
           preview: True
 
         - name: "position"
-          type: "vector2"
+          type: "Vector2"
           value: [0.5,0.5]
           editable: True
           preview: True
 
         - name: "center_align"
-          type: "bool"
+          type: "Bool"
           value: True
           global: 
             active: True
@@ -114,13 +114,13 @@ Renderables:
           preview: False
 
         - name: "text"
-          type: "paragraph"
+          type: "Paragraph"
           value: ""
           editable: True
           preview: True
 
         - name: "text_size"
-          type: "int"
+          type: "Int"
           value: 24
           global: 
             active: True
@@ -128,7 +128,7 @@ Renderables:
           preview: True
 
         - name: "text_color"
-          type: "color"
+          type: "Color"
           value: [255, 255, 255]
           global: 
             active: True
@@ -136,7 +136,7 @@ Renderables:
           preview: True
 
         - name: "font"
-          type: "file_font"
+          type: "File_Font"
           value: "None"
           global: 
             active: True
@@ -144,7 +144,7 @@ Renderables:
           preview: False
 
         - name: "z_order"
-          type: "int"
+          type: "Int"
           value: 0
           global: 
             active: True
@@ -152,7 +152,7 @@ Renderables:
           preview: True
 
         - name: "wrap_bounds"
-          type: "vector2"
+          type: "Vector2"
           value: [0.2,0.2]
           global:
             active: True
@@ -160,11 +160,11 @@ Renderables:
           preview: False
 
         - name: "transition"
-          type: "container"
+          type: "Container"
           preview: True
           children:
             - name: "type"
-              type: "dropdown"
+              type: "Dropdown"
               value: "None"
               options:
                 - "None"
@@ -173,13 +173,13 @@ Renderables:
               preview: True
 
             - name: "speed"
-              type: "int"
+              type: "Int"
               value: 500
               editable: True
               preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_for_input"
           options:
             - "no_wait"
@@ -192,33 +192,33 @@ Renderables:
       action_name: "create_background"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: "Background"
           editable: False
           preview: True
 
         - name: "sprite"
-          type: "file_image"
+          type: "File_Image"
           value: "None"
           editable: True
           preview: True
 
         - name: "position"
-          type: "vector2"
+          type: "Vector2"
           value: [0,0]
           editable: True
           preview: False
 
         - name: "z_order"
-          type: "int"
+          type: "Int"
           value: -9999
-          global: 
+          global:
             active: True
-          editable: False
+          editable: True
           preview: False
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "no_wait"
           options:
             - "no_wait"
@@ -231,17 +231,17 @@ Renderables:
       action_name: "remove_renderable"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: ""
           editable: True
           preview: True
 
         - name: "transition"
-          type: "container"
+          type: "Container"
           preview: True
           children:
             - name: "type"
-              type: "dropdown"
+              type: "Dropdown"
               value: "None"
               options:
                 - "None"
@@ -250,13 +250,13 @@ Renderables:
               preview: True
 
             - name: "speed"
-              type: "int"
+              type: "Int"
               value: 500
               editable: True
               preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "no_wait"
           options:
             - "no_wait"
@@ -273,7 +273,7 @@ Dialogue:
       action_name: "create_dialogue_interface"
       requirements:
         - name: "sprite"
-          type: "file_image"
+          type: "File_Image"
           value: "None"
           global: 
             active: True
@@ -281,7 +281,7 @@ Dialogue:
           preview: True
 
         - name: "position"
-          type: "vector2"
+          type: "Vector2"
           value: [0,0]
           global: 
             active: True
@@ -289,7 +289,7 @@ Dialogue:
           preview: True
 
         - name: "center_align"
-          type: "bool"
+          type: "Bool"
           value: True
           global: 
             active: True
@@ -297,7 +297,7 @@ Dialogue:
           preview: True
 
         - name: "z_order"
-          type: "int"
+          type: "Int"
           value: 0
           global: 
             active: True
@@ -305,7 +305,7 @@ Dialogue:
           preview: True
         
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "no_wait"
           options:
             - "no_wait"
@@ -320,17 +320,17 @@ Dialogue:
       action_name: "dialogue"
       requirements:
         - name: "speaker"
-          type: "container"
+          type: "Container"
           preview: True
           children:
             - name: "key"
-              type: "str"
+              type: "String"
               value: "SpeakerText"
               editable: False
               preview: False
 
             - name: "position"
-              type: "vector2"
+              type: "Vector2"
               value: [0,0]
               global: 
                 active: True
@@ -338,7 +338,7 @@ Dialogue:
               preview: False
 
             - name: "center_align"
-              type: "bool"
+              type: "Bool"
               value: True
               global: 
                 active: True
@@ -346,13 +346,13 @@ Dialogue:
               preview: False
 
             - name: "text"
-              type: "str"
+              type: "String"
               value: ""
               editable: True
               preview: True
 
             - name: "text_size"
-              type: "int"
+              type: "Int"
               value: 24
               global: 
                 active: True
@@ -360,7 +360,7 @@ Dialogue:
               preview: False
 
             - name: "text_color"
-              type: "color"
+              type: "Color"
               value: [255, 255, 255]
               global: 
                 active: True
@@ -368,7 +368,7 @@ Dialogue:
               preview: False
 
             - name: "font"
-              type: "file_font"
+              type: "File_Font"
               value: "None"
               global: 
                 active: True
@@ -376,7 +376,7 @@ Dialogue:
               preview: False
 
             - name: "z_order"
-              type: "int"
+              type: "Int"
               value: 0
               global: 
                 active: True
@@ -384,11 +384,11 @@ Dialogue:
               preview: False
 
             - name: "transition"
-              type: "container"
+              type: "Container"
               preview: False
               children:
                 - name: "type"
-                  type: "dropdown"
+                  type: "Dropdown"
                   value: "None"
                   options:
                     - "fade_in"
@@ -397,23 +397,23 @@ Dialogue:
                   preview: False
 
                 - name: "speed"
-                  type: "int"
+                  type: "Int"
                   value: 500
                   editable: True
                   preview: False
 
         - name: "dialogue"
-          type: "container"
+          type: "Container"
           preview: True
           children:
             - name: "key"
-              type: "str"
+              type: "String"
               value: "DialogueText"
               editable: False
               preview: False
 
             - name: "position"
-              type: "vector2"
+              type: "Vector2"
               value: [0,0]
               global: 
                 active: True
@@ -421,7 +421,7 @@ Dialogue:
               preview: False
 
             - name: "center_align"
-              type: "bool"
+              type: "Bool"
               value: True
               global:
                 active: True
@@ -429,13 +429,13 @@ Dialogue:
               preview: False
 
             - name: "text"
-              type: "paragraph"
+              type: "Paragraph"
               value: ""
               editable: True
               preview: True
 
             - name: "text_size"
-              type: "int"
+              type: "Int"
               value: 24
               global: 
                 active: True
@@ -443,7 +443,7 @@ Dialogue:
               preview: False
 
             - name: "text_color"
-              type: "color"
+              type: "Color"
               value: [255, 255, 255]
               global: 
                 active: True
@@ -451,7 +451,7 @@ Dialogue:
               preview: False
 
             - name: "font"
-              type: "file_font"
+              type: "File_Font"
               value: "None"
               global: 
                 active: True
@@ -459,7 +459,7 @@ Dialogue:
               preview: False
 
             - name: "z_order"
-              type: "int"
+              type: "Int"
               value: 0
               global: 
                 active: True
@@ -467,11 +467,11 @@ Dialogue:
               preview: False
 
             - name: "transition"
-              type: "container"
+              type: "Container"
               preview: False
               children:
                 - name: "type"
-                  type: "dropdown"
+                  type: "Dropdown"
                   value: "None"
                   options:
                     - "fade_in"
@@ -480,13 +480,13 @@ Dialogue:
                   preview: False
 
                 - name: "speed"
-                  type: "int"
+                  type: "Int"
                   value: 500
                   editable: True
                   preview: False
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_for_input"
           options:
             - "no_wait"
@@ -500,25 +500,25 @@ Dialogue:
       action_name: "choice"
       requirements:
         - name: "choices"
-          type: "choice"
+          type: "Choice"
           value: ""
           editable: True
           preview: True
           template:
             - name: "position"
-              type: "vector2"
+              type: "Vector2"
               value: [ 0,0 ]
               editable: True
               preview: True
 
             - name: "text"
-              type: "str"
+              type: "String"
               value: ""
               editable: True
               preview: True
 
             - name: "text_size"
-              type: "int"
+              type: "Int"
               value: 24
               global:
                 active: True
@@ -526,7 +526,7 @@ Dialogue:
               preview: True
 
             - name: "text_color"
-              type: "color"
+              type: "Color"
               value: [ 255, 255, 255 ]
               global:
                 active: True
@@ -534,7 +534,7 @@ Dialogue:
               preview: True
 
             - name: "font"
-              type: "file_font"
+              type: "File_Font"
               value: "None"
               global:
                 active: True
@@ -542,7 +542,7 @@ Dialogue:
               preview: False
 
             - name: "z_order"
-              type: "int"
+              type: "Int"
               value: 0
               global:
                 active: True
@@ -557,7 +557,7 @@ Scene:
       action_name: "load_scene"
       requirements:
         - name: "scene_file"
-          type: "file_data"
+          type: "File_Data"
           value: ""
           editable: True
           preview: True
@@ -566,7 +566,7 @@ Scene:
       action_name: "fade_scene_from_black"
       requirements:
         - name: "z_order"
-          type: "int"
+          type: "Int"
           value: "9999"
           global:
             active: True
@@ -574,7 +574,7 @@ Scene:
           preview: True
 
         - name: "speed"
-          type: "int"
+          type: "Int"
           value: "150"
           global:
             active: True
@@ -582,7 +582,7 @@ Scene:
           preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_until_complete"
           options:
             - "no_wait"
@@ -599,13 +599,13 @@ Sound:
       action_name: "play_sfx"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: ""
           editable: True
           preview: True
 
         - name: "sound"
-          type: "file_sound"
+          type: "File_Sound"
           value: ""
           editable: True
           preview: True
@@ -617,7 +617,7 @@ Sound:
           preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_until_complete"
           options:
             - "no_wait"
@@ -643,13 +643,13 @@ Sound:
           preview: True
 
         - name: "loop"
-          type: "bool"
+          type: "Bool"
           value: False
           editable: True
           preview: True
 
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "no_wait"
           options:
             - "no_wait"
@@ -663,7 +663,7 @@ Sound:
       action_name: "stop_sfx"
       requirements:
         - name: "key"
-          type: "str"
+          type: "String"
           value: ""
           editable: True
           preview: True
@@ -680,12 +680,12 @@ Utilities:
       action_name: "wait"
       requirements:
         - name: "seconds"
-          type: "int"
+          type: "Int"
           value: 3
           editable: True
           preview: True
         - name: "post_wait"
-          type: "dropdown"
+          type: "Dropdown"
           value: "wait_until_complete"
           options:
             - "wait_until_complete"

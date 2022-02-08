@@ -9,7 +9,7 @@ Game:
   title: "String"
   author: "String"
   company: "String"
-  starting_scene: "File"
+  starting_scene: "File_Data"
 
 Window:
   resolution: "" # This is generated when choosing a value for 'resolution_options'
@@ -67,7 +67,7 @@ Dialogue:
   dialogue_frame_position: "Vector2"
 
 Pause Menu:
-  data_file: "File"
+  data_file: "File_Data"
 
 Scene Transitions:
   speed: "Int"
