@@ -164,11 +164,7 @@ class DetailsPanel(QtWidgets.QWidget):
         # Set the name (Applicable for all widget types)
         details_widget.name_widget.setText(data["name"])
 
-        # Containers are special in that they don't hold data, so generally ignore them for certain actions
         if "children" not in data:
-
-            # Only show the global toggle if this detail has a global setting. By default, all settings with global
-            # values use the global toggle
             if 'global' in data:
                 details_widget.show_global_toggle = True
 

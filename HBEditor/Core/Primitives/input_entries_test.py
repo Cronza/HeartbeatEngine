@@ -34,100 +34,49 @@ List of available entries:
 """
 
 
-class InputEntryBase(QtWidgets.QTreeWidgetItem):
+class InputEntryBase(QtWidgets.QWidget):
     def __init__(self, refresh_func=None):
         super().__init__()
 
-        # When the input widget is updated, in case another U.I element needs to refresh, use a callback
-        self.refresh_func = refresh_func
-
-        # Details entries have three main widgets: 'name_widget', 'input_widget' and 'global_toggle'.
-        # - 'name_widget': A standalone text widget representing the name of the detail
-        # - 'input_widget': Kept inside 'input_container' as to allow any number of input_widgets for child classes
-        # - 'global_toggle': A checkbox representing whether to use a global value or the value in the 'input_widget'
-
-        # 'name_widget' and 'input_widget' are declared, but not initialized as it is up to the subclass to
-        # do that
-        self.name_widget = QtWidgets.QLabel()
-
+        # It's up to the children to add the input_widget to the layout
         self.input_widget = None
-        self.input_container = QtWidgets.QWidget()
 
-        # 'global_toggle' is not supposed to be shown for all entries. It's only used for entries that need it
-        self.show_global_toggle = False
-
-        self.global_toggle = SimpleCheckbox(self.GlobalToggle)
-        self.global_toggle.setToolTip("Whether to use the global value specified in the project file for this entry")
-
-        self.main_layout = QtWidgets.QHBoxLayout(self.input_container)
+        self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(0,0,0,0)
 
     def Get(self):
         pass
 
-    def Connect(self):
-        """ Establish the signal for when the input_widget is updated """
+    def Set(self, data):
+        pass
+
+    def Connect(self, slot):
         pass
 
     def Disconnect(self):
-        """ Dismantle the signal that monitors the input_widget changes """
-        self.input_widget.disconnect()
-
-    def GetGlobal(self) -> bool:
-        """ Returns the current value of the global checkbox """
-        return self.global_toggle.Get()
+        pass
 
     def SetEditable(self, state: int):
-        """
-        Enables or disables editability of relevant input widgets based on the provided state
-        0 = Enabled, 2 = Disabled
-        """
         pass
-
-    def RefreshStyle(self):
-        """ Refreshes the stylesheet to update any dynamic properties """
-        pass
-
-    def InputValueUpdated(self):
-        """ When the input value for this entry is changed, call the refresh function provided to this class """
-        # Any change to detail entries while the global toggle is enabled will toggle it off
-        if self.global_toggle.Get():
-            self.global_toggle.Set(False)
-
-        if self.refresh_func:
-            self.refresh_func(self)
-
-    def GlobalToggle(self):
-        """
-        When the global checkbox is toggled on, call a provided function, passing a reference to this class
-        This function is not meant to be overridden
-        """
-        if self.global_toggle.Get():
-            self.SetEditable(2)
-        else:
-            self.SetEditable(0)
-
-        if self.refresh_func:
-            self.refresh_func(self)
 
 
 class InputEntryBool(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
-
+    def __init__(self):
+        super().__init__()
         self.input_widget = QtWidgets.QCheckBox()
-
-        # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
-
-        # Connect Signals
-        self.input_widget.stateChanged.connect(self.InputValueUpdated)
 
     def Get(self) -> bool:
         return self.input_widget.isChecked()
 
-    def Connect(self):
-        self.input_widget.stateChanged.connect(self.InputValueUpdated)
+    def Set(self, data):
+        self.input_widget.setChecked(bool(data))
+
+    def Connect(self, slot):
+        self.input_widget.stateChanged.connect(slot)
+
+    def Disconnect(self):
+        self.input_widget.disconnect()
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -139,21 +88,13 @@ class InputEntryBool(InputEntryBase):
 
 
 class InputEntryColor(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
-        # NOTE FOR THE LOGIC IN THIS FILE
-        # Qt doesn't really have a great way of changing widget colors. While stylesheets are nice, retrieving data
-        # from a stylesheet is a lesson in pain (You get ALL of the data, not just a part you actually want
-
-        # Additionally, to my knowledge, changing stylesheets don't cause a signal change unless you hook onto the
-        # underlying events. I try to avoid this complexity, so the way this file handles detecting changes is different
-        # than other detail types
+    def __init__(self):
+        super().__init__()
         self.input_widget = QtWidgets.QFrame()
         self.input_widget.setFrameStyle(QtWidgets.QFrame.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
 
         # @TODO: Replace style sheet assignment with a QPalette to retain button state styles
-        # Create the color selector button, and style it accordingly
         self.color_select_button = QtWidgets.QToolButton()
         self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
@@ -162,7 +103,6 @@ class InputEntryColor(InputEntryBase):
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 
-        # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addWidget(self.color_select_button)
 
@@ -172,6 +112,10 @@ class InputEntryColor(InputEntryBase):
 
         color = re.search(pattern, raw_style_sheet).group(1)
         return list(map(int, color.split(",")))
+
+    def Set(self, data):
+        css = f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})"
+        self.input_widget.input_widget.setStyleSheet(css)
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -222,6 +166,9 @@ class InputEntryDropdown(InputEntryBase):
 
     def Get(self):
         return self.input_widget.currentText()
+
+    def Set(self, data):
+
 
     def Connect(self):
         self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
