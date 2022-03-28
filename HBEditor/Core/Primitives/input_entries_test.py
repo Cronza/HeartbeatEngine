@@ -168,7 +168,7 @@ class InputEntryDropdown(InputEntryBase):
         return self.input_widget.currentText()
 
     def Set(self, data):
-
+        return self.input_widget.currentText()
 
     def Connect(self):
         self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)

@@ -18,12 +18,14 @@ from HBEditor.Core.Primitives.input_entries import *
 from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
+from HBEditor.Core.Primitives import input_entry_model_handler as iemh
+
 
 class DetailsPanel(QtWidgets.QWidget):
     def __init__(self, excluded_properties: list = None):
         super().__init__()
 
-        self.source_obj = None
+        self.active_entry = None
 
         # Allow the filtering of what properties can possibly appear
         self.excluded_properties = excluded_properties
@@ -72,6 +74,29 @@ class DetailsPanel(QtWidgets.QWidget):
         #self.details_layout.addWidget(self.details_toolbar)
         self.details_layout.addWidget(self.details_tree)
 
+    def Populate(self, selected_entry):
+        print("Populating...")
+        if selected_entry is not self.active_entry:
+            print("Current details do not match the active entry - We should refresh")
+
+        iemh.Clear(self.details_tree)
+        
+        self.active_entry = selected_entry
+
+        action_data = self.active_entry.action_data
+        if "requirements" in action_data:
+            for requirement in action_data['requirements']:
+                iemh.Add(owner=self,
+                         data=requirement,
+                         entry_updated_func=self.UserUpdatedEntry,
+                         excluded_entries=self.excluded_properties
+                )
+
+
+        # Expand all dropdowns automatically
+        self.details_tree.expandAll()
+        pass
+
     def CreateEntry(self, data):
         pass
 
@@ -87,6 +112,11 @@ class DetailsPanel(QtWidgets.QWidget):
     def StoreData(self):
         pass
 
+
     ### Slots ###
 
+    def UserUpdatedEntry(self):
+        print("Entry has been updated by the user")
+
     #def Request
+
