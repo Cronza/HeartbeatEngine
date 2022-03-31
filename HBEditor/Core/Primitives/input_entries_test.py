@@ -15,7 +15,6 @@
 import re
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
-from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 
 """
@@ -35,8 +34,13 @@ List of available entries:
 
 
 class InputEntryBase(QtWidgets.QWidget):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object)
+
     def __init__(self, refresh_func=None):
         super().__init__()
+        # QWidgets don't natively know if they've been added as a child to a tree widget item, so we need our own
+        # way of storing that information
+        self.owning_tree_item = None
 
         # It's up to the children to add the input_widget to the layout
         self.input_widget = None
@@ -50,7 +54,7 @@ class InputEntryBase(QtWidgets.QWidget):
     def Set(self, data):
         pass
 
-    def Connect(self, slot):
+    def Connect(self):
         pass
 
     def Disconnect(self):
@@ -72,8 +76,8 @@ class InputEntryBool(InputEntryBase):
     def Set(self, data):
         self.input_widget.setChecked(bool(data))
 
-    def Connect(self, slot):
-        self.input_widget.stateChanged.connect(slot)
+    def Connect(self):
+        self.input_widget.stateChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def Disconnect(self):
         self.input_widget.disconnect()
@@ -115,7 +119,7 @@ class InputEntryColor(InputEntryBase):
 
     def Set(self, data):
         css = f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})"
-        self.input_widget.input_widget.setStyleSheet(css)
+        self.input_widget.setStyleSheet(css)
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -135,7 +139,7 @@ class InputEntryColor(InputEntryBase):
             self.input_widget.setStyleSheet(f"background-color: rgb({', '.join(map(str, rgb))})")
 
             # Manually call the input change func since we know for a fact the input widget has changed
-            self.InputValueUpdated()
+            self.SIG_USER_UPDATE.emit()
 
 
 class InputEntryContainer(InputEntryBase):
@@ -159,8 +163,6 @@ class InputEntryDropdown(InputEntryBase):
         for option in self.options:
             self.input_widget.addItem(str(option))
 
-        self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
-
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
 
@@ -168,10 +170,13 @@ class InputEntryDropdown(InputEntryBase):
         return self.input_widget.currentText()
 
     def Set(self, data):
-        return self.input_widget.currentText()
+        self.input_widget.setCurrentIndex(self.input_widget.findText(data))
 
     def Connect(self):
-        self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
+        self.input_widget.currentIndexChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+
+    def Disconnect(self):
+        self.input_widget.disconnect()
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -193,7 +198,7 @@ class InputEntryFileSelector(InputEntryBase):
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        #self.input_widget.textChanged.connect(lambda update: self.SIG_USER_UPDATE.emit())
         #self.input_widget.setReadOnly(True)
 
         # Create the file selector button, and style it accordingly
@@ -213,6 +218,12 @@ class InputEntryFileSelector(InputEntryBase):
 
     def Get(self):
         return self.input_widget.text()
+
+    def Set(self, data):
+        self.input_widget.setText(data)
+
+    def Connect(self):
+        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -248,7 +259,6 @@ class InputEntryFloat(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.textEdited.connect(self.InputValueUpdated)
 
         # Limit entered values to float only
         self.validator = QtGui.QDoubleValidator()
@@ -273,6 +283,12 @@ class InputEntryFloat(InputEntryBase):
 
         return conv_val
 
+    def Set(self, data):
+        self.input_widget.setText(str(data))
+
+    def Connect(self):
+        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
@@ -295,9 +311,6 @@ class InputEntryInt(InputEntryBase):
         # Assign default value
         self.input_widget.setText("0")
 
-        # Signal
-        self.input_widget.textEdited.connect(self.InputValueUpdated)
-
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
 
@@ -314,6 +327,12 @@ class InputEntryInt(InputEntryBase):
 
         return conv_val
 
+    def Set(self, data):
+        self.input_widget.setText(str(data))
+
+    def Connect(self):
+        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+
     def SetEditable(self, state: int):
         if state == 0:
             self.input_widget.setReadOnly(False)
@@ -322,6 +341,7 @@ class InputEntryInt(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+
 class InputEntryParagraph(InputEntryBase):
     def __init__(self, refresh_func=None):
         super().__init__(refresh_func)
@@ -329,16 +349,21 @@ class InputEntryParagraph(InputEntryBase):
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
 
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
-
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
 
     def Get(self) -> str:
         return self.input_widget.toPlainText()
 
+    def Set(self, data):
+        # self.input_widget.setPlainText("This is a test string\nI wonder if the line break worked") # DEBUG
+        self.input_widget.setPlainText(data)
+
     def Connect(self):
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+
+    def Disconnect(self):
+        self.input_widget.disconnect()
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -353,7 +378,6 @@ class InputEntryText(InputEntryBase):
         super().__init__(refresh_func)
 
         self.input_widget = QtWidgets.QLineEdit()
-        self.input_widget.textEdited.connect(self.InputValueUpdated)
 
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget)
@@ -361,8 +385,11 @@ class InputEntryText(InputEntryBase):
     def Get(self) -> str:
         return self.input_widget.text()
 
+    def Set(self, data):
+        self.input_widget.setText(data)
+
     def Connect(self):
-        self.input_widget.textChanged.connect(self.InputValueUpdated)
+        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -393,10 +420,6 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget.setText("0")
         self.input_widget_alt.setText("0")
 
-        # Signals
-        self.input_widget.textEdited.connect(self.InputValueUpdated)
-        self.input_widget_alt.textEdited.connect(self.InputValueUpdated)
-
         # Add input elements to the layout
         self.main_layout.addWidget(self.input_widget_title)
         self.main_layout.addWidget(self.input_widget)
@@ -423,6 +446,14 @@ class InputEntryTuple(InputEntryBase):
             pass
 
         return [conv_x, conv_y]
+
+    def Set(self, data):
+        self.input_widget.setText(str(data[0]))
+        self.input_widget_alt.setText(str(data[1]))
+
+    def Connect(self):
+        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget_alt.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:

@@ -12,22 +12,23 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 
 class SimpleCheckbox(QtWidgets.QWidget):
     """
     A custom wrapper for the QCheckbox class when provides a textless, centered checkbox
     """
-    def __init__(self, click_func):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, bool)
+
+    def __init__(self):
         super().__init__()
+        self.owner = None
+
         # For some unholy reason, the QCheckbox widget does not support center alignment natively. To make matters
         # worse, the text is considered in the size when used in layouts regardless if text is actually specified
 
         # This can be bypassed by surrounding the QCheckbox in spacers that force it to the center of the layout
-
-        self.click_func = click_func
-
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -42,9 +43,6 @@ class SimpleCheckbox(QtWidgets.QWidget):
         self.main_layout.addWidget(self.checkbox)
         self.main_layout.addItem(self.right_spacer)
 
-        if self.click_func:
-            self.checkbox.stateChanged.connect(self.click_func)
-
     def Get(self) -> bool:
         """ Returns whether the checkbox is checked """
         return self.checkbox.isChecked()
@@ -52,3 +50,8 @@ class SimpleCheckbox(QtWidgets.QWidget):
     def Set(self, value) -> None:
         self.checkbox.setChecked(value)
 
+    def Connect(self):
+        self.checkbox.stateChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owner, self.Get()))
+
+    def Disconnect(self):
+        self.checkbox.disconnect()

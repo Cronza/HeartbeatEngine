@@ -78,30 +78,43 @@ class DetailsPanel(QtWidgets.QWidget):
         print("Populating...")
         if selected_entry is not self.active_entry:
             print("Current details do not match the active entry - We should refresh")
+        self.active_entry = selected_entry
 
         iemh.Clear(self.details_tree)
-        
-        self.active_entry = selected_entry
 
         action_data = self.active_entry.action_data
         if "requirements" in action_data:
             for requirement in action_data['requirements']:
-                iemh.Add(owner=self,
-                         data=requirement,
-                         entry_updated_func=self.UserUpdatedEntry,
-                         excluded_entries=self.excluded_properties
+                entry = iemh.Add(
+                     owner=self,
+                     tree=self.details_tree,
+                     data=requirement,
+                     excluded_entries=self.excluded_properties
                 )
+                self.ConnectSignals(entry)
 
+                if "children" in requirement and entry:
+                    for child_requirement in requirement["children"]:
+                        child_entry = iemh.Add(
+                            owner=self,
+                            tree=self.details_tree,
+                            data=child_requirement,
+                            parent=entry,
+                            excluded_entries=self.excluded_properties
+                        )
+                        self.ConnectSignals(child_entry)
 
         # Expand all dropdowns automatically
         self.details_tree.expandAll()
         pass
 
-    def CreateEntry(self, data):
-        pass
+    def ConnectSignals(self, tree_item):
+        input_widget = self.details_tree.itemWidget(tree_item, 1)
+        input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
 
-    def AddEntry(self, parent=None):
-        pass
+        global_checkbox = self.details_tree.itemWidget(tree_item, 2)
+        if global_checkbox:
+            global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
     def CollectData(self):
         pass
@@ -112,11 +125,25 @@ class DetailsPanel(QtWidgets.QWidget):
     def StoreData(self):
         pass
 
-
     ### Slots ###
 
-    def UserUpdatedEntry(self):
-        print("Entry has been updated by the user")
+    def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
+        input_widget = self.details_tree.itemWidget(owning_tree_item, 1)
+        if global_active:
+            input_widget.SetEditable(2)
+        else:
+            input_widget.SetEditable(0)
+
+    def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
+        print("Input widget updated")
+
+        if self.active_entry:
+            # First, update the active entry with the current contents of the tree
+            #self.UpdateCache()
+
+            # Inform the active entry to refresh
+            self.active_entry.Refresh()
+
 
     #def Request
 
