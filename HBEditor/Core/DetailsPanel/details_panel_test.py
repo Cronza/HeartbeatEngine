@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import copy
 from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Primitives.input_entries import *
@@ -77,7 +78,8 @@ class DetailsPanel(QtWidgets.QWidget):
     def Populate(self, selected_entry):
         print("Populating...")
         if selected_entry is not self.active_entry:
-            print("Current details do not match the active entry - We should refresh")
+            self.StoreData()
+
         self.active_entry = selected_entry
 
         iemh.Clear(self.details_tree)
@@ -122,8 +124,39 @@ class DetailsPanel(QtWidgets.QWidget):
     def AssignData(self):
         pass
 
-    def StoreData(self):
-        pass
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem=None, action_data: dict=None):
+        """
+        Retrieves the values from all items in the details tree, and updates the active entry using the
+        collected data
+        """
+        if self.active_entry:
+
+            if not parent:
+                parent = self.details_tree.invisibleRootItem()
+                action_data = self.active_entry.action_data["requirements"]
+
+            for entry_index in range(0, parent.childCount()):
+                entry = parent.child(entry_index)
+                name = self.details_tree.itemWidget(entry, 0).text()
+                input_val = self.details_tree.itemWidget(entry, 1).Get()
+
+                global_checkbox = self.details_tree.itemWidget(entry, 2)
+                if global_checkbox:
+                    global_val = global_checkbox.Get()
+
+                # Since the requirements list is a list, we need to parse through for the match for this entry
+                for requirement in action_data:
+                    if requirement["name"] == name:
+
+                        if "value" in requirement:
+                            requirement["value"] = input_val
+
+                        if "global" in requirement:
+                            requirement["global"]["active"] = global_val
+
+                        if "children" in requirement and entry.childCount() > 0:
+                            self.StoreData(entry, requirement["children"])
+                        break
 
     ### Slots ###
 
@@ -140,6 +173,7 @@ class DetailsPanel(QtWidgets.QWidget):
         if self.active_entry:
             # First, update the active entry with the current contents of the tree
             #self.UpdateCache()
+            self.StoreData()
 
             # Inform the active entry to refresh
             self.active_entry.Refresh()

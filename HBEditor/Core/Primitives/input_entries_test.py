@@ -36,7 +36,7 @@ List of available entries:
 class InputEntryBase(QtWidgets.QWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal(object)
 
-    def __init__(self, refresh_func=None):
+    def __init__(self):
         super().__init__()
         # QWidgets don't natively know if they've been added as a child to a tree widget item, so we need our own
         # way of storing that information
@@ -77,7 +77,7 @@ class InputEntryBool(InputEntryBase):
         self.input_widget.setChecked(bool(data))
 
     def Connect(self):
-        self.input_widget.stateChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.stateChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def Disconnect(self):
         self.input_widget.disconnect()
@@ -139,12 +139,12 @@ class InputEntryColor(InputEntryBase):
             self.input_widget.setStyleSheet(f"background-color: rgb({', '.join(map(str, rgb))})")
 
             # Manually call the input change func since we know for a fact the input widget has changed
-            self.SIG_USER_UPDATE.emit()
+            self.SIG_USER_UPDATE.emit(self.owning_tree_item)
 
 
 class InputEntryContainer(InputEntryBase):
-    def __init__(self, children: list, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self, children: list):
+        super().__init__()
 
     #@TODO: Does this class uh...need to exist? It basically does nothing special
     def Get(self):
@@ -152,9 +152,9 @@ class InputEntryContainer(InputEntryBase):
 
 
 class InputEntryDropdown(InputEntryBase):
-    def __init__(self, options, refresh_func=None):
+    def __init__(self, options):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
-        super().__init__(refresh_func)
+        super().__init__()
 
         self.input_widget = QtWidgets.QComboBox()
         self.options = options
@@ -173,7 +173,7 @@ class InputEntryDropdown(InputEntryBase):
         self.input_widget.setCurrentIndex(self.input_widget.findText(data))
 
     def Connect(self):
-        self.input_widget.currentIndexChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.currentIndexChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def Disconnect(self):
         self.input_widget.disconnect()
@@ -188,8 +188,8 @@ class InputEntryDropdown(InputEntryBase):
 
 
 class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, details_panel, type_filter, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self, details_panel, type_filter):
+        super().__init__()
 
         self.details_panel = details_panel
 
@@ -198,7 +198,7 @@ class InputEntryFileSelector(InputEntryBase):
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        #self.input_widget.textChanged.connect(lambda update: self.SIG_USER_UPDATE.emit())
+        #self.input_widget.textChanged.connect(lambda: self.SIG_USER_UPDATE.emit())
         #self.input_widget.setReadOnly(True)
 
         # Create the file selector button, and style it accordingly
@@ -223,7 +223,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget.setText(data)
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -255,8 +255,8 @@ class InputEntryFileSelector(InputEntryBase):
 
 
 class InputEntryFloat(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self):
+        super().__init__()
 
         self.input_widget = QtWidgets.QLineEdit()
 
@@ -287,7 +287,7 @@ class InputEntryFloat(InputEntryBase):
         self.input_widget.setText(str(data))
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -299,8 +299,8 @@ class InputEntryFloat(InputEntryBase):
 
 
 class InputEntryInt(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self):
+        super().__init__()
 
         self.input_widget = QtWidgets.QLineEdit()
 
@@ -331,7 +331,7 @@ class InputEntryInt(InputEntryBase):
         self.input_widget.setText(str(data))
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -343,8 +343,8 @@ class InputEntryInt(InputEntryBase):
 
 
 class InputEntryParagraph(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self):
+        super().__init__()
 
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
@@ -360,7 +360,7 @@ class InputEntryParagraph(InputEntryBase):
         self.input_widget.setPlainText(data)
 
     def Connect(self):
-        self.input_widget.textChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def Disconnect(self):
         self.input_widget.disconnect()
@@ -374,8 +374,8 @@ class InputEntryParagraph(InputEntryBase):
 
 
 class InputEntryText(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self):
+        super().__init__()
 
         self.input_widget = QtWidgets.QLineEdit()
 
@@ -389,7 +389,7 @@ class InputEntryText(InputEntryBase):
         self.input_widget.setText(data)
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -401,8 +401,8 @@ class InputEntryText(InputEntryBase):
 
 
 class InputEntryTuple(InputEntryBase):
-    def __init__(self, refresh_func=None):
-        super().__init__(refresh_func)
+    def __init__(self):
+        super().__init__()
 
         #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
@@ -452,8 +452,8 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt.setText(str(data[1]))
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
-        self.input_widget_alt.textEdited.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
+        self.input_widget_alt.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_tree_item))
 
     def SetEditable(self, state: int):
         if state == 0:
@@ -536,7 +536,7 @@ class InputEntryChoice(InputEntryBase):
         delete_choice_button.setObjectName("choice-remove")
 
         new_choice_container.input_widget = delete_choice_button
-        new_choice_container.input_widget.clicked.connect(lambda delete: self.DeleteChoice(new_choice_container))
+        new_choice_container.input_widget.clicked.connect(lambda: self.DeleteChoice(new_choice_container))
         new_choice_container.main_layout.addWidget(new_choice_container.input_widget)
         self.add_to_parent_func(new_choice_container, self)
 
@@ -549,7 +549,7 @@ class InputEntryChoice(InputEntryBase):
         branch_dropdown = InputEntryDropdown(branch_names, None)
         branch_dropdown.name_widget.setText("branch")
         self.add_to_parent_func(branch_dropdown, new_choice_container)
-        key_input = InputEntryText(lambda change: self.UpdateChoiceName(new_choice_container))
+        key_input = InputEntryText(lambda: self.UpdateChoiceName(new_choice_container))
         key_input.name_widget.setText("key")
         self.add_to_parent_func(key_input, new_choice_container)
 
