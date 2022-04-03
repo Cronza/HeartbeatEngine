@@ -500,8 +500,7 @@ Dialogue:
       action_name: "choice"
       requirements:
         - name: "choices"
-          type: "Choice"
-          value: ""
+          type: "Array"
           editable: True
           preview: True
           template:
@@ -611,7 +610,7 @@ Sound:
           preview: True
 
         - name: "volume"
-          type: "float"
+          type: "Float"
           value: 1.0
           editable: True
           preview: True
@@ -631,13 +630,13 @@ Sound:
       action_name: "play_music"
       requirements:
         - name: "music"
-          type: "file_sound"
+          type: "File_Sound"
           value: ""
           editable: True
           preview: True
 
         - name: "volume"
-          type: "float"
+          type: "Float"
           value: 1.0
           editable: True
           preview: True
@@ -671,6 +670,12 @@ Sound:
     # Stop Music
     - display_name: "Stop Music"
       action_name: "stop_music"
+      requirements:
+        - name: "key"
+          type: "String"
+          value: ""
+          editable: True
+          preview: True
 
 Utilities:
   icon: ":/Icons/Dialogue.png"

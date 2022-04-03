@@ -286,13 +286,12 @@ class DialogueEntry(QtWidgets.QWidget):
                 param_name = param["name"]
                 param_data = None
 
-                if ParameterType[param["type"]] == ParameterType.Container:
-                    # Recurse, searching the children as well
+                if "children" in param:
                     cur_string += f"{param_name}: ["
                     cur_string += self.CompileSubtextString(param['children'])
                     cur_string += "], "
 
-                else:
+                elif "value" in param:
                     param_data = param["value"]
                     cur_string += f"{param_name}: {param_data}, "
 
@@ -303,6 +302,5 @@ class DialogueEntry(QtWidgets.QWidget):
         """
         Refresh is the common function used by elements that need refreshing when an important U.I change is made
         """
-        print("test")
         self.UpdateSubtext()
         self.size_refresh_func()

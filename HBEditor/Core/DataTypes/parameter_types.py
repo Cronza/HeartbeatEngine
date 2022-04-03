@@ -29,5 +29,6 @@ class ParameterType(Enum):
     File_Sound = 11
     Dropdown = 12
     Container = 13
-    Choice = 14
-    CUST_Resolution = 15
+    Closable_Container = 14
+    Array = 15
+    CUST_Resolution = 16

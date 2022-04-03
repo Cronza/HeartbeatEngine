@@ -12,24 +12,18 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
-from PyQt5 import QtWidgets, QtCore
-from HBEditor.Core.settings import Settings
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
-from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.Primitives import input_entry_model_handler as iemh
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, excluded_properties: list = None):
+    def __init__(self, excluded_entries: list = None):
         super().__init__()
 
         self.active_entry = None
 
         # Allow the filtering of what properties can possibly appear
-        self.excluded_properties = excluded_properties
+        self.excluded_entries = excluded_entries
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -76,39 +70,30 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):
-        print("Populating...")
+        """ Fill out the details tree based on the active entry's action data"""
         if selected_entry is not self.active_entry:
             self.StoreData()
-
         self.active_entry = selected_entry
 
         iemh.Clear(self.details_tree)
-
-        action_data = self.active_entry.action_data
-        if "requirements" in action_data:
-            for requirement in action_data['requirements']:
-                entry = iemh.Add(
-                     owner=self,
-                     tree=self.details_tree,
-                     data=requirement,
-                     excluded_entries=self.excluded_properties
-                )
-                self.ConnectSignals(entry)
-
-                if "children" in requirement and entry:
-                    for child_requirement in requirement["children"]:
-                        child_entry = iemh.Add(
-                            owner=self,
-                            tree=self.details_tree,
-                            data=child_requirement,
-                            parent=entry,
-                            excluded_entries=self.excluded_properties
-                        )
-                        self.ConnectSignals(child_entry)
-
-        # Expand all dropdowns automatically
+        self.AddItems(self.active_entry.action_data["requirements"])
         self.details_tree.expandAll()
-        pass
+
+    def AddItems(self, data, parent=None):
+        """ Recursively adds an InputEntry element into the details tree, including all of its children"""
+        for requirement in data:
+            entry = iemh.Add(
+                owner=self,
+                view=self.details_tree,
+                data=requirement,
+                parent=parent,
+                excluded_entries=self.excluded_entries,
+                signal_func=self.ConnectSignals,
+                refresh_func=self.UserUpdatedInputWidget
+            )
+
+            if "children" in requirement:
+                self.AddItems(requirement["children"], entry)
 
     def ConnectSignals(self, tree_item):
         input_widget = self.details_tree.itemWidget(tree_item, 1)
@@ -118,45 +103,34 @@ class DetailsPanel(QtWidgets.QWidget):
         if global_checkbox:
             global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
-    def CollectData(self):
-        pass
-
-    def AssignData(self):
-        pass
-
-    def StoreData(self, parent: QtWidgets.QTreeWidgetItem=None, action_data: dict=None):
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem=None, initial_iter: bool=True) -> list:
         """
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
         """
         if self.active_entry:
+            data_to_store = []
 
             if not parent:
                 parent = self.details_tree.invisibleRootItem()
-                action_data = self.active_entry.action_data["requirements"]
 
             for entry_index in range(0, parent.childCount()):
                 entry = parent.child(entry_index)
-                name = self.details_tree.itemWidget(entry, 0).text()
-                input_val = self.details_tree.itemWidget(entry, 1).Get()
+                entry_data = self.details_tree.itemWidget(entry, 1).Get()
 
                 global_checkbox = self.details_tree.itemWidget(entry, 2)
                 if global_checkbox:
-                    global_val = global_checkbox.Get()
+                    entry_data["global"]["active"] = global_checkbox.Get()
 
-                # Since the requirements list is a list, we need to parse through for the match for this entry
-                for requirement in action_data:
-                    if requirement["name"] == name:
+                if entry.childCount() > 0:
+                    entry_data["children"] = self.StoreData(entry, False)
 
-                        if "value" in requirement:
-                            requirement["value"] = input_val
+                data_to_store.append(entry_data)
 
-                        if "global" in requirement:
-                            requirement["global"]["active"] = global_val
+            if initial_iter:
+                self.active_entry.action_data["requirements"] = data_to_store
 
-                        if "children" in requirement and entry.childCount() > 0:
-                            self.StoreData(entry, requirement["children"])
-                        break
+            return data_to_store
 
     ### Slots ###
 
@@ -168,16 +142,7 @@ class DetailsPanel(QtWidgets.QWidget):
             input_widget.SetEditable(0)
 
     def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
-        print("Input widget updated")
-
+        #@TODO: Change to only store / refresh the item that changed, not the whole tree
         if self.active_entry:
-            # First, update the active entry with the current contents of the tree
-            #self.UpdateCache()
             self.StoreData()
-
-            # Inform the active entry to refresh
             self.active_entry.Refresh()
-
-
-    #def Request
-
