@@ -57,7 +57,7 @@ class EditorDialogue(EditorBase):
 
         # If there is no source branch, then there is nothing to store
         if cur_branch:
-            self.UpdateBranchData(cur_branch)
+            self.StoreActiveData(cur_branch)
             self.editor_ui.dialogue_sequence.Clear()
 
         # Load any entries in the new branch (if applicable)
@@ -65,21 +65,19 @@ class EditorDialogue(EditorBase):
             for entry in new_branch.branch_data:
                 self.editor_ui.dialogue_sequence.AddEntry(entry, None, True)
 
-    def UpdateBranchData(self, cur_branch):
+    def StoreActiveData(self, cur_branch):
         """ Updates the active branch with all active dialogue entries """
-        # Clear the contents of the current branch since we're forcefully updating whats stored
+        # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.branch_data.clear()
 
-        # Store the data from each entry in the branch
-        num_of_entries = self.editor_ui.dialogue_sequence.dialogue_table.rowCount()
+        dialogue_seq = self.editor_ui.dialogue_sequence.GetDialogueTable()
+        num_of_entries = dialogue_seq.rowCount()
         for entry_index in range(num_of_entries):
-
-            # Store the data held by the entry
-            dialogue_entry = self.editor_ui.dialogue_sequence.dialogue_table.cellWidget(entry_index, 0)
+            dialogue_entry = dialogue_seq.cellWidget(entry_index, 0)
             cur_branch.branch_data.append(dialogue_entry.action_data)
 
     def GetAllDialogueData(self) -> dict:
-        """ Collects all dialogue data in this file, including all branches, and returns them as a dict """
+        """ Collects all dialogue data in the loaded file, including all branches, and returns them as a dict """
         data_to_export = {}
         branch_count = self.editor_ui.branches.branches_list.count()
         for index in range(0, branch_count):
@@ -87,14 +85,14 @@ class EditorDialogue(EditorBase):
             branch = self.editor_ui.branches.branches_list.itemWidget(self.editor_ui.branches.branches_list.item(index))
 
             # Before we save, let's be double sure the current information in the details panel is cached properly
-            self.editor_ui.details.UpdateCache()
+            self.editor_ui.details.StoreData()
 
-            # If a branch is currently active, then it's likely to of not updated it's cached branch data (Only
+            # If a branch is currently active, then it's likely to of not updated its cached branch data (Only
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
             # differently by scanning the current dialogue entries
             if branch is self.editor_ui.branches.active_branch:
                 Logger.getInstance().Log("Scanning dialogue entries...")
-                self.UpdateBranchData(branch)
+                self.StoreActiveData(branch)
 
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()

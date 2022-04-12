@@ -16,7 +16,6 @@ from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.EditorProjectSettings.input_entry_resolution import InputEntryResolution
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
 
@@ -198,7 +197,6 @@ class EditorProjectSettingsUI(EditorBaseUI):
             return InputEntryFileSelector(self, Settings.getInstance().supported_content_types['Image'], None)
         elif data_type == ParameterType.Dropdown:
             return InputEntryDropdown(data, None)
-        elif data_type == ParameterType.CUST_Resolution:
-            return InputEntryResolution(data, self.core.project_settings)
+
         else:
             return None

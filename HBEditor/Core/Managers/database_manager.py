@@ -50,31 +50,36 @@ class DBManager:
 
         return new_dialogue_data
 
-    def ConvertActionRequirementsToEngineFormat(self, editor_action_data, has_parent=None):
-        """ Given an editor action requirements / children data dict, convert it to a format usable by the engine"""
-        converted_action = {}
+    def ConvertActionRequirementsToEngineFormat(self, editor_req_data, search_term="requirements"):
+        conv_data = {}
 
-        term = "requirements"
-        if has_parent:
-            term = "children"
+        if search_term in editor_req_data:
+            for req in editor_req_data[search_term]:
+                if "children" not in req and "value" in req:
 
-        if term in editor_action_data:
-            for requirement in editor_action_data[term]:
-                if ParameterType[requirement["type"]] != ParameterType.Container:
-
-                    # Exclude requirements that are pointing to a global setting. The engine will take care of this at
-                    # runtime since any global value stored in a file will become outdated as soon as the global setting
-                    # is changed
-                    if "global" in requirement:
-                        if "active" in requirement["global"]:
-                            if not requirement["global"]["active"]:
-                                converted_action[requirement["name"]] = requirement["value"]
+                    if "global" in req:
+                        # Exclude requirements that are pointing to a global setting. The engine will take care of
+                        # this at runtime since any global value stored in a file will become outdated as soon as the
+                        # global setting is changed
+                        if not req["global"]["active"]:
+                            conv_data[req["name"]] = req["value"]
                     else:
-                        converted_action[requirement["name"]] = requirement["value"]
-                else:
-                    converted_action[requirement["name"]] = self.ConvertActionRequirementsToEngineFormat(requirement, True)
+                        conv_data[req["name"]] = req["value"]
+                elif "template" in req:
+                    # Templates are used for dynamic child creation, where each child is an instance of the template.
+                    # To allow this without causing key stomping issues, use a list of dicts
+                    template_instances = []
+                    for index in range(0, len(req["children"])):
+                        child_data = req["children"][index]
+                        template_instances.append(
+                            {child_data["name"]: self.ConvertActionRequirementsToEngineFormat(child_data, "children")}
+                        )
 
-            return converted_action
+                    conv_data[req["name"]] = template_instances
+                else:
+                    conv_data[req["name"]] = self.ConvertActionRequirementsToEngineFormat(req, "children")
+
+            return conv_data
         return None
 
     def ConvertDialogueFileToEditorFormat(self, action_data):
@@ -110,33 +115,31 @@ class DBManager:
 
         return new_dialogue_data
 
-    def ConvertActionRequirementsToEditorFormat(self, editor_action_data, engine_action_data, has_parent=None):
-        """
-        Given engine & editor action requirements / children data dict, convert it to a format usable
-        by the editor
-        """
-        term = "requirements"
-        if has_parent:
-            term = "children"
+    def ConvertActionRequirementsToEditorFormat(self, editor_req, engine_req, search_term="requirements"):
+        if search_term in editor_req:
+            for index in range(0, len(editor_req[search_term])):
+                req = editor_req[search_term][index]
 
-        # Compare the parameters that are in the file, and those that aren't. Any that aren't are assumed to be
-        # using global params, and any that are will be using custom values. Account for this difference in the
-        # settings
-        if term in editor_action_data:
-            for requirement in editor_action_data[term]:
-                if ParameterType[requirement["type"]] != ParameterType.Container:
+                if "children" not in req and "value" in req:
+                    if req["name"] in engine_req:
+                        # If the requirement is present, but it does have a global option, then it's an override
+                        if "global" in req:
+                            req["global"]["active"] = False
 
-                    # If the requirement is present, and it does have a global option, then it's an override
-                    if requirement["name"] in engine_action_data:
-                        if "global" in requirement:
-                            requirement["global"]["active"] = False
-
-                        requirement["value"] = engine_action_data[requirement["name"]]
+                        req["value"] = engine_req[req["name"]]
                     else:
-                        if "global" in requirement:
-                            requirement["global"]["active"] = True
-                else:
-                    self.ConvertActionRequirementsToEditorFormat(requirement, engine_action_data[requirement["name"]], True)
+                        if "global" in req:
+                            req["global"]["active"] = True
 
-            return editor_action_data
-        return None
+                elif "template" in req:
+                    # We need to duplicate the template a number of times equal to the number of instances found
+                    # in the eng data, then update each copy using the eng data
+                    req["children"] = []
+                    eng_target = engine_req[req["name"]]
+                    for i in range(0, len(eng_target)):
+                        template_copy = copy.deepcopy(req["template"])
+                        self.ConvertActionRequirementsToEditorFormat(template_copy, eng_target[i][template_copy["name"]], "children")
+                        req["children"].append(template_copy)
+
+                elif "children" in req:
+                    self.ConvertActionRequirementsToEditorFormat(req, engine_req[req["name"]], "children")

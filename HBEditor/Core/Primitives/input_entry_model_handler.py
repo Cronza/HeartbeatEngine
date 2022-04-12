@@ -95,11 +95,13 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
         input_widget = InputEntryDropdown(data)
     elif data_type == ParameterType.Container:
         input_widget = InputEntryBase(data)
-    elif data_type == ParameterType.Closable_Container:
-        input_widget = InputEntryClosableContainer(data)
+    elif data_type == ParameterType.Array_Element:
+        input_widget = InputEntryArrayElement(data)
         input_widget.SIG_USER_DELETE.connect(Remove)
     elif data_type == ParameterType.Array:
         input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_entries)
+    elif data_type == ParameterType.CUST_Resolution:
+        return InputEntryResolution(data)
 
     input_widget.owning_model_item = owning_model_item
     input_widget.Connect()
@@ -109,6 +111,11 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
         input_widget.Set(data["value"])
     else:
         input_widget.Set(data)
+
+    # Make the option read-only if applicable
+    if "editable" in data:
+        if not data["editable"]:
+            input_widget.SetEditable(2)
 
     name_widget = QLabel(data["name"])
     global_checkbox = SimpleCheckbox()
@@ -134,7 +141,3 @@ def Remove(item: QTreeWidgetItem):
     parent = item.parent()
     if parent:
         parent.removeChild(item)
-
-
-def Clear(tree):
-    tree.clear()

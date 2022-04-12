@@ -43,6 +43,7 @@ class DetailsPanel(QtWidgets.QWidget):
         #self.details_toolbar.addWidget(self.details_filter)
 
         # Create Details List
+        #@TODO: Investigate implementing 'dataChanged' signal so the Array entry can bubble up a refresh call
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
@@ -75,8 +76,9 @@ class DetailsPanel(QtWidgets.QWidget):
             self.StoreData()
         self.active_entry = selected_entry
 
-        iemh.Clear(self.details_tree)
+        self.Clear()
         self.AddItems(self.active_entry.action_data["requirements"])
+
         self.details_tree.expandAll()
 
     def AddItems(self, data, parent=None):
@@ -93,6 +95,11 @@ class DetailsPanel(QtWidgets.QWidget):
             )
 
             if "children" in requirement:
+                #if "template" in requirement:
+                    # Anything that use templates handle creating their own children, as they instantiate the template
+                    #for child_data in requirement["children"]:
+                        #self.details_tree.itemWidget(entry, 1).AddItems(child_data)
+
                 self.AddItems(requirement["children"], entry)
 
     def ConnectSignals(self, tree_item):
@@ -131,6 +138,9 @@ class DetailsPanel(QtWidgets.QWidget):
                 self.active_entry.action_data["requirements"] = data_to_store
 
             return data_to_store
+
+    def Clear(self):
+        self.details_tree.clear()
 
     ### Slots ###
 

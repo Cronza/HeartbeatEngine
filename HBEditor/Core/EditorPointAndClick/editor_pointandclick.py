@@ -97,7 +97,7 @@ class EditorPointAndClick(EditorBase):
         Refreshes the details panel with the details from the selected item. Clears all details if None is provided
         """
         if selected_item:
-            self.editor_ui.details.PopulateDetails(selected_item)
+            self.editor_ui.details.Populate(selected_item)
 
         # No entries left to select. Wipe remaining details
         else:

@@ -18,12 +18,12 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 """
 List of available entries:
     - InputEntryBool
     - InputEntryColor
-    - InputEntryClosableContainer
     - InputEntryDropdown
     - InputEntryFileSelector
     - InputEntryFloat
@@ -32,6 +32,7 @@ List of available entries:
     - InputEntryText
     - InputEntryTuple
     - InputEntryArray
+    - InputEntryArrayElement
 """
 
 
@@ -57,7 +58,7 @@ class InputEntryBase(QtWidgets.QWidget):
         return self.data
 
     def Set(self, data):
-        pass
+        self.data = data
 
     def Connect(self):
         pass
@@ -147,21 +148,6 @@ class InputEntryColor(InputEntryBase):
 
             # Manually call the input change func since we know for a fact the input widget has changed
             self.SIG_USER_UPDATE.emit(self.owning_model_item)
-
-
-class InputEntryClosableContainer(InputEntryBase):
-    SIG_USER_DELETE = QtCore.pyqtSignal(object)
-
-    def __init__(self, data):
-        super().__init__(data)
-
-        # Delete button
-        self.delete_button = QtWidgets.QToolButton()
-        self.delete_button.setObjectName("choice-remove")
-        self.main_layout.addWidget(self.delete_button)
-
-        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item))
-
 
 class InputEntryDropdown(InputEntryBase):
     def __init__(self, data):
@@ -468,6 +454,10 @@ class InputEntryTuple(InputEntryBase):
 
 
 class InputEntryArray(InputEntryBase):
+    """
+    A highly specialized container that allows the generation of child entries based on a template defined in
+    the ActionsDatabase
+    """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, refresh_func: callable,
                  excluded_entries: dict = None):
@@ -487,43 +477,91 @@ class InputEntryArray(InputEntryBase):
 
         self.add_item_button = QtWidgets.QToolButton()
         self.add_item_button.setObjectName("choice-add")
-        self.add_item_button.clicked.connect(lambda: self.AddTemplateItem())
+        self.add_item_button.clicked.connect(lambda: self.AddItems())
         self.main_layout.addWidget(self.add_item_button)
 
-    def AddTemplateItem(self):
-        """
-        Adds a closable container as a child, before populating it with the entries specified in the template
-
-        Note: Entries created this way are not expected to be maintained or recreated on load by the Array entry. It's
-        up to the owner to record these entries, and recreate them when necessary
-        """
+    def AddItems(self, data=None, parent=None):
         if self.owning_model_item.childCount() >= self.child_limit:
-            Logger.getInstance().Log("Unable to add more choices - Limit Reached!", 3)
+            Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
-            data = {
-                "name": "Item",
-                "type": "Closable_Container",
-                "preview": "True",
-                "children": copy.deepcopy(self.data["template"])
-            }
+            if not data:
+                data = copy.deepcopy(self.data["template"])
+            if not parent:
+                parent = self.owning_model_item
 
-            container = self.add_func(
+            #@TODO: Investigate how to incorporate this functionality with saving / loading
+            # Array elements are special in that their names are dynamically assigned based on the number of them
+            #if ParameterType[data["type"]] == ParameterType.Array_Element:
+            #    data["name"] = str(parent.childCount())
+
+            new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
                 data=data,
-                parent=self.owning_model_item,
-                signal_func=self.signal_func
+                parent=parent,
+                excluded_entries=self.excluded_entries,
+                signal_func=self.signal_func,
+                refresh_func=self.refresh_func
             )
 
-            for item in data["children"]:
-                self.add_func(
-                    owner=self,
-                    view=self.owning_view,
-                    data=item,
-                    excluded_entries=self.excluded_entries,
-                    parent=container,
-                    signal_func=self.signal_func
-                )
+            if "children" in data:
+                for child_data in data["children"]:
+                    self.AddItems(child_data, new_entry)
 
         # Inform the owning U.I that we've added a child outside it's purview
         self.refresh_func(self.owning_model_item)
+
+
+class InputEntryArrayElement(InputEntryBase):
+    SIG_USER_DELETE = QtCore.pyqtSignal(object)
+
+    def __init__(self, data):
+        super().__init__(data)
+
+        # Delete button
+        self.delete_button = QtWidgets.QToolButton()
+        self.delete_button.setObjectName("choice-remove")
+        self.main_layout.addWidget(self.delete_button)
+
+        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item))
+
+
+class InputEntryResolution(InputEntryBase):
+    """
+    An alternative to the regular dropdown customized to support the project's resolution settings
+
+    The resolution settings are divided into two settings:
+    - An int input representing the index of the selected resolution
+    - A specialized dropdown representing resolution choices
+
+    When the latter is changed, the former needs to be updated as well. Instead of trying to build
+    a system for handling inter-input entry dependencies, this widget directly references the project settings
+    so it can go and update the former at it's leisure
+    """
+
+    def __init__(self, resolution_options):
+        super().__init__(None)
+
+        self.input_widget = QtWidgets.QComboBox()
+        self.options = resolution_options
+
+        for option in self.options:
+            self.input_widget.addItem(str(option))
+
+        # Use the value of the "Int" widget mentioned in the class docstring to switch the active option
+        # @TODO: Figure out how to avoid hard-coding the category name here
+        self.input_widget.setCurrentIndex(self.project_settings["Window"]["resolution"])
+
+        # Add input elements to the layout
+        self.main_layout.addWidget(self.input_widget)
+
+        self.input_widget.currentIndexChanged.connect(self.InputValueUpdated)
+
+    def Get(self):
+        # Typically, this function is used when retrieving the data and storing it somewhere. When this happens,
+        # let's make sure to update the additional "Int" widget mentioned in the class docstring
+
+        #@TODO: Figure out how to avoid hard-coding the category name here
+        self.project_settings["Window"]["resolution"] = self.input_widget.currentIndex()
+
+        return self.options

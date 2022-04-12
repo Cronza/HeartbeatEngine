@@ -234,6 +234,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         else:
             return None
 
+    def GetDialogueTable(self) -> QtWidgets.QAbstractItemView:
+        return self.dialogue_table
 
 class DialogueEntry(QtWidgets.QWidget):
     def __init__(self, action_data, select_func, size_refresh_func):
@@ -274,13 +276,16 @@ class DialogueEntry(QtWidgets.QWidget):
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
         if "requirements" in self.action_data:
+            #print(f"Requirements: {self.action_data['requirements']}")
             self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
 
     def CompileSubtextString(self, data):
         """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
         #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
+        #print(f"Data: {data}")
         for param in data:
+            #print(f"Param: {param}")
             if param["preview"]:
 
                 param_name = param["name"]
@@ -302,5 +307,5 @@ class DialogueEntry(QtWidgets.QWidget):
         """
         Refresh is the common function used by elements that need refreshing when an important U.I change is made
         """
-        self.UpdateSubtext()
+        #self.UpdateSubtext()
         self.size_refresh_func()
