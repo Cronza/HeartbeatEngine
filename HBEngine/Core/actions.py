@@ -43,6 +43,7 @@ from HBEngine.Core.BaseClasses.action_sound import SoundAction
 
 # -------------- GRAPHICS ACTIONS --------------
 
+
 class remove_renderable(Action):
     """
     Based on a given key, remove the associated renderable from the renderable stack
@@ -78,6 +79,7 @@ class remove_renderable(Action):
         if self.active_transition:
             self.active_transition.Skip()
         self.Complete()
+
 
 class remove_container(Action):
     """
@@ -131,6 +133,7 @@ class remove_container(Action):
             self.active_transition.Skip()
         self.Complete()
 
+
 class create_dialogue_interface(Action):
     """
     Creates sprite renderables for the dialogue and speaker text, and assigns them to the renderable stack using
@@ -175,6 +178,7 @@ class create_dialogue_interface(Action):
         self.scene.Draw()
         self.Complete()
 
+
 class create_background(Action):
     """
     Creates a pre-configured 'SpriteRenderable' suitable as a background image. Returns a
@@ -208,6 +212,7 @@ class create_background(Action):
         self.Complete()
 
         return new_sprite
+
 
 class create_sprite(Action):
     """
@@ -272,6 +277,7 @@ class create_sprite(Action):
             self.active_transition.Skip()
         self.Complete()
 
+
 class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
     def Start(self):
@@ -306,6 +312,7 @@ class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE U
         self.Complete()
 
         return new_renderable
+
 
 class create_text(Action):
     """
@@ -380,6 +387,7 @@ class create_text(Action):
             self.active_transition.Skip()
         self.Complete()
 
+
 class create_button(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates a button interactable, and adds it to the renderable stack. Returns a 'Button' """
     def Start(self):
@@ -440,6 +448,7 @@ class create_button(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
 
         return new_renderable
 
+
 class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates a simple container renderable with the provided action data. Returns a 'Container' """
 
@@ -465,7 +474,9 @@ class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDAT
 
         return new_renderable
 
+
 # -------------- DIALOGUE ACTIONS --------------
+
 
 class dialogue(Action):
     """
@@ -593,6 +604,7 @@ class dialogue(Action):
         if self.active_transition:
             self.active_transition.Skip()
         self.Complete()
+
 
 class character_dialogue(Action):
     """
@@ -751,6 +763,7 @@ class character_dialogue(Action):
             self.active_transition.Skip()
         self.Complete()
 
+
 class create_character(Action):
     """
     Creates a specialized 'SpriteRenderable' based on character data settings, allowing the developer to move
@@ -824,6 +837,7 @@ class create_character(Action):
             self.active_transition.Skip()
         self.Complete()
 
+
 #@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
     def Start(self):
@@ -835,19 +849,22 @@ class choice(Action):
         self.action_data["center_align"] = False
         self.action_data["key"] = "Choice"
 
-        # All choice options use the same underlying 'create_button' action. Specify and enforce that here
-        # Additionally, apply all settings determined here to each choice button
-        for choice in self.action_data["choices"]:
-            # Build the child dict that gets sent to the interact action
+        # All choice buttons use the same underlying 'create_button' action
+        for choice_index in range(0, len(self.action_data["choices"])):
+            choice = self.action_data["choices"][choice_index]["choice"]
+
+            # Define what the button does when clicked
             choice["action"] = {
                 "action": "choose_branch",
-                "branch": choice["branch"],
-                "key": choice["key"]
+                "branch": choice["branch"]
             }
+
+            # The key is generated dynamically instead of being provided by the file
+            choice["key"] = f"Choice{choice_index}"
 
             # CHOICE BUTTONS - OVERRIDES WITH NO PROJECT DEFAULTS
             if "text_position" not in choice:
-                choice["text_position"] = self.action_data["position"]
+                choice["text_position"] = (0, 0)
 
             # CHOICE BUTTONS - PROJECT DEFAULTS OVERRIDE
             if "sprite" not in choice:
@@ -890,15 +907,13 @@ class choice(Action):
                 choice["text_color"] = Settings.getInstance().project_settings["Choice"][
                     "button_text_color"]
 
-        # Choices provide blocks of options. Each one needs to be built
         new_renderable = Choice(
             self.scene,
             self.action_data
         )
 
-        # Generate and add each choice button to the choice container
-        for choice_data in self.action_data["choices"]:
-            new_renderable.children.append(self.a_manager.PerformAction(choice_data, "create_choice_button"))
+        for choice_entry in self.action_data["choices"]:
+            new_renderable.children.append(self.a_manager.PerformAction(choice_entry["choice"], "create_choice_button"))
 
         self.scene.active_renderables.Add(new_renderable)
 
@@ -906,6 +921,7 @@ class choice(Action):
         self.Complete()
 
         return new_renderable
+
 
 class create_choice_button(Action):
     """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable' """
@@ -931,6 +947,7 @@ class create_choice_button(Action):
 
         return new_renderable
 
+
 class choose_branch(Action):
     def Start(self):
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
@@ -946,7 +963,9 @@ class choose_branch(Action):
         self.scene.Draw()
         self.Complete()
 
+
 # -------------- SOUND ACTIONS --------------
+
 
 class play_sfx(SoundAction):
     """
@@ -976,6 +995,7 @@ class play_sfx(SoundAction):
         self.scene.active_sounds.pop(self.action_data["key"])
         self.Complete()
 
+
 class stop_sfx(Action):
     """
     Based on a given key, stop and remove the associated sfx from the sound stack
@@ -993,6 +1013,7 @@ class stop_sfx(Action):
             self.Complete()
         else:
             raise ValueError("'stop_sfx' action Failed - Key not specified")
+
 
 class play_music(SoundAction):
     #@TODO: Implement end-event so this action completes when the song reaches last frame
@@ -1030,6 +1051,7 @@ class play_music(SoundAction):
             print("SFX completed")
             self.Complete()
 
+
 class stop_music(Action):
     """
     Stops the currently active music
@@ -1044,7 +1066,9 @@ class stop_music(Action):
         self.scene.active_music = None  # DEBUG: Remove once the end-event is implemented
         self.Complete()
 
+
 # -------------- UTILITY ACTIONS --------------
+
 
 class load_scene(Action):
     """
@@ -1062,6 +1086,7 @@ class load_scene(Action):
             raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
 
         self.Complete()
+
 
 class wait(Action):
     """
@@ -1084,6 +1109,7 @@ class wait(Action):
     def Skip(self):
         self.Complete()
 
+
 class quit_game(Action):
     """
     Immediately closes the game
@@ -1094,11 +1120,13 @@ class quit_game(Action):
         self.scene.pygame_lib.quit()
         exit()
 
+
 # -------------- TRANSITION ACTIONS --------------
 """ 
 These actions function as transitions in their own right, but are not modifiers on existing actions like
 those listed in the 'transitions' file
 """
+
 
 class fade_scene_from_black(Action):
     """

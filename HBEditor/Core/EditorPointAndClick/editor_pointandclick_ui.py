@@ -14,7 +14,7 @@
 """
 from PyQt5 import QtWidgets
 from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
-from HBEditor.Core.DetailsPanel.details_panel_test import DetailsPanel
+from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorPointAndClick.scene_viewer import SceneViewer
 
 

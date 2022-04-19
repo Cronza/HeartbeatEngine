@@ -12,29 +12,18 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtCore
-from HBEditor.Core.settings import Settings
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
-from HBEditor.Core.DataTypes.parameter_types import ParameterType
-
-
-# @TODO: Split this file up into a functions class & U.I class
-# @TODO: Make this class agnostic to the dialogue editor
+from HBEditor.Core.Primitives import input_entry_model_handler as iemh
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, excluded_properties: list = None):
+    def __init__(self, excluded_entries: list = None):
         super().__init__()
 
-        # In order to save details as we switch between active dialogue entries, keep track of the last selected entry
         self.active_entry = None
 
-        # Optional dependencies (Some input widgets might need certain references depending on the owner)
-        self.branch_list = None
-
         # Allow the filtering of what properties can possibly appear
-        self.excluded_properties = excluded_properties
+        self.excluded_entries = excluded_entries
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -54,6 +43,7 @@ class DetailsPanel(QtWidgets.QWidget):
         #self.details_toolbar.addWidget(self.details_filter)
 
         # Create Details List
+        #@TODO: Investigate implementing 'dataChanged' signal so the Array entry can bubble up a refresh call
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
@@ -80,183 +70,84 @@ class DetailsPanel(QtWidgets.QWidget):
         #self.details_layout.addWidget(self.details_toolbar)
         self.details_layout.addWidget(self.details_tree)
 
-    def PopulateDetails(self, selected_entry):
-        """
-        Populates the details tree with an entry for all relevant action_data parameters of the given entry.
-        If an entry is already selected, cache the values of all detail entries in the previously selected entry,
-        and load the cache from the new selection if applicable
-
-        If this was called manually (the previously selected and the newly selected entries are the same), skip
-        updating the caching and just load from the existing cache
-        """
-
+    def Populate(self, selected_entry):
+        """ Fill out the details tree based on the active entry's action data"""
         if selected_entry is not self.active_entry:
-            self.UpdateCache()
-
-        # Clear the existing details
-        self.Clear()
-
-        # Update the active entry
+            self.StoreData()
         self.active_entry = selected_entry
 
-        # Generate each entry (If there are any requirements)
-        if "requirements" in self.active_entry.action_data:
-            for requirement in self.active_entry.action_data['requirements']:
+        self.Clear()
+        self.AddItems(self.active_entry.action_data["requirements"])
 
-                if self.excluded_properties:
-                    if requirement["name"] in self.excluded_properties:
-                        continue
-
-                # Create a new entry, and add it to the details list
-                self.AddEntry(self.CreateEntryWidget(requirement))
-
-        # Expand all dropdowns automatically
         self.details_tree.expandAll()
 
-    def UpdateCache(self, parent_entry=None, action_data=None):
-        """
-        Collect all inputs for all detail entries, and cache them in the active entry's action data
+    def AddItems(self, data, parent=None):
+        """ Recursively adds an InputEntry element into the details tree, including all of its children"""
+        for requirement in data:
+            entry = iemh.Add(
+                owner=self,
+                view=self.details_tree,
+                data=requirement,
+                parent=parent,
+                excluded_entries=self.excluded_entries,
+                signal_func=self.ConnectSignals,
+                refresh_func=self.UserUpdatedInputWidget
+            )
 
-        If 'parent_entry' and 'action_data' are provided, parse them. Otherwise, only consider
-        entries at the root. Either way, recurse for any children found
+            if "children" in requirement:
+                self.AddItems(requirement["children"], entry)
+
+    def ConnectSignals(self, tree_item):
+        input_widget = self.details_tree.itemWidget(tree_item, 1)
+        input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
+
+        global_checkbox = self.details_tree.itemWidget(tree_item, 2)
+        if global_checkbox:
+            global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
+
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem=None, initial_iter: bool=True) -> list:
+        """
+        Retrieves the values from all items in the details tree, and updates the active entry using the
+        collected data
         """
         if self.active_entry:
-            # If we've been provided a parent (due to recursion or otherwise), target's it's children and data.
-            # Otherwise, target the root entries and action data
-            details_entry_parent = None
-            action_data_target = None
-            if parent_entry:
-                details_entry_parent = parent_entry
-                action_data_target = action_data
-            else:
-                details_entry_parent = self.details_tree.invisibleRootItem()
-                if "requirements" in self.active_entry.action_data:
-                    action_data_target = self.active_entry.action_data["requirements"]
-            for details_entry_index in range(0, details_entry_parent.childCount()):
-                details_entry = details_entry_parent.child(details_entry_index)
-                details_entry_name = details_entry.name_widget.text()
-                # Are there any requirements to cache?
-                if action_data_target:
-                    # Since the requirements list is a list, we need to parse through for specifically for the
-                    # match for this entry
-                    for requirement in action_data_target:
-                        if requirement["name"] == details_entry_name:
-                            # If this details_entry has children (IE. It's a container), recursively update the
-                            # cache for any and all children entries
-                            if details_entry.childCount() > 0 and "children" in requirement: #@TODO: TESTING: Please review
-                                self.UpdateCache(details_entry, requirement["children"])
+            data_to_store = []
 
-                            # Containers don't store values themselves, so the above code accounts solely for
-                            # it's children. If this entry is not a container, lets cache normally
-                            else:
-                                requirement["value"] = details_entry.Get()
+            if not parent:
+                parent = self.details_tree.invisibleRootItem()
 
-                                # If this entry has a global option, keep track of it's value
-                                if details_entry.show_global_toggle:
-                                    global_value = details_entry.GetGlobal()
-                                    requirement["global"]["active"] = global_value
+            for entry_index in range(0, parent.childCount()):
+                entry = parent.child(entry_index)
+                entry_data = self.details_tree.itemWidget(entry, 1).Get()
 
-    def CreateEntryWidget(self, data):
-        """ Given an action_data dict, create a new details entry widget and return it """
-        # Populate the data column with the widget appropriate to the given type
-        details_widget = self.GetDetailsWidget(data)
+                global_checkbox = self.details_tree.itemWidget(entry, 2)
+                if global_checkbox:
+                    entry_data["global"]["active"] = global_checkbox.Get()
 
-        # Set the name (Applicable for all widget types)
-        details_widget.name_widget.setText(data["name"])
+                if entry.childCount() > 0:
+                    entry_data["children"] = self.StoreData(entry, False)
 
-        if "children" not in data:
-            if 'global' in data:
-                details_widget.show_global_toggle = True
+                data_to_store.append(entry_data)
 
-                # Keep the global toggle off if the user previously turned it off
-                if "active" in data["global"]:
-                    if data["global"]["active"]:
+            if initial_iter:
+                self.active_entry.action_data["requirements"] = data_to_store
 
-                        details_widget.global_toggle.checkbox.setChecked(True)
-                    else:
-                        details_widget.global_toggle.checkbox.setChecked(False)
-                else:
-                    details_widget.global_toggle.checkbox.setChecked(True)
-
-            # Update the contents of the entry
-            EntryUpdater.Set(details_widget, data["value"])
-
-            # Make the option read-only if applicable
-            if not data["editable"]:
-                details_widget.SetEditable(2)
-
-        return details_widget
-
-    def AddEntry(self, entry, parent=None):
-        """
-        Given a details widget, add it to the bottom of the details tree. If the details widget has any children, add
-        all of them through recursion
-        """
-        if parent:
-            parent.addChild(entry)
-        else:
-            self.details_tree.addTopLevelItem(entry)
-
-        self.details_tree.setItemWidget(entry, 0, entry.name_widget)
-        self.details_tree.setItemWidget(entry, 1, entry.input_container)
-        if entry.show_global_toggle:
-            self.details_tree.setItemWidget(entry, 2, entry.global_toggle)
-
-        # If the entry has any children, add them all via recursion
-        if entry.childCount() > 0:
-            for childIndex in range(0, entry.childCount()):
-                self.AddEntry(entry.child(childIndex), entry)
-
-    def GetDetailsWidget(self, data: dict):
-        """ Given an action data dict, create and return the relevant details widget """
-        #@TODO: Can this be converted to use an enum?
-
-        data_type = ParameterType[data["type"]]
-
-        if data_type == ParameterType.String:
-             return InputEntryText(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Paragraph:
-            return InputEntryParagraph(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Vector2:
-            return InputEntryTuple(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Bool:
-            return InputEntryBool(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Color:
-            return InputEntryColor(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Int:
-            return InputEntryInt(self.DetailEntryUpdated)
-        elif data_type == ParameterType.Float:
-            return InputEntryFloat(self.DetailEntryUpdated)
-        elif data_type == ParameterType.File_Data:
-            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Data"], self.DetailEntryUpdated)
-        elif data_type == ParameterType.File_Image:
-            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Image"], self.DetailEntryUpdated)
-        elif data_type == ParameterType.File_Font:
-            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Font"], self.DetailEntryUpdated)
-        elif data_type == ParameterType.File_Sound:
-            return InputEntryFileSelector(self, Settings.getInstance().supported_content_types["Sound"], self.DetailEntryUpdated)
-        elif data_type == ParameterType.Dropdown:
-            return InputEntryDropdown(data['options'], self.DetailEntryUpdated)
-        elif data_type == ParameterType.Choice:
-            return InputEntryChoice(data, self.AddEntry, self.CreateEntryWidget, self.branch_list, self.DetailEntryUpdated)
-        elif data_type == ParameterType.Container:
-            new_entry = InputEntryContainer(data['children'])
-            for child in data['children']:
-                new_entry.addChild(self.CreateEntryWidget(child))
-
-            return new_entry
+            return data_to_store
 
     def Clear(self):
-        """ Deletes all data in the details table """
         self.details_tree.clear()
 
-    def DetailEntryUpdated(self, details_entry):
-        """
-        Whenever a details entry is changed, we need to inform the active entry so it can refresh necessary elements
-        """
-        if self.active_entry:
-            # First update the cache so the active entry is updated to use the data from the detail entries
-            self.UpdateCache()
+    ### Slots ###
 
-            # Inform the active entry to refresh
+    def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
+        input_widget = self.details_tree.itemWidget(owning_tree_item, 1)
+        if global_active:
+            input_widget.SetEditable(2)
+        else:
+            input_widget.SetEditable(0)
+
+    def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
+        #@TODO: Change to only store / refresh the item that changed, not the whole tree
+        if self.active_entry:
+            self.StoreData()
             self.active_entry.Refresh()

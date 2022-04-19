@@ -44,7 +44,6 @@ class EditorDialogue(EditorBase):
     def UpdateDetails(self, selected_entry):
         """ Refreshes the details panel with the details from the selected dialogue entry """
         if selected_entry:
-            #self.editor_ui.details.PopulateDetails(selected_entry)
             self.editor_ui.details.Populate(selected_entry)
 
         # No entries left to select. Wipe remaining details
@@ -97,7 +96,6 @@ class EditorDialogue(EditorBase):
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
             new_entry = {
-                #"name": branch_name,
                 "description": branch_description,
                 "entries": branch_data
             }

@@ -5,7 +5,7 @@ Game:
   title: Sample Project - Dialogue
   author: Cronza
   company: Cloud City Stories
-  starting_scene: Content/Branching_Dialogues.yaml
+  starting_scene: Content/Simple_Conversation.yaml
 Window:
   resolution: 0
   resolution_options:
