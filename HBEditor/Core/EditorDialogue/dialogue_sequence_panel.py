@@ -246,6 +246,7 @@ class DialogueEntry(QtWidgets.QWidget):
 
         # Store a func object that is used when the row containing this object should be resized based on the
         # subtext data in this object
+        #@TODO: Replace with a Qt signal / slot
         self.size_refresh_func = size_refresh_func
 
         # Store this entries action data
@@ -283,11 +284,8 @@ class DialogueEntry(QtWidgets.QWidget):
         """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
         #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
-        #print(f"Data: {data}")
         for param in data:
-            #print(f"Param: {param}")
             if param["preview"]:
-
                 param_name = param["name"]
                 param_data = None
 
@@ -307,5 +305,4 @@ class DialogueEntry(QtWidgets.QWidget):
         """
         Refresh is the common function used by elements that need refreshing when an important U.I change is made
         """
-        #self.UpdateSubtext()
         self.size_refresh_func()

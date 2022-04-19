@@ -506,7 +506,7 @@ Dialogue:
           template:
             name: "choice"
             type: "Array_Element"
-            preview: False
+            preview: True
             children:
               - name: "branch"
                 type: "String"
@@ -517,7 +517,7 @@ Dialogue:
                 type: "Vector2"
                 value: [ 0,0 ]
                 editable: True
-                preview: True
+                preview: False
 
               - name: "text"
                 type: "String"
@@ -531,7 +531,7 @@ Dialogue:
                 global:
                   active: True
                 editable: True
-                preview: True
+                preview: False
 
               - name: "text_color"
                 type: "Color"
@@ -539,7 +539,7 @@ Dialogue:
                 global:
                   active: True
                 editable: True
-                preview: True
+                preview: False
 
               - name: "font"
                 type: "File_Font"
@@ -555,7 +555,7 @@ Dialogue:
                 global:
                   active: True
                 editable: True
-                preview: True
+                preview: False
 
 Scene:
   icon: ":/Icons/Dialogue.png"
