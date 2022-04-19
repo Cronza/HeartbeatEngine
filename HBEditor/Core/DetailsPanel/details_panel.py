@@ -105,7 +105,7 @@ class DetailsPanel(QtWidgets.QWidget):
         if global_checkbox:
             global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
-    def StoreData(self, parent: QtWidgets.QTreeWidgetItem=None, initial_iter: bool=True) -> list:
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None, initial_iter: bool = True) -> list:
         """
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
@@ -129,7 +129,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
                 data_to_store.append(entry_data)
 
-            if initial_iter:
+            if initial_iter and data_to_store:
                 self.active_entry.action_data["requirements"] = data_to_store
 
             return data_to_store

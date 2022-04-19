@@ -82,13 +82,17 @@ class EditorPointAndClick(EditorBase):
         Makes the selected scene item the active one, refreshing the details panel. Hides the details information
         if more than one item is selected
         """
+        # NOTE: This occurs twice when switching selections, first by deselecting the active entry,
+        # and then selecting the second while there is no selection
+        #@TODO: Investigate double details refresh when switching scene item selections
+
         selected_items = self.editor_ui.scene_viewer.GetSelectedItems()
 
         if selected_items:
             # Only allow editing of details when a single item is selected
             if len(selected_items) == 1:
                 self.UpdateDetails(selected_items[0])
-                return None
+                return
 
         self.UpdateDetails(None)
 

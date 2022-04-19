@@ -107,8 +107,9 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, SceneItemUtilities):
 
     def itemChange(self, change, value):
         """
-        OVERRIDE: Called when the item has a change made to it. Currently, only selection changes are included
+        OVERRIDE: Called when the item has a change made to it
         """
+        # Did the selection state of this item change (Was it unselected, selected, etc)?
         if change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
             self.select_func()
 
@@ -123,6 +124,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, SceneItemUtilities):
             round(cur_pos.x() / self.scene().width(), 2),
             round(cur_pos.y() / self.scene().height(), 2)
         ]
+        #@TODO: Something is wrong here that breaks when switching selection
         self.FindProperty(self.action_data, "position")["value"] = norm_range
         self.data_changed_func(self)
 
@@ -228,8 +230,9 @@ class TextItem(QtWidgets.QGraphicsTextItem, SceneItemUtilities):
 
     def itemChange(self, change, value):
         """
-        OVERRIDE: Called when the item has a change made to it. Currently, only selection changes are included
+        OVERRIDE: Called when the item has a change made to it
         """
+        # Did the selection state of this item change (Was it unselected, selected, etc)?
         if change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
             self.select_func()
 

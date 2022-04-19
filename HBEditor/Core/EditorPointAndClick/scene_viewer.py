@@ -46,29 +46,8 @@ class SceneViewer(QtWidgets.QWidget):
         self.sub_layout.setContentsMargins(0, 0, 0, 0)
         self.sub_layout.setSpacing(0)
 
-        self.CreateActionBar()
-
-        # Create the core elements
-        self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
-        self.view = SceneView(self.scene)
-
-        # Add the core view components together
-        self.sub_layout.addWidget(self.action_toolbar)
-        self.sub_layout.addWidget(self.view)
-
-        # Add the top level components together
-        self.main_layout.addWidget(self.title)
-        self.main_layout.addLayout(self.sub_layout)
-
-        self.view.show()
-
-    def CreateActionBar(self):
-        """ Create the action bar and populate it with each editing button """
-
         # Build the action menu which displays the options for creating things in the editor
         self.action_menu = ActionMenu(self.AddRenderable, self.core.action_data)
-
-        # Create the frame container
         self.action_toolbar = QtWidgets.QToolBar()
         self.action_toolbar.setOrientation(QtCore.Qt.Vertical)
 
@@ -101,8 +80,21 @@ class SceneViewer(QtWidgets.QWidget):
             self.CopyRenderable
         )
 
-    def AddRenderable(self, action_data) -> bool:
+        # Create the core elements
+        self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
+        self.view = SceneView(self.scene)
 
+        # Add the core view components together
+        self.sub_layout.addWidget(self.action_toolbar)
+        self.sub_layout.addWidget(self.view)
+
+        # Add the top level components together
+        self.main_layout.addWidget(self.title)
+        self.main_layout.addLayout(self.sub_layout)
+
+        self.view.show()
+
+    def AddRenderable(self, action_data) -> bool:
         for actions in self.core.possible_actions.values():
             if action_data["action_name"] in actions:
                 item_type = actions[action_data["action_name"]]

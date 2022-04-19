@@ -196,8 +196,7 @@ class InputEntryFileSelector(InputEntryBase):
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        #self.input_widget.textChanged.connect(lambda: self.SIG_USER_UPDATE.emit())
-        #self.input_widget.setReadOnly(True)
+        self.input_widget.setReadOnly(True)  # Disallow the user from manually entering a path / enforce the button
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -219,17 +218,7 @@ class InputEntryFileSelector(InputEntryBase):
         self.input_widget.setText(data)
 
     def Connect(self):
-        self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
-
-    def SetEditable(self, state: int):
-        if state == 0:
-            self.file_select_button.setEnabled(True)
-            self.input_widget.setReadOnly(False)
-        elif state == 2:
-            self.file_select_button.setEnabled(False)
-            self.input_widget.setReadOnly(True)
-
-        self.input_widget.style().polish(self.input_widget)
+        self.input_widget.textChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
