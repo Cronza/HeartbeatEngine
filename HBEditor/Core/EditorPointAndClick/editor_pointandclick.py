@@ -18,6 +18,7 @@ from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
+from HBEditor.Core.EditorPointAndClick.scene_viewer import SceneItemTypes
 
 
 class EditorPointAndClick(EditorBase):
@@ -31,19 +32,20 @@ class EditorPointAndClick(EditorBase):
         # we'll allow
 
         # Additionally, since scene items functionally differ depending on the type of information they present (text
-        # graphics fundamentally differ from sprite graphics), we need a map of what action leads to what item type
+        # graphics differ fundamentally from sprite graphics), we need a map of what action leads to what item type
         self.possible_actions = {
             "Renderables": {
-                "create_sprite": "sprite",
-                "create_text": "text",
-                "create_background": "sprite"
+                "create_sprite": SceneItemTypes.Sprite,
+                "create_text": SceneItemTypes.Text,
+                "create_background": SceneItemTypes.Sprite
             }
         }
 
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
         self.excluded_properties = ["transition", "post_wait"]
 
-        self.action_data = self.BuildActionDataDict(self.possible_actions)
+        #@TODO: Rework in order to avoid having to clone the database
+        #self.action_data = self.BuildActionDataDict(self.possible_actions)
 
         # Initialize the editor U.I
         self.editor_ui = EditorPointAndClickUI(self)
@@ -65,7 +67,6 @@ class EditorPointAndClick(EditorBase):
             category_data["options"] = []
 
             # For every action we want, find the matching entry in the database and clone it
-
             for action_name in action_list:
                 for db_action in Settings.getInstance().action_database[category_name]["options"]:
                     if action_name == db_action["action_name"]:

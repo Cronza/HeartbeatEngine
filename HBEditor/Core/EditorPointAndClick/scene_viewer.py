@@ -13,11 +13,17 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
+from enum import Enum
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
 from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
+
+
+class SceneItemTypes(Enum):
+    Sprite = 1
+    Text = 2
 
 
 class SceneViewer(QtWidgets.QWidget):
@@ -84,17 +90,16 @@ class SceneViewer(QtWidgets.QWidget):
         self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
         self.view = SceneView(self.scene)
 
-        # Add the core view components together
+        # Add everything together
         self.sub_layout.addWidget(self.action_toolbar)
         self.sub_layout.addWidget(self.view)
-
-        # Add the top level components together
         self.main_layout.addWidget(self.title)
         self.main_layout.addLayout(self.sub_layout)
 
         self.view.show()
 
     def AddRenderable(self, action_data) -> bool:
+        """ Add an item to the scene view """
         for actions in self.core.possible_actions.values():
             if action_data["action_name"] in actions:
                 item_type = actions[action_data["action_name"]]
@@ -125,7 +130,7 @@ class SceneViewer(QtWidgets.QWidget):
         return False
 
     def CopyRenderable(self):
-        """ Clones the active renderable. If multiple are selected, clone each one """
+        """ Clones the active renderable, adding it to the scene view. If multiple are selected, clone each one """
         selected_items = self.scene.selectedItems()
 
         if selected_items:

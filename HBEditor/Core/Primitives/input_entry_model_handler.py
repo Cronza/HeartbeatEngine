@@ -65,7 +65,7 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
     - InputEntry
     - Global Checkbox (SimpleCheckbox)
     """
-    # @TODO: Replace with a switch when the Python version is upgraded to allow it
+    # @TODO: Replace with a switch when the Python version is upgraded to allow it (3.10)
     data_type = ParameterType[data["type"]]
 
     input_widget = None
