@@ -12,7 +12,6 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import os
 import sys
 import shutil
 import re
@@ -76,8 +75,10 @@ class HBEditor:
             if not user_project_name:
                 Logger.getInstance().Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
+                project_path = Path(new_project_dir) / user_project_name
+
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
-                if os.path.exists(new_project_dir + "/" + user_project_name):
+                if project_path.exists():
                     Logger.getInstance().Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
                     QtWidgets.QMessageBox.about(
                         self.e_ui.central_widget,
@@ -85,36 +86,33 @@ class HBEditor:
                         "The chosen directory already contains a project of the chosen name.\n"
                         "Please either delete this project, or choose another directory"
                     )
-
                 # Everything is good to go. Create a new project!
                 else:
                     Logger.getInstance().Log("Valid project destination chosen! Creating project folder structure...")
 
-                    # Create the project directory
-                    project_path = new_project_dir + "/" + user_project_name
-                    os.mkdir(project_path)
+                    # Create the project directory, including parent directories if necessary
+                    project_path.mkdir(parents=True)
 
                     # Create the pre-requisite project folders
                     for main_dir in Settings.getInstance().project_folder_structure:
-                        main_dir_path = project_path + "/" + main_dir
-                        os.mkdir(main_dir_path)
+                        main_dir_path = project_path / main_dir
+                        main_dir_path.mkdir()
 
                     # Create the project file
-                    project_file = project_path + "/" + Settings.getInstance().project_file
-                    with open(project_file, "w"):
-                        pass
+                    project_file = project_path / Settings.getInstance().project_file
+                    project_file.touch()
 
                     # Clone project default files
-                    for key, rel_path in Settings.getInstance().project_default_files.items():
+                    for _, rel_path in Settings.getInstance().project_default_files.items():
                         shutil.copy(
-                            Settings.getInstance().engine_root + "/" + rel_path,
-                            project_path + "/" + rel_path
+                            Path(Settings.getInstance().engine_root) / rel_path,
+                            project_path / rel_path
                         )
 
                     Logger.getInstance().Log(f"Project Created at: {project_path}", 2)
 
                     # Set this as the active project
-                    self.SetActiveProject(user_project_name, project_path)
+                    self.SetActiveProject(user_project_name, str(project_path))
 
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
@@ -131,11 +129,12 @@ class HBEditor:
             Logger.getInstance().Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the admin folder's existence)
-            if os.path.exists(existing_project_dir + "/" + Settings.getInstance().project_file):
+            project_file_path = Path(existing_project_dir) / Settings.getInstance().project_file
+            if project_file_path.exists():
                 Logger.getInstance().Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
-                project_name = os.path.basename(existing_project_dir)
+                project_name = Path(existing_project_dir).name
                 self.SetActiveProject(project_name, existing_project_dir)
             else:
                 Logger.getInstance().Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
@@ -345,7 +344,7 @@ class HBEditor:
 
                 self.e_ui.AddTab(
                     self.active_editor.GetUI(),
-                    os.path.basename(target_file_path),
+                    Path(target_file_path).name,
                     self.e_ui.main_tab_editor
                 )
         else:
@@ -441,16 +440,13 @@ class HBEditor:
 
     def WriteToTemp(self, temp_file: str, data: dict) -> bool:
         """ Write to the provided temp file, creating it if it doesn't already exist """
-        if not os.path.exists(temp_file):
-            try:
-                if not os.path.exists(Settings.editor_temp_root):
-                    os.mkdir(Settings.editor_temp_root)
-                with open(temp_file, "w"):
-                    pass
-            except Exception as exc:
+        try:
+            self.__create_temp_file_if_not_exist(Path(temp_file))
+        except Exception as exc:
                 Logger.getInstance().Log(f"Unable to create '{temp_file}'", 4)
                 Logger.getInstance().Log(str(exc), 4)
                 return False
+
         temp_data = Reader.ReadAll(temp_file)
         if not temp_data:
             temp_data = {}
@@ -466,7 +462,7 @@ class HBEditor:
 
     def ReadFromTemp(self, temp_file: str, key: str) -> str:
         """ Read from the provided temp file using the provided key, returning the results if found """
-        if not os.path.exists(temp_file):
+        if not Path(temp_file).exists():
             Logger.getInstance().Log(f"The temp file '{temp_file}' was not found")
             return ""
         try:
@@ -476,6 +472,19 @@ class HBEditor:
             Logger.getInstance().Log(f"Failed to read '{temp_file}'")
             Logger.getInstance().Log(str(exc), 4)
             return ""
+
+    @staticmethod
+    def __create_temp_file_if_not_exist(temp_file_path: Path):
+        """ Attempts to create a temp file at the given path.
+            This function may raise an exception in case creating the file was
+            unsuccessful. """
+        if temp_file_path.exists(): return
+
+        temp_root = Path(Settings.getInstance().editor_temp_root)
+        if not temp_root.exists():
+            temp_root.mkdir(parents=True, exist_ok=True)
+        temp_file_path.touch()
+
 
 if __name__ == "__main__":
     editor = HBEditor()
