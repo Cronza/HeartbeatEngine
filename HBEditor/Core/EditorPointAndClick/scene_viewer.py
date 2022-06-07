@@ -18,12 +18,8 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
-from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
-
-
-class SceneItemTypes(Enum):
-    Sprite = 1
-    Text = 2
+#from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
+from HBEditor.Core.EditorPointAndClick.scene_items import RootItem
 
 
 class SceneViewer(QtWidgets.QWidget):
@@ -34,6 +30,7 @@ class SceneViewer(QtWidgets.QWidget):
     def __init__(self, core):
         super().__init__()
 
+        #@TODO: Rename this to 'owner' to be more explicit
         self.core = core
 
         self.viewer_size = (1280, 720)
@@ -42,7 +39,6 @@ class SceneViewer(QtWidgets.QWidget):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # Create the View title
         self.title = QtWidgets.QLabel(self)
         self.title.setText("Scene Viewer")
         self.title.setObjectName("h1")
@@ -53,14 +49,12 @@ class SceneViewer(QtWidgets.QWidget):
         self.sub_layout.setSpacing(0)
 
         # Build the action menu which displays the options for creating things in the editor
-        self.action_menu = ActionMenu(self.AddRenderable, self.core.action_data)
+        self.action_menu = ActionMenu(self.AddRenderable, self.core.file_type)
         self.action_toolbar = QtWidgets.QToolBar()
         self.action_toolbar.setOrientation(QtCore.Qt.Vertical)
 
-        # Generic button settings
         icon = QtGui.QIcon()
 
-        # Add Entry Button (Popup Menu)
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         icon.addPixmap(
             QtGui.QPixmap(":/Icons/Plus.png"),
@@ -72,21 +66,18 @@ class SceneViewer(QtWidgets.QWidget):
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.action_toolbar.addWidget(self.add_entry_button)
 
-        # Remove Entry Button
         self.action_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
             "Remove Entry",
             self.RemoveSelectedItems
         )
 
-        # Copy Entry Button
         self.action_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
             "Copy Entry",
             self.CopyRenderable
         )
 
-        # Create the core elements
         self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
         self.view = SceneView(self.scene)
 
@@ -100,32 +91,16 @@ class SceneViewer(QtWidgets.QWidget):
 
     def AddRenderable(self, action_data) -> bool:
         """ Add an item to the scene view """
-        for actions in self.core.possible_actions.values():
-            if action_data["action_name"] in actions:
-                item_type = actions[action_data["action_name"]]
+        new_item = RootItem(
+            action_data=action_data,
+            select_func=self.core.UpdateActiveSceneItem,
+            data_changed_func=self.core.UpdateDetails
+        )
 
-                if item_type == "sprite":
-                    image = QtGui.QPixmap(":/Sprites/Placeholder.png")
-                    sprite = SpriteItem(
-                        image,
-                        action_data,
-                        self.core.UpdateActiveSceneItem,
-                        self.core.UpdateDetails
-                    )
-                    self.scene.addItem(sprite)
-                    sprite.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
-                    return True
+        self.scene.addItem(new_item)
 
-                elif item_type == "text":
-                    text = TextItem(
-                        "Default",
-                        action_data,
-                        self.core.UpdateActiveSceneItem,
-                        self.core.UpdateDetails
-                    )
-                    self.scene.addItem(text)
-                    text.Refresh()  # Force a refresh as the renderable doesn't use the action data right away
-                    return True
+        # Generate after adding to the scene so children have the scene transform context
+        new_item.GenerateChildren()
 
         return False
 

@@ -13,8 +13,8 @@ class SceneView(QtWidgets.QGraphicsView):
         self.zoom = 1  # Tracks the amount we've zoomed in
         self.zoom_speed = 0.1
 
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setDragMode(self.RubberBandDrag)
+        self.setRubberBandSelectionMode(QtCore.Qt.ContainsItemShape)
         self.setTransformationAnchor(self.AnchorUnderMouse)
         self.fitInView(parent.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
@@ -36,6 +36,20 @@ class SceneView(QtWidgets.QGraphicsView):
 
         self.scale(factor, factor)
         self.zoom *= factor
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        # Enable viewport panning while spacebar is down
+        if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
+            self.setDragMode(self.ScrollHandDrag)
+
+        super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
+        # Disable viewport panning once the spacebar is released
+        if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
+            self.setDragMode(self.RubberBandDrag)
+
+        super().keyReleaseEvent(event)
 
 
 class Scene(QtWidgets.QGraphicsScene):

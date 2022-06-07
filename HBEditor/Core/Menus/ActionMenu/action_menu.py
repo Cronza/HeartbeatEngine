@@ -14,6 +14,7 @@
 """
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
+from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.Menus.ActionMenu.action_menu_option import ActionMenuOption
 
 #@TODO: Should this class be split into a function class & a U.I class?
@@ -25,20 +26,26 @@ class ActionMenu(QtWidgets.QMenu):
     is clicked. 'available_actions' is a set of actions pulled from the ActionsDatabase that will represent what's available
     in the menu
     """
-    def __init__(self, button_func, available_actions):
+    def __init__(self, button_func, editor_type: FileType):
         super().__init__()
 
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
 
-        for category, data in available_actions.items():
-            # Build the category object and assign it
+        for category, data in Settings.getInstance().action_database.items():
+            # Create the category submenu
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
             cat_menu.setIcon(QtGui.QIcon(data["icon"]))
-            self.addMenu(cat_menu)
 
-            # Generate a list of options for this category
+            # Populate the category submenu
             for action in data['options']:
-                option = ActionMenuOption(self, action, button_func)
-                option.setText(action['display_name'])
-                cat_menu.addAction(option)
+                for applicable_editor in action["applicable_editors"]:
+                    if FileType[applicable_editor] == editor_type:
+                        option = ActionMenuOption(self, action, button_func)
+                        option.setText(action['display_name'])
+                        cat_menu.addAction(option)
+                        break
+
+            # Only use the menu if there were any actions that are allowed for this editor type
+            if len(cat_menu.actions()) > 0:
+                self.addMenu(cat_menu)

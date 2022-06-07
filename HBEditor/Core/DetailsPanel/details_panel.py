@@ -67,7 +67,6 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_title)
-        #self.details_layout.addWidget(self.details_toolbar)
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):
@@ -147,7 +146,22 @@ class DetailsPanel(QtWidgets.QWidget):
             input_widget.SetEditable(0)
 
     def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
-        #@TODO: Change to only store / refresh the item that changed, not the whole tree
         if self.active_entry:
             self.StoreData()
-            self.active_entry.Refresh()
+
+            # In order to provide the context of "which" input widget was updated, we need to provide the
+            # full ancestry tree so there is a direct path to the widget in question
+            # IE: [transition,type]
+            parent_tree = []
+            cur_entry = owning_tree_item
+
+            stop = False
+            while not stop:
+                input_widget = self.details_tree.itemWidget(cur_entry, 1)
+                parent_tree.insert(-1, input_widget.data["name"])  # Descending order
+
+                cur_entry = cur_entry.parent()
+                if not cur_entry:
+                    stop = True
+
+            self.active_entry.Refresh(parent_tree)

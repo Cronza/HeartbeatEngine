@@ -50,7 +50,6 @@ class EditorDialogue(EditorBase):
         else:
             self.editor_ui.details.Clear()
 
-    # @TODO: How to support the initial switch when 'main' is created?
     def SwitchBranches(self, cur_branch, new_branch):
         """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
 

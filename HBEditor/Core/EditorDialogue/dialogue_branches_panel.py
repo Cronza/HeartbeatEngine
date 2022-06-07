@@ -244,13 +244,6 @@ class BranchesEntry(QtWidgets.QWidget):
         """ Returns a list of dialogue entry data stored in this branch entry """
         return self.branch_data
 
-    def Refresh(self):
-        """
-        Refresh is the common function used by elements that need refreshing when an important U.I change is made
-        """
-
-        pass
-
 
 class EditBranchPrompt(QtWidgets.QDialog):
     def __init__(self, branch_name, branch_description, parent=None):
@@ -287,7 +280,6 @@ class EditBranchPrompt(QtWidgets.QDialog):
         # Connect buttons
         self.accept_button.clicked.connect(self.Accept)
         self.cancel_button.clicked.connect(self.Cancel)
-
 
     def Cancel(self):
         self.reject()

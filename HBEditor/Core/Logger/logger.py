@@ -73,10 +73,9 @@ class Logger:
         except Exception as exc:
             print(f"Failed to determine log color type - Resorting to normal colors: {exc}")
 
-        self.log_ui.AddEntry(
-            datetime.now().strftime("%H:%M:%S") + ": " + prefix + log_text,
-            style
-        )
+        log_str = datetime.now().strftime("%H:%M:%S") + ": " + prefix + log_text
+        self.log_ui.AddEntry(log_str, style)
+        print(log_str)
 
     def ClearLog(self):
         """ Deletes all log entries """

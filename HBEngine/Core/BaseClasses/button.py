@@ -29,7 +29,7 @@ class Button(Interactable):
 
         button_text_renderable = TextRenderable(
             self.scene,
-            self.renderable_data
+            self.renderable_data["button_text"]
         )
         button_text_renderable.key = f"{self.renderable_data['key']}_Text"
         self.children.append(button_text_renderable)

@@ -18,7 +18,6 @@ from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
-from HBEditor.Core.EditorPointAndClick.scene_viewer import SceneItemTypes
 
 
 class EditorPointAndClick(EditorBase):
@@ -27,56 +26,11 @@ class EditorPointAndClick(EditorBase):
 
         self.file_type = FileType.Scene_Point_And_Click
 
-        # Since the Point & Click editor doesn't make use of all actions, but only those that can be rendered
-        # (interactables, sprites, text, etc), we need to compile a custom action_data dict with only the options
-        # we'll allow
-
-        # Additionally, since scene items functionally differ depending on the type of information they present (text
-        # graphics differ fundamentally from sprite graphics), we need a map of what action leads to what item type
-        self.possible_actions = {
-            "Renderables": {
-                "create_sprite": SceneItemTypes.Sprite,
-                "create_text": SceneItemTypes.Text,
-                "create_background": SceneItemTypes.Sprite
-            }
-        }
-
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
         self.excluded_properties = ["transition", "post_wait"]
 
-        #@TODO: Rework in order to avoid having to clone the database
-        #self.action_data = self.BuildActionDataDict(self.possible_actions)
-
-        # Initialize the editor U.I
         self.editor_ui = EditorPointAndClickUI(self)
         Logger.getInstance().Log("Editor initialized")
-
-    def BuildActionDataDict(self, possible_actions: dict) -> dict:
-        """
-        Compiles a dict clone of the ActionDatabase, limited to a specific subset of categories and actions defined
-        in 'possible_actions'
-        """
-        # Build our action data dict
-        compiled_dict = {}
-        for category_name, action_list in possible_actions.items():
-            # Clone the entire category structure so we don't try and piecemeal it, potentially creating issues
-            # in the future if we change the structure
-            category_data = copy.deepcopy(Settings.getInstance().action_database[category_name])
-
-            # Wipe the available options, as we're going to rebuild the list with only those we can use
-            category_data["options"] = []
-
-            # For every action we want, find the matching entry in the database and clone it
-            for action_name in action_list:
-                for db_action in Settings.getInstance().action_database[category_name]["options"]:
-                    if action_name == db_action["action_name"]:
-                        category_data["options"].append(copy.deepcopy(db_action))
-                        break
-
-            # Add the completed clone to the main dict
-            compiled_dict[category_name] = category_data
-
-        return compiled_dict
 
     def UpdateActiveSceneItem(self):
         """
@@ -86,7 +40,6 @@ class EditorPointAndClick(EditorBase):
         # NOTE: This occurs twice when switching selections, first by deselecting the active entry,
         # and then selecting the second while there is no selection
         #@TODO: Investigate double details refresh when switching scene item selections
-
         selected_items = self.editor_ui.scene_viewer.GetSelectedItems()
 
         if selected_items:

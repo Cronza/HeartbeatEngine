@@ -196,7 +196,6 @@ class InputEntryFileSelector(InputEntryBase):
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
-        self.input_widget.setReadOnly(True)  # Disallow the user from manually entering a path / enforce the button
 
         # Create the file selector button, and style it accordingly
         self.file_select_button = QtWidgets.QToolButton()
@@ -219,6 +218,16 @@ class InputEntryFileSelector(InputEntryBase):
 
     def Connect(self):
         self.input_widget.textChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
+
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.file_select_button.setDisabled(False)
+            self.input_widget.setReadOnly(False)
+        elif state == 2:
+            self.file_select_button.setDisabled(True)
+            self.input_widget.setReadOnly(True)
+
+        self.input_widget.style().polish(self.input_widget)
 
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
@@ -364,6 +373,7 @@ class InputEntryText(InputEntryBase):
 
     def Set(self, data):
         self.input_widget.setText(data)
+        self.input_widget.setCursorPosition(0)
 
     def Connect(self):
         self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
@@ -425,6 +435,8 @@ class InputEntryTuple(InputEntryBase):
     def Set(self, data):
         self.input_widget.setText(str(data[0]))
         self.input_widget_alt.setText(str(data[1]))
+        self.input_widget.setCursorPosition(0)
+        self.input_widget_alt.setCursorPosition(0)
 
     def Connect(self):
         self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
@@ -479,10 +491,6 @@ class InputEntryArray(InputEntryBase):
                 parent = self.owning_model_item
 
             #@TODO: Investigate how to incorporate this functionality with saving / loading
-            # Array elements are special in that their names are dynamically assigned based on the number of them
-            #if ParameterType[data["type"]] == ParameterType.Array_Element:
-            #    data["name"] = str(parent.childCount())
-
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
