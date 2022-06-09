@@ -17,13 +17,13 @@ from HBEditor.Core.Primitives import input_entry_model_handler as iemh
 
 
 class DetailsPanel(QtWidgets.QWidget):
-    def __init__(self, excluded_entries: list = None):
+    def __init__(self, excluded_properties: list = None):
         super().__init__()
 
         self.active_entry = None
 
         # Allow the filtering of what properties can possibly appear
-        self.excluded_entries = excluded_entries
+        self.excluded_properties = excluded_properties
 
         self.details_layout = QtWidgets.QVBoxLayout(self)
         self.details_layout.setContentsMargins(0, 0, 0, 0)
@@ -81,14 +81,22 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.expandAll()
 
     def AddItems(self, data, parent=None):
-        """ Recursively adds an InputEntry element into the details tree, including all of its children"""
+        """
+        Recursively adds an InputEntry element into the details tree, including all of its children
+        If 'excluded_properties' was provided when initializing the Details Panel, do not add an entry for any
+        items in the exclusion list
+        """
         for requirement in data:
+            if self.excluded_properties:
+                if requirement["name"] in self.excluded_properties:
+                    continue
+
             entry = iemh.Add(
                 owner=self,
                 view=self.details_tree,
                 data=requirement,
                 parent=parent,
-                excluded_entries=self.excluded_entries,
+                excluded_properties=self.excluded_properties,
                 signal_func=self.ConnectSignals,
                 refresh_func=self.UserUpdatedInputWidget
             )

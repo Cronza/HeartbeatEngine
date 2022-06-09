@@ -17,7 +17,9 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
 class EditorPointAndClick(EditorBase):
@@ -60,3 +62,53 @@ class EditorPointAndClick(EditorBase):
         # No entries left to select. Wipe remaining details
         else:
             self.editor_ui.details.Clear()
+
+    def Export(self):
+        super().Export()
+        Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
+
+        # Get an engine-formatted list of scene items
+        conv_scene_items = self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
+
+        data_to_export = {
+            "type": FileType.Scene_Point_And_Click.name,
+            "scene_items": conv_scene_items
+        }
+        Logger.getInstance().Log("Writing data to file...")
+        try:
+            Writer.WriteFile(
+                data=data_to_export,
+                file_path=self.file_path,
+                metadata=f"# Type: {FileType.Scene_Point_And_Click.name}\n" +
+                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
+            )
+            Logger.getInstance().Log("File Exported!", 2)
+        except Exception as exc:
+            Logger.getInstance().Log(f"Failed to Export: {exc}", 4)
+
+    def Import(self):
+        super().Import()
+        Logger.getInstance().Log(f"Importing Point&Click data for: {self.file_path}")
+
+    def ConvertSceneItemsToEngineFormat(self, scene_items: list):
+        """ Build and return a list of the data from all active scene items converted to engine format """
+        converted_entries = []
+        for scene_item in scene_items:
+            scene_item_data = scene_item.action_data
+
+            # Get the action name
+            converted_action = {"action": scene_item_data["action_name"]}
+
+            # Collect a converted dict of all requirements for this action (If any are present)
+            converted_requirements = adh.ConvertActionRequirementsToEngineFormat(
+                editor_req_data=scene_item_data,
+                excluded_properties=self.excluded_properties
+            )
+            if converted_requirements:
+                converted_action.update(converted_requirements)
+
+            # Add the newly converted action
+            converted_entries.append(converted_action)
+
+        return converted_entries
+

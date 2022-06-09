@@ -237,9 +237,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         else:
             return -1
 
-    def GetDialogueTable(self) -> QtWidgets.QAbstractItemView:
-        return self.dialogue_table
-
 
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
     def __init__(self, action_data, select_func, size_refresh_func):

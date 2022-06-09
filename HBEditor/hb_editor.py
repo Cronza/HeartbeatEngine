@@ -18,17 +18,18 @@ import shutil
 import re
 from pathlib import Path
 from PyQt5 import QtWidgets
+
+from HBEditor import hb_editor_ui as hbe
+from HBEditor.Content import content
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.Managers.play_manager import PlayManager
-from HBEditor import hb_editor_ui as hbe
+from HBEditor.Core.play_manager import PlayManager
 from HBEditor.Core.Menus.NewFileMenu.new_file_menu import NewFileMenu
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
-from HBEditor.Content import content
 from Tools.HBBuilder.hb_builder import HBBuilder
 from Tools.HBYaml.hb_yaml import Reader, Writer
 

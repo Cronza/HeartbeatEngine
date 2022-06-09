@@ -461,9 +461,9 @@ class InputEntryArray(InputEntryBase):
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, refresh_func: callable,
-                 excluded_entries: dict = None):
+                 excluded_properties: dict = None):
         super().__init__(data)
-        self.excluded_entries = excluded_entries
+        self.excluded_properties = excluded_properties
         self.owning_view = owning_view
 
         self.child_limit = 6
@@ -496,7 +496,7 @@ class InputEntryArray(InputEntryBase):
                 view=self.owning_view,
                 data=data,
                 parent=parent,
-                excluded_entries=self.excluded_entries,
+                excluded_properties=self.excluded_properties,
                 signal_func=self.signal_func,
                 refresh_func=self.refresh_func
             )

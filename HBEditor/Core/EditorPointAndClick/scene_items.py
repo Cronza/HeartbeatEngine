@@ -1,17 +1,7 @@
-import os
-from PyQt5 import QtWidgets, QtGui
-from HBEditor.Core.settings import Settings
-from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.Managers.font_manager import FontManager
-
-
-import os
-from typing import Union
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtGui import QFontMetrics
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.Managers.font_manager import FontManager
+from HBEditor.Core.EditorUtilities.font_manager import FontManager
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
 
 
@@ -114,11 +104,14 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         else:
             self.RefreshRecursive(self)
 
+        # The root item dictates the tree's general z-order. It needs to inherit the z-order of the top-most child
+        self.setZValue(self.childItems()[0].zValue())  # The root only ever has a single child
+
     def RefreshRecursiveAll(self, cur_target: QtWidgets.QGraphicsItem) -> bool:
         """ Perform a full Refresh for all children """
         for child in cur_target.childItems():
             child.Refresh()
-            self.RefreshRecursiveAll(cur_target)
+            self.RefreshRecursiveAll(child)
 
         return True
 
@@ -134,6 +127,13 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                     if len(change_tree) == 1:
                         # We're at the end, so this must be it
                         child.Refresh(change_tree[0])
+
+                        # Certain changes may impact the item's 'boundingRect', which child objects rely on for their
+                        # positions. When these changes are detected, we need to fully refresh the item's children
+                        # just in case
+                        if change_tree[0] == "sprite":
+                            self.RefreshRecursiveAll(child)
+
                         return True
                     else:
                         # Still more to go. Recurse, removing this level from the list we're passing along
@@ -210,7 +210,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
             self.UpdateZOrder()
 
         # Any changes that require a transform adjustment requires all others be updated as well
-        if changed_entry_name == "center_align" or changed_entry_name == "flip" or changed_entry_name == "":
+        if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "flip" or changed_entry_name == "":
             self.resetTransform()
             new_transform = QtGui.QTransform()
 
@@ -343,10 +343,6 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             self.UpdateZOrder()
 
         # Any changes that require a transform adjustment requires all others be updated as well
-        #
-        # Note: It seems adjusting text_size while center aligned causes bizarre positioning issues. In order to
-        # circumvent this, if the object was previously centered, always re-center it. This isn't very performant,
-        # but a necessary workaround for now
         if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "":
             self.resetTransform()
             new_transform = QtGui.QTransform()

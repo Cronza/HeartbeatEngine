@@ -14,6 +14,7 @@
 """
 import copy
 from enum import Enum
+from typing import List
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
@@ -131,3 +132,7 @@ class SceneViewer(QtWidgets.QWidget):
                 self.scene.removeItem(item)
 
             self.core.UpdateActiveSceneItem()
+
+    def GetSceneItems(self) -> List[RootItem]:
+        """ Returns a list of all RootItems in the SceneView """
+        return [item for item in self.scene.items() if isinstance(item, RootItem)]

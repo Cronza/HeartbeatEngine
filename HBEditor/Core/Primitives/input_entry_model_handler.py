@@ -19,7 +19,7 @@ from HBEditor.Core.Primitives.input_entries import *
 
 
 def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
-        parent: QTreeWidgetItem = None, excluded_entries: dict = None,
+        parent: QTreeWidgetItem = None, excluded_properties: list = None,
         signal_func: callable = None, refresh_func: callable = None) -> QTreeWidgetItem:
     """
     Adds a new InputEntry into the provided QAbstractItemModel, along with its name and global checkbox elements.
@@ -34,10 +34,6 @@ def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
     the caller to know about it. When they call it, they'll provide their owning widget item
     """
 
-    if excluded_entries:
-        if data["name"] in excluded_entries:
-            return None
-
     entry = QTreeWidgetItem()
     if parent:
         parent.addChild(entry)
@@ -45,7 +41,7 @@ def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
         view.addTopLevelItem(entry)
 
     name_widget, input_widget, global_checkbox = Create(
-        owner, data, entry, view, signal_func, refresh_func, excluded_entries
+        owner, data, entry, view, signal_func, refresh_func, excluded_properties
     )
     view.setItemWidget(entry, 0, name_widget)
     view.setItemWidget(entry, 1, input_widget)
@@ -58,7 +54,7 @@ def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
 
 def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
            owning_view: QtWidgets.QAbstractItemView, signal_func: callable = None,
-           refresh_func: callable = None, excluded_entries: dict = None) -> object:
+           refresh_func: callable = None, excluded_properties: dict = None) -> object:
     """
     Creates and returns each element of an InputEntry:
     - QLabel (Name)
@@ -99,7 +95,7 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
         input_widget = InputEntryArrayElement(data)
         input_widget.SIG_USER_DELETE.connect(Remove)
     elif data_type == ParameterType.Array:
-        input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_entries)
+        input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_properties)
     elif data_type == ParameterType.CUST_Resolution:
         input_widget = InputEntryResolution(data)
 

@@ -12,12 +12,13 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import copy
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.EditorDialogue.editor_dialogue_ui import EditorDialogueUI
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.Managers.database_manager import DBManager
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
@@ -68,10 +69,10 @@ class EditorDialogue(EditorBase):
         # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.branch_data.clear()
 
-        dialogue_seq = self.editor_ui.dialogue_sequence.GetDialogueTable()
-        num_of_entries = dialogue_seq.rowCount()
+        dialogue_table = self.editor_ui.dialogue_sequence.dialogue_table
+        num_of_entries = dialogue_table.rowCount()
         for entry_index in range(num_of_entries):
-            dialogue_entry = dialogue_seq.cellWidget(entry_index, 0)
+            dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
             cur_branch.branch_data.append(dialogue_entry.action_data)
 
     def GetAllDialogueData(self) -> dict:
@@ -107,24 +108,23 @@ class EditorDialogue(EditorBase):
         super().Export()
         Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
         data_to_export = self.GetAllDialogueData()
-        db_manager = DBManager()
         data_to_export = {
             "type": FileType.Scene_Dialogue.name,
-            "dialogue": db_manager.ConvertDialogueFileToEngineFormat(data_to_export)
+            "dialogue": self.ConvertDialogueFileToEngineFormat(data_to_export)
         }
 
         # Write the data out
         Logger.getInstance().Log("Writing data to file...")
         try:
             Writer.WriteFile(
-                data_to_export,
-                self.file_path,
-                f"# Type: {FileType.Scene_Dialogue.name}\n" +
+                data=data_to_export,
+                file_path=self.file_path,
+                metadata=f"# Type: {FileType.Scene_Dialogue.name}\n" +
                 f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
-        except:
-            Logger.getInstance().Log("Failed to Export!", 4)
+        except Exception as exc:
+            Logger.getInstance().Log(f"Failed to Export: {exc}", 4)
 
     def Import(self):
         super().Import()
@@ -134,8 +134,7 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
-            db_manager = DBManager()
-            converted_data = db_manager.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
+            converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
 
             # The main branch is treated specially since we don't need to create it
             for branch_name, branch_data in converted_data.items():
@@ -147,4 +146,97 @@ class EditorDialogue(EditorBase):
 
             # Select the main branch by default
             self.editor_ui.branches.ChangeBranch(0)
+
+    def ConvertDialogueFileToEngineFormat(self, action_data: dict):
+        """
+        Given a full dict of dialogue file data in editor format (branches and all), convert it to the engine format
+        Return the converted dict
+        """
+        new_dialogue_data = {}
+        for branch_name, branch_data in action_data.items():
+            converted_branch = {
+                "description": branch_data["description"]
+            }
+
+            converted_entries = []
+            for editor_action in branch_data["entries"]:
+                # Get the action name
+                converted_action = {"action": editor_action["action_name"]}
+
+                # Collect a converted dict of all requirements for this action (If any are present)
+                converted_requirements = adh.ConvertActionRequirementsToEngineFormat(editor_action)
+                if converted_requirements:
+                    converted_action.update(converted_requirements)
+
+                # Add the newly converted action
+                converted_entries.append(converted_action)
+
+            # Complete the converted branch, and add it to the new dialogue data
+            converted_branch["entries"] = converted_entries
+            new_dialogue_data[branch_name] = converted_branch
+
+        return new_dialogue_data
+
+
+    def ConvertDialogueFileToEditorFormat(self, action_data):
+        """
+        Given a full dict of dialogue file data in engine format (branches and all), convert it to the editor format by
+        rebuilding the structure based on lookups in the ActionDatabase
+        """
+        #@TODO: Investigate how to speed this up. The volume of O(n) searching is worrying
+        new_dialogue_data = {}
+
+        for branch_name, branch_data in action_data.items():
+            converted_entries = []
+            for action in branch_data["entries"]:
+                action_name = action["action"]
+
+                # Using the name of the action, look it up in the ActionDatabase. From there, we can build the new
+                # structure
+                database_entry = None
+                for cat_name, cat_data in Settings.getInstance().action_database.items():
+                    for option in cat_data["options"]:
+                        if action_name == option['action_name']:
+                            database_entry = copy.deepcopy(option)
+                            break
+
+                    if database_entry:
+                        break
+                # Pass the entry by ref, and let the convert func edit it directly
+                self.ConvertActionRequirementsToEditorFormat(database_entry, action)
+                converted_entries.append(database_entry)
+
+            branch_data["entries"] = converted_entries
+            new_dialogue_data[branch_name] = branch_data
+
+        return new_dialogue_data
+
+    def ConvertActionRequirementsToEditorFormat(self, editor_req, engine_req, search_term="requirements"):
+        if search_term in editor_req:
+            for index in range(0, len(editor_req[search_term])):
+                req = editor_req[search_term][index]
+
+                if "children" not in req and "value" in req:
+                    if req["name"] in engine_req:
+                        # If the requirement is present, but it does have a global option, then it's an override
+                        if "global" in req:
+                            req["global"]["active"] = False
+
+                        req["value"] = engine_req[req["name"]]
+                    else:
+                        if "global" in req:
+                            req["global"]["active"] = True
+
+                elif "template" in req:
+                    # We need to duplicate the template a number of times equal to the number of instances found
+                    # in the eng data, then update each copy using the eng data
+                    req["children"] = []
+                    eng_target = engine_req[req["name"]]
+                    for i in range(0, len(eng_target)):
+                        template_copy = copy.deepcopy(req["template"])
+                        self.ConvertActionRequirementsToEditorFormat(template_copy, eng_target[i][template_copy["name"]], "children")
+                        req["children"].append(template_copy)
+
+                elif "children" in req:
+                    self.ConvertActionRequirementsToEditorFormat(req, engine_req[req["name"]], "children")
 
