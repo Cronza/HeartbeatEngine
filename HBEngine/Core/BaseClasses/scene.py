@@ -101,7 +101,7 @@ class Scene:
 
     def LoadSceneData(self):
         """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """
-        pass
+        raise NotImplementedError("'LoadSceneData' not implemented")
 
     def CalculateScreenSizeMultiplier(self, old_resolution, new_resolution):
         """

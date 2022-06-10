@@ -22,16 +22,20 @@ class Button(Interactable):
     """
     def __init__(self, scene, renderable_data):
         super().__init__(scene, renderable_data)
+        # # Buttons use a container called 'button_text' to store their button text action data. To the user, this is
+        # a simplified text renderable as a number of the settings are handled behind-the-scenes here
 
         # Use the button image / surface as the wrap Bounds. Since we already have the screen space
         # size though, provide it instead of letting the text convert it from normalized values later
-        self.renderable_data["size"] = self.surface.get_size()
+        self.renderable_data["button_text"]["size"] = self.surface.get_size()
+
+        # Instead of the user having to provide a key for this, we generate it for them
+        self.renderable_data["button_text"]["key"] = f"{self.renderable_data['key']}_Text"
 
         button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data["button_text"]
         )
-        button_text_renderable.key = f"{self.renderable_data['key']}_Text"
         self.children.append(button_text_renderable)
         self.scene.active_renderables.Add(button_text_renderable)
 

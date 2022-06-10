@@ -24,4 +24,4 @@ class SourceEntry:
         Optional: change_tree - A descending list, starting with the top-most parent, of all action_data names
         leading to the specific entry that was edited (IE. ["parent", "parent", "center_align"])
         """
-        raise NotImplementedError("'Refresh' not implemented - This is mandatory'")
+        raise NotImplementedError("'Refresh' not implemented")

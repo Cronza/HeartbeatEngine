@@ -367,12 +367,14 @@ class create_text(Action):
         # not meant to be kept around long-term
         self.scene.active_renderables.Add(new_text_renderable)
 
-        if "None" not in self.action_data["transition"]["type"]:
-            self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
-            self.active_transition.Start()
-        else:
-            self.scene.Draw()
-            self.Complete()
+        if "transition" in self.action_data:
+            if "None" not in self.action_data["transition"]["type"]:
+                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
+                self.active_transition.Start()
+                return new_text_renderable
+
+        self.scene.Draw()
+        self.Complete()
 
         return new_text_renderable
 

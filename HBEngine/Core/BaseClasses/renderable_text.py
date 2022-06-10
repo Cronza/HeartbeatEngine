@@ -37,9 +37,10 @@ class TextRenderable(Renderable):
 
         # If a size was passed (expected as screen space values), then use it for the wrap bounds
         if "size" not in self.renderable_data:
-            assert "wrap_bounds" in self.renderable_data, print(
-                f"No 'wrap_bounds' value assigned to {self}, and no 'size' "
-                f"value provided. This makes for an impossible action!")
+            if "wrap_bounds" not in self.renderable_data:
+                raise ValueError(f"No 'wrap_bounds' value assigned to {self}, and no 'size' "
+                                 f"value provided. This makes for an impossible action!")
+
             self.renderable_data["size"] = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
 
         # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's

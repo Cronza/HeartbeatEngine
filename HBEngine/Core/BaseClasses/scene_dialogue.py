@@ -70,7 +70,6 @@ class DialogueScene(PointAndClickScene):
 
     def LoadSceneData(self):
         """ Load the full dialogue structure, and load the first action """
-        super().LoadSceneData()
         self.dialogue_data = self.scene_data['dialogue']
 
         # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
