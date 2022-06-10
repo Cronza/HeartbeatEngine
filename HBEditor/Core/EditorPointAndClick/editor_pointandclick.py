@@ -88,7 +88,15 @@ class EditorPointAndClick(EditorBase):
 
     def Import(self):
         super().Import()
-        Logger.getInstance().Log(f"Importing Point&Click data for: {self.file_path}")
+        Logger.getInstance().Log(f"Importing Point & Click data for: {self.file_path}")
+
+        file_data = Reader.ReadAll(self.file_path)
+
+        # Skip importing if the file has no data to load
+        if file_data:
+            conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
+            for item in conv_scene_items:
+                self.editor_ui.scene_viewer.AddRenderable(item)
 
     def ConvertSceneItemsToEngineFormat(self, scene_items: list):
         """ Build and return a list of the data from all active scene items converted to engine format """
@@ -112,3 +120,31 @@ class EditorPointAndClick(EditorBase):
 
         return converted_entries
 
+    def ConvertSceneItemsToEditorFormat(self, action_data):
+        """
+            Given a full dict of scene item data in engine format, convert it to the editor format by
+            rebuilding the structure based on lookups in the ActionDatabase
+        """
+        conv_items = []
+        for item in action_data:
+            action_name = item["action"]
+
+            # Using the name of the action, look it up in the ActionDatabase. If found, clone it
+            database_entry = None
+            for cat_name, cat_data in Settings.getInstance().action_database.items():
+                for option in cat_data["options"]:
+                    if action_name == option['action_name']:
+                        database_entry = copy.deepcopy(option)
+                        break
+                if database_entry:
+                    break
+
+            # Pass the entry by ref, and let the convert func edit it directly
+            adh.ConvertActionRequirementsToEditorFormat(
+                editor_req=database_entry,
+                engine_req=item,
+                excluded_properties=self.excluded_properties
+            )
+            conv_items.append(database_entry)
+
+        return conv_items

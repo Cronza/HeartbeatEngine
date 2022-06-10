@@ -103,6 +103,10 @@ class SceneViewer(QtWidgets.QWidget):
         # Generate after adding to the scene so children have the scene transform context
         new_item.GenerateChildren()
 
+        # The root item dictates the tree's general z-order. It needs to inherit the z-order of the top-most child
+        # Note: The root only ever has a single child
+        new_item.UpdateZValue()
+
         return False
 
     def CopyRenderable(self):

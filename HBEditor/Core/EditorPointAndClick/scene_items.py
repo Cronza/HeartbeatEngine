@@ -104,8 +104,9 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         else:
             self.RefreshRecursive(self)
 
-        # The root item dictates the tree's general z-order. It needs to inherit the z-order of the top-most child
-        self.setZValue(self.childItems()[0].zValue())  # The root only ever has a single child
+        # The root item uses the top-most child's z-order, so they both need to be updated
+        if change_tree[0] == "z_order":
+            self.UpdateZValue()
 
     def RefreshRecursiveAll(self, cur_target: QtWidgets.QGraphicsItem) -> bool:
         """ Perform a full Refresh for all children """
@@ -144,6 +145,10 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                             search_term="children"
                         )
         return False
+
+    def UpdateZValue(self):
+        """ Updates this object's z-value using it's top-most child's z-value """
+        self.setZValue(self.childItems()[0].zValue())
 
     def boundingRect(self) -> QtCore.QRectF:
         return self.childrenBoundingRect()
