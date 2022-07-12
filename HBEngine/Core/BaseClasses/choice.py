@@ -21,5 +21,5 @@ class Choice(Container):
         self.visible = False
 
         # Pass in a button list, and generate buttons
-        assert 'choices' in self.renderable_data, print(
-            f"No 'choices' block assigned to {self}. This makes for an impossible action!")
+        if 'choices' not in self.renderable_data:
+            raise ValueError(f"No 'choices' block assigned to {self}. This makes for an impossible action!")

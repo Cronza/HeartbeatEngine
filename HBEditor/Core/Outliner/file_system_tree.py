@@ -55,7 +55,6 @@ class FileSystemTree(QtWidgets.QTreeView):
         self.setEditTriggers(QtWidgets.QTreeView.NoEditTriggers)
         self.setModel(self.model)
         self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        print(type(self.header()))
 
         # Create and use a custom icon provider to override tree icons
         self.model.setIconProvider(FileSystemIconProvider())

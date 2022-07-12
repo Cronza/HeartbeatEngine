@@ -80,7 +80,8 @@ class Settings:
 
         # Idea 1: We still use main, but we don't package the editor, and in main, we have a flag to skip
         # the editor (Likely ill-advised)
-        print(os.getcwd())
+        #print(os.getcwd())
+
         # Idea 2: We modify this code for the build
         if partial_path.startswith("HBEngine"):
             return partial_path.replace("HBEngine", f"{self.root_dir}/HBEngine")

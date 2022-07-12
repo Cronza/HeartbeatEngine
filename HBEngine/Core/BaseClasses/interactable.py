@@ -15,6 +15,7 @@
 import pygame
 from HBEngine.Core.settings import Settings
 from HBEngine.Core.DataTypes.input_states import State
+from HBEngine.Core.BaseClasses.renderable import Renderable
 from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
 
 
@@ -25,8 +26,8 @@ class Interactable(SpriteRenderable):
     - Normal, hover, and clicked input states
     - A 'click' action
     """
-    def __init__(self, scene, renderable_data):
-        super().__init__(scene, renderable_data, False)
+    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+        super().__init__(scene, renderable_data, False, parent)
 
         # YAML Parameters
         #sprite_hover = self.renderable_data['sprite_hover']
@@ -91,20 +92,13 @@ class Interactable(SpriteRenderable):
             self.scaled_original_surface = None
 
         # Recalculate each of the interactable states
-        if multiplier == 1:
-            self.hover_surface = self.RecalculateSurfaceSize(multiplier, self.hover_surface)
-            self.clicked_surface = self.RecalculateSurfaceSize(multiplier, self.clicked_surface)
-            self.scaled_hover_surface = None
-            self.scaled_clicked_surface = None
-        else:
-            print("Resizing State Surfaces")
-            self.scaled_hover_surface = self.RecalculateSurfaceSize(multiplier, self.hover_surface)
-            self.scaled_clicked_surface = self.RecalculateSurfaceSize(multiplier, self.clicked_surface)
+        if multiplier != 1:
+            self.scaled_hover_surface = self.GetRescaledSurface(multiplier, self.hover_surface)
+            self.scaled_clicked_surface = self.GetRescaledSurface(multiplier, self.clicked_surface)
 
     def Interact(self):
         # Check if any actions are defined in the data file
         if 'action' in self.renderable_data:
-
             # Interactables use a child 'action' block which acts as its own independent 'renderable_data'. Pass that
             # instead of this object's data
             action_data = self.renderable_data['action']
@@ -160,7 +154,6 @@ class Interactable(SpriteRenderable):
                 return self.scaled_original_surface
             else:
                 return self.original_surface
-
 
     def Flip(self):
         #super().Flip()

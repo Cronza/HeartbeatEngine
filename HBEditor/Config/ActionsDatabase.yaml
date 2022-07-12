@@ -393,6 +393,12 @@ Interactables:
               editable: True
               preview: False
 
+            - name: "wrap_bounds"
+              type: "Vector2"
+              value: [ 0.2, 0.2 ]
+              editable: True
+              preview: False
+
 Dialogue:
   icon: ":/Icons/Dialogue.png"
   options:

@@ -26,8 +26,8 @@ class TextRenderable(Renderable):
         - Pop-up text
         - etc
     """
-    def __init__(self, scene, renderable_data):
-        super().__init__(scene, renderable_data)
+    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+        super().__init__(scene, renderable_data, parent)
 
         font = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data["text"]
@@ -35,7 +35,8 @@ class TextRenderable(Renderable):
         text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
 
-        # If a size was passed (expected as screen space values), then use it for the wrap bounds
+        # If a size was passed (expected as screen space values), then use it for the wrap bounds. This is typical
+        # when a parent needs to provide its own size to act as the child's wrap bounds
         if "size" not in self.renderable_data:
             if "wrap_bounds" not in self.renderable_data:
                 raise ValueError(f"No 'wrap_bounds' value assigned to {self}, and no 'size' "
@@ -43,19 +44,20 @@ class TextRenderable(Renderable):
 
             self.renderable_data["size"] = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
 
+        #@TODO: This is flawed as its conflating size and wrap bounds. This is causing clipping at the edges because the surface isn't sized properly to fix the text
         # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's
         # automatically wrapped until the maximum Y
+        size = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
         self.surface = pygame.Surface((
-            int(self.renderable_data["size"][0]),
-            int(self.renderable_data["size"][1])),
+            int(size[0]),
+            int(size[1])),
             pygame.SRCALPHA
         )
-
-        self.WrapText(self.surface)
         self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
         self.RecalculateSize(self.scene.resolution_multiplier)
+        self.WrapText(self.surface)
 
     def WrapText(self, surface):
         """ Applies text wrapping based on the provided surface area """

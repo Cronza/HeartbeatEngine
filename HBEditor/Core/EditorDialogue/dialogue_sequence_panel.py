@@ -202,7 +202,6 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             elif selection_index + 1 >= self.dialogue_table.rowCount():
                 Logger.getInstance().Log("Can't move entry down as we're at the bottom of the sequence", 3)
             else:
-                print("blah")
                 # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
                 # of gently moving the row, we recreate it by transferring it's data to a newly created entry
                 taken_entry = self.dialogue_table.cellWidget(selection_index, 0)

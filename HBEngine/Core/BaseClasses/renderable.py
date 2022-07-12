@@ -12,6 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from __future__ import annotations
+from typing import Union
 import pygame
 
 
@@ -25,7 +27,7 @@ class Renderable(pygame.sprite.Sprite):
 
     This class is not meant to be used directly, but to be subclassed into more specialized objects
     """
-    def __init__(self, scene, renderable_data):
+    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
         super().__init__()
 
         # Renderables require access to the owning scene so that they can keep track of resolution updates
@@ -41,7 +43,6 @@ class Renderable(pygame.sprite.Sprite):
         self.position = self.renderable_data['position']
         self.center_align = self.renderable_data['center_align']
         self.z_order = self.renderable_data['z_order']
-        # self.flipped = False
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned
         # a unique identifier. This parameter is mandatory, and is considered an exception if not provided
@@ -50,57 +51,56 @@ class Renderable(pygame.sprite.Sprite):
 
         self.key = self.renderable_data['key']
 
-        # Renderables can have any number of associated objects. This allows renderables to be deleted or moved as
-        # a group. Since the children are drawn like regular renderables, they're independent of the rect of the parent
+        self.parent = parent
         self.children = []
 
     def RecalculateSize(self, multiplier):
-        """ Resize the renderable and it's surfaces based on the provided size multiplier """
+        """ Resize the renderable and its surfaces based on the provided size multiplier """
 
-        # Recalculate the main surface
+        # Renderables can only have one rect which is based on the base surface. Any sprite changes won't alter the rect
         if multiplier == 1:
-            self.surface = self.RecalculateSurfaceSize(multiplier, self.surface)
             self.scaled_surface = None
+            self.UpdateRect(self.RecalculateSurfacePosition(self.surface), self.surface.get_size())
         else:
-            self.scaled_surface = self.RecalculateSurfaceSize(multiplier, self.surface)
+            self.scaled_surface = self.GetRescaledSurface(multiplier, self.surface)
+            self.UpdateRect(self.RecalculateSurfacePosition(self.scaled_surface), self.scaled_surface.get_size())
 
-    def RecalculateSurfaceSize(self, multiplier, surface):
-        """ Based on the provided multiplier, resize the provided surface accordingly """
-
-        # A multiplier of 1 means this is the main resolution. Update the renderable using the unscaled surface
-        if multiplier == 1:
-
-            # Generate a new absolute position using this renderable's normalized screen position
-            new_position = self.ConvertNormToScreen(tuple(self.position))
-
-            if self.center_align:
-                new_position = self.GetCenterOffset(new_position, surface.get_size())
-
-            self.UpdateRect(new_position, surface.get_size())
-
-            return surface
-
-        else:  # We're using a different resolution. We need to use a scaled version of the provided surface
-            width = surface.get_width()
-            height = surface.get_height()
-
-            # Round each value as blitting doesn't support floats
-            new_size = tuple(
-                [
-                    round(width * multiplier[0]),
-                    round(height * multiplier[1])
-                ]
+    def RecalculateSurfacePosition(self, surface: pygame.Surface) -> tuple:
+        new_position = 0,0
+        if self.parent:
+            # Since normalized values can be viewed as a percentage of a range (IE. 0.7 = 70/100),
+            # use this to get our position in the parent's coordinate system by multiplying our parent's size
+            # by our position (Ex. Size of 50 * 0.5 = 25, or center), then adding this to the parent's position
+            new_position = (
+                (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
+                (self.parent.rect.height * self.position[1]) + self.parent.rect.y
             )
-            # Generate the scaled surface
-            scaled_surface = pygame.transform.smoothscale(surface, new_size)
+        else:
             new_position = self.ConvertNormToScreen(tuple(self.position))
 
-            if self.center_align:
-                new_position = self.GetCenterOffset(new_position, scaled_surface.get_size())
+        # Offset the position so the origin point is in the center
+        if self.center_align:
+            new_position = self.GetCenterOffset(new_position, surface.get_size())
 
-            self.UpdateRect(new_position, scaled_surface.get_size())
+        return new_position
 
-            return scaled_surface
+    def GetRescaledSurface(self, surface: pygame.Surface, multiplier: float) -> pygame.Surface:
+        """ Rescale and return the provided surface using the provided multiplier """
+        # @TODO Needs a review once resolution support has been updated / fixed
+        width = surface.get_width()
+        height = surface.get_height()
+
+        # Round each value as blitting doesn't support floats
+        new_size = tuple(
+            [
+                round(width * multiplier[0]),
+                round(height * multiplier[1])
+            ]
+        )
+        # Generate the scaled surface
+        scaled_surface = pygame.transform.smoothscale(surface, new_size)
+
+        return scaled_surface
 
     def GetSurface(self):
         """
@@ -112,8 +112,8 @@ class Renderable(pygame.sprite.Sprite):
         else:
             return self.surface
 
-    def UpdateRect(self, new_pos, new_size):
-        """ Sets the rect location to the provided X and Y"""
+    def UpdateRect(self, new_pos: tuple, new_size: tuple):
+        """ Updates this renderable's rect position and size using the provided values """
         self.rect.x = new_pos[0]
         self.rect.y = new_pos[1]
         self.rect.w = new_size[0]
@@ -136,8 +136,8 @@ class Renderable(pygame.sprite.Sprite):
         else:
             self.surface = surface
 
-    def ConvertNormToScreen(self, norm_value):
-        """ Take the normalized object pos and convert it to absolute screen space coordinates """
+    def ConvertNormToScreen(self, norm_value: tuple) -> tuple:
+        """ Take the normalized pos and convert it to absolute screen space coordinates """
         screen_size = pygame.display.get_surface().get_size()
 
         return (
@@ -145,12 +145,20 @@ class Renderable(pygame.sprite.Sprite):
             norm_value[1] * screen_size[1]
         )
 
+    def ConvertScreenToNorm(self, screen_val: tuple) -> tuple:
+        """ Take the screen space position and normalize it to 0-1 """
+        screen_size = pygame.display.get_surface().get_size()
+
+        return (
+            screen_val[0] / screen_size[0],
+            screen_val[1] / screen_size[1]
+        )
+
     def GetCenterOffset(self, pos, size):
         """
-        Given size and position tuples representing the center point of a sprite,
+        Given size and position tuples representing the center point of a surface,
         return the offset position for the top-left corner
         """
-        
         return (
             round(pos[0] - size[0] / 2),
             round(pos[1] - size[1] / 2)

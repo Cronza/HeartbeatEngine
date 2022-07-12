@@ -25,8 +25,8 @@ class SpriteRenderable(Renderable):
         - Backgrounds
         - etc
     """
-    def __init__(self, scene, renderable_data, initial_rescale=True):
-        super().__init__(scene, renderable_data)
+    def __init__(self, scene, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None):
+        super().__init__(scene, renderable_data, parent)
 
         # YAML Parameters
         sprite = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data['sprite'])

@@ -1,3 +1,5 @@
+import math
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.settings import Settings
 from HBEditor.Core.Logger.logger import Logger
@@ -398,7 +400,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             text_size = 1
 
         cur_font = self.font()
-        cur_font.setPointSize(text_size)
+        cur_font.setPixelSize(text_size)
         self.setFont(cur_font)
 
     def UpdateFont(self):
