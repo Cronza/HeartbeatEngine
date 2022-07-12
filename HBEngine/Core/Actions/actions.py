@@ -207,7 +207,7 @@ class create_dialogue_interface(Action):
         )
 
         # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
-        self.scene.active_renderables.Add(dialogue_frame)
+        self.scene.AddToScreen(dialogue_frame)
 
         self.scene.Draw()
         self.Complete()
