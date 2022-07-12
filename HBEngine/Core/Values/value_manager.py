@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import inspect
-from HBEngine.Core import actions
+from HBEngine.Core.Actions import actions
 
 
 class ValueManager:

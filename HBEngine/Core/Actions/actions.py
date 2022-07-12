@@ -31,14 +31,48 @@ provided actions
 """
 import pygame.mixer
 from HBEngine.Core.settings import Settings
-from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
-from HBEngine.Core.BaseClasses.renderable_text import TextRenderable
-from HBEngine.Core.BaseClasses.interactable import Interactable
-from HBEngine.Core.BaseClasses.button import Button
-from HBEngine.Core.BaseClasses.choice import Choice
-from HBEngine.Core.BaseClasses.renderable_container import Container
-from HBEngine.Core.BaseClasses.action import Action
-from HBEngine.Core.BaseClasses.action_sound import SoundAction
+from HBEngine.Core.Rendering.renderable_sprite import SpriteRenderable
+from HBEngine.Core.Rendering.renderable_text import TextRenderable
+from HBEngine.Core.Rendering.interactable import Interactable
+from HBEngine.Core.Rendering.button import Button
+from HBEngine.Core.Rendering.choice import Choice
+from HBEngine.Core.Rendering.renderable_container import Container
+
+
+class Action():
+    def __init__(self, scene, action_data, a_manager):
+        self.scene = scene
+        self.action_data = action_data
+        self.a_manager = a_manager
+        self.active_transition = None
+        self.speed = 5
+        self.skippable = True
+        self.complete = False
+        self.complete_delegate = None  # Called by the action manager before it deletes the action
+
+    def Start(self):
+        pass
+
+    def Update(self, events):
+        pass
+
+    def Skip(self):
+        pass
+
+    def Complete(self):
+        self.complete = True
+
+    #@TODO: Create 'ValidateParams' function to handle checking for parameters in action data, and using global default
+    #@TODO: if none are provided
+    def ValidateParams(self):
+        pass
+
+
+class SoundAction(Action):
+    # @TODO: Add Pause function
+    def __init__(self, scene, action_data, a_manager):
+        super().__init__(scene, action_data, a_manager)
+        self.assigned_channel = None
 
 
 # -------------- GRAPHICS ACTIONS --------------
@@ -206,7 +240,7 @@ class create_background(Action):
             self.action_data,
         )
 
-        self.scene.active_renderables.Add(new_sprite)
+        self.scene.AddToScreen(new_sprite)
 
         self.scene.Draw()
         self.Complete()
@@ -363,9 +397,7 @@ class create_text(Action):
             self.action_data
         )
 
-        # Add the text to the renderables list instead of the sprite group as text is a temporary element that is
-        # not meant to be kept around long-term
-        self.scene.active_renderables.Add(new_text_renderable)
+        self.scene.AddToScreen(new_text_renderable)
 
         if "transition" in self.action_data:
             if "None" not in self.action_data["transition"]["type"]:
@@ -463,7 +495,7 @@ class create_button(Action):
             if self.action_data['flip']:
                 new_renderable.Flip()
 
-        self.scene.active_renderables.Add(new_renderable)
+        self.scene.AddToScreen(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -489,7 +521,7 @@ class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDAT
             self.action_data,
         )
 
-        self.scene.active_renderables.Add(new_renderable)
+        self.scene.AddToScreen(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -594,8 +626,8 @@ class dialogue(Action):
             self.action_data["dialogue"]
         )
 
-        self.scene.active_renderables.Add(new_speaker_text)
-        self.scene.active_renderables.Add(new_dialogue_text)
+        self.scene.AddToScreen(new_speaker_text)
+        self.scene.AddToScreen(new_dialogue_text)
 
         # By default, dialogue text fades in. However, allow the user to override this behaviour
         # Note: Speaker text does not support transitions currently
@@ -636,7 +668,7 @@ class character_dialogue(Action):
     def Start(self):
 
         # Dialogue-specific adjustments
-        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == HBEngine.Core.Scenes.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed"
         )
 
@@ -679,7 +711,7 @@ class character_dialogue(Action):
                 character_data
             )
             # Speaker text does not support transitions currently
-            self.scene.active_renderables.Add(new_character_text)
+            self.scene.AddToScreen(new_character_text)
 
         # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
         # information, and / or any global settings
@@ -717,7 +749,7 @@ class character_dialogue(Action):
                 self.action_data['speaker']
             )
             # Speaker text does not support transitions currently
-            self.scene.active_renderables.Add(new_speaker_text)
+            self.scene.AddToScreen(new_speaker_text)
 
         # If the user has specified a 'dialogue' block, build the speaker renderable
         if 'dialogue' in self.action_data:
@@ -754,7 +786,7 @@ class character_dialogue(Action):
                 self.action_data['dialogue']
             )
 
-            self.scene.active_renderables.Add(new_dialogue_text)
+            self.scene.AddToScreen(new_dialogue_text)
 
             # By default, dialogue text fades in. However, allow the user to override this behaviour
             if 'transition' in self.action_data['dialogue']:
@@ -795,7 +827,7 @@ class create_character(Action):
     def Start(self):
 
         # Character-specific adjustments
-        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
+        assert type(self.scene) == HBEngine.Core.Scenes.scene_dialogue.DialogueScene, print(
             "The active scene is not of the 'DialogueScene' type. This action can not be performed")
         assert 'character' in self.action_data, print(
             f"No 'character' block assigned to {self}. This makes for an impossible action!")
@@ -834,7 +866,7 @@ class create_character(Action):
             if self.action_data['flip']:
                 new_sprite.Flip()
 
-        self.scene.active_renderables.Add(new_sprite)
+        self.scene.AddToScreen(new_sprite)
 
         # Any transitions are applied to the sprite post-load
         if 'transition' in self.action_data:
@@ -936,7 +968,7 @@ class choice(Action):
         for choice_entry in self.action_data["choices"]:
             new_renderable.children.append(self.a_manager.PerformAction(choice_entry["choice"], "create_choice_button"))
 
-        self.scene.active_renderables.Add(new_renderable)
+        self.scene.AddToScreen(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -961,7 +993,7 @@ class create_choice_button(Action):
             if self.action_data['flip']:
                 new_renderable.Flip()
 
-        self.scene.active_renderables.Add(new_renderable)
+        self.scene.AddToScreen(new_renderable)
 
         self.scene.Draw()
         self.Complete()
@@ -973,7 +1005,7 @@ class choose_branch(Action):
     def Start(self):
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
-        if self.scene.active_renderables.Exists("Choice"):
+        if self.scene.GetIsInScene("Choice"):
             self.a_manager.PerformAction(
                 {"key": "Choice", "transition": {"type": "None"}},
                 "remove_container"

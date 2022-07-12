@@ -12,14 +12,16 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEngine.Core.BaseClasses.renderable_container import Container
+from HBEngine.Core.Actions.scene import Scene
 
 
-class Choice(Container):
-    def __init__(self, scene, renderable_data):
-        super().__init__(scene, renderable_data)
-        self.visible = False
+class PointAndClickScene(Scene):
+    def __init__(self, scene_data_file, window, scene_manager):
+        super().__init__(scene_data_file, window, scene_manager)
 
-        # Pass in a button list, and generate buttons
-        if 'choices' not in self.renderable_data:
-            raise ValueError(f"No 'choices' block assigned to {self}. This makes for an impossible action!")
+    def LoadSceneData(self):
+        if "scene_items" in self.scene_data:
+            for item in self.scene_data["scene_items"]:
+                self.a_manager.PerformAction(item, item['action'])
+        else:
+            raise ValueError("'scene_items' missing from the scene file")

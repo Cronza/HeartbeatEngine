@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEngine.Core.BaseClasses.renderable import Renderable
+from HBEngine.Core.Rendering.renderable import Renderable
 
 
 class Container(Renderable):
@@ -21,6 +21,7 @@ class Container(Renderable):
         self.visible = False
 
         #@TODO: Minimize the specific references to objects here so that containers can be more generalized
+        #@TODO: Update this file to use the dynamic type checking used in the point&click scene file
         # Load any specified objects (Non-interactables)
         if 'sprites' in renderable_data:
             f_objects = renderable_data['sprites']

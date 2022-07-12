@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEngine.Core.BaseClasses.renderable import Renderable
-from HBEngine.Core.BaseClasses.interactable import Interactable
-from HBEngine.Core.BaseClasses.renderable_text import TextRenderable
+from HBEngine.Core.Rendering.renderable import Renderable
+from HBEngine.Core.Rendering.interactable import Interactable
+from HBEngine.Core.Rendering.renderable_text import TextRenderable
 
 
 class Button(Interactable):
@@ -34,7 +34,7 @@ class Button(Interactable):
             self
         )
         self.children.append(button_text_renderable)
-        self.scene.active_renderables.Add(button_text_renderable)
+        self.scene.AddToScreen(button_text_renderable)
 
     def GetText(self):
         pass

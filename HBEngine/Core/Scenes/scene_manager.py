@@ -13,8 +13,8 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEngine.Core.settings import Settings
-from HBEngine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
-from HBEngine.Core.BaseClasses.scene_dialogue import DialogueScene
+from HBEngine.Core.Scenes.scene_pointandclick import PointAndClickScene
+from HBEngine.Core.Scenes.scene_dialogue import DialogueScene
 from HBEngine.Core.DataTypes.file_types import FileType
 
 

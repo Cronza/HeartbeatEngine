@@ -15,8 +15,8 @@
 import pygame
 from HBEngine.Core.settings import Settings
 from HBEngine.Core.DataTypes.input_states import State
-from HBEngine.Core.BaseClasses.renderable import Renderable
-from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
+from HBEngine.Core.Rendering.renderable import Renderable
+from HBEngine.Core.Rendering.renderable_sprite import SpriteRenderable
 
 
 class Interactable(SpriteRenderable):
@@ -52,7 +52,7 @@ class Interactable(SpriteRenderable):
         self.scaled_original_surface = None
 
         # Defer the resize until we're able to define the interactive surfaces
-        self.RecalculateSize(self.scene.resolution_multiplier)
+        self.RecalculateSize(1)
 
     def update(self, *args):
         super().update()

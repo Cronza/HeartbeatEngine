@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core.BaseClasses.renderable import Renderable
+from HBEngine.Core.Rendering.renderable import Renderable
 from HBEngine.Core.settings import Settings
 
 
@@ -56,7 +56,7 @@ class TextRenderable(Renderable):
         self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
-        self.RecalculateSize(self.scene.resolution_multiplier)
+        self.RecalculateSize(1)
         self.WrapText(self.surface)
 
     def WrapText(self, surface):
