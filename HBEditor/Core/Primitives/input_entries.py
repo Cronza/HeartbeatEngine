@@ -77,6 +77,7 @@ class InputEntryBool(InputEntryBase):
         self.main_layout.addWidget(self.input_widget)
 
     def Get(self):
+        """ Stores the active check state and returns the full action data dict """
         self.data["value"] = self.input_widget.isChecked()
         return self.data
 
@@ -118,6 +119,7 @@ class InputEntryColor(InputEntryBase):
         self.main_layout.addWidget(self.color_select_button)
 
     def Get(self):
+        """ Stores the active rgb color and returns the full action data dict """
         raw_style_sheet = self.input_widget.styleSheet()
         pattern = "background-color: rgb\((.*)\)"
 
@@ -144,8 +146,8 @@ class InputEntryColor(InputEntryBase):
         rgb = color_choice.red(), color_choice.green(), color_choice.blue()
 
         if color_choice.isValid():
-            self.input_widget.setStyleSheet(f"background-color: rgb({', '.join(map(str, rgb))})")
-
+            self.Set(rgb)
+            
             # Manually call the input change func since we know for a fact the input widget has changed
             self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
@@ -164,6 +166,7 @@ class InputEntryDropdown(InputEntryBase):
         self.main_layout.addWidget(self.input_widget)
 
     def Get(self):
+        """ Stores the active selection and returns the full action data dict """
         self.data["value"] = self.input_widget.currentText()
         return self.data
 
@@ -186,10 +189,10 @@ class InputEntryDropdown(InputEntryBase):
 
 
 class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, data, details_panel, type_filter):
+    def __init__(self, data, parent, type_filter):
         super().__init__(data)
 
-        self.details_panel = details_panel
+        self.parent = parent
 
         # Store a type filter to restrict what files can be chosen in the browser
         self.type_filter = type_filter
@@ -232,7 +235,7 @@ class InputEntryFileSelector(InputEntryBase):
     def OpenFilePrompt(self) -> str:
         #@TODO: Replace file browser will popup list of files available in the project
         """ Prompts the user with a filedialog, accepting an existing file """
-        prompt = FileSystemPrompt(self.details_panel)
+        prompt = FileSystemPrompt(self.parent)
         existing_file = prompt.GetFile(
             Settings.getInstance().GetProjectContentDirectory(),
             self.type_filter,
