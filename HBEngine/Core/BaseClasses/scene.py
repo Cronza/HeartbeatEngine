@@ -46,6 +46,7 @@ class Scene:
         self.LoadSceneData()
 
     def Update(self, events):
+        print(self.active_renderables.Get())
         self.active_renderables.Update()
         self.a_manager.Update(events)
 
@@ -69,6 +70,7 @@ class Scene:
             if renderable.visible:
                 self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
 
+            #@TODO: Review if this causes redundant drawing
             # Draw any child renderables after drawing the parent
             if renderable.children:
                 for child in renderable.children:

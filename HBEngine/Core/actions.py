@@ -405,12 +405,10 @@ class create_button(Action):
     - button_text : dict
         - position : tuple
         - text : str
-        - z_order : int <GLOBAL_AVAILABLE>
         - center_align : bool <GLOBAL_AVAILABLE>
         - text_size : str <GLOBAL_AVAILABLE>
         - text_color : str <GLOBAL_AVAILABLE>
         - font : str <GLOBAL_AVAILABLE>
-        - z_order : int <GLOBAL_AVAILABLE>
     """
     def Start(self):
         self.skippable = False
@@ -420,7 +418,7 @@ class create_button(Action):
             self.action_data["position"] = (0, 0)
 
         if "position" not in self.action_data["button_text"]:
-            self.action_data["button_text"]["position"] = self.action_data["position"]
+            self.action_data["button_text"]["position"] = (0.5, 0.5)
 
         # PROJECT DEFAULTS OVERRIDE
         if "sprite" not in self.action_data:
@@ -438,9 +436,6 @@ class create_button(Action):
         if "center_align" not in self.action_data:
             self.action_data["center_align"] = Settings.getInstance().project_settings["Button"]["button_center_align"]
 
-        if "z_order" not in self.action_data["button_text"]:
-            self.action_data["button_text"]["z_order"] = Settings.getInstance().project_settings["Button"]["text_z_order"]
-
         if "center_align" not in self.action_data["button_text"]:
             self.action_data["button_text"]["center_align"] = Settings.getInstance().project_settings["Button"]["text_center_align"]
 
@@ -452,6 +447,9 @@ class create_button(Action):
 
         if "text_color" not in self.action_data["button_text"]:
             self.action_data["button_text"]["text_color"] = Settings.getInstance().project_settings["Button"]["text_color"]
+
+        # The button text uses the same z-order as the sprite, but slightly greater
+        self.action_data["button_text"]["z_order"] = self.action_data["z_order"] + 1
 
         new_renderable = Button(
             self.scene,
@@ -859,7 +857,6 @@ class create_character(Action):
         self.Complete()
 
 
-#@TODO: Organize dialogue actions into their own sections (dialogue, choice, choose_branch)
 class choice(Action):
     def Start(self):
         self.skippable = False
@@ -872,95 +869,64 @@ class choice(Action):
 
         # All choice buttons use the same underlying 'create_button' action
         for choice_index in range(0, len(self.action_data["choices"])):
-            choice = self.action_data["choices"][choice_index]["choice"]
+            choice_data = self.action_data["choices"][choice_index]["choice"]
 
             # Define what the button does when clicked
-            choice["action"] = {
+            choice_data["action"] = {
                 "action": "choose_branch",
-                "branch": choice["branch"]
+                "branch": choice_data["branch"]
             }
 
             # The key is generated dynamically instead of being provided by the file
-            choice["key"] = f"Choice{choice_index}"
+            choice_data["key"] = f"Choice{choice_index}"
 
-            # CHOICE BUTTONS - OVERRIDES WITH NO PROJECT DEFAULTS
-            if "text_position" not in choice:
-                choice["text_position"] = (0, 0)
+            choice_data["center_align"] = True  # Choice buttons are always centered, while the text is user-defined
+            choice_data["z_order"] = 10000  # Choice buttons should render above all other things
+            choice_data["button_text"]["z_order"] = 10001  # Choice button text should render just above the art
 
-            # CHOICE BUTTONS - PROJECT DEFAULTS OVERRIDE
-            if "sprite" not in choice:
-                choice["sprite"] = Settings.getInstance().project_settings["Choice"][
+            if "sprite" not in choice_data:
+                choice_data["sprite"] = Settings.getInstance().project_settings["Choice"][
                     "button_sprite"]
 
-            if 'sprite_hover' not in choice:
-                choice["sprite_hover"] = Settings.getInstance().project_settings["Choice"][
+            if 'sprite_hover' not in choice_data:
+                choice_data["sprite_hover"] = Settings.getInstance().project_settings["Choice"][
                     "button_sprite_hover"]
 
-            if "sprite_clicked" not in choice:
-                choice["sprite_clicked"] = Settings.getInstance().project_settings["Choice"][
+            if "sprite_clicked" not in choice_data:
+                choice_data["sprite_clicked"] = Settings.getInstance().project_settings["Choice"][
                     "button_sprite_clicked"]
 
-            if "z_order" not in choice:
-                choice["z_order"] = Settings.getInstance().project_settings["Choice"][
-                    "button_z_order"]
-
-            if "center_align" not in choice:
-                choice["center_align"] = Settings.getInstance().project_settings["Choice"][
-                    "button_center_align"]
-
-            if "text_z_order" not in choice:
-                choice["text_z_order"] = Settings.getInstance().project_settings["Choice"][
-                    "button_text_z_order"]
-
-            if "text_center_align" not in choice:
-                choice["center_align"] = Settings.getInstance().project_settings["Choice"][
+            if "center_align" not in choice_data["button_text"]:
+                choice_data["button_text"]["center_align"] = Settings.getInstance().project_settings["Choice"][
                     "button_text_center_align"]
 
-            if "font" not in choice:
-                choice["font"] = Settings.getInstance().project_settings["Choice"][
+            if "font" not in choice_data["button_text"]:
+                choice_data["button_text"]["font"] = Settings.getInstance().project_settings["Choice"][
                     "button_font"]
 
-            if "text_size" not in choice:
-                choice["text_size"] = Settings.getInstance().project_settings["Choice"][
+            if "text_size" not in choice_data["button_text"]:
+                choice_data["button_text"]["text_size"] = Settings.getInstance().project_settings["Choice"][
                     "button_text_size"]
 
-            if "text_color" not in choice:
-                choice["text_color"] = Settings.getInstance().project_settings["Choice"][
+            if "text_color" not in choice_data["button_text"]:
+                choice_data["button_text"]["text_color"] = Settings.getInstance().project_settings["Choice"][
                     "button_text_color"]
 
+        # Create an object that acts as a parent for all the choice buttons. When this is deleted, the buttons
+        # will be deleted with it
         new_renderable = Choice(
             self.scene,
             self.action_data
         )
 
+        # Generate a button for each choice, adding them to the active renderables group for access to updates
+        # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
         for choice_entry in self.action_data["choices"]:
-            new_renderable.children.append(self.a_manager.PerformAction(choice_entry["choice"], "create_choice_button"))
+            new_child = Button( self.scene, choice_entry["choice"])
+            self.scene.active_renderables.Add(new_child)
+            new_renderable.children.append(new_child)
 
-        self.scene.active_renderables.Add(new_renderable)
-
-        self.scene.Draw()
-        self.Complete()
-
-        return new_renderable
-
-
-class create_choice_button(Action):
-    """ Creates a simplified button renderable used by the choice system. Returns a 'ButtonRenderable' """
-    def Start(self):
-        self.skippable = False
-
-        # In order to avoid redundant setting scans and global setting validation, no default settings
-        # are applied for this action, as its expected that the choice system will provide those details
-        new_renderable = Button(
-            self.scene,
-            self.action_data
-        )
-
-        # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
-                new_renderable.Flip()
-
+        # Add the choice parent object to the render stack
         self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()

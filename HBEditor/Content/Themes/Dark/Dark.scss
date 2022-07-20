@@ -225,6 +225,8 @@ QTreeView{
     border-top: $size_border solid $col_secondary;
     background-color: $col_secondary;
     outline: none;
+    qproperty-indentation: 10; // Edits the indentation distance when using branches
+
     &#outliner{ /* The outliner doesn't use any padding */
         border: 0px solid transparent;
         background-color: $col_secondary;
@@ -248,8 +250,6 @@ QTreeView{
         background-color: $col_secondary;
     }
     &:branch {
-        padding: 5px;
-
         &:open {
             border-image: none;
             &:has-children {

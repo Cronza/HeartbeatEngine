@@ -44,7 +44,7 @@ class FontManager:
                 # leads to an exception. Instead of passing PIL the file path (which it can't read), pass it the file's
                 # data in byte form instead
                 byte_data = BytesIO(font_file.readAll())
-                name, style = ImageFont.truetype(byte_data).getname()
+                name, style = ImageFont.truetype(font=byte_data, encoding="utf-8").getname()
                 new_font = QtGui.QFont(name)
 
                 # Apply any style used by the loaded font
@@ -91,7 +91,6 @@ class FontManager:
     @staticmethod
     def ApplyStyle(style_string: str, font: QtGui.QFont) -> None:
         """ Given a string with style text within it, apply the correlating style to the given font """
-        # Based on the style, enable the right style
         # Due to unique cases where certain styles state multiple style (IE. 'Bold Italic' for Arial), do an
         # 'in' check, instead of '=='
         font.setBold("Bold" in style_string)

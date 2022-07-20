@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
+import pygame.freetype
 from HBEngine.Core.BaseClasses.renderable import Renderable
 from HBEngine.Core.settings import Settings
 
@@ -35,22 +36,19 @@ class TextRenderable(Renderable):
         text_size = self.renderable_data["text_size"]
         self.font_obj = pygame.font.Font(font, text_size)
 
-        # If a size was passed (expected as screen space values), then use it for the wrap bounds. This is typical
-        # when a parent needs to provide its own size to act as the child's wrap bounds
-        if "size" not in self.renderable_data:
-            if "wrap_bounds" not in self.renderable_data:
-                raise ValueError(f"No 'wrap_bounds' value assigned to {self}, and no 'size' "
-                                 f"value provided. This makes for an impossible action!")
+        if "wrap_bounds" not in self.renderable_data:
+            raise ValueError(f"No 'wrap_bounds' value assigned to '{self}' - This makes for an impossible action!")
 
-            self.renderable_data["size"] = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
-
-        #@TODO: This is flawed as its conflating size and wrap bounds. This is causing clipping at the edges because the surface isn't sized properly to fix the text
-        # Build a surface using the wrap bounds as the containing area. If text spills outside these bounds, it's
-        # automatically wrapped until the maximum Y
+        # Build a surface using the wrap bounds as the containing area. The values are expected to be normalized so that
+        # we avoid resolution-dependent positioning (IE. 0.2 works for 16/9 and 4/3)
+        #
+        # If text spills outside these bounds, it's automatically wrapped until the maximum Y
         size = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
-        self.surface = pygame.Surface((
-            int(size[0]),
-            int(size[1])),
+        self.surface = pygame.Surface(
+            (
+                int(size[0]),
+                int(size[1])
+            ),
             pygame.SRCALPHA
         )
         self.rect = self.surface.get_rect()
@@ -99,7 +97,7 @@ class TextRenderable(Renderable):
                 # Render the line and blit it to the surface
                 image = self.font_obj.render(line[:i], True, self.text_color)
 
-                # If applicable, center align the line based on it's unique size
+                # If applicable, center align the line based on its unique size
                 if self.center_align:
                     extra_space = self.surface.get_size()[0] - image.get_size()[0]
                     centered_width = rect.left + extra_space / 2

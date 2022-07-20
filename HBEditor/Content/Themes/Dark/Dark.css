@@ -153,7 +153,8 @@ QTreeView {
   border: 0px solid transparent;
   border-top: 1px solid #2A2A2B;
   background-color: #2A2A2B;
-  outline: none; }
+  outline: none;
+  qproperty-indentation: 10; }
   QTreeView#outliner {
     /* The outliner doesn't use any padding */
     border: 0px solid transparent;
@@ -171,20 +172,18 @@ QTreeView {
   QTreeView:item {
     padding: 3px;
     background-color: #2A2A2B; }
-  QTreeView:branch {
-    padding: 5px; }
-    QTreeView:branch:open {
-      border-image: none; }
-      QTreeView:branch:open:has-children {
-        image: url(":/Icons/Arrow_Down.png"); }
-        QTreeView:branch:open:has-children:hover {
-          image: url(":/Icons/Arrow_Down_Hover.png"); }
-    QTreeView:branch:closed {
-      border-image: none; }
-      QTreeView:branch:closed:has-children {
-        image: url(":/Icons/Arrow_Right.png"); }
-        QTreeView:branch:closed:has-children:hover {
-          image: url(":/Icons/Arrow_Right_Hover.png"); }
+  QTreeView:branch:open {
+    border-image: none; }
+    QTreeView:branch:open:has-children {
+      image: url(":/Icons/Arrow_Down.png"); }
+      QTreeView:branch:open:has-children:hover {
+        image: url(":/Icons/Arrow_Down_Hover.png"); }
+  QTreeView:branch:closed {
+    border-image: none; }
+    QTreeView:branch:closed:has-children {
+      image: url(":/Icons/Arrow_Right.png"); }
+      QTreeView:branch:closed:has-children:hover {
+        image: url(":/Icons/Arrow_Right_Hover.png"); }
 
 QGraphicsView {
   border: 1px solid #2A2A2B; }

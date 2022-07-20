@@ -28,6 +28,11 @@ class Button(Interactable):
 
         # Instead of the user having to provide a key for this, we generate it for them
         self.renderable_data["button_text"]["key"] = f"{self.renderable_data['key']}_Text"
+
+        self.renderable_data["button_text"]["wrap_bounds"] = self.ConvertScreenToNorm(  #@TODO: Text cuts off at button bounds. It used to be based on text size which it should be changed to
+            (self.surface.get_width(), self.surface.get_height())
+        )
+
         button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data["button_text"],

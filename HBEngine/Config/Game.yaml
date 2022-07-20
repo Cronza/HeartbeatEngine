@@ -42,7 +42,6 @@ Button:
   - 255
   - 255
   font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  text_z_order: 101
   text_center_align: true
   button_z_order: 100
   button_center_align: true
@@ -97,8 +96,5 @@ Choice:
   - 204
   - 255
   - 255
-  button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  button_text_z_order: 101
   button_text_center_align: true
-  button_z_order: 100
-  button_center_align: true
+  button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf

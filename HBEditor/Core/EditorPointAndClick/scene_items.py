@@ -236,74 +236,78 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         #
         # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
         # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
-        pos_data = self.FindProperty(self.action_data, "position")["value"]
-
-        if self.parentItem() == self.root_item:
-            scene_pos = QtCore.QPointF(
-                float(pos_data[0]) * self.scene().width(),
-                float(pos_data[1]) * self.scene().height()
-            )
-            item_pos = self.mapFromScene(scene_pos)
-            parent_pos = self.mapToParent(item_pos)
-            self.setPos(parent_pos)
-        else:
-            parent_bounds = self.parentItem().boundingRect()
-            scene_pos = QtCore.QPointF(
-                float(pos_data[0]) * parent_bounds.width(),
-                float(pos_data[1]) * parent_bounds.height()
-            )
-            parent_pos = self.mapToParent(scene_pos)
-            self.setPos(parent_pos)
+        pos_data = self.FindProperty(self.action_data, "position")
+        if pos_data is not None:
+            if self.parentItem() == self.root_item:
+                scene_pos = QtCore.QPointF(
+                    float(pos_data["value"][0]) * self.scene().width(),
+                    float(pos_data["value"][1]) * self.scene().height()
+                )
+                item_pos = self.mapFromScene(scene_pos)
+                parent_pos = self.mapToParent(item_pos)
+                self.setPos(parent_pos)
+            else:
+                parent_bounds = self.parentItem().boundingRect()
+                scene_pos = QtCore.QPointF(
+                    float(pos_data["value"][0]) * parent_bounds.width(),
+                    float(pos_data["value"][1]) * parent_bounds.height()
+                )
+                parent_pos = self.mapToParent(scene_pos)
+                self.setPos(parent_pos)
 
     def UpdateSprite(self):
         sprite_path = self.DEFAULT_SPRITE
-        sprite_rel_path = self.FindProperty(self.action_data, "sprite")["value"]
-        if sprite_rel_path != "None":
-            sprite_path = f"{Settings.getInstance().user_project_dir}/{sprite_rel_path}"
+        sprite_rel_path = self.FindProperty(self.action_data, "sprite")
+        if sprite_rel_path is not None:
+            if sprite_rel_path["value"] != "None":
+                sprite_path = f"{Settings.getInstance().user_project_dir}/{sprite_rel_path['value']}"
 
-        image = QtGui.QPixmap(sprite_path)  # If the file does not exist, it will create a null pixmap
-        if not image.isNull():
-            self.setPixmap(image)
-        else:
-            Logger.getInstance().Log(f"File does not Exist: '{sprite_path}' - Loading default sprite", 3)
-            image = QtGui.QPixmap(self.DEFAULT_SPRITE)
-            self.setPixmap(image)
+            image = QtGui.QPixmap(sprite_path)  # If the file does not exist, it will create a null pixmap
+            if not image.isNull():
+                self.setPixmap(image)
+            else:
+                Logger.getInstance().Log(f"File does not Exist: '{sprite_path}' - Loading default sprite", 3)
+                image = QtGui.QPixmap(self.DEFAULT_SPRITE)
+                self.setPixmap(image)
 
     def UpdateZOrder(self):
-        z_order = self.FindProperty(self.action_data, "z_order")["value"]
-        self.setZValue(float(z_order))
+        z_order = self.FindProperty(self.action_data, "z_order")
+        if z_order is not None:
+            self.setZValue(float(z_order["value"]))
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
         in_use = self.FindProperty(self.action_data, "center_align")
-        if in_use:
-            if in_use["value"]:
-                new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
-                self.is_centered = True
+        if in_use is not None:
+            if in_use:
+                if in_use["value"]:
+                    new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+                    self.is_centered = True
+                else:
+                    self.is_centered = False
             else:
                 self.is_centered = False
-        else:
-            self.is_centered = False
 
     def UpdateFlip(self, new_transform: QtGui.QTransform):
         in_use = self.FindProperty(self.action_data, "flip")
-        if in_use:
-            if in_use["value"]:
-                # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
-                # fact you can't change the origin, we have a hard dependency on knowing whether center align
-                # is active, so we know how to counter the movement from the scaling
-                if self.is_centered:
-                    # We need to reverse the movement from center_align in the X (we don't flip in the Y).
-                    # m31 represents the amount of horizontal translation that has been applied so far
-                    new_transform.translate(-new_transform.m31() * 2, 0)
-                else:
-                    new_transform.translate(self.boundingRect().width(), 0)
+        if in_use is not None:
+            if in_use:
+                if in_use["value"]:
+                    # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
+                    # fact you can't change the origin, we have a hard dependency on knowing whether center align
+                    # is active, so we know how to counter the movement from the scaling
+                    if self.is_centered:
+                        # We need to reverse the movement from center_align in the X (we don't flip in the Y).
+                        # m31 represents the amount of horizontal translation that has been applied so far
+                        new_transform.translate(-new_transform.m31() * 2, 0)
+                    else:
+                        new_transform.translate(self.boundingRect().width(), 0)
 
-                new_transform.scale(-1, 1)
-                self.is_flipped = True
+                    new_transform.scale(-1, 1)
+                    self.is_flipped = True
+                else:
+                    self.is_flipped = False
             else:
                 self.is_flipped = False
-        else:
-            self.is_flipped = False
 
     def Select(self):
         """ Add this object and all children to the active selection """
@@ -324,6 +328,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
 
         self.setFlag(self.ItemSendsGeometryChanges)
         self.setAcceptDrops(True)
+        self.document().setDocumentMargin(0)
 
     def Refresh(self, changed_entry_name: str = ""):
         """
@@ -349,6 +354,10 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         if changed_entry_name == "z_order" or changed_entry_name == "":
             self.UpdateZOrder()
 
+
+
+
+
         # Any changes that require a transform adjustment requires all others be updated as well
         if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "":
             self.resetTransform()
@@ -356,7 +365,39 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
 
             self.UpdateCenterAlign(new_transform)
 
+            #
+
+            metrics = QtGui.QFontMetricsF(self.font())
+            normal_rect = metrics.boundingRect(self.toPlainText())
+            tight_rect = metrics.tightBoundingRect(self.toPlainText())
+            #print(self.toPlainText())
+            #print(f"Normal: {normal_rect}")
+            #print(f"Tight: {tight_rect}")
+            #print(f"Height: {metrics.height()}")
+            #print("\n")
+            """
+            new_transform.translate(
+                0,
+                (metrics.tightBoundingRect(self.toPlainText()).height() - metrics.boundingRect(self.toPlainText()).height()) / 2
+            )
+            
+            print(f"Normal after: {normal_rect}")
+            #"""
+            #
             self.setTransform(new_transform)
+
+    """
+    def boundingRect(self) -> QtCore.QRectF:
+        metrics = QtGui.QFontMetricsF(self.font())
+        text = self.FindProperty(self.action_data, "text")["value"]
+        print(text)
+        text = "Default"
+        #return super().boundingRect()
+        #print(super().boundingRect())
+        #print(metrics.tightBoundingRect(text))
+        #return metrics.tightBoundingRect(self.toPlainText())
+        return QtCore.QRectF(0, 0, 100, 100)
+    """
 
     def UpdatePosition(self):
         # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
@@ -368,82 +409,93 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         #
         # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
         # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
-        pos_data = self.FindProperty(self.action_data, "position")["value"]
+        pos_data = self.FindProperty(self.action_data, "position")
 
-        if self.parentItem() == self.root_item:
-            scene_pos = QtCore.QPointF(
-                float(pos_data[0]) * self.scene().width(),
-                float(pos_data[1]) * self.scene().height()
-            )
-            item_pos = self.mapFromScene(scene_pos)
-            parent_pos = self.mapToParent(item_pos)
-            self.setPos(parent_pos)
-        else:
-            parent_bounds = self.parentItem().boundingRect()
-            parent_pos = QtCore.QPointF(
-                float(pos_data[0]) * parent_bounds.width(),
-                float(pos_data[1]) * parent_bounds.height()
-            )
-            self.setPos(parent_pos)
+        if pos_data is not None:
+            if self.parentItem() == self.root_item:
+                scene_pos = QtCore.QPointF(
+                    float(pos_data["value"][0]) * self.scene().width(),
+                    float(pos_data["value"][1]) * self.scene().height()
+                )
+                item_pos = self.mapFromScene(scene_pos)
+                parent_pos = self.mapToParent(item_pos)
+                self.setPos(parent_pos)
+            else:
+                parent_bounds = self.parentItem().boundingRect()
+                parent_pos = QtCore.QPointF(
+                    float(pos_data["value"][0]) * parent_bounds.width(),
+                    float(pos_data["value"][1]) * parent_bounds.height()
+                )
+                self.setPos(parent_pos)
+
 
     def UpdateText(self):
-        text = self.FindProperty(self.action_data, "text")["value"]
-        if not text:
-            text = "Default"
-        self.setPlainText(text)
+        text = self.FindProperty(self.action_data, "text")
+
+        if text is not None:
+            if not text["value"]:
+                text["value"] = "Default"
+            self.setPlainText(text["value"])
 
     def UpdateTextSize(self):
-        text_size = self.FindProperty(self.action_data, "text_size")["value"]
+        text_size = self.FindProperty(self.action_data, "text_size")
 
-        # Enforce a minimum text size
-        if text_size < 1:
-            text_size = 1
+        if text_size is not None:
+            # Enforce a minimum text size
+            if text_size["value"] < 1:
+                text_size["value"] = 1
 
-        cur_font = self.font()
-        cur_font.setPixelSize(text_size)
-        self.setFont(cur_font)
+            cur_font = self.font()
+            cur_font.setPixelSize(text_size["value"])
+            self.setFont(cur_font)
 
     def UpdateFont(self):
-        font = self.FindProperty(self.action_data, "font")["value"]
-        new_font = None
-        if font == "None" or not font:
-            font = self.DEFAULT_FONT
-            new_font = FontManager.LoadCustomFont(font)
+        font = self.FindProperty(self.action_data, "font")
+        if font is not None:
+            font = font["value"]
+            new_font = None
+            if font == "None" or not font:
+                font = self.DEFAULT_FONT
+                new_font = FontManager.LoadCustomFont(font)
 
-        # @ TODO: Review whether this is the optimal way of differentiating this case and the next one
-        elif font.startswith("Content"):
-            # This is likely a real path
-            font = f"{Settings.getInstance().user_project_dir}/{font}"
-            new_font = FontManager.LoadCustomFont(font)
-        else:
-            # This might be the user trying to load a system font
-            split_str = font.split("|", 1)
-            if len(split_str) == 2:
-                new_font = FontManager.LoadFont(split_str[0], split_str[1])  # Format: <name> <style>
+            # @ TODO: Review whether this is the optimal way of differentiating this case and the next one
+            elif font.startswith("Content"):
+                # This is likely a real path
+                font = f"{Settings.getInstance().user_project_dir}/{font}"
+                new_font = FontManager.LoadCustomFont(font)
             else:
-                new_font = FontManager.LoadFont(split_str[0])
+                # This might be the user trying to load a system font
+                split_str = font.split("|", 1)
+                if len(split_str) == 2:
+                    new_font = FontManager.LoadFont(split_str[0], split_str[1])  # Format: <name> <style>
+                else:
+                    new_font = FontManager.LoadFont(split_str[0])
 
-        if new_font:
-            self.setFont(new_font)
+            if new_font:
+                self.setFont(new_font)
 
     def UpdateTextColor(self):
-        color = self.FindProperty(self.action_data, "text_color")["value"]
-        self.setDefaultTextColor(QtGui.QColor(color[0], color[1], color[2]))
+        color = self.FindProperty(self.action_data, "text_color")
+
+        if color is not None:
+            self.setDefaultTextColor(QtGui.QColor(color["value"][0], color["value"][1], color["value"][2]))
 
     def UpdateZOrder(self):
-        z_order = self.FindProperty(self.action_data, "z_order")["value"]
-        self.setZValue(float(z_order))
+        z_order = self.FindProperty(self.action_data, "z_order")
+        if z_order is not None:
+            self.setZValue(float(z_order["value"]))
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
         in_use = self.FindProperty(self.action_data, "center_align")
-        if in_use:
-            if in_use["value"]:
-                new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
-                self.is_centered = True
+        if in_use is not None:
+            if in_use:
+                if in_use["value"]:
+                    new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+                    self.is_centered = True
+                else:
+                    self.is_centered = False
             else:
                 self.is_centered = False
-        else:
-            self.is_centered = False
 
     def Select(self):
         """ Add this object and all children to the active selection """

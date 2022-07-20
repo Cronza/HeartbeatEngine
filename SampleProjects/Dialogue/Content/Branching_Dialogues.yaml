@@ -63,18 +63,24 @@ dialogue:
       choices:
       - choice:
           branch: FirstTime
-          key: FirstTime
           position:
           - 0.3
           - 0.35
-          text: First Time
+          button_text:
+            position:
+            - 0.5
+            - 0.5
+            text: First Time
       - choice:    
           branch: Main
-          key: I'mExperienced
           position:
           - 0.7
           - 0.35
-          text: I'm Experienced
+          button_text:
+            position:
+            - 0.5
+            - 0.5
+            text: I'm Experienced
   FirstTime:
     description: This is the user's first time
     entries:

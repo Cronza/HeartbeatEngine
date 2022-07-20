@@ -54,9 +54,10 @@ class Interactable(SpriteRenderable):
         # Defer the resize until we're able to define the interactive surfaces
         self.RecalculateSize(self.scene.resolution_multiplier)
 
+        print(f"Interactable created: {self.renderable_data}")
     def update(self, *args):
         super().update()
-
+        print("fdsf")
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             # If not already in the hover state...

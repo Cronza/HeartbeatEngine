@@ -385,20 +385,6 @@ Interactables:
               editable: True
               preview: False
 
-            - name: "z_order"
-              type: "Int"
-              value: 0
-              global:
-                active: True
-              editable: True
-              preview: False
-
-            - name: "wrap_bounds"
-              type: "Vector2"
-              value: [ 0.2, 0.2 ]
-              editable: True
-              preview: False
-
 Dialogue:
   icon: ":/Icons/Dialogue.png"
   options:
@@ -653,39 +639,42 @@ Dialogue:
                 value: ""
                 editable: True
                 preview: True
+
               - name: "position"
                 type: "Vector2"
-                value: [ 0,0 ]
-                editable: True
-                preview: False
-
-              - name: "text"
-                type: "String"
-                value: ""
+                value: [ 0.5, 0.5 ]
                 editable: True
                 preview: True
 
-              - name: "text_size"
-                type: "Int"
-                value: 24
+              - name: "center_align"
+                type: "Bool"
+                value: True
                 global:
                   active: True
                 editable: True
                 preview: False
 
-              - name: "text_color"
-                type: "Color"
-                value: [ 255, 255, 255 ]
-                global:
-                  active: True
-                editable: True
-                preview: False
-
-              - name: "font"
-                type: "File_Font"
+              - name: "sprite"
+                type: "File_Image"
                 value: "None"
                 global:
                   active: True
+                editable: True
+                preview: True
+
+              - name: "sprite_hover"
+                type: "File_Image"
+                global:
+                  active: True
+                value: "None"
+                editable: True
+                preview: False
+
+              - name: "sprite_clicked"
+                type: "File_Image"
+                global:
+                  active: True
+                value: "None"
                 editable: True
                 preview: False
 
@@ -696,6 +685,54 @@ Dialogue:
                   active: True
                 editable: True
                 preview: False
+
+              - name: "button_text"
+                type: "Container"
+                preview: True
+                children:
+                  - name: "position"
+                    type: "Vector2"
+                    value: [ 0.5, 0.5 ]
+                    editable: True
+                    preview: True
+
+                  - name: "center_align"
+                    type: "Bool"
+                    value: True
+                    global:
+                      active: True
+                    editable: True
+                    preview: False
+
+                  - name: "text"
+                    type: "String"
+                    value: ""
+                    editable: True
+                    preview: True
+
+                  - name: "text_size"
+                    type: "Int"
+                    value: 24
+                    global:
+                      active: True
+                    editable: True
+                    preview: False
+
+                  - name: "text_color"
+                    type: "Color"
+                    value: [ 255, 255, 255 ]
+                    global:
+                      active: True
+                    editable: True
+                    preview: False
+
+                  - name: "font"
+                    type: "File_Font"
+                    value: "None"
+                    global:
+                      active: True
+                    editable: True
+                    preview: False
 
 Scene:
   icon: ":/Icons/Dialogue.png"
