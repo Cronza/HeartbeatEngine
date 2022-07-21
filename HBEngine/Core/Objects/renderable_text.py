@@ -14,7 +14,7 @@
 """
 import pygame
 import pygame.freetype
-from HBEngine.Core.BaseClasses.renderable import Renderable
+from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.settings import Settings
 
 

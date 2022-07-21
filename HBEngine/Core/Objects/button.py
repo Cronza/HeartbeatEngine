@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEngine.Core.BaseClasses.renderable import Renderable
-from HBEngine.Core.BaseClasses.interactable import Interactable
-from HBEngine.Core.BaseClasses.renderable_text import TextRenderable
+from HBEngine.Core.Objects.renderable import Renderable
+from HBEngine.Core.Objects.interactable import Interactable
+from HBEngine.Core.Objects.renderable_text import TextRenderable
 
 
 class Button(Interactable):

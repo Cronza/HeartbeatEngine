@@ -14,7 +14,7 @@
 """
 import pygame
 from HBEngine.Core.settings import Settings
-from HBEngine.Core.BaseClasses.renderable import Renderable
+from HBEngine.Core.Objects.renderable import Renderable
 
 
 class SpriteRenderable(Renderable):

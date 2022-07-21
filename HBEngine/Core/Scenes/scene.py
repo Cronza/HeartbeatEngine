@@ -14,8 +14,8 @@
 """
 import pygame
 from HBEngine.Core.settings import Settings
-from HBEngine.Core.BaseClasses.renderable_group import RenderableGroup
-from HBEngine.Core.action_manager import ActionManager
+from HBEngine.Core.Objects.renderable_group import RenderableGroup
+from HBEngine.Core.Actions.action_manager import ActionManager
 from Tools.HBYaml.hb_yaml import Reader
 
 

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core.BaseClasses.scene_pointandclick import PointAndClickScene
+from HBEngine.Core.Scenes.scene_pointandclick import PointAndClickScene
 
 
 class DialogueScene(PointAndClickScene):

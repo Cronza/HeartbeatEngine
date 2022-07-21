@@ -15,8 +15,8 @@
 import pygame
 from HBEngine.Core.settings import Settings
 from HBEngine.Core.DataTypes.input_states import State
-from HBEngine.Core.BaseClasses.renderable import Renderable
-from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
+from HBEngine.Core.Objects.renderable import Renderable
+from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 
 
 class Interactable(SpriteRenderable):

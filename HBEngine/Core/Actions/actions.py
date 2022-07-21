@@ -31,14 +31,50 @@ provided actions
 """
 import pygame.mixer
 from HBEngine.Core.settings import Settings
-from HBEngine.Core.BaseClasses.renderable_sprite import SpriteRenderable
-from HBEngine.Core.BaseClasses.renderable_text import TextRenderable
-from HBEngine.Core.BaseClasses.interactable import Interactable
-from HBEngine.Core.BaseClasses.button import Button
-from HBEngine.Core.BaseClasses.choice import Choice
-from HBEngine.Core.BaseClasses.renderable_container import Container
-from HBEngine.Core.BaseClasses.action import Action
-from HBEngine.Core.BaseClasses.action_sound import SoundAction
+from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
+from HBEngine.Core.Objects.renderable_text import TextRenderable
+from HBEngine.Core.Objects.interactable import Interactable
+from HBEngine.Core.Objects.button import Button
+from HBEngine.Core.Objects.choice import Choice
+from HBEngine.Core.Objects.renderable_container import Container
+
+
+# -------------- BASE ACTIONS --------------
+
+
+class Action():
+    def __init__(self, scene, action_data, a_manager):
+        self.scene = scene
+        self.action_data = action_data
+        self.a_manager = a_manager
+        self.active_transition = None
+        self.speed = 5
+        self.skippable = True
+        self.complete = False
+        self.complete_delegate = None  # Called by the action manager before it deletes the action
+
+    def Start(self):
+        pass
+
+    def Update(self, events):
+        pass
+
+    def Skip(self):
+        pass
+
+    def Complete(self):
+        self.complete = True
+
+    #@TODO: Create 'ValidateParams' function to handle checking for parameters in action data, and using global default
+    #@TODO: if none are provided
+    def ValidateParams(self):
+        pass
+
+class SoundAction(Action):
+    # @TODO: Add Pause function
+    def __init__(self, scene, action_data, a_manager):
+        super().__init__(scene, action_data, a_manager)
+        self.assigned_channel = None
 
 
 # -------------- GRAPHICS ACTIONS --------------
