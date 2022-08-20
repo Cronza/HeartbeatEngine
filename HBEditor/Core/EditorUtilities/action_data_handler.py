@@ -120,7 +120,6 @@ def GetActionDisplayName(action_data: dict) -> str:
 
     This function is meant to be used by classes that cloned a piece of metadata from the actions_metadata.yaml file
     """
-    print(f"GetActionDisplayName: {action_data}")
     return action_data[GetActionName(action_data)]["display_name"]
 
 

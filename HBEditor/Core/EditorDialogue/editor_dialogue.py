@@ -73,7 +73,6 @@ class EditorDialogue(EditorBase):
         num_of_entries = dialogue_table.rowCount()
         for entry_index in range(num_of_entries):
             dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
-            print(f"Storing Entry Data: {dialogue_entry.action_data}")
             cur_branch.branch_data.append(dialogue_entry.action_data)
 
     def GetAllDialogueData(self) -> dict:
@@ -135,14 +134,16 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
+            print(f"Original File Data: {file_data}")
             converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
-
+            print(f"Conv File Data: {converted_data}")
             # The main branch is treated specially since we don't need to create it
             for branch_name, branch_data in converted_data.items():
                 if not branch_name == "Main":
                     self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])
 
                 for action in branch_data["entries"]:
+                    print(f"Loading Action Entry: {action}")
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default
@@ -176,19 +177,14 @@ class EditorDialogue(EditorBase):
         Given a full dict of dialogue file data in engine format (branches and all), convert it to the editor format by
         rebuilding the structure based on lookups in the ActionDatabase
         """
-        #@TODO: Investigate how to speed this up. The volume of O(n) searching is worrying
         new_dialogue_data = {}
 
         for branch_name, branch_data in action_data.items():
             converted_entries = []
             for entry in branch_data["entries"]:
-                #print(f"Entry: {entry}")
-                #action_name = action["action"]
-
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
                 # the matching metadata entry and clone it
                 name = next(iter(entry))
-
                 metadata_entry = copy.deepcopy(settings.action_metadata[name])
 
                 # Pass the entry by ref, and let the convert func edit it directly
@@ -198,22 +194,8 @@ class EditorDialogue(EditorBase):
                 )
 
                 converted_entries.append({name: metadata_entry})
-                break
 
-                # Using the name of the action, look it up in the ActionDatabase. If found, clone it
-                """
-                database_entry = None
-                for cat_name, cat_data in settings.action_database.items():
-                    for option in cat_data["options"]:
-                        if action_name == option['action_name']:
-                            database_entry = copy.deepcopy(option)
-                            break
-                    if database_entry:
-                        break
-                """
-
-
-
+            # Update the branch entries with the newly converted ones
             branch_data["entries"] = converted_entries
             new_dialogue_data[branch_name] = branch_data
 
