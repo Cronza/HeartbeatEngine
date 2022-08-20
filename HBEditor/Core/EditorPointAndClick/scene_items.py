@@ -1,7 +1,7 @@
 import math
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities.font_manager import FontManager
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
@@ -260,7 +260,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         sprite_rel_path = self.FindProperty(self.action_data, "sprite")
         if sprite_rel_path is not None:
             if sprite_rel_path["value"] != "None":
-                sprite_path = f"{Settings.getInstance().user_project_dir}/{sprite_rel_path['value']}"
+                sprite_path = f"{settings.user_project_dir}/{sprite_rel_path['value']}"
 
             image = QtGui.QPixmap(sprite_path)  # If the file does not exist, it will create a null pixmap
             if not image.isNull():
@@ -461,7 +461,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             # @ TODO: Review whether this is the optimal way of differentiating this case and the next one
             elif font.startswith("Content"):
                 # This is likely a real path
-                font = f"{Settings.getInstance().user_project_dir}/{font}"
+                font = f"{settings.user_project_dir}/{font}"
                 new_font = FontManager.LoadCustomFont(font)
             else:
                 # This might be the user trying to load a system font

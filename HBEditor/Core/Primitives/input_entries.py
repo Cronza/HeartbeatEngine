@@ -15,7 +15,7 @@
 import re
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
@@ -234,7 +234,7 @@ class InputEntryFileSelector(InputEntryBase):
         """ Prompts the user with a filedialog, accepting an existing file """
         prompt = FileSystemPrompt(self.details_panel)
         existing_file = prompt.GetFile(
-            Settings.getInstance().GetProjectContentDirectory(),
+            settings.GetProjectContentDirectory(),
             self.type_filter,
             "Choose a File to Open"
         )
@@ -244,7 +244,7 @@ class InputEntryFileSelector(InputEntryBase):
             selected_dir = existing_file
 
             # Remove the project dir from the path, so that the selected dir only contains a relative path
-            selected_dir = selected_dir.replace(Settings.getInstance().user_project_dir + "/", "")
+            selected_dir = selected_dir.replace(settings.user_project_dir + "/", "")
             self.input_widget.setText(selected_dir)
 
 
@@ -546,7 +546,7 @@ class InputEntryResolution(InputEntryBase):
             self.input_widget.addItem(str(option))
 
         # Use the value of the "Int" widget mentioned in the class docstring to switch the active option
-        self.input_widget.setCurrentIndex(Settings.getInstance().user_project_data["Window"]["resolution"])
+        self.input_widget.setCurrentIndex(settings.user_project_data["Window"]["resolution"])
 
         self.main_layout.addWidget(self.input_widget)
 
@@ -559,6 +559,6 @@ class InputEntryResolution(InputEntryBase):
         # index value.
         #
         # To account for this, let's store the index value before we return the list of options
-        Settings.getInstance().user_project_data["Window"]["resolution"] = self.input_widget.currentIndex()
+        settings.user_project_data["Window"]["resolution"] = self.input_widget.currentIndex()
 
         return self.data

@@ -18,7 +18,7 @@ from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.Primitives.input_entries import *
 
 
-def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
+def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QAbstractItemView,
         parent: QTreeWidgetItem = None, excluded_properties: list = None,
         signal_func: callable = None, refresh_func: callable = None) -> QTreeWidgetItem:
     """
@@ -41,7 +41,7 @@ def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
         view.addTopLevelItem(entry)
 
     name_widget, input_widget, global_checkbox = Create(
-        owner, data, entry, view, signal_func, refresh_func, excluded_properties
+        owner, name, data, entry, view, signal_func, refresh_func, excluded_properties
     )
     view.setItemWidget(entry, 0, name_widget)
     view.setItemWidget(entry, 1, input_widget)
@@ -52,7 +52,7 @@ def Add(owner: QWidget, data: dict, view: QtWidgets.QAbstractItemView,
     return entry
 
 
-def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
+def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidgetItem,
            owning_view: QtWidgets.QAbstractItemView, signal_func: callable = None,
            refresh_func: callable = None, excluded_properties: dict = None) -> object:
     """
@@ -80,13 +80,13 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
     elif data_type == ParameterType.Float:
         input_widget = InputEntryFloat(data)
     elif data_type == ParameterType.File_Data:
-        input_widget = InputEntryFileSelector(data, owner, Settings.getInstance().supported_content_types["Data"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Data"])
     elif data_type == ParameterType.File_Image:
-        input_widget = InputEntryFileSelector(data, owner, Settings.getInstance().supported_content_types["Image"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Image"])
     elif data_type == ParameterType.File_Font:
-        input_widget = InputEntryFileSelector(data, owner, Settings.getInstance().supported_content_types["Font"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Font"])
     elif data_type == ParameterType.File_Sound:
-        input_widget = InputEntryFileSelector(data, owner, Settings.getInstance().supported_content_types["Sound"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Sound"])
     elif data_type == ParameterType.Dropdown:
         input_widget = InputEntryDropdown(data)
     elif data_type == ParameterType.Container:
@@ -113,7 +113,7 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
         if not data["editable"]:
             input_widget.SetEditable(2)
 
-    name_widget = QLabel(data["name"])
+    name_widget = QLabel(name)
     global_checkbox = SimpleCheckbox()
     global_checkbox.owner = owning_model_item
     global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
@@ -122,11 +122,18 @@ def Create(owner: QWidget, data: dict, owning_model_item: QTreeWidgetItem,
     # the input widget as uneditable by the user
     if "global" in data:
         owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
-        if data["global"]["active"]:
+        if "global_active" in data:
+            if data["global_active"]:
+                global_checkbox.Set(True)
+                input_widget.SetEditable(2)
+            else:
+                global_checkbox.Set(False)
+        else:
+            # 'global_active' isn't a part of the metadata, as it is a generated key. If it isn't found, it's because the
+            # data is directly from the metadata and prior to any alteration
+            data["global_active"] = True
             global_checkbox.Set(True)
             input_widget.SetEditable(2)
-        else:
-            global_checkbox.Set(False)
 
         global_checkbox.Connect()
 

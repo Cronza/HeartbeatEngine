@@ -15,9 +15,10 @@
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 
 
 class DialogueSequencePanel(QtWidgets.QWidget):
@@ -249,7 +250,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         #@TODO: Replace with a Qt signal / slot
         self.size_refresh_func = size_refresh_func
 
-        # Store this entries action data
+        # Store this entry's action data
         self.action_data = action_data
 
         # ****** DISPLAY WIDGETS ******
@@ -259,7 +260,8 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
-        self.name_widget.setText(self.action_data["display_name"])
+
+        self.name_widget.setText(adh.GetActionDisplayName(self.action_data))
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
 
@@ -276,27 +278,22 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
-        if "requirements" in self.action_data:
-            #print(f"Requirements: {self.action_data['requirements']}")
-            self.subtext_widget.setText(self.CompileSubtextString(self.action_data["requirements"]))
+        self.subtext_widget.setText(self.CompileSubtextString(adh.GetActionRequirements(self.action_data)))
 
-    def CompileSubtextString(self, data):
+    def CompileSubtextString(self, req_data):
         """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
         #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
-        for param in data:
-            if param["preview"]:
-                param_name = param["name"]
-                param_data = None
-
-                if "children" in param:
-                    cur_string += f"{param_name}: ["
-                    cur_string += self.CompileSubtextString(param['children'])
+        for name, data in req_data.items():
+            if data["preview"]:
+                if "children" in data:
+                    cur_string += f"{name}: ["
+                    cur_string += self.CompileSubtextString(data['children'])
                     cur_string += "], "
 
-                elif "value" in param:
-                    param_data = param["value"]
-                    cur_string += f"{param_name}: {param_data}, "
+                elif "value" in data:
+                    req_value = data["value"]
+                    cur_string += f"{name}: {req_value}, "
 
         # Due to how the comma formatting is, strip it from the end of the string
         return cur_string.strip(', ')

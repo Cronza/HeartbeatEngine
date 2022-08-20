@@ -14,7 +14,7 @@
 """
 import os
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
@@ -40,7 +40,7 @@ class FileSystemPrompt(QFileDialog):
             selected_dir = file_path[0]
 
             if project_only:
-                if Settings.getInstance().user_project_dir in selected_dir:
+                if settings.user_project_dir in selected_dir:
                     Logger.getInstance().Log("Valid file chosen")
                     return selected_dir
                 else:
@@ -65,7 +65,7 @@ class FileSystemPrompt(QFileDialog):
 
         if dir_path:
             if project_only:
-                if Settings.getInstance().user_project_dir in dir_path:
+                if settings.user_project_dir in dir_path:
                     Logger.getInstance().Log("Valid directory chosen")
                     return dir_path
                 else:
@@ -94,7 +94,7 @@ class FileSystemPrompt(QFileDialog):
             selected_dir = file_path[0]
 
             if project_only:
-                if Settings.getInstance().user_project_dir in selected_dir:
+                if settings.user_project_dir in selected_dir:
                     Logger.getInstance().Log("Valid file chosen")
                     return selected_dir
                 else:

@@ -15,7 +15,7 @@
 import os
 import shutil
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Outliner.outliner_ui import OutlinerUI
 from HBEditor.Core.DataTypes.file_types import FileType
 from Tools.HBYaml.hb_yaml import Writer
@@ -54,7 +54,7 @@ class Outliner:
                 Writer.WriteFile(
                     "",
                     full_file_path,
-                    Settings.getInstance().GetMetadataString(FileType[file_type])
+                    settings.GetMetadataString(FileType[file_type])
                 )
                 return full_file_path
 

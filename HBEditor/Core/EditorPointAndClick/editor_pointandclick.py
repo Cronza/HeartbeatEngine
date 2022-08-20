@@ -14,7 +14,7 @@
 """
 import copy
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import action_data_handler as adh
@@ -80,7 +80,7 @@ class EditorPointAndClick(EditorBase):
                 data=data_to_export,
                 file_path=self.file_path,
                 metadata=f"# Type: {FileType.Scene_Point_And_Click.name}\n" +
-                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
+                f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
         except Exception as exc:
@@ -131,7 +131,7 @@ class EditorPointAndClick(EditorBase):
 
             # Using the name of the action, look it up in the ActionDatabase. If found, clone it
             database_entry = None
-            for cat_name, cat_data in Settings.getInstance().action_database.items():
+            for cat_name, cat_data in settings.action_database.items():
                 for option in cat_data["options"]:
                     if action_name == option['action_name']:
                         database_entry = copy.deepcopy(option)

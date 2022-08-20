@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core.settings import Settings
+from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 
 
@@ -29,7 +29,7 @@ class SpriteRenderable(Renderable):
         super().__init__(scene, renderable_data, parent)
 
         # YAML Parameters
-        sprite = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
+        sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
 
         try:
             self.surface = pygame.image.load(sprite).convert_alpha()

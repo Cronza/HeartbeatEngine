@@ -14,6 +14,7 @@
 """
 from HBEditor.Core.Primitives.input_entries import *
 from HBEditor.Core.Primitives import input_entry_model_handler as iemh
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 
 
 class DetailsPanel(QtWidgets.QWidget):
@@ -70,41 +71,49 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):
-        """ Fill out the details tree based on the active entry's action data"""
+        """ Fill out the details tree based on the active entry's action data """
         if selected_entry is not self.active_entry:
             self.StoreData()
         self.active_entry = selected_entry
 
         self.Clear()
-        self.AddItems(self.active_entry.action_data["requirements"])
+        self.AddItems(adh.GetActionRequirements(self.active_entry.action_data))
 
         self.details_tree.expandAll()
 
-    def AddItems(self, data, parent=None):
+    def AddItems(self, req_data: dict, parent=None):
         """
-        Recursively adds an InputEntry element into the details tree, including all of its children
-        If 'excluded_properties' was provided when initializing the Details Panel, do not add an entry for any
-        items in the exclusion list
+        Recursively adds an InputEntry element into the details tree, including all of its children, for each action
+        data dict item provided
         """
-        for requirement in data:
-            if self.excluded_properties:
-                if requirement["name"] in self.excluded_properties:
+        for name, data in req_data.items():
+            # Some reqs are strictly meant to use defaults or globals, and not be edited by the user. In these
+            # circumstances,  don't display them
+            if "editable" in data:
+                if not data["editable"]:
+                    continue
+
+            # Some editors exclude certain requirements (IE. Point & Click doesn't make use ot 'post_wait')
+            elif self.excluded_properties:
+                if name in self.excluded_properties:
                     continue
 
             entry = iemh.Add(
                 owner=self,
                 view=self.details_tree,
-                data=requirement,
+                name=name,
+                data=data,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
                 signal_func=self.ConnectSignals,
                 refresh_func=self.UserUpdatedInputWidget
             )
 
-            if "children" in requirement:
-                self.AddItems(requirement["children"], entry)
+            if "children" in data:
+                self.AddItems(data["children"], entry)
 
     def ConnectSignals(self, tree_item):
+        """ Connects the InputEntry signals to slots within this class """
         input_widget = self.details_tree.itemWidget(tree_item, 1)
         input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
 
@@ -118,23 +127,24 @@ class DetailsPanel(QtWidgets.QWidget):
         collected data
         """
         if self.active_entry:
-            data_to_store = []
+            data_to_store = {}
 
             if not parent:
                 parent = self.details_tree.invisibleRootItem()
 
             for entry_index in range(0, parent.childCount()):
                 entry = parent.child(entry_index)
+                entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
 
-                global_checkbox = self.details_tree.itemWidget(entry, 2)
-                if global_checkbox:
-                    entry_data["global"]["active"] = global_checkbox.Get()
+                if "global" in entry_data:
+                    global_checkbox = self.details_tree.itemWidget(entry, 2)
+                    entry_data["global_active"] = global_checkbox.Get()
 
                 if entry.childCount() > 0:
                     entry_data["children"] = self.StoreData(entry, False)
 
-                data_to_store.append(entry_data)
+                data_to_store[entry_name] = entry_data
 
             if initial_iter and data_to_store:
                 self.active_entry.action_data["requirements"] = data_to_store
@@ -165,8 +175,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
             stop = False
             while not stop:
-                input_widget = self.details_tree.itemWidget(cur_entry, 1)
-                parent_tree.insert(-1, input_widget.data["name"])  # Descending order
+                parent_tree.insert(-1, self.details_tree.itemWidget(cur_entry, 0).text())  # Descending order
 
                 cur_entry = cur_entry.parent()
                 if not cur_entry:

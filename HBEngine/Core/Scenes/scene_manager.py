@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEngine.Core.settings import Settings
+from HBEngine.Core import settings
 from HBEngine.Core.Scenes.scene_pointandclick import PointAndClickScene
 from HBEngine.Core.Scenes.scene_dialogue import DialogueScene
 from HBEngine.Core.DataTypes.file_types import FileType
@@ -35,13 +35,13 @@ class SceneManager:
         }
 
         # Load the starting scene defined in the project settings
-        if not Settings.getInstance().project_settings["Game"]["starting_scene"]:
+        if not settings.project_settings["Game"]["starting_scene"]:
             raise ValueError("No starting scene was provided in the project settings")
-        self.LoadScene(Settings.getInstance().project_settings["Game"]["starting_scene"])
+        self.LoadScene(settings.project_settings["Game"]["starting_scene"])
 
         # Read in the yaml data for the pause menu
         #@TODO: Re-enable after review
-        #self.pause_menu_data = Reader.ReadAll(self.settings.project_dir + "/" + self.settings.project_settings['Pause Menu']['data_file'])
+        #self.pause_menu_data = Reader.ReadAll(self.settings.project_root + "/" + self.settings.project_settings['Pause Menu']['data_file'])
         #self.pause_menu_data['action'] = "create_container"
 
     def LoadScene(self, scene_file):
@@ -49,7 +49,7 @@ class SceneManager:
         # We need to read the file to find it's type. This is denoted by the 'type' value somewhere near the top of the
         # file. We can't guarentee it's position since the metadata may grow one day, and the line number would shift.
         scene_type = None
-        with open(Settings.getInstance().ConvertPartialToAbsolutePath(scene_file), "r") as f:
+        with open(settings.ConvertPartialToAbsolutePath(scene_file), "r") as f:
             for line in f:
                 if line.startswith("type:"):
                     scene_type = FileType[line.replace("type: ", "").strip()]

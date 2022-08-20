@@ -16,7 +16,7 @@ import copy
 from enum import Enum
 from typing import List
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
 #from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
