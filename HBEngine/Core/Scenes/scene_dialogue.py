@@ -19,7 +19,7 @@ from HBEngine.Core.Scenes.scene_pointandclick import PointAndClickScene
 class DialogueScene(PointAndClickScene):
     def __init__(self, scene_data_file, window, scene_manager):
         self.dialogue_index = 0
-        self.dialogue_data = ""
+        self.dialogue_data = {}
         self.active_branch = "Main"
         self.character_data = {}
 
@@ -49,20 +49,24 @@ class DialogueScene(PointAndClickScene):
         """
         if len(self.dialogue_data[self.active_branch]["entries"]) > self.dialogue_index:
             action_data = self.dialogue_data[self.active_branch]["entries"][self.dialogue_index]
-            if "post_wait" in action_data:
-                if "wait_for_input" in action_data["post_wait"]:
-                    self.a_manager.PerformAction(action_data, action_data["action"])
+
+            name = next(iter(action_data))
+            data = action_data[name]
+
+            if "post_wait" in data:
+                if "wait_for_input" in data["post_wait"]:
+                    self.a_manager.PerformAction(data, data["action"])
                     self.dialogue_index += 1
-                elif "wait_until_complete" in action_data["post_wait"]:
+                elif "wait_until_complete" in data["post_wait"]:
                     print("Waiting until complete")
-                    self.a_manager.PerformAction(action_data, action_data["action"], self.ActionComplete)
-                elif "no_wait" in action_data["post_wait"]:
-                    self.a_manager.PerformAction(action_data, action_data["action"])
+                    self.a_manager.PerformAction(data, name, self.ActionComplete)
+                elif "no_wait" in data["post_wait"]:
+                    self.a_manager.PerformAction(data, name)
                     self.dialogue_index += 1
                     self.LoadAction()
             # Default to 'no_wait' when nothing is provided
             else:
-                self.a_manager.PerformAction(action_data, action_data["action"])
+                self.a_manager.PerformAction(data, name)
                 self.dialogue_index += 1
                 self.LoadAction()
         else:

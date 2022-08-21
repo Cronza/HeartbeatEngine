@@ -95,6 +95,7 @@ class EditorDialogue(EditorBase):
 
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
+            #print(branch_data)
             new_entry = {
                 "description": branch_description,
                 "entries": branch_data
@@ -134,16 +135,14 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
-            print(f"Original File Data: {file_data}")
             converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
-            print(f"Conv File Data: {converted_data}")
+
             # The main branch is treated specially since we don't need to create it
             for branch_name, branch_data in converted_data.items():
                 if not branch_name == "Main":
                     self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])
 
                 for action in branch_data["entries"]:
-                    print(f"Loading Action Entry: {action}")
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default
@@ -164,7 +163,8 @@ class EditorDialogue(EditorBase):
             for entry in branch_data["entries"]:
                 # Convert the requirements for this action to the engine format before rebuilding the full entry,
                 # recreating the top level action name key in the process
-                converted_entries.append({adh.GetActionName(entry): adh.ConvertActionRequirementsToEngineFormat(entry)})
+                conv_requirements = adh.ConvertActionRequirementsToEngineFormat(entry[adh.GetActionName(entry)])
+                converted_entries.append({adh.GetActionName(entry): conv_requirements})
 
             # Complete the converted branch, and add it to the new dialogue data
             converted_branch["entries"] = converted_entries
@@ -182,6 +182,7 @@ class EditorDialogue(EditorBase):
         for branch_name, branch_data in action_data.items():
             converted_entries = []
             for entry in branch_data["entries"]:
+                #print(f"Conv Entry to Editor Format: {entry}")
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
                 # the matching metadata entry and clone it
                 name = next(iter(entry))

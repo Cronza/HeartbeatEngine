@@ -26,7 +26,7 @@ class HBEngine:
             print("Warning: No project path provided - Defaulting to the engine root")
 
         settings.SetProjectRoot(project_path)
-        settings.Evaluate(settings.project_root + "/Config/Game.yaml")
+        settings.Evaluate(settings.ConvertPartialToAbsolutePath("Config/Game.yaml"))
 
         pygame.display.set_caption(settings.project_settings['Game']['title'])
 
@@ -93,6 +93,7 @@ class HBEngine:
             pygame.display.set_mode(settings.resolution_options[new_size_index], flag)
 
             self.scene_manager.active_scene.Draw()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

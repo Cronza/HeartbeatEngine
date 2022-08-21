@@ -38,7 +38,7 @@ def LoadProjectSettings():
     user_project_data = Reader.ReadAll(user_project_dir + "/" + project_default_files['Config'])
 
 
-def ConvertPartialToAbsolutePath(self, partial_path):
+def ConvertPartialToAbsolutePath(partial_path):
     """ Given a partial path, return an absolute path using the editor's root """
     global editor_root
     return editor_root + "/" + partial_path

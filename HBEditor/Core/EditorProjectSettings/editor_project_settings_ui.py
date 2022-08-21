@@ -137,9 +137,9 @@ class EditorProjectSettingsUI(EditorBaseUI):
                     "type": schema[setting_name],
                     "value": setting_data
                 }
-                print(f"Creating: {data}")
                 iemh.Add(
                     owner=self,
                     view=self.settings_tree,
-                    data=data,
+                    name=setting_name,
+                    data=data
                 )

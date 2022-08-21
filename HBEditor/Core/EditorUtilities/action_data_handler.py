@@ -12,7 +12,6 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
 
 
 def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="requirements",
@@ -25,7 +24,6 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
     returned data
     """
     conv_data = {}
-
     if search_term in editor_req_data:
         for req_name, req_data in editor_req_data[search_term].items():
             # Prevent exporting requirements that are not in use by this editor type
@@ -67,8 +65,6 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
     If excluded_properties is provided, any properties in that list will not be converted, and will not appear in the
     returned data
     """
-    print(f"Metadata: {metadata_entry}")
-    print(f"Engine: {engine_entry}")
     for req_name, req_data in metadata_entry[search_term].items():
         # Prevent importing requirements that are not in used by this editor type (They would
         # have been removed during exporting, so they wouldn't appear when importing)

@@ -26,7 +26,7 @@ from Tools.HBYaml.hb_yaml import Reader
 # Load the metadata that contains the data definitions for what each
 # action accepts for 'action_data', and what globals are in use by any
 # action
-actions_metadata = Reader.ReadAll("actions_metadata.yaml")
+actions_metadata = Reader.ReadAll(settings.ConvertPartialToAbsolutePath("HBEngine/Core/Actions/actions_metadata.yaml"))
 
 
 # -------------- BASE ACTIONS --------------
@@ -42,7 +42,15 @@ class Action:
         self.skippable = True
         self.complete = False
         self.complete_delegate = None  # Called by the action manager before it deletes the action
-        self.metadata = actions_metadata[__name__]
+        self.metadata = actions_metadata[__class__.__name__]
+        print("SPawned base action")
+        """print(__class__.__name__)
+        try:
+            self.metadata = actions_metadata[__class__.__name__]
+        except Exception as exc:
+            if __class__.__name__ != "Action":
+                raise ValueError(f"The action '{__class__.__name__}' does not have a corresponding entry in the action_metadata.yaml file")
+        """
 
         # Load the default action data values from the metadata file for all applicable parameters that were not found
         # in the action data provided to this class when it initialized

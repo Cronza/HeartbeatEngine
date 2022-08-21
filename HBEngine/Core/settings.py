@@ -54,9 +54,9 @@ def Evaluate(data_path):
 
 def ConvertPartialToAbsolutePath(partial_path):
     """
-    Given a partial path, return a absolute path
+    Given a partial path, return an absolute path
 
-    If the provided path has 'ENGINE_FILES' at the beginning, then the returned path will be relative
+    If the provided path has 'HBEngine' at the beginning, then the returned path will be relative
     to the engine, not the project. This is to allow references to engine default files that are not
     a part of Heartbeat projects
     """
