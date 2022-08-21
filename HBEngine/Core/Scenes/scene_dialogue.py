@@ -50,12 +50,14 @@ class DialogueScene(PointAndClickScene):
         if len(self.dialogue_data[self.active_branch]["entries"]) > self.dialogue_index:
             action_data = self.dialogue_data[self.active_branch]["entries"][self.dialogue_index]
 
+            # The action_dict dict has one top level key which is the name of the action. We need to fetch it in order
+            # to access the action data stored as the value
             name = next(iter(action_data))
             data = action_data[name]
 
             if "post_wait" in data:
                 if "wait_for_input" in data["post_wait"]:
-                    self.a_manager.PerformAction(data, data["action"])
+                    self.a_manager.PerformAction(data, name)
                     self.dialogue_index += 1
                 elif "wait_until_complete" in data["post_wait"]:
                     print("Waiting until complete")

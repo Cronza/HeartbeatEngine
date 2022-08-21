@@ -42,24 +42,7 @@ class Action:
         self.skippable = True
         self.complete = False
         self.complete_delegate = None  # Called by the action manager before it deletes the action
-        self.metadata = actions_metadata[__class__.__name__]
-        print("SPawned base action")
-        """print(__class__.__name__)
-        try:
-            self.metadata = actions_metadata[__class__.__name__]
-        except Exception as exc:
-            if __class__.__name__ != "Action":
-                raise ValueError(f"The action '{__class__.__name__}' does not have a corresponding entry in the action_metadata.yaml file")
-        """
-
-        # Load the default action data values from the metadata file for all applicable parameters that were not found
-        # in the action data provided to this class when it initialized
-        for req_name, req_data in self.metadata["requirements"].items():
-            if req_name not in self.action_data:
-                if "global" in req_data:
-                    self.action_data[req_name] = settings.GetProjectGlobal(req_data["global"][0], req_data["global"][1])
-                else:
-                    self.action_data[req_name] = req_data["value"]
+        self.metadata = {}  # Loaded via function
 
     def Start(self):
         pass
@@ -72,6 +55,24 @@ class Action:
 
     def Complete(self):
         self.complete = True
+
+    def LoadMetadata(self, action_name):
+        """
+        Given an action name, set the 'metadata' variable using the corresponding data found in the
+        actions_metadata.yaml file
+        """
+        # We have to take a parameter for the action name here because '__class__.__name__' returns the base class name
+        # when running under code defined in the base class
+        self.metadata = actions_metadata[action_name]
+
+        # Load the default action data values from the metadata file for all applicable parameters that were not found
+        # in the action data provided to this class when it initialized
+        for req_name, req_data in self.metadata["requirements"].items():
+            if req_name not in self.action_data:
+                if "global" in req_data:
+                    self.action_data[req_name] = settings.GetProjectGlobal(req_data["global"][0], req_data["global"][1])
+                else:
+                    self.action_data[req_name] = req_data["value"]
 
     def GetMetadataValue(self, key):
         """ Returns the value for the given requirements key (IE. 'position') """
@@ -103,6 +104,8 @@ class SoundAction(Action):
 class remove_renderable(Action):
     """ Based on a given key, remove the associated renderable from the renderable stack """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         # Any transitions are applied to the sprite pre-unload
         if "None" not in self.action_data["transition"]["type"]:
             self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], renderable)
@@ -135,6 +138,8 @@ class remove_container(Action):
             - speed: int
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         if "key" in self.action_data:
             container = self.scene.active_renderables.renderables[self.action_data["key"]]
 
@@ -181,6 +186,7 @@ class remove_container(Action):
 class create_sprite(Action):
     """ Create a sprite renderable using passed in settings. Returns a 'SpriteRenderable' """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
 
         new_sprite = SpriteRenderable(
             self.scene,
@@ -222,6 +228,8 @@ class create_background(Action):
     'SpriteRenderable'
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         self.skippable = False
 
         new_sprite = SpriteRenderable(
@@ -240,6 +248,7 @@ class create_background(Action):
 class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         # OVERRIDES WITH NO PROJECT DEFAULTS
@@ -278,6 +287,8 @@ class create_text(Action):
     Create a TextRenderable at the target location, with the given settings. Returns a 'TextRenderable'
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         new_text_renderable = TextRenderable(
             self.scene,
             self.action_data
@@ -311,6 +322,7 @@ class create_button(Action):
     Creates a button interactable, and adds it to the renderable stack. Returns a 'Button'
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         # System defined overrides
@@ -339,6 +351,7 @@ class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDAT
 
     # @TODO: Update to new workflow
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         # Container-specific adjustments
@@ -369,6 +382,7 @@ class create_dialogue_interface(Action):
     pre-configured settings
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         dialogue_frame = SpriteRenderable(
@@ -389,6 +403,8 @@ class dialogue(Action):
     If the user specifies a 'character' block, create a speaker text using the character details instead. Returns None
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         new_speaker_text = TextRenderable(
             self.scene,
             self.action_data["speaker"]
@@ -429,6 +445,7 @@ class character_dialogue(Action):
     """
 
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
 
         # Dialogue-specific adjustments
         assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
@@ -588,6 +605,7 @@ class create_character(Action):
     This action is only available in DialogueScenes, and requires a 'character' block be provided
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
 
         # Character-specific adjustments
         assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
@@ -656,6 +674,7 @@ class create_character(Action):
 
 class choice(Action):
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         # Choice-specific adjustments
@@ -734,6 +753,8 @@ class choice(Action):
 
 class choose_branch(Action):
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
         if self.scene.active_renderables.Exists("Choice"):
@@ -760,6 +781,8 @@ class play_sfx(SoundAction):
     """
 
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
         new_sound = pygame.mixer.Sound(settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
         new_sound.set_volume(self.action_data["volume"])
 
@@ -787,6 +810,7 @@ class stop_sfx(Action):
     - key : str
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         if "key" in self.action_data:
@@ -809,6 +833,7 @@ class play_music(SoundAction):
     """
 
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         # If the user hasn't removed the previous music, forcefully remove it here without any transition
@@ -843,6 +868,7 @@ class stop_music(Action):
     - key : str
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         pygame.mixer.music.stop()  # This will invoke the end-event on the existing music action
@@ -862,6 +888,7 @@ class load_scene(Action):
     - scene_file : str
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         if "scene_file" in self.action_data:
@@ -877,6 +904,7 @@ class wait(Action):
     Waits for a set amount of time before completing
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.counter = 0
         self.target = self.action_data["seconds"]
 
@@ -900,6 +928,7 @@ class quit_game(Action):
     This is not meant to be called during scenes, but is available as an action for inputs, buttons, etc
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
         self.scene.pygame_lib.quit()
         exit()
@@ -920,6 +949,7 @@ class fade_scene_from_black(Action):
     - speed: int <GLOBAL_AVAILABLE>
     """
     def Start(self):
+        self.LoadMetadata(__class__.__name__)
 
         # Action-specific adjustments
         self.action_data['position'] = (0, 0)

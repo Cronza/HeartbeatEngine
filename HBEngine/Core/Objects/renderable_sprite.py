@@ -35,8 +35,8 @@ class SpriteRenderable(Renderable):
             self.surface = pygame.image.load(sprite).convert_alpha()
             self.rect = self.surface.get_rect()
         except Exception as exc:
-            print("Failed to load data file for Renderable - Either the file was not found, or it is not a "
-                  f"supported file type:\n{exc}\n")
+            raise ValueError(f"Failed to load sprite: '{sprite}' - Either the file was not found, or it is not a "
+                  f"supported file type") from None  # PEP 409: Suppressing exception context
 
         # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
         # to defer this though if they need to do any additional work beforehand

@@ -86,13 +86,19 @@ create_background:
 
     sprite:
       type: "File_Image"
-      value: "None"
+      value: "HBEngine/Content/Sprites/Placeholder.png"
       editable: True
       preview: True
 
     position:
       type: "Vector2"
       value: [ 0,0 ]
+      editable: False
+      preview: False
+
+    center_align:
+      type: "Bool"
+      value: False
       editable: False
       preview: False
 
