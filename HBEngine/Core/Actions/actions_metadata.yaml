@@ -1,10 +1,15 @@
-# - 'editable' controls whether a parameter can be changed by the user either in the editor, or via editing the file manually.
-# - 'global' allows the parameter to access a shared, global value that applies across all instances of that action. This
-#    global value can be ignored per-instance if the action has a value specified. If 'editable' is not active, then this
-#    flag is required as it will force the use of the global value
-#  - [Editor Only] 'type' controls how that parameter is displayed in the editor (IE. Dropdown vs text box)
-#  - [Editor Only] 'preview' controls whether certain editors can show the value of the parameter in additional areas of the
-#    interface
+#
+# This file is used to define the data requirements for each action specified within the 'actions.py' module, along with
+# how to interact and edit this data within the Heartbeat Editor. The data here is often referred to as 'action_data'
+
+# Key Index
+#   - 'global' allows the parameter to access a shared, global value that applies across all instances of that action. This
+#      global value can be ignored per-instance if the action has a value specified
+#   - [Editor Only] 'default' contains the unedited value when loaded from this file. It's kept separate in order to allow resetting of 'value'
+#   - [Editor Only] 'editable' controls whether a parameter can be changed by the user either in the editor, or via editing the file manually.
+#   - [Editor Only] 'type' controls how that parameter is displayed in the editor (IE. Dropdown vs text box)
+#   - [Editor Only] 'preview' controls whether certain editors can show the value of the parameter in additional areas of the
+#     interface
 
 
 create_sprite:
@@ -12,37 +17,37 @@ create_sprite:
   requirements:
     key:
       type: "String"
-      value: ""
+      default: ""
       editable: True
       preview: True
 
     sprite:
       type: "File_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
+      default: "HBEngine/Content/Sprites/Placeholder.png"
       editable: True
       preview: True
 
     position:
       type: "Vector2"
-      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
       editable: True
       preview: True
 
     center_align:
       type: "Bool"
-      value: True
+      default: True
       editable: True
       preview: True
 
     flip:
       type: "Bool"
-      value: False
+      default: False
       editable: True
       preview: False
 
     z_order:
       type: "Int"
-      value: 0
+      default: 0
       editable: True
       preview: True
 
@@ -52,7 +57,7 @@ create_sprite:
       children:
         type:
           type: "Dropdown"
-          value: "None"
+          default: "None"
           options:
             - "None"
             - "fade_in"
@@ -61,13 +66,13 @@ create_sprite:
 
         speed:
           type: "Int"
-          value: 500
+          default: 500
           editable: True
           preview: True
 
     post_wait:
       type: "Dropdown"
-      value: "wait_for_input"
+      default: "wait_for_input"
       options:
         - "no_wait"
         - "wait_for_input"
@@ -80,37 +85,37 @@ create_background:
   requirements:
     key:
       type: "String"
-      value: "Background"
+      default: "Background"
       editable: False
       preview: True
 
     sprite:
       type: "File_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
+      default: "HBEngine/Content/Sprites/Placeholder.png"
       editable: True
       preview: True
 
     position:
       type: "Vector2"
-      value: [ 0,0 ]
+      default: [ 0,0 ]
       editable: False
       preview: False
 
     center_align:
       type: "Bool"
-      value: False
+      default: False
       editable: False
       preview: False
 
     z_order:
       type: "Int"
-      value: -9999
+      default: -9999
       editable: False
       preview: False
 
     post_wait:
       type: "Dropdown"
-      value: "no_wait"
+      default: "no_wait"
       options:
         - "no_wait"
         - "wait_for_input"
@@ -123,60 +128,60 @@ create_text:
   requirements:
     key:
       type: "String"
-      value: ""
+      default: ""
       editable: True
       preview: True
 
     position:
       type: "Vector2"
-      value: [0.5,0.5]
+      default: [0.5,0.5]
       editable: True
       preview: True
 
     center_align:
       type: "Bool"
-      value: True
+      default: True
       global: ["Text", "center_align"]
       editable: True
       preview: False
 
     text:
       type: "Paragraph"
-      value: "Default"
+      default: "Default"
       editable: True
       preview: True
 
     text_size:
       type: "Int"
-      value: 24
+      default: 24
       global: ["Text", "size"]
       editable: True
       preview: True
 
     text_color:
       type: "Color"
-      value: [255, 255, 255]
+      default: [255, 255, 255]
       global: ["Text", "color"]
       editable: True
       preview: True
 
     font:
       type: "File_Font"
-      value: "None"
+      default: "None"
       global: ["Text", "center_align"]
       editable: True
       preview: False
 
     z_order:
       type: "Int"
-      value: 0
+      default: 0
       global: ["Text", "z_order"]
       editable: True
       preview: True
 
     wrap_bounds:
       type: "Vector2"
-      value: [0.2,0.2]
+      default: [0.2,0.2]
       global: ["Text", "wrap_bounds"]
       editable: True
       preview: False
@@ -187,7 +192,7 @@ create_text:
       children:
         type:
           type: "Dropdown"
-          value: "None"
+          default: "None"
           options:
             - "None"
             - "fade_in"
@@ -196,13 +201,13 @@ create_text:
 
         speed:
           type: "Int"
-          value: 500
+          default: 500
           editable: True
           preview: True
 
     post_wait:
       type: "Dropdown"
-      value: "wait_for_input"
+      default: "wait_for_input"
       options:
         - "no_wait"
         - "wait_for_input"
@@ -215,7 +220,7 @@ remove_renderable:
   requirements:
     key:
       type: "String"
-      value: ""
+      default: ""
       editable: True
       preview: True
 
@@ -225,7 +230,7 @@ remove_renderable:
       children:
         type:
           type: "Dropdown"
-          value: "None"
+          default: "None"
           options:
             - "None"
             - "fade_out"
@@ -234,13 +239,13 @@ remove_renderable:
 
         speed:
           type: "Int"
-          value: 500
+          default: 500
           editable: True
           preview: True
 
     post_wait:
       type: "Dropdown"
-      value: "no_wait"
+      default: "no_wait"
       options:
         - "no_wait"
         - "wait_for_input"
@@ -253,25 +258,25 @@ create_button:
   requirements:
     key:
       type: "String"
-      value: ""
+      default: ""
       editable: True
       preview: True
 
     position:
       type: "Vector2"
-      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
       editable: True
       preview: True
 
     center_align:
       type: "Bool"
-      value: True
+      default: True
       editable: True
       preview: False
 
     sprite:
       type: "File_Image"
-      value: "None"
+      default: "None"
       global: ["Button", "sprite"]
       editable: True
       preview: True
@@ -279,20 +284,20 @@ create_button:
     sprite_hover:
       type: "File_Image"
       global: ["Button", "sprite_hover"]
-      value: "None"
+      default: "None"
       editable: True
       preview: False
 
     sprite_clicked:
       type: "File_Image"
       global: ["Button", "sprite_clicked"]
-      value: "None"
+      default: "None"
       editable: True
       preview: False
 
     z_order:
       type: "Int"
-      value: 100
+      default: 100
       global: ["Button", "z_order"]
       editable: True
       preview: False
@@ -303,46 +308,46 @@ create_button:
       children:
         position:
           type: "Vector2"
-          value: [ 0.5, 0.5 ]
+          default: [ 0.5, 0.5 ]
           editable: True
           preview: True
 
         center_align:
           type: "Bool"
-          value: True
+          default: True
           editable: True
           preview: False
 
         text:
           type: "String"
-          value: "Default"
+          default: "Default"
           editable: True
           preview: True
 
         text_size:
           type: "Int"
-          value: 24
+          default: 24
           global: ["Text", "size"]
           editable: True
           preview: False
 
         text_color:
           type: "Color"
-          value: [ 255, 255, 255 ]
+          default: [ 255, 255, 255 ]
           global: ["Text", "color"]
           editable: True
           preview: False
 
         font:
           type: "File_Font"
-          value: "None"
+          default: "None"
           global: ["Button", "font"]
           editable: True
           preview: False
 
         z_order:
           type: "Int"
-          value: 101
+          default: 101
           global: [ "Button", "z_order" ]
           editable: False
           preview: False
@@ -352,41 +357,41 @@ create_dialogue_interface:
   requirements:
     key:
       type: "String"
-      value: "DialogueFrame"
+      default: "DialogueFrame"
       editable: False
       preview: False
 
     sprite:
       type: "File_Image"
-      value: "None"
+      default: "None"
       global: ["Dialogue", "dialogue_frame_sprite"]
       editable: True
       preview: True
 
     position:
       type: "Vector2"
-      value: [0,0]
+      default: [0,0]
       global: ["Dialogue", "dialogue_frame_position"]
       editable: True
       preview: True
 
     center_align:
       type: "Bool"
-      value: True
+      default: True
       global: ["Dialogue", "dialogue_frame_center_align"]
       editable: True
       preview: True
 
     z_order:
       type: "Int"
-      value: 0
+      default: 0
       global: ["Dialogue", "dialogue_frame_z_order"]
       editable: True
       preview: True
 
     post_wait:
       type: "Dropdown"
-      value: "no_wait"
+      default: "no_wait"
       options:
         - "no_wait"
         - "wait_for_input"
@@ -403,54 +408,54 @@ dialogue:
       children:
         key:
           type: "String"
-          value: "SpeakerText"
+          default: "SpeakerText"
           editable: False
           preview: False
 
         position:
           type: "Vector2"
-          value: [0,0]
+          default: [0,0]
           global: ["Dialogue", "speaker_text_position"]
           editable: True
           preview: False
 
         center_align:
           type: "Bool"
-          value: True
+          default: True
           global: ["Dialogue", "speaker_center_align"]
           editable: True
           preview: False
 
         text:
           type: "String"
-          value: ""
+          default: ""
           editable: True
           preview: True
 
         text_size:
           type: "Int"
-          value: 24
+          default: 24
           global: ["Dialogue", "speaker_text_center_align"]
           editable: True
           preview: False
 
         text_color:
           type: "Color"
-          value: [255, 255, 255]
+          default: [255, 255, 255]
           global: ["Dialogue", "speaker_text_color"]
           editable: True
           preview: False
 
         font:
           type: "File_Font"
-          value: "None"
+          default: "None"
           global: ["Dialogue", "speaker_text_font"]
           editable: True
           preview: False
 
         z_order:
           type: "Int"
-          value: 0
+          default: 0
           global: ["Dialogue", "speaker_text_z_order"]
           editable: True
           preview: False
@@ -461,7 +466,7 @@ dialogue:
           children:
             type:
               type: "Dropdown"
-              value: "None"
+              default: "None"
               global: [ "Dialogue", "transition_type" ]
               options:
                 - "fade_in"
@@ -471,14 +476,14 @@ dialogue:
 
             speed:
               type: "Int"
-              value: 500
+              default: 500
               global: [ "Dialogue", "transition_speed" ]
               editable: True
               preview: False
 
         wrap_bounds:
           type: "Vector2"
-          value: [ 0.2,0.2 ]
+          default: [ 0.2,0.2 ]
           global: [ "Dialogue", "speaker_text_wrap_bounds" ]
           editable: False
           preview: False
@@ -489,54 +494,54 @@ dialogue:
       children:
         key:
           type: "String"
-          value: "DialogueText"
+          default: "DialogueText"
           editable: False
           preview: False
 
         position:
           type: "Vector2"
-          value: [0,0]
+          default: [0,0]
           global: ["Dialogue", "dialogue_text_position"]
           editable: True
           preview: False
 
         center_align:
           type: "Bool"
-          value: True
+          default: True
           global: ["Dialogue", "dialogue_center_align"]
           editable: True
           preview: False
 
         text:
           type: "Paragraph"
-          value: "Default"
+          default: "Default"
           editable: True
           preview: True
 
         text_size:
           type: "Int"
-          value: 24
+          default: 24
           global: ["Dialogue", "dialogue_text_size"]
           editable: True
           preview: False
 
         text_color:
           type: "Color"
-          value: [255, 255, 255]
+          default: [255, 255, 255]
           global: ["Dialogue", "dialogue_text_color"]
           editable: True
           preview: False
 
         font:
           type: "File_Font"
-          value: "None"
+          default: "None"
           global: ["Dialogue", "dialogue_text_font"]
           editable: True
           preview: False
 
         z_order:
           type: "Int"
-          value: 0
+          default: 0
           global: ["Dialogue", "dialogue_text_z_order"]
           editable: True
           preview: False
@@ -547,7 +552,7 @@ dialogue:
           children:
             type:
               type: "Dropdown"
-              value: "fade_in"
+              default: "fade_in"
               global: ["Dialogue", "transition_type"]
               options:
                 - "fade_in"
@@ -557,21 +562,21 @@ dialogue:
 
             speed:
               type: "Int"
-              value: 1000
+              default: 1000
               global: ["Dialogue", "transition_speed"]
               editable: True
               preview: False
 
         wrap_bounds:
           type: "Vector2"
-          value: [ 0.8,0.16 ]
+          default: [ 0.8,0.16 ]
           global: [ "Dialogue", "dialogue_text_wrap_bounds" ]
           editable: False
           preview: False
 
     post_wait:
       type: "String"
-      value: "wait_for_input"
+      default: "wait_for_input"
       editable: False
       preview: False
 

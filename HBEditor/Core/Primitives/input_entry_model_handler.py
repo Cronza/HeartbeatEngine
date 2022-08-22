@@ -63,7 +63,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     """
     # @TODO: Replace with a switch when the Python version is upgraded to allow it (3.10)
     data_type = ParameterType[data["type"]]
-
+    print(f"Entry Data: {data}")
     input_widget = None
     if data_type == ParameterType.String:
         input_widget = InputEntryText(data)
@@ -102,11 +102,12 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     input_widget.owning_model_item = owning_model_item
     input_widget.Connect()
 
-    # Update the entry with the value key if available, or using the entire data block
+    # Update the entry with the value key if applicable. Otherwise, use the default value
     if "value" in data:
         input_widget.Set(data["value"])
-    else:
-        input_widget.Set(data)
+    elif "default" in data:
+        data["value"] = data["default"]
+        input_widget.Set(data["value"])
 
     # Make the option read-only if applicable
     if "editable" in data:

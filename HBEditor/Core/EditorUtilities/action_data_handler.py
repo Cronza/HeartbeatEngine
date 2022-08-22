@@ -30,7 +30,11 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
             if excluded_properties:
                 if req_name in excluded_properties:
                     continue
-            if "children" not in req_data and "value" in req_data:
+            if "children" not in req_data:
+                # New data or data that hasn't been edited by the user won't have the 'value' key. In these cases,
+                # generate the key using the value of the 'default' key
+                if "value" not in req_data:
+                    req_data["value"] = req_data["default"]
                 if "global_active" in req_data:
                     # Exclude requirements that are pointing to a global setting. The engine will take care of
                     # this at runtime since any global value stored in a file will become outdated as soon as the
@@ -71,7 +75,7 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
         if excluded_properties:
             if req_name in excluded_properties:
                 continue
-        if "children" not in req_data and "value" in req_data:
+        if "children" not in req_data:
             # If the req entry isn't found in the engine action data, then it was likely omitted due to a global
             # setting being enabled
             if req_name in engine_entry:

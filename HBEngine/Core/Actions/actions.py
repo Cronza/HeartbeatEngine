@@ -72,7 +72,7 @@ class Action:
                 if "global" in req_data:
                     self.action_data[req_name] = settings.GetProjectGlobal(req_data["global"][0], req_data["global"][1])
                 else:
-                    self.action_data[req_name] = req_data["value"]
+                    self.action_data[req_name] = req_data["default"]
 
     def GetMetadataValue(self, key):
         """ Returns the value for the given requirements key (IE. 'position') """
