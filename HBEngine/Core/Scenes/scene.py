@@ -46,7 +46,6 @@ class Scene:
         self.LoadSceneData()
 
     def Update(self, events):
-        print(self.active_renderables.Get())
         self.active_renderables.Update()
         self.a_manager.Update(events)
 

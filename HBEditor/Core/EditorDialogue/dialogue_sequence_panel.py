@@ -266,6 +266,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         self.subtext_widget.setObjectName("text-soft-italic")
 
         # Refresh the subtext
+        print(self.action_data)
         self.UpdateSubtext()
 
         # Add everything to the layout
@@ -278,6 +279,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
+        print(adh.GetActionRequirements(self.action_data))
         self.subtext_widget.setText(self.CompileSubtextString(adh.GetActionRequirements(self.action_data)))
 
     def CompileSubtextString(self, req_data):

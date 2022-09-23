@@ -56,7 +56,7 @@ class Action:
     def Complete(self):
         self.complete = True
 
-    def LoadMetadata(self, action_name):
+    def LoadMetadata(self, action_name: str, recurse: bool = False):
         """
         Given an action name, set the 'metadata' variable using the corresponding data found in the
         actions_metadata.yaml file
@@ -65,14 +65,69 @@ class Action:
         # when running under code defined in the base class
         self.metadata = actions_metadata[action_name]
 
-        # Load the default action data values from the metadata file for all applicable parameters that were not found
-        # in the action data provided to this class when it initialized
-        for req_name, req_data in self.metadata["requirements"].items():
-            if req_name not in self.action_data:
-                if "global" in req_data:
-                    self.action_data[req_name] = settings.GetProjectGlobal(req_data["global"][0], req_data["global"][1])
+        # Compare the action_data against the metadata. If any items found within the metadata are missing in the
+        # action_data, we can assume it was not edited or modified by the user, and that we can defer to either the
+        # global value or the default
+        self.UpdateFromMetadata(self.metadata, self.action_data)
+        print(f"Completed Metadata Conversion: {self.action_data}")
+        """
+        for md_req_name, md_req_data in self.metadata["requirements"].items():
+            print(f"Line: {md_req_name} | {md_req_data}")
+            if md_req_name not in self.action_data:
+                # Item missing. Assume all children are missing as well...
+                #ad_target = self.action_data
+                if "global" in md_req_data:
+                    self.action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
                 else:
-                    self.action_data[req_name] = req_data["default"]
+                    self.action_data[md_req_name] = md_req_data["default"]
+
+            
+                
+                while not parsed_all_children:
+                    for c_md_req_name, c_md_req_data in md_data_target["children"].items():
+                        print(f"Child Line: {c_md_req_name} | {c_md_req_data}")
+                        if "children" in c_md_req_data:
+                            # Update the targets so the loop will recurse deeper, then skip the rest of the iteration
+                            md_data_target = c_md_req_data
+                            ad_data_target = ad_data_target[c_md_req_name]
+                            continue
+                        else:
+                            if c_md_req_name not in ad_data_target:
+                                if "global" in c_md_req_data:
+                                    ad_data_target[c_md_req_name] = settings.GetProjectGlobal(c_md_req_data["global"][0], c_md_req_data["global"][1])
+                                else:
+                                    ad_data_target[c_md_req_name] = c_md_req_data["default"]
+
+                            # Break the loop as we've reached maximum depth
+                            parsed_all_children = True
+                
+            print(f"Completed Metadata Conversion: {self.action_data}")
+        """
+
+        """
+        if md_req_name not in self.action_data:
+            if "global" in md_req_data:
+                self.action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
+            else:
+                self.action_data[md_req_name] = md_req_data["default"]
+        """
+
+    def UpdateFromMetadata(self, metadata: dict, action_data: dict, search_term: str = "requirements"):
+        for md_req_name, md_req_data in metadata[search_term].items():
+            if "children" in md_req_data:
+                # If the item has children, then it won't have a value itself (IE. Containers). Recurse in this case
+                self.UpdateFromMetadata(md_req_data, action_data[md_req_name], "children")
+
+            elif md_req_name not in action_data:
+                # The item is missing. Update it
+                if "global" in md_req_data:
+                    action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
+                else:
+                    action_data[md_req_name] = md_req_data["default"]
+
+
+
+
 
     def GetMetadataValue(self, key):
         """ Returns the value for the given requirements key (IE. 'position') """
@@ -299,9 +354,9 @@ class create_text(Action):
         if "None" not in self.action_data["transition"]["type"]:
             self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
             self.active_transition.Start()
-
-        self.scene.Draw()
-        self.Complete()
+        else:
+            self.scene.Draw()
+            self.Complete()
 
         return new_text_renderable
 
@@ -419,9 +474,14 @@ class dialogue(Action):
         self.scene.active_renderables.Add(new_dialogue_text)
 
         # Note: Speaker text does not support transitions currently
-        self.active_transition = self.a_manager.CreateTransition(self.action_data["dialogue"]["transition"], new_dialogue_text)
-
-        self.active_transition.Start()
+        print(self.action_data["dialogue"])
+        if self.action_data["dialogue"]["transition"]["type"] != "None":
+            self.active_transition = self.a_manager.CreateTransition(self.action_data["dialogue"]["transition"], new_dialogue_text)
+            self.active_transition.Start()
+            print('Transition')
+        else:
+            self.scene.Draw()
+            self.Complete()
 
         return None
 

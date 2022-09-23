@@ -63,7 +63,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     """
     # @TODO: Replace with a switch when the Python version is upgraded to allow it (3.10)
     data_type = ParameterType[data["type"]]
-    print(f"Entry Data: {data}")
+
     input_widget = None
     if data_type == ParameterType.String:
         input_widget = InputEntryText(data)

@@ -53,7 +53,6 @@ class EditorDialogue(EditorBase):
 
     def SwitchBranches(self, cur_branch, new_branch):
         """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
-
         # If there is no source branch, then there is nothing to store
         if cur_branch:
             self.StoreActiveData(cur_branch)
@@ -95,7 +94,7 @@ class EditorDialogue(EditorBase):
 
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
-            #print(branch_data)
+
             new_entry = {
                 "description": branch_description,
                 "entries": branch_data
