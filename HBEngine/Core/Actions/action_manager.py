@@ -105,7 +105,7 @@ class ActionManager:
 
     def CreateTransition(self, transition_data, renderable):
         transition = self.GetTransition(transition_data)
-        print(f"Transition: {transition}")
+
         if 'speed' in transition_data:
             return transition(self.scene, self, renderable, transition_data['speed'])
         else:

@@ -69,50 +69,12 @@ class Action:
         # action_data, we can assume it was not edited or modified by the user, and that we can defer to either the
         # global value or the default
         self.UpdateFromMetadata(self.metadata, self.action_data)
-        print(f"Completed Metadata Conversion: {self.action_data}")
-        """
-        for md_req_name, md_req_data in self.metadata["requirements"].items():
-            print(f"Line: {md_req_name} | {md_req_data}")
-            if md_req_name not in self.action_data:
-                # Item missing. Assume all children are missing as well...
-                #ad_target = self.action_data
-                if "global" in md_req_data:
-                    self.action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
-                else:
-                    self.action_data[md_req_name] = md_req_data["default"]
-
-            
-                
-                while not parsed_all_children:
-                    for c_md_req_name, c_md_req_data in md_data_target["children"].items():
-                        print(f"Child Line: {c_md_req_name} | {c_md_req_data}")
-                        if "children" in c_md_req_data:
-                            # Update the targets so the loop will recurse deeper, then skip the rest of the iteration
-                            md_data_target = c_md_req_data
-                            ad_data_target = ad_data_target[c_md_req_name]
-                            continue
-                        else:
-                            if c_md_req_name not in ad_data_target:
-                                if "global" in c_md_req_data:
-                                    ad_data_target[c_md_req_name] = settings.GetProjectGlobal(c_md_req_data["global"][0], c_md_req_data["global"][1])
-                                else:
-                                    ad_data_target[c_md_req_name] = c_md_req_data["default"]
-
-                            # Break the loop as we've reached maximum depth
-                            parsed_all_children = True
-                
-            print(f"Completed Metadata Conversion: {self.action_data}")
-        """
-
-        """
-        if md_req_name not in self.action_data:
-            if "global" in md_req_data:
-                self.action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
-            else:
-                self.action_data[md_req_name] = md_req_data["default"]
-        """
 
     def UpdateFromMetadata(self, metadata: dict, action_data: dict, search_term: str = "requirements"):
+        """
+        Recursively compares the provided action_data against the provided metadata, updating the former when
+        it is missing data found in the latter
+        """
         for md_req_name, md_req_data in metadata[search_term].items():
             if "children" in md_req_data:
                 # If the item has children, then it won't have a value itself (IE. Containers). Recurse in this case
@@ -124,10 +86,6 @@ class Action:
                     action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
                 else:
                     action_data[md_req_name] = md_req_data["default"]
-
-
-
-
 
     def GetMetadataValue(self, key):
         """ Returns the value for the given requirements key (IE. 'position') """
