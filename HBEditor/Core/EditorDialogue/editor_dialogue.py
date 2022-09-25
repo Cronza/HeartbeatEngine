@@ -37,6 +37,9 @@ class EditorDialogue(EditorBase):
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
+        # In case something changed in the active details and hasn't been saved, force a resave
+        #print("Forcing Resave before switching active entry")
+        #self.editor_ui.details.StoreData()
         selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
@@ -181,10 +184,9 @@ class EditorDialogue(EditorBase):
         for branch_name, branch_data in action_data.items():
             converted_entries = []
             for entry in branch_data["entries"]:
-                #print(f"Conv Entry to Editor Format: {entry}")
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
                 # the matching metadata entry and clone it
-                name = next(iter(entry))
+                name = adh.GetActionName(entry)
                 metadata_entry = copy.deepcopy(settings.action_metadata[name])
 
                 # Pass the entry by ref, and let the convert func edit it directly

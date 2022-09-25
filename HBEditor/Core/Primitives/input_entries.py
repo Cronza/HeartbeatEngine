@@ -18,6 +18,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 """
@@ -457,12 +458,13 @@ class InputEntryTuple(InputEntryBase):
 class InputEntryArray(InputEntryBase):
     """
     A highly specialized container that allows the generation of child entries based on a template defined in
-    the ActionsDatabase
+    the actions_metadata
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, refresh_func: callable,
                  excluded_properties: dict = None):
         super().__init__(data)
+
         self.excluded_properties = excluded_properties
         self.owning_view = owning_view
 
@@ -481,29 +483,37 @@ class InputEntryArray(InputEntryBase):
         self.add_item_button.clicked.connect(lambda: self.AddItems())
         self.main_layout.addWidget(self.add_item_button)
 
-    def AddItems(self, data=None, parent=None):
+    def AddItems(self, name="", data=None, parent=None):
         if self.owning_model_item.childCount() >= self.child_limit:
             Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
             if not data:
                 data = copy.deepcopy(self.data["template"])
+
+                # Choices have generated names to avoid having to be stored as a list when caching or saving
+                name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
+
             if not parent:
                 parent = self.owning_model_item
 
-            #@TODO: Investigate how to incorporate this functionality with saving / loading
+            data_no_key = data[adh.GetActionName(data)]
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
-                data=data,
+                name=name,
+                data=data_no_key,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
                 signal_func=self.signal_func,
                 refresh_func=self.refresh_func
             )
+            if "children" in data_no_key:
+                for child_name, child_data in data_no_key["children"].items():
+                    if "editable" in child_data:
+                        if not child_data["editable"]:
+                            continue
 
-            if "children" in data:
-                for child_data in data["children"]:
-                    self.AddItems(child_data, new_entry)
+                    self.AddItems(child_name, {child_name: child_data}, new_entry)
 
         # Inform the owning U.I that we've added a child outside it's purview
         self.refresh_func(self.owning_model_item)

@@ -33,3 +33,6 @@ Dialogue:
     - name: "dialogue"
       applicable_editors:
         - Scene_Dialogue
+    - name: "choice"
+      applicable_editors:
+        - Scene_Dialogue

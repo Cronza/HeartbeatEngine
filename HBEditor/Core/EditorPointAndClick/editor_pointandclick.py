@@ -65,7 +65,7 @@ class EditorPointAndClick(EditorBase):
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
+        Logger.getInstance().Log(f"Exporting Point & Click data for: {self.file_path}")
 
         # Get an engine-formatted list of scene items
         conv_scene_items = self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
@@ -105,13 +105,14 @@ class EditorPointAndClick(EditorBase):
             scene_item_data = scene_item.action_data
 
             # Get the action name
-            converted_action = {"action": scene_item_data["action_name"]}
+            converted_action = {"action": adh.GetActionName(scene_item_data)}
 
             # Collect a converted dict of all requirements for this action (If any are present)
             converted_requirements = adh.ConvertActionRequirementsToEngineFormat(
-                editor_req_data=scene_item_data,
+                editor_req_data=scene_item_data[adh.GetActionName(scene_item_data)],
                 excluded_properties=self.excluded_properties
             )
+
             if converted_requirements:
                 converted_action.update(converted_requirements)
 
@@ -127,24 +128,15 @@ class EditorPointAndClick(EditorBase):
         """
         conv_items = []
         for item in action_data:
-            action_name = item["action"]
-
-            # Using the name of the action, look it up in the ActionDatabase. If found, clone it
-            database_entry = None
-            for cat_name, cat_data in settings.action_database.items():
-                for option in cat_data["options"]:
-                    if action_name == option['action_name']:
-                        database_entry = copy.deepcopy(option)
-                        break
-                if database_entry:
-                    break
+            # Using the name of the action, look it up in the actions_metadata and clone it
+            md_entry = copy.deepcopy(settings.action_metadata[item["action"]])
 
             # Pass the entry by ref, and let the convert func edit it directly
             adh.ConvertActionRequirementsToEditorFormat(
-                editor_req=database_entry,
-                engine_req=item,
+                metadata_entry=md_entry,
+                engine_entry=item,
                 excluded_properties=self.excluded_properties
             )
-            conv_items.append(database_entry)
+            conv_items.append({item["action"]: md_entry})
 
         return conv_items

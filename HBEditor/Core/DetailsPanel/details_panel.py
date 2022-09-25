@@ -13,8 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.Primitives import input_entry_model_handler as iemh
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
+from HBEditor.Core.EditorUtilities import action_data_handler as adh, input_entry_model_handler as iemh
 
 
 class DetailsPanel(QtWidgets.QWidget):
@@ -93,8 +92,8 @@ class DetailsPanel(QtWidgets.QWidget):
                 if not data["editable"]:
                     continue
 
-            # Some editors exclude certain requirements (IE. Point & Click doesn't make use ot 'post_wait')
-            elif self.excluded_properties:
+            # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait')
+            if self.excluded_properties:
                 if name in self.excluded_properties:
                     continue
 
@@ -146,8 +145,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
                 data_to_store[entry_name] = entry_data
 
-            if initial_iter and data_to_store:
-                self.active_entry.action_data["requirements"] = data_to_store
+            #if initial_iter and data_to_store:
+            #    reqs = adh.GetActionRequirements(self.active_entry.action_data)
+            #    reqs = data_to_store
 
             return data_to_store
 
