@@ -484,13 +484,13 @@ class InputEntryArray(InputEntryBase):
         self.main_layout.addWidget(self.add_item_button)
 
     def AddItems(self, name="", data=None, parent=None):
-        if self.owning_model_item.childCount() >= self.child_limit:
+        if self.owning_model_item.childCount() >= self.child_limit and not data:  # Don't run when recursing
             Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
             if not data:
                 data = copy.deepcopy(self.data["template"])
 
-                # Choices have generated names to avoid having to be stored as a list when caching or saving
+                # Array elements have generated names to avoid having to be stored as a list when caching or saving
                 name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
             if not parent:
@@ -518,9 +518,6 @@ class InputEntryArray(InputEntryBase):
         # Inform the owning U.I that we've added a child outside it's purview
         self.refresh_func(self.owning_model_item)
 
-    def ChildDeleted(self):
-        """ Called when a child ArrayElement is deleted """
-        print("Child Deleted!")
 
 class InputEntryArrayElement(InputEntryBase):
     SIG_USER_DELETE = QtCore.pyqtSignal(object, object)

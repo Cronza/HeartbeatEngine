@@ -147,6 +147,18 @@ def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QAbstractItemView = Non
         parent.removeChild(item)
 
     if owning_view:
-        # ArrayElements need to inform their owning array when they are deleted in order to recalculate properly
-        print(item)
-        print(owning_view.itemWidget(item, 0))
+        parent_input_widget = owning_view.itemWidget(parent, 1)
+        if isinstance(parent_input_widget, InputEntryArray):
+            # ArrayElements need to inform their owning array when they are deleted in order to recalculate properly
+            for child_index in range(0, parent.childCount()):
+                array_element = parent.child(child_index)
+                name_widget = owning_view.itemWidget(array_element, 0)
+
+                # We need to fetch the index that is a part of the name (IE. 'choice_01'). Just in case the name
+                # makes use of more than one '_', only fetch the last instance as the delimiter
+                name_split = name_widget.text().split("_")
+                name_split.pop(-1)
+                name_widget.setText("_".join(name_split) + f"_{child_index}")
+
+
+
