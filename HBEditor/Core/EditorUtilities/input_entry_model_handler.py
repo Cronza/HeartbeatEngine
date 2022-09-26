@@ -92,7 +92,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     elif data_type == ParameterType.Container:
         input_widget = InputEntryBase(data)
     elif data_type == ParameterType.Array_Element:
-        input_widget = InputEntryArrayElement(data)
+        input_widget = InputEntryArrayElement(data, owning_view)
         input_widget.SIG_USER_DELETE.connect(Remove)
     elif data_type == ParameterType.Array:
         input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_properties)
@@ -141,7 +141,12 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     return name_widget, input_widget, global_checkbox
 
 
-def Remove(item: QTreeWidgetItem):
+def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QAbstractItemView = None):
     parent = item.parent()
     if parent:
         parent.removeChild(item)
+
+    if owning_view:
+        # ArrayElements need to inform their owning array when they are deleted in order to recalculate properly
+        print(item)
+        print(owning_view.itemWidget(item, 0))

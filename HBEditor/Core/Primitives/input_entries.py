@@ -518,19 +518,26 @@ class InputEntryArray(InputEntryBase):
         # Inform the owning U.I that we've added a child outside it's purview
         self.refresh_func(self.owning_model_item)
 
+    def ChildDeleted(self):
+        """ Called when a child ArrayElement is deleted """
+        print("Child Deleted!")
 
 class InputEntryArrayElement(InputEntryBase):
-    SIG_USER_DELETE = QtCore.pyqtSignal(object)
+    SIG_USER_DELETE = QtCore.pyqtSignal(object, object)
 
-    def __init__(self, data):
+    def __init__(self, data, owning_view: QtWidgets.QAbstractItemView):
         super().__init__(data)
+
+        # Store a reference to the owning view in order to inform it when we're deleted, so the parent InputEntryArray
+        # can recalculate its entries
+        self.owning_view = owning_view
 
         # Delete button
         self.delete_button = QtWidgets.QToolButton()
         self.delete_button.setObjectName("choice-remove")
         self.main_layout.addWidget(self.delete_button)
 
-        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item))
+        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item, self.owning_view))
 
 
 class InputEntryResolution(InputEntryBase):
