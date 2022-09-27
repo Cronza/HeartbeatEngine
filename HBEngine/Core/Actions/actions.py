@@ -76,9 +76,31 @@ class Action:
         it is missing data found in the latter
         """
         for md_req_name, md_req_data in metadata[search_term].items():
+
             if "children" in md_req_data:
                 # If the item has children, then it won't have a value itself (IE. Containers). Recurse in this case
                 self.UpdateFromMetadata(md_req_data, action_data[md_req_name], "children")
+
+
+            elif "template" in md_req_data:
+                # Requirements that use templates have a fundamentally unique metadata in that each child is generated
+                # from the template instead of being instrinctically a part of the metadata to begin with. Due to this,
+                # we must compare the action_data against the metadata template specifically
+                #
+                # The template data structure is usually a few layers deep. Example:
+                #    choices: (Array)
+                #        choice: (ArrayElement)
+                #            ...
+
+                # Because the top level key names for ArrayElements are generated, we can't do a typical key name
+                # search (IE. 'choice_01' instead of 'choice' which matches the metadata). Instead, we're accessing the
+                # value dict directly
+                template_data = list(md_req_data["template"].values())[0]
+
+                # Update each ArrayElement
+                for element_name, element_data in action_data[md_req_name].items():
+                    # Skip a level as this is the "ArrayElement" container
+                    self.UpdateFromMetadata(template_data, element_data, "children")
 
             elif md_req_name not in action_data:
                 # The item is missing. Update it
@@ -119,11 +141,36 @@ class remove_renderable(Action):
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
+        renderable = self.scene.active_renderables.renderables[self.action_data['key']]
+        children = []
+
+        if isinstance(renderable, Container):
+            # Collect a flattened list of all children in this container
+            children = renderable.GetAllChildren()
+
         # Any transitions are applied to the sprite pre-unload
         if "None" not in self.action_data["transition"]["type"]:
+            if children:
+                # In order to apply the transition to each and every child of the container, we merge the surfaces
+                # and combine them into the container surface. That way, the rendering only manages a single
+                # surface. This causes containers to be non-functional once a transition starts, as the underlying
+                # children are destroyed before the transition begins
+
+                # Merge the surfaces, then delete the child (Grim, I know)
+                for child in children:
+                    renderable.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+                    self.scene.active_renderables.Remove(child.key)
+
+                renderable.visible = True
+
             self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], renderable)
             self.active_transition.Start()
         else:
+            if children:
+                # Remove all children first
+                for child in children:
+                    self.scene.active_renderables.Remove(child.key)
+
             self.scene.active_renderables.Remove(self.action_data["key"])
             self.scene.Draw()
             self.Complete()
@@ -131,61 +178,6 @@ class remove_renderable(Action):
     def Update(self, events):
         if self.active_transition.complete is True:
             self.scene.active_renderables.Remove(self.action_data["key"])
-            self.Complete()
-        else:
-            self.active_transition.Update()
-
-    def Skip(self):
-        if self.active_transition:
-            self.active_transition.Skip()
-        self.Complete()
-
-
-class remove_container(Action):
-    """
-        Based on a given key, remove the associated container and all of its children from the renderable stack
-        Possible Parameters:
-        - key : str
-        - transition : dict
-            - type: str
-            - speed: int
-    """
-    def Start(self):
-        self.LoadMetadata(__class__.__name__)
-
-        if "key" in self.action_data:
-            container = self.scene.active_renderables.renderables[self.action_data["key"]]
-
-            # Collect a flattened list of all children in this container
-            children = container.GetAllChildren()
-
-            if "None" not in self.action_data["transition"]["type"]:
-                # In order to apply the transition to each and every child of the container, we merge the surfaces
-                # and combine them into the container surface. That way, the rendering only manages a single
-                # surface. This causes containers to be non-functional once a transition starts, as the underlying
-                # children are destroyed before the transition begins
-
-                # Merge the surfaces, then delete the child (Grim, I know)
-                for child in list(children):
-                    container.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
-                    self.scene.active_renderables.Remove(child.key)
-
-                container.visible = True
-                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], container)
-                self.active_transition.Start()
-            else:
-                # Remove all children first
-                for child in children:
-                    self.scene.active_renderables.Remove(child.key)
-                self.scene.active_renderables.Remove(self.action_data['key'])
-                self.scene.Draw()
-                self.Complete()
-        else:
-            raise ValueError("'remove_renderable' action Failed - Key not specified")
-
-    def Update(self, events):
-        if self.active_transition.complete is True:
-            self.scene.active_renderables.Remove(self.action_data['key'])
             self.Complete()
         else:
             self.active_transition.Update()
@@ -432,11 +424,9 @@ class dialogue(Action):
         self.scene.active_renderables.Add(new_dialogue_text)
 
         # Note: Speaker text does not support transitions currently
-        print(self.action_data["dialogue"])
         if self.action_data["dialogue"]["transition"]["type"] != "None":
             self.active_transition = self.a_manager.CreateTransition(self.action_data["dialogue"]["transition"], new_dialogue_text)
             self.active_transition.Start()
-            print('Transition')
         else:
             self.scene.Draw()
             self.Complete()
@@ -695,59 +685,12 @@ class choice(Action):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
-        # Choice-specific adjustments
+        # Create an object that acts as a parent for all the choice buttons. When this is deleted, the buttons
+        # will be deleted with it
         self.action_data["position"] = (0, 0)
         self.action_data["z_order"] = 0
         self.action_data["center_align"] = False
         self.action_data["key"] = "Choice"
-
-        # All choice buttons use the same underlying 'create_button' action
-        for choice_index in range(0, len(self.action_data["choices"])):
-            choice_data = self.action_data["choices"][choice_index]["choice"]
-
-            # Define what the button does when clicked
-            choice_data["action"] = {
-                "action": "choose_branch",
-                "branch": choice_data["branch"]
-            }
-
-            # The key is generated dynamically instead of being provided by the file
-            choice_data["key"] = f"Choice{choice_index}"
-
-            choice_data["center_align"] = True  # Choice buttons are always centered, while the text is user-defined
-            choice_data["z_order"] = 10000  # Choice buttons should render above all other things
-            choice_data["button_text"]["z_order"] = 10001  # Choice button text should render just above the art
-
-            if "sprite" not in choice_data:
-                choice_data["sprite"] = settings.project_settings["Choice"][
-                    "button_sprite"]
-
-            if 'sprite_hover' not in choice_data:
-                choice_data["sprite_hover"] = settings.project_settings["Choice"][
-                    "button_sprite_hover"]
-
-            if "sprite_clicked" not in choice_data:
-                choice_data["sprite_clicked"] = settings.project_settings["Choice"][
-                    "button_sprite_clicked"]
-
-            if "center_align" not in choice_data["button_text"]:
-                choice_data["button_text"]["center_align"] = settings.project_settings["Choice"][
-                    "button_text_center_align"]
-
-            if "font" not in choice_data["button_text"]:
-                choice_data["button_text"]["font"] = settings.project_settings["Choice"][
-                    "button_font"]
-
-            if "text_size" not in choice_data["button_text"]:
-                choice_data["button_text"]["text_size"] = settings.project_settings["Choice"][
-                    "button_text_size"]
-
-            if "text_color" not in choice_data["button_text"]:
-                choice_data["button_text"]["text_color"] = settings.project_settings["Choice"][
-                    "button_text_color"]
-
-        # Create an object that acts as a parent for all the choice buttons. When this is deleted, the buttons
-        # will be deleted with it
         new_renderable = Choice(
             self.scene,
             self.action_data
@@ -755,8 +698,19 @@ class choice(Action):
 
         # Generate a button for each choice, adding them to the active renderables group for access to updates
         # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
-        for choice_entry in self.action_data["choices"]:
-            new_child = Button(self.scene, choice_entry["choice"])
+        #
+        # Because we the data comes from the 'template' key, we don't have a mechanism to load from the action
+        for choice_name, choice_data in self.action_data["choices"].items():
+            # Define what the button does when clicked
+            choice_data["action"] = {
+                "action": "choose_branch",
+                "branch": choice_data["branch"]
+            }
+
+            # The key is generated dynamically instead of being provided by the file
+            choice_data["key"] = choice_name
+
+            new_child = Button(self.scene, choice_data)
             self.scene.active_renderables.Add(new_child)
             new_renderable.children.append(new_child)
 
@@ -771,14 +725,14 @@ class choice(Action):
 
 class choose_branch(Action):
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        #self.LoadMetadata(__class__.__name__)
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
         if self.scene.active_renderables.Exists("Choice"):
             self.a_manager.PerformAction(
                 {"key": "Choice", "transition": {"type": "None"}},
-                "remove_container"
+                "remove_renderable"
             )
 
         self.scene.SwitchDialogueBranch(self.action_data['branch'])

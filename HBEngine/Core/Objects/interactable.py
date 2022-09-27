@@ -57,7 +57,6 @@ class Interactable(SpriteRenderable):
         print(f"Interactable created: {self.renderable_data}")
     def update(self, *args):
         super().update()
-        print("fdsf")
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             # If not already in the hover state...
