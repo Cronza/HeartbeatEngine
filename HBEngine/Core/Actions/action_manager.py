@@ -84,13 +84,16 @@ class ActionManager:
         if 'type' in transition_data:
             transition = None
 
+            # No transition specified
+            if transition_data['type'] == 'None':
+                return None
+
             available_transitions = inspect.getmembers(transitions, inspect.isclass)
             for transition, t_object in available_transitions:
                 if transition_data['type'] == transition:
                     transition = t_object
                     break
 
-            # The given transition name was not found, thus not populating 'transition' properly
             if transition is None:
                 raise ValueError("The provided transition name is invalid. Please review the available transitions, "
                                  "or add a new action object for the one provided")

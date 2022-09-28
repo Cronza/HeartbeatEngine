@@ -14,7 +14,7 @@
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.Outliner.outliner import Outliner
 
@@ -27,8 +27,8 @@ class HBEditorUI:
 
     def setupUi(self, MainWindow):
 
-        self.LoadFonts(Settings.getInstance().editor_data['EditorSettings']["fonts"])
-        self.LoadTheme(Settings.getInstance().editor_data['EditorSettings']["theme"])
+        self.LoadFonts(settings.editor_data['EditorSettings']["fonts"])
+        self.LoadTheme(settings.editor_data['EditorSettings']["theme"])
 
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
@@ -133,7 +133,7 @@ class HBEditorUI:
     def retranslateUi(self, MainWindow):
         """ Sets the text of all UI components using available translation """
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", f"Heartbeat Editor - {Settings.getInstance().user_project_name}"))
+        MainWindow.setWindowTitle(_translate("MainWindow", f"Heartbeat Editor - {settings.user_project_name}"))
 
         # 'File Menu' Actions
         self.file_menu.setTitle(_translate("MainWindow", "File"))

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.EditorDialogue.editor_dialogue_ui import EditorDialogueUI
@@ -37,6 +37,9 @@ class EditorDialogue(EditorBase):
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
+        # In case something changed in the active details and hasn't been saved, force a resave
+        #print("Forcing Resave before switching active entry")
+        #self.editor_ui.details.StoreData()
         selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
@@ -53,7 +56,6 @@ class EditorDialogue(EditorBase):
 
     def SwitchBranches(self, cur_branch, new_branch):
         """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
-
         # If there is no source branch, then there is nothing to store
         if cur_branch:
             self.StoreActiveData(cur_branch)
@@ -83,7 +85,7 @@ class EditorDialogue(EditorBase):
             # Get the actual branch entry widget instead of the containing item widget
             branch = self.editor_ui.branches.branches_list.itemWidget(self.editor_ui.branches.branches_list.item(index))
 
-            # Before we save, let's be double sure the current information in the details panel is cached properly
+            # Before we save, let's be extra sure the current information in the details panel is cached properly
             self.editor_ui.details.StoreData()
 
             # If a branch is currently active, then it's likely to of not updated its cached branch data (Only
@@ -95,6 +97,7 @@ class EditorDialogue(EditorBase):
 
             branch_name, branch_description = branch.Get()
             branch_data = branch.GetData()
+
             new_entry = {
                 "description": branch_description,
                 "entries": branch_data
@@ -120,7 +123,7 @@ class EditorDialogue(EditorBase):
                 data=data_to_export,
                 file_path=self.file_path,
                 metadata=f"# Type: {FileType.Scene_Dialogue.name}\n" +
-                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
+                f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
         except Exception as exc:
@@ -159,16 +162,11 @@ class EditorDialogue(EditorBase):
             }
 
             converted_entries = []
-            for editor_action in branch_data["entries"]:
-                converted_action = {"action": editor_action["action_name"]}
-
-                # Collect a converted dict of all requirements for this action (If any are present)
-                converted_requirements = adh.ConvertActionRequirementsToEngineFormat(editor_action)
-                if converted_requirements:
-                    converted_action.update(converted_requirements)
-
-                # Add the newly converted action
-                converted_entries.append(converted_action)
+            for entry in branch_data["entries"]:
+                # Convert the requirements for this action to the engine format before rebuilding the full entry,
+                # recreating the top level action name key in the process
+                conv_requirements = adh.ConvertActionRequirementsToEngineFormat(entry[adh.GetActionName(entry)])
+                converted_entries.append({adh.GetActionName(entry): conv_requirements})
 
             # Complete the converted branch, and add it to the new dialogue data
             converted_branch["entries"] = converted_entries
@@ -181,30 +179,25 @@ class EditorDialogue(EditorBase):
         Given a full dict of dialogue file data in engine format (branches and all), convert it to the editor format by
         rebuilding the structure based on lookups in the ActionDatabase
         """
-        #@TODO: Investigate how to speed this up. The volume of O(n) searching is worrying
         new_dialogue_data = {}
 
         for branch_name, branch_data in action_data.items():
             converted_entries = []
-            for action in branch_data["entries"]:
-                action_name = action["action"]
+            for entry in branch_data["entries"]:
+                # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
+                # the matching metadata entry and clone it
+                name = adh.GetActionName(entry)
+                metadata_entry = copy.deepcopy(settings.action_metadata[name])
 
-                # Using the name of the action, look it up in the ActionDatabase. If found, clone it
-                database_entry = None
-                for cat_name, cat_data in Settings.getInstance().action_database.items():
-                    for option in cat_data["options"]:
-                        if action_name == option['action_name']:
-                            database_entry = copy.deepcopy(option)
-                            break
-                    if database_entry:
-                        break
                 # Pass the entry by ref, and let the convert func edit it directly
                 adh.ConvertActionRequirementsToEditorFormat(
-                    editor_req=database_entry,
-                    engine_req=action
+                    metadata_entry=metadata_entry,
+                    engine_entry=entry[name]
                 )
-                converted_entries.append(database_entry)
 
+                converted_entries.append({name: metadata_entry})
+
+            # Update the branch entries with the newly converted ones
             branch_data["entries"] = converted_entries
             new_dialogue_data[branch_name] = branch_data
 

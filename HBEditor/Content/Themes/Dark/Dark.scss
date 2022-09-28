@@ -406,6 +406,10 @@ QComboBox {
         border-left-style: solid; /* just a single line */
         border-bottom-right-radius: 3px;
     }
+    &:disabled{
+        color: $col_text_read_only;
+        background-color: $col_input_inactive;
+    }
     QAbstractItemView {
         border: &size_border solid $col_primary;
         background-color: $col_tertiary;

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets, QtGui
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 
 # Useful Thread: https://stackoverflow.com/questions/50068802/pyqt-qfileiconprovider-class-custom-icons
 

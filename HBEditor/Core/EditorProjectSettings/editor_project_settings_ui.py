@@ -12,13 +12,10 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtCore
-from HBEditor.Core.settings import Settings
 from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.DataTypes.parameter_types import ParameterType
 #from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
-from HBEditor.Core.Primitives import input_entry_model_handler as iemh
+from HBEditor.Core.EditorUtilities import input_entry_model_handler as iemh
 
 
 class EditorProjectSettingsUI(EditorBaseUI):
@@ -137,9 +134,9 @@ class EditorProjectSettingsUI(EditorBaseUI):
                     "type": schema[setting_name],
                     "value": setting_data
                 }
-                print(f"Creating: {data}")
                 iemh.Add(
                     owner=self,
                     view=self.settings_tree,
-                    data=data,
+                    name=setting_name,
+                    data=data
                 )

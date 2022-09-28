@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core.settings import Settings
+from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 
 
@@ -29,14 +29,14 @@ class SpriteRenderable(Renderable):
         super().__init__(scene, renderable_data, parent)
 
         # YAML Parameters
-        sprite = Settings.getInstance().ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
+        sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
 
         try:
             self.surface = pygame.image.load(sprite).convert_alpha()
             self.rect = self.surface.get_rect()
         except Exception as exc:
-            print("Failed to load data file for Renderable - Either the file was not found, or it is not a "
-                  f"supported file type:\n{exc}\n")
+            raise ValueError(f"Failed to load sprite: '{sprite}' - Either the file was not found, or it is not a "
+                  f"supported file type") from None  # PEP 409: Suppressing exception context
 
         # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
         # to defer this though if they need to do any additional work beforehand

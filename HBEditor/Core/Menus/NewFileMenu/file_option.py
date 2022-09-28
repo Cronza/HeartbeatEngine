@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5.QtWidgets import QListWidgetItem
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 
 
 class FileOption(QListWidgetItem):

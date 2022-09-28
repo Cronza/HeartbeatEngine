@@ -291,6 +291,9 @@ QComboBox {
     border-left-style: solid;
     /* just a single line */
     border-bottom-right-radius: 3px; }
+  QComboBox:disabled {
+    color: rgba(150, 150, 150, 80%);
+    background-color: #343436; }
   QComboBox QAbstractItemView {
     border: QComboBox QAbstractItemView size_border solid #3F4245;
     background-color: #46494D;

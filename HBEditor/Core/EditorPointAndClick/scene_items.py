@@ -1,31 +1,22 @@
 import math
-
+import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities.font_manager import FontManager
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
+from HBEditor.Core.EditorUtilities import file_system_handler as fsh
 
 
 class BaseItem:
     def __init__(self):
         self.root_item = None
 
-    def FindProperty(self, action_data: dict, name: str):
-        search_term = "requirements"
-        if search_term not in action_data:
-            search_term = "children"
-
-        for req in action_data[search_term]:
-            if req["name"] == name:
-                return req
-
-        return None
-
 
 class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     """
-    A basic GraphicsItem that acts as the root of a scene_item and its descendents. It serves a few purposes:
+    A basic GraphicsItem that acts as the root of a scene_item and its descendants. It serves a few purposes:
     - It is the 'active_entry' for the details panel
     - It can easily be found when using scene.items(), which returns a 1-dimensional array of items (There is no known
     way of just getting the top-most items, so this is workaround)
@@ -37,7 +28,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
 
     def __init__(self, action_data: dict, select_func: callable, data_changed_func: callable):
         super().__init__(None)
-        self.action_data = action_data
+        self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
         self.select_func = select_func
         self.data_changed_func = data_changed_func
 
@@ -48,11 +39,13 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
                          pixmap: QtGui.QPixmap = None, text: str = "", search_term: str = "requirements"):
-        """ Recursively generate child items in the tree """
-        if not action_data:
-            action_data = self.action_data
-
-        if not parent:
+        """
+        Recursively generate child items in the tree for each item in the action_data. All items are created with
+        the full requirements data block
+        """
+        # Set values for the top-most item
+        if not action_data and not parent:
+            action_data = self.action_data[adh.GetActionName(self.action_data)][search_term]
             parent = self
 
         # In order to determine what child to spawn, we need to look through all the requirements at a given
@@ -60,14 +53,12 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         #
         # IE. {text: '', text_size: '', position: ''}. If 'text' is found, provide all 3 keys
         #
-        # Note: Only one of these can appear at any level, otherwise they'd share a data block and cause stomping
-        # issues. However, even if we find one of the terms, we keep going in case there are requirements with children
-        # which will spawn sub children, causing the process to recurse
-        recurse_indices = []
+        # Note: Only one of these can appear at any level, otherwise multiple items would share a data block and cause
+        # stomping issue
         new_item = None
-        for req_index in range(0, len(action_data[search_term])):
-            req = action_data[search_term][req_index]
-            if req["name"] == "sprite":
+
+        for req_name, req_data in action_data.items():
+            if req_name == "sprite":
                 new_item = SpriteItem(
                     action_data=action_data,  # Pass by ref
                     pixmap=pixmap
@@ -76,7 +67,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            if req["name"] == "text":
+            elif req_name == "text":
                 new_item = TextItem(
                     action_data=action_data,  # Pass by ref
                     text=text
@@ -85,25 +76,24 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            if "children" in req:
-                recurse_indices.insert(-1, req_index)
-
-        for recurse_index in recurse_indices:
-            req = action_data[search_term][recurse_index]
-            self.GenerateChildren(
-                parent=new_item,
-                action_data=req,
-                pixmap=pixmap,
-                text=text,
-                search_term="children"
-            )
+            if "children" in req_data:
+                self.GenerateChildren(
+                    parent=new_item,
+                    action_data=req_data["children"],
+                    pixmap=pixmap,
+                    text=text,
+                    search_term="children"
+                )
 
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
         # that here, use this func as a wrapper to invoke the recursive refresh funcs
+
         if change_tree:
+            print("RefreshPartial")
             self.RefreshRecursivePartial(self, change_tree)
         else:
+            print("Refresh")
             self.RefreshRecursive(self)
 
         # The root item uses the top-most child's z-order, so they both need to be updated
@@ -125,27 +115,26 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         specified in the change tree
         """
         for child in cur_target.childItems():
-            for req in child.action_data[search_term]:
-                if req["name"] == change_tree[0]:
-                    if len(change_tree) == 1:
-                        # We're at the end, so this must be it
-                        child.Refresh(change_tree[0])
+            if change_tree[0] in child.action_data:
+                if len(change_tree) == 1:
+                    # We're at the end, so this must be it
+                    child.Refresh(change_tree[0])
 
-                        # Certain changes may impact the item's 'boundingRect', which child objects rely on for their
-                        # positions. When these changes are detected, we need to fully refresh the item's children
-                        # just in case
-                        if change_tree[0] == "sprite":
-                            self.RefreshRecursiveAll(child)
+                    # Certain changes may impact the item's 'boundingRect', which child objects rely on for their
+                    # positions. When these changes are detected, we need to fully refresh the item's children
+                    # just in case
+                    if change_tree[0] == "sprite":
+                        self.RefreshRecursiveAll(child)
 
-                        return True
-                    else:
-                        # Still more to go. Recurse, removing this level from the list we're passing along
-                        del change_tree[0]
-                        self.RefreshRecursivePartial(
-                            cur_target=child,
-                            change_tree=change_tree,
-                            search_term="children"
-                        )
+                    return True
+                else:
+                    # Still more to go. Recurse, removing this level from the list we're passing along
+                    del change_tree[0]
+                    self.RefreshRecursivePartial(
+                        cur_target=child,
+                        change_tree=change_tree,
+                        search_term="children"
+                    )
         return False
 
     def UpdateZValue(self):
@@ -185,7 +174,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 scene_pos.x() / self.scene().width(),
                 scene_pos.y() / self.scene().height()
             ]
-            child.FindProperty(child.action_data, "position")["value"] = norm_range
+            child.action_data["position"]["value"] = norm_range
 
         self.data_changed_func(self)
 
@@ -193,8 +182,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
-    DEFAULT_SPRITE = ":/Sprites/Placeholder.png"
-
     def __init__(self, action_data: dict, pixmap: QtGui.QPixmap = None):
         super().__init__(pixmap)
         self.action_data = action_data
@@ -206,7 +193,6 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         self.setAcceptDrops(True)
 
     def Refresh(self, changed_entry_name: str = ""):
-
         if changed_entry_name == "position" or changed_entry_name == "":
             self.UpdatePosition()
 
@@ -230,18 +216,17 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
         # parent's coordinate system, and we typically store position data as scene coordinates. So, we need to:
         #
-        # - Take the normalize (0-1) position, and de-normalize it so we have 'scene coordinates'
+        # - Take the normalize (0-1) position, and denormalize it so we have 'scene coordinates'
         # - Convert the scene coordinates to the equivalent position in this item's coordinates
         # - Convert the item coordinates to the equivalent position in this item's parent's coordinates
         #
         # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
         # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
-        pos_data = self.FindProperty(self.action_data, "position")
-        if pos_data is not None:
+        if self.action_data["position"]["value"] is not None:
             if self.parentItem() == self.root_item:
                 scene_pos = QtCore.QPointF(
-                    float(pos_data["value"][0]) * self.scene().width(),
-                    float(pos_data["value"][1]) * self.scene().height()
+                    float(self.action_data["position"]["value"][0]) * self.scene().width(),
+                    float(self.action_data["position"]["value"][1]) * self.scene().height()
                 )
                 item_pos = self.mapFromScene(scene_pos)
                 parent_pos = self.mapToParent(item_pos)
@@ -249,65 +234,42 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
             else:
                 parent_bounds = self.parentItem().boundingRect()
                 scene_pos = QtCore.QPointF(
-                    float(pos_data["value"][0]) * parent_bounds.width(),
-                    float(pos_data["value"][1]) * parent_bounds.height()
+                    float(self.action_data["position"]["value"][0]) * parent_bounds.width(),
+                    float(self.action_data["position"]["value"][1]) * parent_bounds.height()
                 )
                 parent_pos = self.mapToParent(scene_pos)
                 self.setPos(parent_pos)
 
     def UpdateSprite(self):
-        sprite_path = self.DEFAULT_SPRITE
-        sprite_rel_path = self.FindProperty(self.action_data, "sprite")
-        if sprite_rel_path is not None:
-            if sprite_rel_path["value"] != "None":
-                sprite_path = f"{Settings.getInstance().user_project_dir}/{sprite_rel_path['value']}"
-
-            image = QtGui.QPixmap(sprite_path)  # If the file does not exist, it will create a null pixmap
-            if not image.isNull():
-                self.setPixmap(image)
-            else:
-                Logger.getInstance().Log(f"File does not Exist: '{sprite_path}' - Loading default sprite", 3)
-                image = QtGui.QPixmap(self.DEFAULT_SPRITE)
-                self.setPixmap(image)
+        image = QtGui.QPixmap(fsh.ResolveImageFilePath(self.action_data["sprite"]["value"]))
+        self.setPixmap(image)
 
     def UpdateZOrder(self):
-        z_order = self.FindProperty(self.action_data, "z_order")
-        if z_order is not None:
-            self.setZValue(float(z_order["value"]))
+        self.setZValue(float(self.action_data["z_order"]["value"]))
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
-        in_use = self.FindProperty(self.action_data, "center_align")
-        if in_use is not None:
-            if in_use:
-                if in_use["value"]:
-                    new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
-                    self.is_centered = True
-                else:
-                    self.is_centered = False
-            else:
-                self.is_centered = False
+        if self.action_data["center_align"]["value"]:
+            new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+            self.is_centered = True
+        else:
+            self.is_centered = False
 
     def UpdateFlip(self, new_transform: QtGui.QTransform):
-        in_use = self.FindProperty(self.action_data, "flip")
-        if in_use is not None:
-            if in_use:
-                if in_use["value"]:
-                    # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
-                    # fact you can't change the origin, we have a hard dependency on knowing whether center align
-                    # is active, so we know how to counter the movement from the scaling
-                    if self.is_centered:
-                        # We need to reverse the movement from center_align in the X (we don't flip in the Y).
-                        # m31 represents the amount of horizontal translation that has been applied so far
-                        new_transform.translate(-new_transform.m31() * 2, 0)
-                    else:
-                        new_transform.translate(self.boundingRect().width(), 0)
-
-                    new_transform.scale(-1, 1)
-                    self.is_flipped = True
-                else:
-                    self.is_flipped = False
+        if self.action_data["flip"]["value"]:
+            # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
+            # fact you can't change the origin, we have a hard dependency on knowing whether center align
+            # is active, so we know how to counter the movement from the scaling
+            if self.is_centered:
+                # We need to reverse the movement from center_align in the X (we don't flip in the Y).
+                # m31 represents the amount of horizontal translation that has been applied so far
+                new_transform.translate(-new_transform.m31() * 2, 0)
             else:
-                self.is_flipped = False
+                new_transform.translate(self.boundingRect().width(), 0)
+
+            new_transform.scale(-1, 1)
+            self.is_flipped = True
+        else:
+            self.is_flipped = False
 
     def Select(self):
         """ Add this object and all children to the active selection """
@@ -317,8 +279,6 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
 
 
 class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
-    DEFAULT_FONT = ":/Fonts/Comfortaa-Regular.ttf"
-
     def __init__(self, action_data: dict, text: str = "Default"):
         super().__init__(text)
         self.action_data = action_data
@@ -354,10 +314,6 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         if changed_entry_name == "z_order" or changed_entry_name == "":
             self.UpdateZOrder()
 
-
-
-
-
         # Any changes that require a transform adjustment requires all others be updated as well
         if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "":
             self.resetTransform()
@@ -365,39 +321,17 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
 
             self.UpdateCenterAlign(new_transform)
 
-            #
-
-            metrics = QtGui.QFontMetricsF(self.font())
-            normal_rect = metrics.boundingRect(self.toPlainText())
-            tight_rect = metrics.tightBoundingRect(self.toPlainText())
+            #@TODO: The engine and editor differ on text spacing, and the following code is experimental towards fixing it
+            #metrics = QtGui.QFontMetricsF(self.font())
+            #normal_rect = metrics.boundingRect(self.toPlainText())
+            #tight_rect = metrics.tightBoundingRect(self.toPlainText())
             #print(self.toPlainText())
             #print(f"Normal: {normal_rect}")
             #print(f"Tight: {tight_rect}")
             #print(f"Height: {metrics.height()}")
             #print("\n")
-            """
-            new_transform.translate(
-                0,
-                (metrics.tightBoundingRect(self.toPlainText()).height() - metrics.boundingRect(self.toPlainText()).height()) / 2
-            )
-            
-            print(f"Normal after: {normal_rect}")
-            #"""
-            #
-            self.setTransform(new_transform)
 
-    """
-    def boundingRect(self) -> QtCore.QRectF:
-        metrics = QtGui.QFontMetricsF(self.font())
-        text = self.FindProperty(self.action_data, "text")["value"]
-        print(text)
-        text = "Default"
-        #return super().boundingRect()
-        #print(super().boundingRect())
-        #print(metrics.tightBoundingRect(text))
-        #return metrics.tightBoundingRect(self.toPlainText())
-        return QtCore.QRectF(0, 0, 100, 100)
-    """
+            self.setTransform(new_transform)
 
     def UpdatePosition(self):
         # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
@@ -409,13 +343,11 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         #
         # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
         # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
-        pos_data = self.FindProperty(self.action_data, "position")
-
-        if pos_data is not None:
+        if self.action_data["position"]["value"] is not None:
             if self.parentItem() == self.root_item:
                 scene_pos = QtCore.QPointF(
-                    float(pos_data["value"][0]) * self.scene().width(),
-                    float(pos_data["value"][1]) * self.scene().height()
+                    float(self.action_data["position"]["value"][0]) * self.scene().width(),
+                    float(self.action_data["position"]["value"][1]) * self.scene().height()
                 )
                 item_pos = self.mapFromScene(scene_pos)
                 parent_pos = self.mapToParent(item_pos)
@@ -423,79 +355,45 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             else:
                 parent_bounds = self.parentItem().boundingRect()
                 parent_pos = QtCore.QPointF(
-                    float(pos_data["value"][0]) * parent_bounds.width(),
-                    float(pos_data["value"][1]) * parent_bounds.height()
+                    float(self.action_data["position"]["value"][0]) * parent_bounds.width(),
+                    float(self.action_data["position"]["value"][1]) * parent_bounds.height()
                 )
                 self.setPos(parent_pos)
 
-
     def UpdateText(self):
-        text = self.FindProperty(self.action_data, "text")
-
-        if text is not None:
-            if not text["value"]:
-                text["value"] = "Default"
-            self.setPlainText(text["value"])
+        if self.action_data["text"]["value"] == "" or self.action_data["text"]["value"].lower() == "none":
+            self.action_data["text"]["value"] = "Default"
+        else:
+            self.setPlainText(self.action_data["text"]["value"])
 
     def UpdateTextSize(self):
-        text_size = self.FindProperty(self.action_data, "text_size")
+        # Enforce a minimum text size
+        if self.action_data["text_size"]["value"] < 1:
+            self.action_data["text_size"]["value"] = 1
 
-        if text_size is not None:
-            # Enforce a minimum text size
-            if text_size["value"] < 1:
-                text_size["value"] = 1
-
-            cur_font = self.font()
-            cur_font.setPixelSize(text_size["value"])
-            self.setFont(cur_font)
+        cur_font = self.font()
+        cur_font.setPixelSize(self.action_data["text_size"]["value"])
+        self.setFont(cur_font)
 
     def UpdateFont(self):
-        font = self.FindProperty(self.action_data, "font")
-        if font is not None:
-            font = font["value"]
-            new_font = None
-            if font == "None" or not font:
-                font = self.DEFAULT_FONT
-                new_font = FontManager.LoadCustomFont(font)
-
-            # @ TODO: Review whether this is the optimal way of differentiating this case and the next one
-            elif font.startswith("Content"):
-                # This is likely a real path
-                font = f"{Settings.getInstance().user_project_dir}/{font}"
-                new_font = FontManager.LoadCustomFont(font)
-            else:
-                # This might be the user trying to load a system font
-                split_str = font.split("|", 1)
-                if len(split_str) == 2:
-                    new_font = FontManager.LoadFont(split_str[0], split_str[1])  # Format: <name> <style>
-                else:
-                    new_font = FontManager.LoadFont(split_str[0])
-
-            if new_font:
-                self.setFont(new_font)
+        new_font = FontManager.LoadCustomFont(fsh.ResolveFontFilePath(self.action_data["font"]["value"]))
+        self.setFont(new_font)
 
     def UpdateTextColor(self):
-        color = self.FindProperty(self.action_data, "text_color")
-
-        if color is not None:
-            self.setDefaultTextColor(QtGui.QColor(color["value"][0], color["value"][1], color["value"][2]))
+        color = self.action_data["text_color"]["value"]
+        self.setDefaultTextColor(QtGui.QColor(color[0], color[1], color[2]))
 
     def UpdateZOrder(self):
-        z_order = self.FindProperty(self.action_data, "z_order")
-        if z_order is not None:
-            self.setZValue(float(z_order["value"]))
+        #print(self.action_data)
+        self.setZValue(float(self.action_data["z_order"]["value"]))
+        #print("Post z_order change")
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
-        in_use = self.FindProperty(self.action_data, "center_align")
-        if in_use is not None:
-            if in_use:
-                if in_use["value"]:
-                    new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
-                    self.is_centered = True
-                else:
-                    self.is_centered = False
-            else:
-                self.is_centered = False
+        if self.action_data["center_align"]["value"]:
+            new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+            self.is_centered = True
+        else:
+            self.is_centered = False
 
     def Select(self):
         """ Add this object and all children to the active selection """

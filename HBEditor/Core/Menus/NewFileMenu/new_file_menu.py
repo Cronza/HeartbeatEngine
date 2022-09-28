@@ -14,7 +14,7 @@
 """
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Menus.base_popup_menu import BasePopupMenu
 from HBEditor.Core.Menus.NewFileMenu.file_option import FileOption
 from HBEditor.Core.DataTypes.file_types import FileType

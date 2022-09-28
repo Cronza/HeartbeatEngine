@@ -15,9 +15,10 @@
 import re
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 
 """
@@ -234,7 +235,7 @@ class InputEntryFileSelector(InputEntryBase):
         """ Prompts the user with a filedialog, accepting an existing file """
         prompt = FileSystemPrompt(self.details_panel)
         existing_file = prompt.GetFile(
-            Settings.getInstance().GetProjectContentDirectory(),
+            settings.GetProjectContentDirectory(),
             self.type_filter,
             "Choose a File to Open"
         )
@@ -244,7 +245,7 @@ class InputEntryFileSelector(InputEntryBase):
             selected_dir = existing_file
 
             # Remove the project dir from the path, so that the selected dir only contains a relative path
-            selected_dir = selected_dir.replace(Settings.getInstance().user_project_dir + "/", "")
+            selected_dir = selected_dir.replace(settings.user_project_dir + "/", "")
             self.input_widget.setText(selected_dir)
 
 
@@ -457,12 +458,13 @@ class InputEntryTuple(InputEntryBase):
 class InputEntryArray(InputEntryBase):
     """
     A highly specialized container that allows the generation of child entries based on a template defined in
-    the ActionsDatabase
+    the actions_metadata
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, refresh_func: callable,
                  excluded_properties: dict = None):
         super().__init__(data)
+
         self.excluded_properties = excluded_properties
         self.owning_view = owning_view
 
@@ -481,46 +483,58 @@ class InputEntryArray(InputEntryBase):
         self.add_item_button.clicked.connect(lambda: self.AddItems())
         self.main_layout.addWidget(self.add_item_button)
 
-    def AddItems(self, data=None, parent=None):
-        if self.owning_model_item.childCount() >= self.child_limit:
+    def AddItems(self, name="", data=None, parent=None):
+        if self.owning_model_item.childCount() >= self.child_limit and not data:  # Don't run when recursing
             Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
             if not data:
                 data = copy.deepcopy(self.data["template"])
+
+                # Array elements have generated names to avoid having to be stored as a list when caching or saving
+                name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
+
             if not parent:
                 parent = self.owning_model_item
 
-            #@TODO: Investigate how to incorporate this functionality with saving / loading
+            data_no_key = data[adh.GetActionName(data)]
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
-                data=data,
+                name=name,
+                data=data_no_key,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
                 signal_func=self.signal_func,
                 refresh_func=self.refresh_func
             )
+            if "children" in data_no_key:
+                for child_name, child_data in data_no_key["children"].items():
+                    if "editable" in child_data:
+                        if not child_data["editable"]:
+                            continue
 
-            if "children" in data:
-                for child_data in data["children"]:
-                    self.AddItems(child_data, new_entry)
+                    self.AddItems(child_name, {child_name: child_data}, new_entry)
 
         # Inform the owning U.I that we've added a child outside it's purview
         self.refresh_func(self.owning_model_item)
 
 
 class InputEntryArrayElement(InputEntryBase):
-    SIG_USER_DELETE = QtCore.pyqtSignal(object)
+    SIG_USER_DELETE = QtCore.pyqtSignal(object, object)
 
-    def __init__(self, data):
+    def __init__(self, data, owning_view: QtWidgets.QAbstractItemView):
         super().__init__(data)
+
+        # Store a reference to the owning view in order to inform it when we're deleted, so the parent InputEntryArray
+        # can recalculate its entries
+        self.owning_view = owning_view
 
         # Delete button
         self.delete_button = QtWidgets.QToolButton()
         self.delete_button.setObjectName("choice-remove")
         self.main_layout.addWidget(self.delete_button)
 
-        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item))
+        self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item, self.owning_view))
 
 
 class InputEntryResolution(InputEntryBase):
@@ -546,7 +560,7 @@ class InputEntryResolution(InputEntryBase):
             self.input_widget.addItem(str(option))
 
         # Use the value of the "Int" widget mentioned in the class docstring to switch the active option
-        self.input_widget.setCurrentIndex(Settings.getInstance().user_project_data["Window"]["resolution"])
+        self.input_widget.setCurrentIndex(settings.user_project_data["Window"]["resolution"])
 
         self.main_layout.addWidget(self.input_widget)
 
@@ -559,6 +573,6 @@ class InputEntryResolution(InputEntryBase):
         # index value.
         #
         # To account for this, let's store the index value before we return the list of options
-        Settings.getInstance().user_project_data["Window"]["resolution"] = self.input_widget.currentIndex()
+        settings.user_project_data["Window"]["resolution"] = self.input_widget.currentIndex()
 
         return self.data

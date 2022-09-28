@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.BaseClasses.base_editor import EditorBase
 from HBEditor.Core.EditorProjectSettings.editor_project_settings_ui import EditorProjectSettingsUI
@@ -29,7 +29,7 @@ class EditorProjectSettings(EditorBase):
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
         self.project_settings_schema = Reader.ReadAll(
-            Settings.getInstance().ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
+            settings.ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
         )
 
         self.editor_ui = EditorProjectSettingsUI(self)
@@ -49,11 +49,11 @@ class EditorProjectSettings(EditorBase):
                 self.project_settings,
                 self.file_path,
                 f"# Type: {FileType.Project_Settings.name}\n" +
-                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
+                f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
         except:
             Logger.getInstance().Log("Failed to Export!", 4)
 
         # Reload the project settings
-        Settings.getInstance().LoadProjectSettings()
+        settings.LoadProjectSettings()

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from datetime import datetime
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QFont
 from HBEditor.Core.Logger.logger_ui import LoggerUI

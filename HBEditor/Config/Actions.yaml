@@ -1,0 +1,38 @@
+Renderables:
+  icon: ":/Icons/Renderable.png"
+  options:
+    - name: "create_sprite"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click
+    - name: "create_background"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click
+    - name: "create_text"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click
+    - name: "remove_renderable"
+      applicable_editors:
+        - Scene_Dialogue
+
+Interactables:
+  icon: ":/Icons/Renderable.png"
+  options:
+    - name: "create_button"
+      applicable_editors:
+        - Scene_Point_And_Click
+
+Dialogue:
+  icon: ":/Icons/Dialogue.png"
+  options:
+    - name: "create_dialogue_interface"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "dialogue"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "choice"
+      applicable_editors:
+        - Scene_Dialogue

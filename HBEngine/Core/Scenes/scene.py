@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core.settings import Settings
+from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable_group import RenderableGroup
 from HBEngine.Core.Actions.action_manager import ActionManager
 from Tools.HBYaml.hb_yaml import Reader
@@ -35,7 +35,7 @@ class Scene:
         self.delta_time = 0
 
         # Read in the active scene data
-        self.scene_data = Reader.ReadAll(Settings.getInstance().ConvertPartialToAbsolutePath(scene_data_file))
+        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:
@@ -46,7 +46,6 @@ class Scene:
         self.LoadSceneData()
 
     def Update(self, events):
-        print(self.active_renderables.Get())
         self.active_renderables.Update()
         self.a_manager.Update(events)
 
@@ -86,8 +85,8 @@ class Scene:
         """ Determines a new sprite size based on the difference between the main resolution and the new resolution """
 
         # Generate the new screen size scale multiplier, then cache it in the scene manager in case scenes change
-        new_resolution = Settings.getInstance().resolution_options[Settings.getInstance().resolution]
-        self.resolution_multiplier = self.CalculateScreenSizeMultiplier(Settings.getInstance().main_resolution, new_resolution)
+        new_resolution = settings.resolution_options[settings.resolution]
+        self.resolution_multiplier = self.CalculateScreenSizeMultiplier(settings.main_resolution, new_resolution)
         self.scene_manager.resolution_multiplier = self.resolution_multiplier
 
         # Inform each renderable of the resolution change so they can update their respective elements
