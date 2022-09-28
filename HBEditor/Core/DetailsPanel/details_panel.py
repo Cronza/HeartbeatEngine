@@ -73,9 +73,14 @@ class DetailsPanel(QtWidgets.QWidget):
         """ Fill out the details tree based on the active entry's action data """
         if selected_entry is not self.active_entry:
             self.StoreData()
+
         self.active_entry = selected_entry
 
         self.Clear()
+
+        # Create an entry for all items within the action_data
+        # Note: This provides data to each by reference, so any changes made to data stored in each details entry
+        # propagates directly back to the main entry
         self.AddItems(adh.GetActionRequirements(self.active_entry.action_data))
 
         self.details_tree.expandAll()
@@ -120,18 +125,21 @@ class DetailsPanel(QtWidgets.QWidget):
         if global_checkbox:
             global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
-    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None, initial_iter: bool = True) -> list:
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None, initial_iter: bool = True) -> dict:
         """
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
         """
+
         if self.active_entry:
             data_to_store = {}
 
             if not parent:
                 parent = self.details_tree.invisibleRootItem()
 
-            for entry_index in range(0, parent.childCount()):
+            for entry_index in range(0, parent.childCount()): #@TODO: THis can't store the data of uneditable entries as they are never added to the details panel to begin with
+                # Each entry is assigned data as reference to the original entry. Any changes we make will propagate
+                # directly back to that entry
                 entry = parent.child(entry_index)
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
@@ -141,13 +149,11 @@ class DetailsPanel(QtWidgets.QWidget):
                     entry_data["global_active"] = global_checkbox.Get()
 
                 if entry.childCount() > 0:
-                    entry_data["children"] = self.StoreData(entry, False)
+                    # We do an update here as not all items within the action_data were displayed (uneditable details
+                    # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
+                    entry_data["children"].update(self.StoreData(entry, False))
 
                 data_to_store[entry_name] = entry_data
-
-            #if initial_iter and data_to_store:
-            #    reqs = adh.GetActionRequirements(self.active_entry.action_data)
-            #    reqs = data_to_store
 
             return data_to_store
 

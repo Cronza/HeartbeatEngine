@@ -48,9 +48,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             action_data = self.action_data[adh.GetActionName(self.action_data)][search_term]
             parent = self
 
-
-        #@TODO: This is generating with ref, which causes new items to inherit existing item changes
-
         # In order to determine what child to spawn, we need to look through all the requirements at a given
         # level, and see if certain names appear. If they do, we give them the full data block
         #
@@ -59,6 +56,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # Note: Only one of these can appear at any level, otherwise multiple items would share a data block and cause
         # stomping issue
         new_item = None
+
         for req_name, req_data in action_data.items():
             if req_name == "sprite":
                 new_item = SpriteItem(
@@ -90,9 +88,12 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
         # that here, use this func as a wrapper to invoke the recursive refresh funcs
+
         if change_tree:
+            print("RefreshPartial")
             self.RefreshRecursivePartial(self, change_tree)
         else:
+            print("Refresh")
             self.RefreshRecursive(self)
 
         # The root item uses the top-most child's z-order, so they both need to be updated
@@ -192,7 +193,6 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         self.setAcceptDrops(True)
 
     def Refresh(self, changed_entry_name: str = ""):
-
         if changed_entry_name == "position" or changed_entry_name == "":
             self.UpdatePosition()
 
@@ -241,13 +241,11 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
                 self.setPos(parent_pos)
 
     def UpdateSprite(self):
-        sprite_path = ""
         image = QtGui.QPixmap(fsh.ResolveImageFilePath(self.action_data["sprite"]["value"]))
         self.setPixmap(image)
 
     def UpdateZOrder(self):
-        if self.action_data["z_order"]["value"] is not None:
-            self.setZValue(float(self.action_data["z_order"]["value"]))
+        self.setZValue(float(self.action_data["z_order"]["value"]))
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
         if self.action_data["center_align"]["value"]:
@@ -281,8 +279,6 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
 
 
 class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
-    DEFAULT_FONT = ":/Fonts/Comfortaa-Regular.ttf"
-
     def __init__(self, action_data: dict, text: str = "Default"):
         super().__init__(text)
         self.action_data = action_data
@@ -364,7 +360,6 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
                 )
                 self.setPos(parent_pos)
 
-
     def UpdateText(self):
         if self.action_data["text"]["value"] == "" or self.action_data["text"]["value"].lower() == "none":
             self.action_data["text"]["value"] = "Default"
@@ -389,7 +384,9 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.setDefaultTextColor(QtGui.QColor(color[0], color[1], color[2]))
 
     def UpdateZOrder(self):
+        #print(self.action_data)
         self.setZValue(float(self.action_data["z_order"]["value"]))
+        #print("Post z_order change")
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
         if self.action_data["center_align"]["value"]:
