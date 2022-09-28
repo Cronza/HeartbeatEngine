@@ -281,7 +281,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         self.subtext_widget.setText(self.CompileSubtextString(adh.GetActionRequirements(self.action_data)))
 
     def CompileSubtextString(self, req_data):
-        """ Given a list of requirements from the ActionsDatabase file, compile them into a user-friendly string """
+        """ Given a list of requirements from the actions_metadata file, compile them into a user-friendly string """
         #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
         for name, data in req_data.items():

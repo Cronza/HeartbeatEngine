@@ -24,9 +24,9 @@ from HBEditor.Core.Menus.ActionMenu.action_menu_option import ActionMenuOption
 class ActionMenu(QtWidgets.QMenu):
     """
     A generic menu of categories and actions that the active editor can use. 'button' func is used when any menu option
-    is clicked. 'available_actions' is a set of actions pulled from the ActionsDatabase that will represent what's available
+    is clicked. 'available_actions' is a set of actions pulled from the action_metadata that will represent what's available
     in the menu
-    """ #@TODO: Update this docstring11 (Whichever mention sapplicatible editors)
+    """
     def __init__(self, button_func, editor_type: FileType):
         super().__init__()
 
