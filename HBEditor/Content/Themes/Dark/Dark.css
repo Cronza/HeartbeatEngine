@@ -26,18 +26,17 @@ QWidget {
   font-family: "Cabin";
   font-size: 9pt; }
 
-QWidget
 QToolBar {
   icon-size: 18px;
   /* maximum icon size */
   background-color: #3F4245;
   border-top: 1px solid #2A2A2B; }
-  QWidget
-QToolBar QToolButton {
-    padding: 2px;
-    border: 0px solid transparent; }
-  QWidget
-QToolBar#logger {
+  QToolBar:separator {
+    background-color: #2A2A2B;
+    height: 1px;
+    margin-top: 2px;
+    margin-bottom: 2px; }
+  QToolBar#logger {
     /* The logger is pressed against another border above it */
     border-top: 0px solid transparent; }
 
@@ -380,3 +379,6 @@ QWidget[model-entry="text-warning"] {
 
 QWidget[model-entry="text-error"] {
   color: rgba(204, 51, 0, 100%); }
+
+QWidget[toggleable-action="toggled"] {
+  background-color: #2D5373; }

@@ -48,6 +48,7 @@
         <file alias="Arrow_Down_Hover.png">Icons/Arrow_Down_Hover.png</file>
         <file alias="Arrow_Right.png">Icons/Arrow_Right.png</file>
         <file alias="Arrow_Right_Hover.png">Icons/Arrow_Right_Hover.png</file>
+        <file alias="Lock.png">Icons/Lock.png</file>
     </qresource>
     <qresource prefix="Themes">
         <file alias="Dark.css">Themes/Dark/Dark.css</file>

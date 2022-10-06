@@ -21,9 +21,12 @@ from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
 #from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
 from HBEditor.Core.EditorPointAndClick.scene_items import RootItem
+from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 
 
 class SceneViewer(QtWidgets.QWidget):
+    #SIG_ACTIVE_SELECTION_LOCKED = QtCore.pyqtSignal(bool)
+
     """
     The core scene viewer for the Point & Click editor. Allows the user to build scenes with interactable &
     non-interactable objects
@@ -33,6 +36,11 @@ class SceneViewer(QtWidgets.QWidget):
 
         #@TODO: Rename this to 'owner' to be more explicit
         self.core = core
+
+        # Some U.I elements need to be informed when certain changes happen within the scene (IE. selection change,
+        # state change, etc). They can register by adding themselves to a list which is iterated anytime a notable
+        # change occurs
+        self.change_listeners = []
 
         self.viewer_size = (1280, 720)
 
@@ -79,6 +87,15 @@ class SceneViewer(QtWidgets.QWidget):
             self.CopyRenderable
         )
 
+        self.action_toolbar.addSeparator()
+
+        self.lock_button = ToggleableAction(
+            "Lock Entry",
+            QtGui.QIcon(":/Icons/Lock.png")
+        )
+        self.lock_button.clicked.connect(self.LockRenderable)
+        self.action_toolbar.addWidget(self.lock_button)
+
         self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
         self.view = SceneView(self.scene)
 
@@ -94,8 +111,7 @@ class SceneViewer(QtWidgets.QWidget):
         """ Add an item to the scene view """
         new_item = RootItem(
             action_data=action_data,
-            select_func=self.core.UpdateActiveSceneItem,
-            data_changed_func=self.core.UpdateDetails
+            select_func=self.UpdateActiveSceneItem
         )
 
         self.scene.addItem(new_item)
@@ -117,10 +133,30 @@ class SceneViewer(QtWidgets.QWidget):
             for item in selected_items:
                 self.AddRenderable(copy.deepcopy(item.action_data))
 
+    def LockRenderable(self):
+        """ Toggles the locked state of the selected items, preventing their movement with the cursor """
+        selected_items = self.GetSelectedItems()
+        lock = True
+        if selected_items:
+            # Since locking multiple objects at once is supported,  there is a possibility where each selected object
+            # has a different lock state (Some locked, some not). In these cases, we need to preprocess the selected
+            # items and see if any are locked. If any are locked, then we should unlock them all
+            for item in selected_items:
+                if item.GetLocked():
+                    lock = False
+                    break
+
+            for item in selected_items:
+                item.SetLocked(lock)
+
+            # Refresh the lock button state
+            if lock:
+                self.lock_button.Toggle(True)
+            else:
+                self.lock_button.Toggle(False)
 
     def GetSelectedItems(self):
         """ Returns all currently selected QGraphicsItems. If there aren't any, returns None """
-
         selected_items = self.scene.selectedItems()
         if not selected_items:
             return None
@@ -135,8 +171,26 @@ class SceneViewer(QtWidgets.QWidget):
             for item in selected_items:
                 self.scene.removeItem(item)
 
-            self.core.UpdateActiveSceneItem()
+            self.core.UpdateActiveSceneItem(selected_items)
 
     def GetSceneItems(self) -> List[RootItem]:
         """ Returns a list of all RootItems in the SceneView """
         return [item for item in self.scene.items() if isinstance(item, RootItem)]
+
+    def UpdateActiveSceneItem(self):
+        # @TODO: Investigate double details refresh when switching scene item selections
+        # NOTE: This occurs twice when switching selections, first by deselecting the active entry,
+        # and then selecting the second while there is no selection
+
+        selected_items = self.GetSelectedItems()
+
+        if selected_items:
+            for item in selected_items:
+                if item.GetLocked():
+                    self.lock_button.Toggle(True)
+                    break
+        else:
+            self.lock_button.Toggle(False)
+
+        # Inform the core so it can take additional actions
+        self.core.UpdateActiveSceneItem(selected_items)

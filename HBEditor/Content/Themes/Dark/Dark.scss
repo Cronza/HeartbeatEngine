@@ -61,20 +61,24 @@ QWidget{
     font-family: "Cabin";
     font-size: $size_text;
 }
-QWidget
+
 QToolBar{
     icon-size: $size_icon; /* maximum icon size */
     background-color: $col_primary;
     border-top: $size_border solid $col_secondary;
 
-    QToolButton{
-    padding: 2px;
-        border: 0px solid transparent;
+    &:separator{
+        background-color: $col_secondary;
+        height: 1px;
+        margin-top: 2px;
+        margin-bottom: 2px;
     }
 
     &#logger{ /* The logger is pressed against another border above it */
         border-top: 0px solid transparent;
     }
+
+
 }
 QToolButton{
     background-color: $col_primary;
@@ -518,4 +522,9 @@ QWidget[model-entry="text-warning"]{
 }
 QWidget[model-entry="text-error"]{
     color: rgba(204, 51, 0, 1.0);
+}
+
+
+QWidget[toggleable-action="toggled"]{
+    background-color: $col_button_hover;
 }

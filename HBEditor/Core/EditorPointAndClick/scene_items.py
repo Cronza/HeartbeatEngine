@@ -26,16 +26,28 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     happen. When selecting this object, all children are recursively selected as well to allow grouped movement
     """
 
-    def __init__(self, action_data: dict, select_func: callable, data_changed_func: callable):
+    def __init__(self, action_data: dict, select_func: callable):
         super().__init__(None)
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
         self.select_func = select_func
-        self.data_changed_func = data_changed_func
 
         self.setFlag(self.ItemIsMovable)
         self.setFlag(self.ItemIsSelectable)
         self.setFlag(self.ItemSendsGeometryChanges)
         self.setAcceptDrops(True)
+
+        self._locked = False
+
+    def GetLocked(self):
+        return self._locked
+
+    def SetLocked(self, state: bool):
+        self._locked = state
+
+        if state:
+            self.setFlags(self.flags() & ~self.ItemIsMovable)
+        else:
+            self.setFlags(self.flags() | self.ItemIsMovable)
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
                          pixmap: QtGui.QPixmap = None, text: str = "", search_term: str = "requirements"):
@@ -176,7 +188,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             ]
             child.action_data["position"]["value"] = norm_range
 
-        self.data_changed_func(self)
+        self.select_func()
 
         super().mouseReleaseEvent(event)
 
@@ -384,9 +396,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.setDefaultTextColor(QtGui.QColor(color[0], color[1], color[2]))
 
     def UpdateZOrder(self):
-        #print(self.action_data)
         self.setZValue(float(self.action_data["z_order"]["value"]))
-        #print("Post z_order change")
 
     def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
         if self.action_data["center_align"]["value"]:
