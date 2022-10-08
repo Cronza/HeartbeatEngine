@@ -34,6 +34,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         self.setFlag(self.ItemIsMovable)
         self.setFlag(self.ItemIsSelectable)
         self.setFlag(self.ItemSendsGeometryChanges)
+
         self.setAcceptDrops(True)
 
         self._locked = False
@@ -157,22 +158,15 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         return self.childrenBoundingRect()
 
     def paint(self, painter, style, widget=None) -> None:
-        pass
-
-    def itemChange(self, change, value):
-        """
-        OVERRIDE: Called when the item has a change made to it
-        """
-        if change == QtWidgets.QGraphicsItem.ItemSelectedHasChanged:
-            self.select_func()
-
-        return super().itemChange(change, value)
+        if self.isSelected():
+            # Draw a selection border
+            pen = painter.pen()
+            pen.setColor(QtGui.QColor(45, 83, 115))
+            pen.setWidth(3)
+            painter.setPen(pen)
+            painter.drawRect(self.boundingRect())
 
     def mouseReleaseEvent(self, event) -> None:
-        """
-        OVERRIDE: When the user releases the mouse (presumably after a drag), update the recorded position of
-        all children
-        """
         for child in self.childItems():
             # Always store a normalized position value between 0-1
             #
@@ -187,8 +181,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 scene_pos.y() / self.scene().height()
             ]
             child.action_data["position"]["value"] = norm_range
-
-        self.select_func()
 
         super().mouseReleaseEvent(event)
 

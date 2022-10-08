@@ -70,8 +70,8 @@ QToolBar{
     &:separator{
         background-color: $col_secondary;
         height: 1px;
-        margin-top: 2px;
-        margin-bottom: 2px;
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
 
     &#logger{ /* The logger is pressed against another border above it */
@@ -283,6 +283,7 @@ QGraphicsView{
         border-right: 0px solid transparent;
     }
 }
+
 QAbstractScrollArea{
     &selected:item{
         border: 0px solid transparent;

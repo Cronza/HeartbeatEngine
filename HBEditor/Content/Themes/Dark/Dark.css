@@ -34,8 +34,8 @@ QToolBar {
   QToolBar:separator {
     background-color: #2A2A2B;
     height: 1px;
-    margin-top: 2px;
-    margin-bottom: 2px; }
+    margin-top: 4px;
+    margin-bottom: 4px; }
   QToolBar#logger {
     /* The logger is pressed against another border above it */
     border-top: 0px solid transparent; }
