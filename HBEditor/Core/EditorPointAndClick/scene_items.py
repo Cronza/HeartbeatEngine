@@ -37,18 +37,31 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
 
         self.setAcceptDrops(True)
 
-        self._locked = False
+        self._movement_locked = False  # User controlled
+        self._movement_perm_locked = False  # System enforced - Disables the usage of 'movement_locked'
 
     def GetLocked(self):
-        return self._locked
+        if self._movement_perm_locked:
+            return self._movement_perm_locked
+        else:
+            return self._movement_locked
 
-    def SetLocked(self, state: bool):
-        self._locked = state
+    def SetLocked(self, state: bool) -> bool:
+        """
+        Updates the locked state of the item. Return whether the operation was performed successfully
 
+        If the item is permanently locked, then always return False
+        """
+        if self._movement_perm_locked:
+            return False
+
+        self._movement_locked = state
         if state:
             self.setFlags(self.flags() & ~self.ItemIsMovable)
         else:
             self.setFlags(self.flags() | self.ItemIsMovable)
+
+        return True
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
                          pixmap: QtGui.QPixmap = None, text: str = "", search_term: str = "requirements"):
@@ -60,6 +73,14 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         if not action_data and not parent:
             action_data = self.action_data[adh.GetActionName(self.action_data)][search_term]
             parent = self
+
+            # Some properties have special implications on usability within the editor (IE. position being uneditable
+            # could apply a lock which prevents user control). Apply these effects only based on the data
+            # from the top-most item
+            if "position" in action_data:
+                if not action_data['position']['editable']:
+                    self.SetLocked(True)
+                    self._movement_perm_locked = True
 
         # In order to determine what child to spawn, we need to look through all the requirements at a given
         # level, and see if certain names appear. If they do, we give them the full data block

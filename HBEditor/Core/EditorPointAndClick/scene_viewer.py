@@ -19,7 +19,6 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
-#from HBEditor.Core.EditorPointAndClick.scene_items import SpriteItem, TextItem
 from HBEditor.Core.EditorPointAndClick.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 
@@ -107,8 +106,8 @@ class SceneViewer(QtWidgets.QWidget):
         
         self.view.show()
 
-    def AddRenderable(self, action_data) -> bool:
-        """ Add an item to the scene view """
+    def AddRenderable(self, action_data) -> RootItem:
+        """ Add an item to the scene view. Return the newly created item """
         new_item = RootItem(
             action_data=action_data,
             select_func=self.UpdateActiveSceneItem
@@ -123,34 +122,36 @@ class SceneViewer(QtWidgets.QWidget):
         # Note: The root only ever has a single child
         new_item.UpdateZValue()
 
-        return False
+        return new_item
 
     def CopyRenderable(self):
         """ Clones the active renderable, adding it to the scene view. If multiple are selected, clone each one """
-        if self.scene:
-            selected_items = self.scene.selectedItems()
+        selected_items = self.scene.selectedItems()
 
-            if selected_items:
-                for item in selected_items:
-                    self.AddRenderable(copy.deepcopy(item.action_data))
+        if selected_items:
+            for item in selected_items:
+                self.AddRenderable(copy.deepcopy(item.action_data))
 
     def LockRenderable(self):
         """ Toggles the locked state of the selected items, preventing their movement with the cursor """
-        if self.scene:
-            selected_items = self.scene.selectedItems()
-            lock = True
-            if selected_items:
-                # Since locking multiple objects at once is supported,  there is a possibility where each selected object
-                # has a different lock state (Some locked, some not). In these cases, we need to preprocess the selected
-                # items and see if any are locked. If any are locked, then we should unlock them all
-                for item in selected_items:
-                    if item.GetLocked():
-                        lock = False
-                        break
+        selected_items = self.scene.selectedItems()
+        lock = True
+        skip_toggle = False
+        if selected_items:
+            # Since locking multiple objects at once is supported,  there is a possibility where each selected object
+            # has a different lock state (Some locked, some not). In these cases, we need to preprocess the selected
+            # items and see if any are locked. If any are locked, then we should unlock them all
+            for item in selected_items:
+                if item.GetLocked():
+                    lock = False
+                    break
 
-                for item in selected_items:
-                    item.SetLocked(lock)
+            for item in selected_items:
+                success = item.SetLocked(lock)
+                if not success:
+                    skip_toggle = True
 
+            if not skip_toggle:
                 # Refresh the lock button state
                 if lock:
                     self.lock_button.Toggle(True)
@@ -159,29 +160,28 @@ class SceneViewer(QtWidgets.QWidget):
 
     def RemoveSelectedItems(self):
         """ Removes all currently selected items """
-        if self.scene:
-            selected_items = self.scene.selectedItems()
+        selected_items = self.scene.selectedItems()
 
-            if selected_items:
-                for item in selected_items:
-                    self.scene.removeItem(item)
+        if selected_items:
+            for item in selected_items:
+                self.scene.removeItem(item)
 
-                self.core.UpdateActiveSceneItem(selected_items)
+            self.core.UpdateActiveSceneItem(selected_items)
 
     def GetSceneItems(self) -> List[RootItem]:
         """ Returns a list of all RootItems in the SceneView """
         return [item for item in self.scene.items() if isinstance(item, RootItem)]
 
     def UpdateActiveSceneItem(self):
-        if self.scene:
-            selected_items = self.scene.selectedItems()
-            if selected_items:
-                for item in selected_items:
-                    if item.GetLocked():
-                        self.lock_button.Toggle(True)
-                        break
-            else:
-                self.lock_button.Toggle(False)
+        selected_items = self.scene.selectedItems()
+        lock = False
+        if selected_items:
+            for item in selected_items:
+                if item.GetLocked():
+                    lock = True
+                    break
 
-            # Inform the core so it can take additional actions
-            self.core.UpdateActiveSceneItem(selected_items)
+        self.lock_button.Toggle(lock)
+
+        # Inform the core so it can take additional actions
+        self.core.UpdateActiveSceneItem(selected_items)

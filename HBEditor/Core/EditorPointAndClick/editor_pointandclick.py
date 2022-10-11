@@ -92,7 +92,13 @@ class EditorPointAndClick(EditorBase):
         if file_data:
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
             for item in conv_scene_items:
-                self.editor_ui.scene_viewer.AddRenderable(item)
+                new_item = self.editor_ui.scene_viewer.AddRenderable(item)
+
+                # Apply any imported editor-specific properties
+                if "editor_properties" in item[adh.GetActionName(item)]:
+                    editor_properties = item[adh.GetActionName(item)]["editor_properties"]
+                    if "locked" in editor_properties:
+                        new_item.SetLocked(editor_properties["locked"])
 
     def ConvertSceneItemsToEngineFormat(self, scene_items: list):
         """ Build and return a list of the data from all active scene items converted to engine format """
@@ -102,6 +108,11 @@ class EditorPointAndClick(EditorBase):
 
             # Get the action name
             converted_action = {"action": adh.GetActionName(scene_item_data)}
+
+            # Preserve any notable editor-specific properties so that they're available when importing
+            # Note: This is subject to change when additional examples are available
+            if scene_item.GetLocked():
+                converted_action["editor_properties"] = {"locked": scene_item.GetLocked()}
 
             # Collect a converted dict of all requirements for this action (If any are present)
             converted_requirements = adh.ConvertActionRequirementsToEngineFormat(
@@ -119,8 +130,8 @@ class EditorPointAndClick(EditorBase):
 
     def ConvertSceneItemsToEditorFormat(self, action_data):
         """
-            Given a full dict of scene item data in engine format, convert it to the editor format by
-            rebuilding the structure based on lookups in the ActionDatabase
+        Given a full dict of scene item data in engine format, convert it to the editor format by
+        rebuilding the structure based on lookups in the actions_metadata
         """
         conv_items = []
         for item in action_data:
@@ -133,6 +144,11 @@ class EditorPointAndClick(EditorBase):
                 engine_entry=item,
                 excluded_properties=self.excluded_properties
             )
+
+            # Import the editor-specific properties in order to preserve editing state for items
+            if "editor_properties" in item:
+                md_entry["editor_properties"] = item["editor_properties"]
+
             conv_items.append({item["action"]: md_entry})
 
         return conv_items
