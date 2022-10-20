@@ -13,6 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
+import copy
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
@@ -63,7 +64,7 @@ class Action:
         """
         # We have to take a parameter for the action name here because '__class__.__name__' returns the base class name
         # when running under code defined in the base class
-        self.metadata = actions_metadata[action_name]
+        self.metadata = copy.deepcopy(actions_metadata[action_name])
 
         # Compare the action_data against the metadata. If any items found within the metadata are missing in the
         # action_data, we can assume it was not edited or modified by the user, and that we can defer to either the
@@ -76,9 +77,10 @@ class Action:
         it is missing data found in the latter
         """
         for md_req_name, md_req_data in metadata[search_term].items():
-
             if "children" in md_req_data:
-                # If the item has children, then it won't have a value itself (IE. Containers). Recurse in this case
+                if md_req_name not in action_data:
+                    action_data[md_req_name] = {}
+
                 self.UpdateFromMetadata(md_req_data, action_data[md_req_name], "children")
 
 
@@ -123,7 +125,8 @@ class Action:
         """
         try:
             return self.metadata["requirements"][key]["global"]
-        except:
+        except Exception as exc:
+            print(f"Failed to retrieve global value for key '{key}' - {exc}")
             return None
 
 class SoundAction(Action):

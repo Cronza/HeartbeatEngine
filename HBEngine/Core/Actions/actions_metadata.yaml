@@ -199,7 +199,7 @@ create_text:
       type: "File_Font"
       value: "None"
       default: "None"
-      global: ["Text", "center_align"]
+      global: ["Text", "font"]
       editable: True
       preview: False
 
