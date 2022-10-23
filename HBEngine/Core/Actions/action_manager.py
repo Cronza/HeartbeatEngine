@@ -49,6 +49,7 @@ class ActionManager:
 
         # Fetch the action function corresponding to the next action index
         action = self.GetAction(action_name)
+        print(action)
         new_action = action(self.scene, action_data, self)
 
         # If the calling function wishes to be informed when the action is completed, opt in here
@@ -73,8 +74,8 @@ class ActionManager:
             if action_name == action:
                 return object_ref
 
-        print("The provided action name is invalid. Please review the available actions, or add a new action function "
-              "for the one provided")
+        print(f"The provided action name is invalid: '{action_name}'. Please review the available actions, or "
+              "add a new action function for the one provided")
         return None
 
     def GetTransition(self, transition_data):

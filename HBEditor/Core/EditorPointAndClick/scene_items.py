@@ -202,7 +202,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 scene_pos.y() / self.scene().height()
             ]
             child.action_data["position"]["value"] = norm_range
-
+        self.select_func()
         super().mouseReleaseEvent(event)
 
 

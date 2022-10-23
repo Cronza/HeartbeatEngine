@@ -399,6 +399,22 @@ create_button:
           editable: True
           preview: False
 
+        text_color_hover:
+          type: "Color"
+          value: [ 255, 255, 255 ]
+          default: [ 255, 255, 255 ]
+          global: ["Text", "color"]
+          editable: True
+          preview: False
+
+        text_color_clicked:
+          type: "Color"
+          value: [ 255, 255, 255 ]
+          default: [ 255, 255, 255 ]
+          global: ["Text", "color"]
+          editable: True
+          preview: False
+
         font:
           type: "File_Font"
           value: "None"
@@ -407,12 +423,23 @@ create_button:
           editable: True
           preview: False
 
-        z_order: # Button text generate it's  z_order based on the parent's. However, the param is still needed
+        z_order: # Button text generate it's z_order based on the parent's. However, the param is still needed
           type: "Int"
           value: 10002
           default: 10002
           editable: False
           preview: False
+
+    #action:
+    #  type: "Event"
+    #  value: None
+    #  default: "load_scene"
+    #  options:
+    #    - "no_wait"
+    #    - "wait_for_input"
+    #    - "wait_until_complete"
+    #  editable: True
+    #  previeaw: False
 
 # Dialogue
 

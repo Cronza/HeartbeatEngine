@@ -29,17 +29,13 @@ class Interactable(SpriteRenderable):
     def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
         super().__init__(scene, renderable_data, False, parent)
 
-        # YAML Parameters
-        #sprite_hover = self.renderable_data['sprite_hover']
-        #sprite_clicked = self.renderable_data['sprite_clicked']
-        #action = self.renderable_data['action']
-
         self.state = State.normal
 
         # Track whether the previous input frame was clicking to determine whether this interactable was clicked
         self.isClicking = False
 
         # Interactable state surfaces
+        #@TODO: Setup 'clicked' state
         self.hover_surface = None
         self.clicked_surface = None
         self.scaled_hover_surface = None
@@ -54,33 +50,33 @@ class Interactable(SpriteRenderable):
         # Defer the resize until we're able to define the interactive surfaces
         self.RecalculateSize(self.scene.resolution_multiplier)
 
-        print(f"Interactable created: {self.renderable_data}")
     def update(self, *args):
         super().update()
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             # If not already in the hover state...
             if self.state is State.normal:
-                self.SetActiveSurface(self.GetStateSurface(State.hover))
-                self.state = State.hover
-                self.scene.Draw()
+                self.ChangeState(State.hover)
             else:  # Track whether the user has released their cursor over the sprite
                 if pygame.mouse.get_pressed()[0] == 1:
                     # Begin the click
+                    self.ChangeState(State.pressed)
                     self.isClicking = True
                 elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
                     # User has clicked this renderable
                     self.Interact()
+                    self.ChangeState(State.hover)
                     self.isClicking = False
                 elif self.isClicking is True:
                     # End the click
+                    self.ChangeState(State.normal)
                     self.isClicking = False
 
         # If no longer hovering...
-        elif self.state is State.hover:
-            self.SetActiveSurface(self.GetStateSurface(State.normal))
-            self.state = State.normal
-            self.scene.Draw()
+        elif self.state is not State.normal:
+            print("ndsfnlkdsflkfd")
+            self.ChangeState(State.normal)
+
 
     def RecalculateSize(self, multiplier):
         # Call the parent function to recalculate the base surface
@@ -98,11 +94,12 @@ class Interactable(SpriteRenderable):
 
     def Interact(self):
         # Check if any actions are defined in the data file
-        if 'action' in self.renderable_data:
+        print(self.renderable_data)
+        if 'click_event' in self.renderable_data:
             # Interactables use a child 'action' block which acts as its own independent 'renderable_data'. Pass that
             # instead of this object's data
-            action_data = self.renderable_data['action']
-            self.scene.a_manager.PerformAction(action_data, action_data['action'])
+            action_data = self.renderable_data['click_event']
+            self.scene.a_manager.PerformAction(action_data, action_data['click_event'])
         else:
             print("No actions defined for this object - Clicking does nothing")
 
@@ -154,6 +151,12 @@ class Interactable(SpriteRenderable):
                 return self.scaled_original_surface
             else:
                 return self.original_surface
+
+    def ChangeState(self, new_state: State):
+        """ Updates the active interact state with the provided state, refreshing the active surface """
+        self.SetActiveSurface(self.GetStateSurface(new_state))
+        self.state = new_state
+        self.scene.Draw()
 
     def Flip(self):
         #super().Flip()

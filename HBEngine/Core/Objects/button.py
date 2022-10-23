@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from HBEngine.Core.DataTypes.input_states import State
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.interactable import Interactable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
@@ -33,17 +34,31 @@ class Button(Interactable):
             (self.surface.get_width(), self.surface.get_height())
         )
 
-        button_text_renderable = TextRenderable(
+        self.button_text_renderable = TextRenderable(
             self.scene,
             self.renderable_data["button_text"],
             self
         )
-        self.children.append(button_text_renderable)
-        self.scene.active_renderables.Add(button_text_renderable)
+        self.children.append(self.button_text_renderable)
+        self.scene.active_renderables.Add(self.button_text_renderable)
 
     def GetText(self):
         pass
 
     def SetText(self):
         pass
+
+    def ChangeState(self, new_state: State):
+        # We need to intercept the state change in order to update the button_text state as well
+        if new_state != self.state:
+            if new_state == State.normal:
+                self.button_text_renderable.text_color = self.button_text_renderable.renderable_data["text_color"]
+            elif new_state == State.hover:
+                self.button_text_renderable.text_color = self.button_text_renderable.renderable_data["text_color_hover"]
+            elif new_state == State.pressed:
+                self.button_text_renderable.text_color = self.button_text_renderable.renderable_data["text_color_clicked"]
+
+        self.button_text_renderable.WrapText(self.button_text_renderable.surface)
+
+        super().ChangeState(new_state)
 
