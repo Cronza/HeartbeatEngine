@@ -806,6 +806,22 @@ choice:
                   editable: True
                   preview: False
 
+                text_color_hover:
+                  type: "Color"
+                  value: [ 255, 255, 255 ]
+                  default: [ 255, 255, 255 ]
+                  global: [ "Dialogue", "choice_button_text_color_hover" ]
+                  editable: True
+                  preview: False
+
+                text_color_clicked:
+                  type: "Color"
+                  value: [ 255, 255, 255 ]
+                  default: [ 255, 255, 255 ]
+                  global: [ "Dialogue", "choice_button_text_color_clicked" ]
+                  editable: True
+                  preview: False
+
                 font:
                   type: "File_Font"
                   value: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"

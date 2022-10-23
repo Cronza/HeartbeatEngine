@@ -57,8 +57,7 @@ class Scene:
                     if self.active_renderables.Exists('Pause_Menu'):
                         print("Pause Menu Open")
                     else:
-                        self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data,
-                                                                       "create_container")
+                        self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data, "create_container")
 
     def Draw(self):
         # Sort the renderable elements by their z-order (Lowest to Highest)
