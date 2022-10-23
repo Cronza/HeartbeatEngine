@@ -94,11 +94,11 @@ class Interactable(SpriteRenderable):
 
     def Interact(self):
         # Check if any actions are defined in the data file
-        if 'action' in self.renderable_data:
-            # Interactables use a child 'action' block which acts as its own independent 'renderable_data'. Pass that
+        if "click_event" in self.renderable_data:
+            # Interactables use a child action block which acts as its own independent 'renderable_data'. Pass that
             # instead of this object's data
-            action_data = self.renderable_data['action']
-            self.scene.a_manager.PerformAction(action_data, action_data['action'])
+            action_data = self.renderable_data["click_event"]
+            self.scene.a_manager.PerformAction(action_data, action_data["action"])
         else:
             print("No actions defined for this object - Clicking does nothing")
 

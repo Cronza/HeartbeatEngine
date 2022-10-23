@@ -705,7 +705,7 @@ class choice(Action):
         # Because we the data comes from the 'template' key, we don't have a mechanism to load from the action
         for choice_name, choice_data in self.action_data["choices"].items():
             # Define what the button does when clicked
-            choice_data["action"] = {
+            choice_data["click_event"] = {
                 "action": "choose_branch",
                 "branch": choice_data["branch"]
             }
