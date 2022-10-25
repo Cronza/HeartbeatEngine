@@ -430,16 +430,16 @@ create_button:
           editable: False
           preview: False
 
-    #action:
-    #  type: "Event"
-    #  value: None
-    #  default: "load_scene"
-    #  options:
-    #    - "no_wait"
-    #    - "wait_for_input"
-    #    - "wait_until_complete"
-    #  editable: True
-    #  previeaw: False
+    click_event:
+      type: "Event"
+      value: "None"
+      default: "None"
+      options:
+        - "None"
+        - "load_scene"
+        - "quit_game"
+      editable: True
+      preview: False
 
 # Dialogue
 
@@ -837,3 +837,20 @@ choice:
                   editable: False
                   preview: False
 
+# Scene
+
+load_scene:
+  display_name: "Load Scene"
+  requirements:
+    scene_file:
+      type: "File_Data"
+      default: ""
+      value: ""
+      editable: True
+      preview: True
+
+# Utilities
+
+quit_game:
+  display_name: "Quit Game"
+  requirements: {}

@@ -130,14 +130,13 @@ class DetailsPanel(QtWidgets.QWidget):
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
         """
-
         if self.active_entry:
             data_to_store = {}
 
             if not parent:
                 parent = self.details_tree.invisibleRootItem()
 
-            for entry_index in range(0, parent.childCount()): #@TODO: THis can't store the data of uneditable entries as they are never added to the details panel to begin with
+            for entry_index in range(0, parent.childCount()):
                 # Each entry is assigned data as reference to the original entry. Any changes we make will propagate
                 # directly back to that entry
                 entry = parent.child(entry_index)
@@ -157,10 +156,18 @@ class DetailsPanel(QtWidgets.QWidget):
 
             return data_to_store
 
+    def ClearActiveItem(self):
+        """ Removes the active_item, storing any data currently in the panel within it before wiping the panel """
+        self.StoreData()
+        self.Clear()
+        self.active_entry = None
+
     def Clear(self):
         self.details_tree.clear()
 
+
     ### Slots ###
+
 
     def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
         input_widget = self.details_tree.itemWidget(owning_tree_item, 1)

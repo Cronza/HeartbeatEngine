@@ -57,11 +57,14 @@ class EditorPointAndClick(EditorBase):
 
         else:
             # No entries left to select. Wipe remaining details
-            self.editor_ui.details.Clear()
+            self.editor_ui.details.ClearActiveItem()
 
     def Export(self):
         super().Export()
         Logger.getInstance().Log(f"Exporting Point & Click data for: {self.file_path}")
+
+        # Store any active changes in the details panel
+        self.editor_ui.details.StoreData()
 
         # Get an engine-formatted list of scene items
         conv_scene_items = self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
@@ -92,7 +95,7 @@ class EditorPointAndClick(EditorBase):
         if file_data:
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
             for item in conv_scene_items:
-                new_item = self.editor_ui.scene_viewer.AddRenderable(item)
+                new_item = self.editor_ui.scene_viewer.AddRenderable(item, True)
 
                 # Apply any imported editor-specific properties
                 if "editor_properties" in item[adh.GetActionName(item)]:

@@ -96,6 +96,8 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget.SIG_USER_DELETE.connect(Remove)
     elif data_type == ParameterType.Array:
         input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_properties)
+    elif data_type == ParameterType.Event:
+        input_widget = InputEntryEvent(data, owning_view, Add, Remove, signal_func, refresh_func, excluded_properties)
     elif data_type == ParameterType.CUST_Resolution:
         input_widget = InputEntryResolution(data)
 
@@ -159,6 +161,3 @@ def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QAbstractItemView = Non
                 name_split = name_widget.text().split("_")
                 name_split.pop(-1)
                 name_widget.setText("_".join(name_split) + f"_{child_index}")
-
-
-

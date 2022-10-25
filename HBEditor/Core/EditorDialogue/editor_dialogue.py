@@ -37,22 +37,21 @@ class EditorDialogue(EditorBase):
 
     def UpdateActiveEntry(self):
         """ Makes the selected entry the active one, refreshing the details panel """
-        # In case something changed in the active details and hasn't been saved, force a resave
-        #print("Forcing Resave before switching active entry")
-        #self.editor_ui.details.StoreData()
         selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
 
         # Refresh the details panel to reflect the newly chosen row
         self.UpdateDetails(selection)
 
-    def UpdateDetails(self, selected_entry):
-        """ Refreshes the details panel with the details from the selected dialogue entry """
-        if selected_entry:
-            self.editor_ui.details.Populate(selected_entry)
+    def UpdateDetails(self, selected_item):
+        """
+        Refreshes the details panel with the details from the selected item. Clears all details if None is provided
+        """
+        if selected_item:
+            self.editor_ui.details.Populate(selected_item)
 
-        # No entries left to select. Wipe remaining details
         else:
-            self.editor_ui.details.Clear()
+            # No entries left to select. Wipe remaining details
+            self.editor_ui.details.ClearActiveItem()
 
     def SwitchBranches(self, cur_branch, new_branch):
         """ Switches the active branch, storing all existing dialogue sequence entries in the old branch """
@@ -110,6 +109,10 @@ class EditorDialogue(EditorBase):
     def Export(self):
         super().Export()
         Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
+
+        # Store any active changes in the details panel
+        self.editor_ui.details.StoreData()
+
         data_to_export = self.GetAllDialogueData()
         data_to_export = {
             "type": FileType.Scene_Dialogue.name,

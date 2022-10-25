@@ -856,21 +856,11 @@ class stop_music(Action):
 
 
 class load_scene(Action):
-    """
-    Switches scenes to the one specified in the action data. Requires an applicable scene type be provided. Returns
-    nothing
-    Possible Parameters:
-    - scene_file : str
-    """
+    """ Switches scenes to the one specified in the action data """
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
-        if "scene_file" in self.action_data:
-            self.scene.SwitchScene(self.action_data["scene_file"])
-        else:
-            raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
-
+        self.scene.SwitchScene(self.action_data["scene_file"])
         self.Complete()
 
 
@@ -905,7 +895,7 @@ class quit_game(Action):
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
-        self.scene.pygame_lib.quit()
+        pygame.quit()
         exit()
 
 

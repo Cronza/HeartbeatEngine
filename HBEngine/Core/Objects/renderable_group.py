@@ -45,7 +45,7 @@ class RenderableGroup():
                 print(f"Unknown error while removing: {rexc}")
 
     def Clear(self):
-        pass
+        self.renderables.clear()
 
     def Exists(self, key) -> bool:
         """ Returns a boolean for whether the provided key exists in the renderables list """

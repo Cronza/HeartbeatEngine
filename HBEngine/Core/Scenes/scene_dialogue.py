@@ -32,7 +32,7 @@ class DialogueScene(PointAndClickScene):
         for event in events:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
-                    # Skip the running action if its able to be skipped
+                    # Skip the running action if it's able to be skipped
                     if self.a_manager.active_actions:
                         for action in self.a_manager.active_actions:
                             if action.skippable:

@@ -62,9 +62,9 @@ class Interactable(SpriteRenderable):
                     # Begin the click
                     self.ChangeState(State.pressed)
                     self.isClicking = True
-                elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
-                    # User has clicked this renderable
                     self.Interact()
+                elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
+                    # User has released the mouse after clicking this renderable. Reset state
                     self.ChangeState(State.hover)
                     self.isClicking = False
                 elif self.isClicking is True:
@@ -74,9 +74,7 @@ class Interactable(SpriteRenderable):
 
         # If no longer hovering...
         elif self.state is not State.normal:
-            print("ndsfnlkdsflkfd")
             self.ChangeState(State.normal)
-
 
     def RecalculateSize(self, multiplier):
         # Call the parent function to recalculate the base surface
@@ -98,9 +96,10 @@ class Interactable(SpriteRenderable):
             # Interactables use a child action block which acts as its own independent 'renderable_data'. Pass that
             # instead of this object's data
             action_data = self.renderable_data["click_event"]
+            print(action_data)
             self.scene.a_manager.PerformAction(action_data, action_data["action"])
         else:
-            print("No actions defined for this object - Clicking does nothing")
+            print("No events defined for this object - Clicking does nothing")
 
     def LoadStateSprites(self):
         """

@@ -150,6 +150,7 @@ class InputEntryColor(InputEntryBase):
             # Manually call the input change func since we know for a fact the input widget has changed
             self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
+
 class InputEntryDropdown(InputEntryBase):
     def __init__(self, data):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
@@ -476,6 +477,10 @@ class InputEntryArray(InputEntryBase):
         self.signal_func = signal_func
         self.refresh_func = refresh_func
 
+        # In order for the data to be recursively parsed, we need the 'children' key
+        if "children" not in self.data:
+            self.data["children"] = {}
+
         self.main_layout.setAlignment(QtCore.Qt.AlignLeft)
 
         self.add_item_button = QtWidgets.QToolButton()
@@ -497,6 +502,7 @@ class InputEntryArray(InputEntryBase):
                 parent = self.owning_model_item
 
             data_no_key = data[adh.GetActionName(data)]
+
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
@@ -515,8 +521,10 @@ class InputEntryArray(InputEntryBase):
 
                     self.AddItems(child_name, {child_name: child_data}, new_entry)
 
-        # Inform the owning U.I that we've added a child outside it's purview
-        self.refresh_func(self.owning_model_item)
+        if not parent:
+            # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion
+            # is done
+            self.refresh_func(self.owning_model_item)
 
 
 class InputEntryArrayElement(InputEntryBase):
@@ -535,6 +543,119 @@ class InputEntryArrayElement(InputEntryBase):
         self.main_layout.addWidget(self.delete_button)
 
         self.delete_button.clicked.connect(lambda: self.SIG_USER_DELETE.emit(self.owning_model_item, self.owning_view))
+
+
+class InputEntryEvent(InputEntryBase):
+    def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
+                 add_func: callable, remove_func: callable, signal_func: callable, refresh_func: callable,
+                 excluded_properties: dict = None):
+        """ A variant of the dropdown entry that uses a pre-set list of options which refer to an action in the
+         actions_metadata. Once an option is selected, all properties related to that action are generated as children
+         to this entry """
+        super().__init__(data)
+
+        self.excluded_properties = excluded_properties
+        self.owning_view = owning_view
+
+        # We need access to the return value of the created view item, so we must use a callback instead of a
+        # signal / slot (Which don't allow return values)
+        self.add_func = add_func
+        self.remove_func = remove_func
+        self.signal_func = signal_func
+        self.refresh_func = refresh_func
+
+        self.input_widget = QtWidgets.QComboBox()
+
+        # In order for the data to be recursively parsed, we need the 'children' key
+        if "children" not in self.data:
+            self.data["children"] = {}
+
+        # Pre-load the list of dropdown options
+        self.options = data["options"]
+        for option in self.options:
+            self.input_widget.addItem(str(option))
+
+        self.main_layout.addWidget(self.input_widget)
+
+    def ChangeEvent(self, index):
+        """ Switch the event, clearing all children and generating new ones """
+        # Delete all existing children, as they're based on the active selection
+        for i in range(self.owning_model_item.childCount()):
+            self.remove_func(self.owning_model_item.child(i))
+
+        # Since the entry children are properties of the action specified in the input_widget, we also need to specify
+        # the action's name. This doesn't come as a part of the metadata clone, so we need to add the key manually
+        #
+        # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it as
+        # a visible entry, and instead writing it directly into the action_data
+        self.data["children"].clear()
+        self.data["children"]["action"] = {
+            "type": "String",
+            "value": self.input_widget.currentText(),
+            "editable": False,
+            "preview": False
+        }
+
+        # Grab the metadata for the event action, and generate children for all of its properties
+        metadata = copy.deepcopy(settings.action_metadata[self.input_widget.currentText()])
+        if metadata["requirements"]:
+            self.AddItems(metadata["requirements"])
+
+    def AddItems(self, data=None, parent=None):
+        if not parent:
+            parent = self.owning_model_item
+
+        data_no_key = data[adh.GetActionName(data)]
+        new_entry = self.add_func(
+            owner=self,
+            view=self.owning_view,
+            name=adh.GetActionName(data),
+            data=data_no_key,
+            parent=parent,
+            excluded_properties=self.excluded_properties,
+            signal_func=self.signal_func,
+            refresh_func=self.refresh_func
+        )
+        if "children" in data_no_key:
+            for child_name, child_data in data_no_key["children"].items():
+                if "editable" in child_data:
+                    if not child_data["editable"]:
+                        continue
+
+                self.AddItems(child_name, {child_name: child_data}, new_entry)
+
+            # Inform the owning U.I that we've added a child outside it's purview
+            self.refresh_func(self.owning_model_item)
+
+    def Get(self):
+        self.data["value"] = self.input_widget.currentText()
+        return self.data
+
+    def Set(self, data):
+        # Because input_entries which contain children can't have input entries of their own (which this class has),
+        # the data of that input_widget can't be saved. In place of the input_widget's data, the entire child block
+        # is saved instead effectively making it resemble a container.
+        #
+        # Given 'data' will be the child block, we need to access the unique 'action' key as it matches the
+        # value selected in the dropdown when caching and saving
+        print("Data: ", data)
+        #self.input_widget.setCurrentIndex(self.input_widget.findText(data["action"]))
+        self.input_widget.setCurrentIndex(self.input_widget.findText(data))
+
+    def Connect(self):
+        self.input_widget.activated.connect(self.ChangeEvent)  # 'activated' only happens on user interaction
+        self.input_widget.currentIndexChanged.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
+
+    def Disconnect(self):
+        self.input_widget.disconnect()
+
+    def SetEditable(self, state: int):
+        if state == 0:
+            self.input_widget.setEnabled(True)
+        elif state == 2:
+            self.input_widget.setEnabled(False)
+
+        self.input_widget.style().polish(self.input_widget)
 
 
 class InputEntryResolution(InputEntryBase):

@@ -106,7 +106,7 @@ class SceneViewer(QtWidgets.QWidget):
         
         self.view.show()
 
-    def AddRenderable(self, action_data) -> RootItem:
+    def AddRenderable(self, action_data, skip_selection: bool = False) -> RootItem:
         """ Add an item to the scene view. Return the newly created item """
         new_item = RootItem(
             action_data=action_data,
@@ -121,6 +121,11 @@ class SceneViewer(QtWidgets.QWidget):
         # The root item dictates the tree's general z-order. It needs to inherit the z-order of the top-most child
         # Note: The root only ever has a single child
         new_item.UpdateZValue()
+
+        # Select the new item instead of waiting for the user to do it
+        if not skip_selection:
+            self.scene.clearSelection()
+            new_item.setSelected(True)
 
         return new_item
 
@@ -166,7 +171,7 @@ class SceneViewer(QtWidgets.QWidget):
             for item in selected_items:
                 self.scene.removeItem(item)
 
-            self.core.UpdateActiveSceneItem(selected_items)
+            self.core.UpdateActiveSceneItem(None)
 
     def GetSceneItems(self) -> List[RootItem]:
         """ Returns a list of all RootItems in the SceneView """

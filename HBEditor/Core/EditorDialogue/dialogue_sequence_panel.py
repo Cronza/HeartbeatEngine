@@ -156,6 +156,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         if selection is not None:
             self.dialogue_table.removeRow(self.GetSelectedRow())
+        else:
+            self.ed_core.UpdateActiveEntry()
 
     def CopyEntry(self):
         """ If an entry is selected, clone it and add it to the sequence """

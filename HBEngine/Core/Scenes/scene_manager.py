@@ -46,9 +46,9 @@ class SceneManager:
         #self.pause_menu_data['action'] = "create_container"
 
     def LoadScene(self, scene_file):
-        """ Given a path to a scene file, check it's type, and load the corresponding scene object """
-        # We need to read the file to find it's type. This is denoted by the 'type' value somewhere near the top of the
-        # file. We can't guarentee it's position since the metadata may grow one day, and the line number would shift.
+        """ Given a path to a scene file, check its type, and load the corresponding scene object """
+        # We need to read the file to find its type. This is denoted by the 'type' value somewhere near the top of the
+        # file. We can't guarantee its position since the metadata may grow one day, and the line number would shift.
         scene_type = None
         with open(settings.ConvertPartialToAbsolutePath(scene_file), "r") as f:
             for line in f:

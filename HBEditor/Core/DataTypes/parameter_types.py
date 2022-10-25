@@ -31,4 +31,5 @@ class ParameterType(Enum):
     Container = 13
     Array_Element = 14
     Array = 15
-    CUST_Resolution = 16
+    Event = 16
+    CUST_Resolution = 17

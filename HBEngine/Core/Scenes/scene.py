@@ -60,25 +60,31 @@ class Scene:
                         self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data, "create_container")
 
     def Draw(self):
-        # Sort the renderable elements by their z-order (Lowest to Highest)
-        renderables = sorted(self.active_renderables.renderables.values(), key=lambda renderable: renderable.z_order)
+        # Don't redraw unless we have items to actually draw. This also prevents last minute draw requests during
+        # scene changes while cleanup is happening
+        if self.active_renderables.Get():
+            # Sort the renderable elements by their z-order (Lowest to Highest)
+            renderables = sorted(self.active_renderables.Get(), key=lambda renderable: renderable.z_order)
 
-        # Draw any renderables using the screen space multiplier to fit the new resolution
-        for renderable in renderables:
-            if renderable.visible:
-                self.window.blit(renderable.GetSurface(), (renderable.rect.x, renderable.rect.y))
+            # Draw any renderables using the screen space multiplier to fit the new resolution
+            for item in renderables:
+                if item.visible:
+                    self.window.blit(item.GetSurface(), (item.rect.x, item.rect.y))
 
-            #@TODO: Review if this causes redundant drawing
-            # Draw any child renderables after drawing the parent
-            if renderable.children:
-                for child in renderable.children:
-                    if child.visible:
-                        self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+                #@TODO: Review if this causes redundant drawing
+                # Draw any child renderables after drawing the parent
+                if item.children:
+                    for child in item.children:
+                        if child.visible:
+                            self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change from the scene_manager"""
-        self.active_renderables.Clear()
-        self.scene_manager.LoadScene(scene_file)
+        if scene_file:
+            self.active_renderables.Clear()
+            self.scene_manager.LoadScene(scene_file)
+        else:
+            raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
 
     def Resize(self):
         """ Determines a new sprite size based on the difference between the main resolution and the new resolution """

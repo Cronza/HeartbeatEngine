@@ -1,5 +1,5 @@
 Renderables:
-  icon: ":/Icons/Renderable.png"
+  icon: ":/Icons/AM_Renderable.png"
   options:
     - name: "create_sprite"
       applicable_editors:
@@ -18,14 +18,14 @@ Renderables:
         - Scene_Dialogue
 
 Interactables:
-  icon: ":/Icons/Renderable.png"
+  icon: ":/Icons/AM_Renderable.png"
   options:
     - name: "create_button"
       applicable_editors:
         - Scene_Point_And_Click
 
 Dialogue:
-  icon: ":/Icons/Dialogue.png"
+  icon: ":/Icons/AM_Dialogue.png"
   options:
     - name: "create_dialogue_interface"
       applicable_editors:
@@ -34,5 +34,12 @@ Dialogue:
       applicable_editors:
         - Scene_Dialogue
     - name: "choice"
+      applicable_editors:
+        - Scene_Dialogue
+
+Scene:
+  icon: ":/Icons/AM_Scene.png"
+  options:
+    - name: "load_scene"
       applicable_editors:
         - Scene_Dialogue
