@@ -430,16 +430,25 @@ create_button:
           editable: False
           preview: False
 
-    click_event:
-      type: "Event"
-      value: "None"
-      default: "None"
-      options:
-        - "None"
-        - "load_scene"
-        - "quit_game"
+    events:
+      type: "Array"
       editable: True
       preview: False
+      template:
+        event:
+          type: "Array_Element"
+          preview: False
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+              editable: True
+              preview: False
 
 # Dialogue
 
@@ -848,6 +857,7 @@ load_scene:
       value: ""
       editable: True
       preview: True
+
 
 # Utilities
 

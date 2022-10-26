@@ -624,7 +624,9 @@ class InputEntryEvent(InputEntryBase):
 
                 self.AddItems(child_name, {child_name: child_data}, new_entry)
 
-            # Inform the owning U.I that we've added a child outside it's purview
+        if not parent:
+            # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion
+            # is done
             self.refresh_func(self.owning_model_item)
 
     def Get(self):
@@ -632,14 +634,6 @@ class InputEntryEvent(InputEntryBase):
         return self.data
 
     def Set(self, data):
-        # Because input_entries which contain children can't have input entries of their own (which this class has),
-        # the data of that input_widget can't be saved. In place of the input_widget's data, the entire child block
-        # is saved instead effectively making it resemble a container.
-        #
-        # Given 'data' will be the child block, we need to access the unique 'action' key as it matches the
-        # value selected in the dropdown when caching and saving
-        print("Data: ", data)
-        #self.input_widget.setCurrentIndex(self.input_widget.findText(data["action"]))
         self.input_widget.setCurrentIndex(self.input_widget.findText(data))
 
     def Connect(self):

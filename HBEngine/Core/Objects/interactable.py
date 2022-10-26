@@ -91,13 +91,20 @@ class Interactable(SpriteRenderable):
             self.scaled_clicked_surface = self.GetRescaledSurface(multiplier, self.clicked_surface)
 
     def Interact(self):
-        # Check if any actions are defined in the data file
-        if "click_event" in self.renderable_data:
-            # Interactables use a child action block which acts as its own independent 'renderable_data'. Pass that
-            # instead of this object's data
-            action_data = self.renderable_data["click_event"]
-            print(action_data)
-            self.scene.a_manager.PerformAction(action_data, action_data["action"])
+        # Check if any events are in use
+        #
+        # Events can either be supplied as an array under the plural form "events", or singularly as "event"
+        if "events" in self.renderable_data:
+            # These is a wrapper layer for each event to give them a unique key. Avoid this by getting values
+            # instead of items
+            events = self.renderable_data["events"][next(iter(self.renderable_data["events"]))]
+
+            # Run each event in parallel
+            for event_name, event_data in events.items():
+                self.scene.a_manager.PerformAction(event_data, event_data["action"])
+        elif "event" in self.renderable_data:
+            event_data = self.renderable_data["event"]
+            self.scene.a_manager.PerformAction(event_data, event_data["action"])
         else:
             print("No events defined for this object - Clicking does nothing")
 

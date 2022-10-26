@@ -70,20 +70,23 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):
-        """ Fill out the details tree based on the active entry's action data """
+        """
+        Fill out the details tree based on the active entry's action data. If the provided item is the same as
+        'active_entry', don't do anything
+        """
         if selected_entry is not self.active_entry:
             self.StoreData()
 
-        self.active_entry = selected_entry
+            self.active_entry = selected_entry
 
-        self.Clear()
+            self.Clear()
 
-        # Create an entry for all items within the action_data
-        # Note: This provides data to each by reference, so any changes made to data stored in each details entry
-        # propagates directly back to the main entry
-        self.AddItems(adh.GetActionRequirements(self.active_entry.action_data))
+            # Create an entry for all items within the action_data
+            # Note: This provides data to each by reference, so any changes made to data stored in each details entry
+            # propagates directly back to the main entry
+            self.AddItems(adh.GetActionRequirements(self.active_entry.action_data))
 
-        self.details_tree.expandAll()
+            self.details_tree.expandAll()
 
     def AddItems(self, req_data: dict, parent=None):
         """
@@ -153,7 +156,7 @@ class DetailsPanel(QtWidgets.QWidget):
                     entry_data["children"].update(self.StoreData(entry, False))
 
                 data_to_store[entry_name] = entry_data
-
+            print("Data to store: ", data_to_store)
             return data_to_store
 
     def ClearActiveItem(self):

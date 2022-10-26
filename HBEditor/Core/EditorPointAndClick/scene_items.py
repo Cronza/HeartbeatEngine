@@ -124,10 +124,8 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # that here, use this func as a wrapper to invoke the recursive refresh funcs
 
         if change_tree:
-            print("RefreshPartial")
             self.RefreshRecursivePartial(self, change_tree)
         else:
-            print("Refresh")
             self.RefreshRecursive(self)
 
         # The root item uses the top-most child's z-order, so they both need to be updated

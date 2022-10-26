@@ -100,7 +100,7 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
                 # in the engine data, then update each copy using the engine data
                 req_data["children"] = {}
 
-                for eng_inst_name, eng_inst_data in engine_entry[adh.GetActionName(engine_entry)].items():
+                for eng_inst_name, eng_inst_data in engine_entry[req_name].items():
                     template_copy = copy.deepcopy(req_data["template"])
                     template_copy_name = adh.GetActionName(req_data["template"])
                     template_copy_data = template_copy[template_copy_name]
