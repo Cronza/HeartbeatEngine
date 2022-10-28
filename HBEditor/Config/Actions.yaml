@@ -43,3 +43,9 @@ Scene:
     - name: "load_scene"
       applicable_editors:
         - Scene_Dialogue
+    - name: "scene_fade_in"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "scene_fade_out"
+      applicable_editors:
+        - Scene_Dialogue

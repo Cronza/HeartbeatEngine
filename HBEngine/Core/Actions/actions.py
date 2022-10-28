@@ -906,30 +906,25 @@ those listed in the 'transitions' file
 """
 
 
-class fade_scene_from_black(Action):
+class scene_fade_in(Action):
     """
-    Creates a black texture covering the entire screen, then slowly fades it out. Returns 'SpriteRenderable'
-    Possible Parameters:
-    - z_order : int <GLOBAL_AVAILABLE>
-    - speed: int <GLOBAL_AVAILABLE>
+    Creates a texture of the selected color covering the entire screen, then slowly fades it out
+
+    Returns 'SpriteRenderable'
     """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
-        # Action-specific adjustments
-        self.action_data['position'] = (0, 0)
-        self.action_data['key'] = 'Transition'
+        self.action_data['key'] = 'Transition_SceneFade'
+        self.action_data['z_order'] = 9999999999999999999
         self.action_data['center_align'] = False
-        self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
 
-        # PROJECT DEFAULTS OVERRIDE
-        if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = settings.project_settings['Scene Transitions']['z_order']
-
-        if 'speed' not in self.action_data:
-            self.speed = settings.project_settings['Scene Transitions']['speed']
+        if self.action_data["color"] == "black":
+            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
+        elif self.action_data["color"] == "white":
+            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
         else:
-            self.speed = self.action_data['speed']
+            raise ValueError(f"'scene_fade_in' action Failed - Invalid color value provided: {self.action_data['color']}")
 
         new_sprite = SpriteRenderable(
             self.scene,
@@ -947,11 +942,64 @@ class fade_scene_from_black(Action):
 
     def Update(self, events):
         self.progress -= (self.speed * self.scene.delta_time)
+        print("Progress: ", self.progress)
+        print("Alpha: ", self.renderable.GetSurface().get_alpha())
         self.renderable.GetSurface().set_alpha(self.progress)
 
         self.scene.Draw()
 
         if self.progress <= self.goal:
+            print("Transition Complete")
+            self.Complete()
+
+    def Skip(self):
+        self.renderable.GetSurface().set_alpha(self.goal)
+        self.scene.Draw()
+        self.Complete()
+
+
+class scene_fade_out(Action):
+    """
+    Creates a texture of the selected color covering the entire screen, then slowly fades it in
+
+    Returns 'SpriteRenderable'
+    """
+    def Start(self):
+        self.LoadMetadata(__class__.__name__)
+
+        self.action_data['key'] = 'Transition_SceneFade'
+        self.action_data['z_order'] = 9999999999999999999
+        self.action_data['center_align'] = False
+
+        if self.action_data["color"] == "black":
+            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
+        elif self.action_data["color"] == "white":
+            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
+        else:
+            raise ValueError(f"'scene_fade_out' action Failed - Invalid color value provided: {self.action_data['color']}")
+
+        new_sprite = SpriteRenderable(
+            self.scene,
+            self.action_data
+        )
+        new_sprite.GetSurface().set_alpha(0)
+
+        self.scene.active_renderables.Add(new_sprite)
+        self.scene.Draw()
+
+        self.renderable = new_sprite
+        self.progress = 0
+        self.goal = 256
+
+        return new_sprite
+
+    def Update(self, events):
+        self.progress += (self.speed * self.scene.delta_time)
+        self.renderable.GetSurface().set_alpha(self.progress)
+
+        self.scene.Draw()
+
+        if self.progress >= self.goal:
             print("Transition Complete")
             self.Complete()
 

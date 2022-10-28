@@ -302,4 +302,5 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
     def Refresh(self, change_tree: list = None):
         self.size_refresh_func()
+        self.UpdateSubtext()
 

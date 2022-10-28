@@ -108,13 +108,6 @@ create_background:
       editable: True
       preview: True
 
-    position:
-      type: "Vector2"
-      value: [ 0,0 ]
-      default: [ 0,0 ]
-      editable: False
-      preview: False
-
     center_align:
       type: "Bool"
       value: False
@@ -858,6 +851,67 @@ load_scene:
       editable: True
       preview: True
 
+scene_fade_in:
+  display_name: "Scene Fade In"
+  requirements:
+    color:
+      type: "Dropdown"
+      value: "black"
+      default: "black"
+      options:
+        - "black"
+        - "white"
+      editable: True
+      preview: True
+
+    speed:
+      type: "Int"
+      value: 300
+      default: 300
+      editable: True
+      preview: True
+
+    post_wait:
+      type: "Dropdown"
+      value: "wait_until_complete"
+      default: "wait_until_complete"
+      options:
+        - "no_wait"
+        - "wait_for_input"
+        - "wait_until_complete"
+      editable: True
+      preview: False
+
+scene_fade_out:
+  display_name: "Scene Fade Out"
+  requirements:
+    color:
+      type: "Dropdown"
+      value: "black"
+      default: "black"
+      options:
+        - "black"
+        - "white"
+      editable: True
+      preview: True
+
+    speed:
+      type: "Int"
+      value: 300
+      default: 300
+      editable: True
+      preview: True
+
+    post_wait:
+      type: "Dropdown"
+      value: "wait_until_complete"
+      default: "wait_until_complete"
+      options:
+        - "no_wait"
+        - "wait_for_input"
+        - "wait_until_complete"
+      editable: True
+      preview: False
 
 # Utilities
 

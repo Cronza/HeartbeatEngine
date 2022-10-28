@@ -86,6 +86,3 @@ Dialogue:
   choice_button_z_order: 10001
 Pause Menu:
   data_file: HBEngine/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml
-Scene Transitions:
-  speed: 150
-  z_order: 9999

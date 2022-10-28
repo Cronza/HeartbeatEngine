@@ -40,9 +40,9 @@ class Renderable(pygame.sprite.Sprite):
 
         # YAML Parameters
         self.renderable_data = renderable_data
-        self.position = self.renderable_data['position']
-        self.center_align = self.renderable_data['center_align']
-        self.z_order = self.renderable_data['z_order']
+        self.position = (0, 0) if "position" not in self.renderable_data else self.renderable_data['position']
+        self.center_align = True if "center_align" not in self.renderable_data else self.renderable_data['center_align']
+        self.z_order = 0 if "z_order" not in self.renderable_data else self.renderable_data['z_order']
 
         # For indentification in the rendering stack, allow all renderables the ability be to assigned
         # a unique identifier. This parameter is mandatory, and is considered an exception if not provided
