@@ -555,6 +555,7 @@ class InputEntryEvent(InputEntryBase):
         super().__init__(data)
 
         self.excluded_properties = excluded_properties
+        #self.excluded_properties = {}#excluded_properties
         self.owning_view = owning_view
 
         # We need access to the return value of the created view item, so we must use a callback instead of a
@@ -577,11 +578,11 @@ class InputEntryEvent(InputEntryBase):
 
         self.main_layout.addWidget(self.input_widget)
 
-    def ChangeEvent(self, index):
+    def ChangeEvent(self):
         """ Switch the event, clearing all children and generating new ones """
         # Delete all existing children, as they're based on the active selection
         for i in range(self.owning_model_item.childCount()):
-            self.remove_func(self.owning_model_item.child(i))
+            self.remove_func(self.owning_model_item.child(0))
 
         # Since the entry children are properties of the action specified in the input_widget, we also need to specify
         # the action's name. This doesn't come as a part of the metadata clone, so we need to add the key manually
@@ -601,28 +602,33 @@ class InputEntryEvent(InputEntryBase):
         if metadata["requirements"]:
             self.AddItems(metadata["requirements"])
 
-    def AddItems(self, data=None, parent=None):
+    def AddItems(self, req_data=None, parent=None):
         if not parent:
             parent = self.owning_model_item
 
-        data_no_key = data[adh.GetActionName(data)]
-        new_entry = self.add_func(
-            owner=self,
-            view=self.owning_view,
-            name=adh.GetActionName(data),
-            data=data_no_key,
-            parent=parent,
-            excluded_properties=self.excluded_properties,
-            signal_func=self.signal_func,
-            refresh_func=self.refresh_func
-        )
-        if "children" in data_no_key:
-            for child_name, child_data in data_no_key["children"].items():
-                if "editable" in child_data:
-                    if not child_data["editable"]:
-                        continue
+        for name, data in req_data.items():
+            # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait')
+            if self.excluded_properties:
+                if name in self.excluded_properties:
+                    continue
 
-                self.AddItems(child_name, {child_name: child_data}, new_entry)
+            new_entry = self.add_func(
+                owner=self,
+                view=self.owning_view,
+                name=name,
+                data=data,
+                parent=parent,
+                excluded_properties=self.excluded_properties,
+                signal_func=self.signal_func,
+                refresh_func=self.refresh_func
+            )
+            if "children" in data:
+                for child_name, child_data in data["children"].items():
+                    if "editable" in child_data:
+                        if not child_data["editable"]:
+                            continue
+
+                    self.AddItems(child_name, {child_name: child_data}, new_entry)
 
         if not parent:
             # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion

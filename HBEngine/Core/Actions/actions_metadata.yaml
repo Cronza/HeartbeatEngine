@@ -108,6 +108,13 @@ create_background:
       editable: True
       preview: True
 
+    position:
+      type: "Vector2"
+      value: [ 0,0 ]
+      default: [ 0,0 ]
+      editable: False
+      preview: False
+
     center_align:
       type: "Bool"
       value: False
@@ -440,6 +447,7 @@ create_button:
                 - "None"
                 - "load_scene"
                 - "quit_game"
+                - "scene_fade_out"
               editable: True
               preview: False
 

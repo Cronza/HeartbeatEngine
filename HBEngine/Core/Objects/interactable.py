@@ -95,13 +95,13 @@ class Interactable(SpriteRenderable):
         #
         # Events can either be supplied as an array under the plural form "events", or singularly as "event"
         if "events" in self.renderable_data:
-            # These is a wrapper layer for each event to give them a unique key. Avoid this by getting values
-            # instead of items
-            events = self.renderable_data["events"][next(iter(self.renderable_data["events"]))]
-
             # Run each event in parallel
-            for event_name, event_data in events.items():
+            for array_elem_name, array_elem_data in self.renderable_data["events"].items():
+                # There is a wrapper layer for each event to give them a unique key. Shed this layer through some
+                # questionable parsing
+                event_data = array_elem_data[next(iter(array_elem_data))]
                 self.scene.a_manager.PerformAction(event_data, event_data["action"])
+
         elif "event" in self.renderable_data:
             event_data = self.renderable_data["event"]
             self.scene.a_manager.PerformAction(event_data, event_data["action"])
