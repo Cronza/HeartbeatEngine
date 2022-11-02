@@ -284,18 +284,18 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
     def CompileSubtextString(self, req_data):
         """ Given a list of requirements from the actions_metadata file, compile them into a user-friendly string """
-        #@TODO: Resolve issue for actions that don't have any requirements (IE. Stop Music)
         cur_string = ""
         for name, data in req_data.items():
-            if data["preview"]:
-                if "children" in data:
-                    cur_string += f"{name}: ["
-                    cur_string += self.CompileSubtextString(data['children'])
-                    cur_string += "], "
+            if "flags" in data:
+                if "preview" in data["flags"]:
+                    if "children" in data:
+                        cur_string += f"{name}: ["
+                        cur_string += self.CompileSubtextString(data['children'])
+                        cur_string += "], "
 
-                elif "value" in data:
-                    req_value = data["value"]
-                    cur_string += f"{name}: {req_value}, "
+                    elif "value" in data:
+                        req_value = data["value"]
+                        cur_string += f"{name}: {req_value}, "
 
         # Due to how the comma formatting is, strip it from the end of the string
         return cur_string.strip(', ')

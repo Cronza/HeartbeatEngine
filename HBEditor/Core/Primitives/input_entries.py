@@ -554,8 +554,7 @@ class InputEntryEvent(InputEntryBase):
          to this entry """
         super().__init__(data)
 
-        self.excluded_properties = excluded_properties
-        #self.excluded_properties = {}#excluded_properties
+        self.excluded_properties = []
         self.owning_view = owning_view
 
         # We need access to the return value of the created view item, so we must use a callback instead of a
@@ -592,9 +591,7 @@ class InputEntryEvent(InputEntryBase):
         self.data["children"].clear()
         self.data["children"]["action"] = {
             "type": "String",
-            "value": self.input_widget.currentText(),
-            "editable": False,
-            "preview": False
+            "value": self.input_widget.currentText()
         }
 
         # Grab the metadata for the event action, and generate children for all of its properties

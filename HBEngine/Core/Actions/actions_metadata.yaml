@@ -9,8 +9,11 @@
 #   - [Editor Only] 'default' contains the unedited value when loaded from this file. It's kept separate in order to allow resetting of 'value'
 #   - [Editor Only] 'editable' controls whether a parameter can be changed by the user either in the editor, or via editing the file manually.
 #   - [Editor Only] 'type' controls how that parameter is displayed in the editor (IE. Dropdown vs text box)
-#   - [Editor Only] 'preview' controls whether certain editors can show the value of the parameter in additional areas of the
-#     interface
+#   - [Editor Only] 'preview' controls whether certain editors can show the value of the parameter in additional areas of the interface
+#   - [Editor Only] 'no_exclusion' controls whether to remove editor-specific property exclusions for a property and its children. This
+#     is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and you
+#     you need it available for a particular action
+
 
 # Renderables
 
@@ -21,47 +24,41 @@ create_sprite:
       type: "String"
       value: ""
       default: ""
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     sprite:
       type: "File_Image"
       value: "HBEngine/Content/Sprites/Placeholder.png"
       default: "HBEngine/Content/Sprites/Placeholder.png"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
       value: [ 0.5, 0.5 ]
       default: [ 0.5, 0.5 ]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     z_order:
       type: "Int"
       value: 0
       default: 0
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     flip:
       type: "Bool"
       value: False
       default: False
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     transition:
       type: "Container"
-      preview: True
+      flags: ["preview"]
       children:
         type:
           type: "Dropdown"
@@ -70,15 +67,13 @@ create_sprite:
           options:
             - "None"
             - "fade_in"
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         speed:
           type: "Int"
           value: 500
           default: 500
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
     post_wait:
       type: "Dropdown"
@@ -88,8 +83,7 @@ create_sprite:
         - "no_wait"
         - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 create_background:
   display_name: "Create Background"
@@ -98,43 +92,33 @@ create_background:
       type: "String"
       value: "Background"
       default: "Background"
-      editable: False
-      preview: True
 
     sprite:
       type: "File_Image"
       value: "HBEngine/Content/Sprites/Placeholder.png"
       default: "HBEngine/Content/Sprites/Placeholder.png"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
       value: [ 0,0 ]
       default: [ 0,0 ]
-      editable: False
-      preview: False
 
     center_align:
       type: "Bool"
       value: False
       default: False
-      editable: False
-      preview: False
 
     z_order:
       type: "Int"
       value: -9999
       default: -9999
-      editable: False
-      preview: False
 
     flip:
       type: "Bool"
       value: False
       default: False
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     post_wait:
       type: "Dropdown"
@@ -144,8 +128,7 @@ create_background:
         - "no_wait"
         - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 create_text:
   display_name: "Create Text"
@@ -154,74 +137,65 @@ create_text:
       type: "String"
       value: ""
       default: ""
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
       value: [0.5,0.5]
       default: [0.5,0.5]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
       global: ["Text", "center_align"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     text:
       type: "Paragraph"
       value: "Default"
       default: "Default"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     text_size:
       type: "Int"
       value: 24
       default: 24
       global: ["Text", "size"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     text_color:
       type: "Color"
       value: [255, 255, 255]
       default: [255, 255, 255]
       global: ["Text", "color"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     font:
       type: "File_Font"
       value: "None"
       default: "None"
       global: ["Text", "font"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     z_order:
       type: "Int"
       value: 0
       default: 0
       global: ["Text", "z_order"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     wrap_bounds:
       type: "Vector2"
       value: [0.2,0.2]
       default: [0.2,0.2]
       global: ["Text", "wrap_bounds"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     transition:
       type: "Container"
-      preview: True
+      flags: ["preview"]
       children:
         type:
           type: "Dropdown"
@@ -230,15 +204,13 @@ create_text:
           options:
             - "None"
             - "fade_in"
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         speed:
           type: "Int"
           value: 500
           default: 500
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
     post_wait:
       type: "Dropdown"
@@ -248,8 +220,7 @@ create_text:
         - "no_wait"
         - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 remove_renderable:
   display_name: "Remove Renderable"
@@ -258,12 +229,11 @@ remove_renderable:
       type: "String"
       value: ""
       default: ""
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     transition:
       type: "Container"
-      preview: True
+      flags: ["preview"]
       children:
         type:
           type: "Dropdown"
@@ -272,15 +242,13 @@ remove_renderable:
           options:
             - "None"
             - "fade_out"
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         speed:
           type: "Int"
           value: 500
           default: 500
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
     post_wait:
       type: "Dropdown"
@@ -290,8 +258,7 @@ remove_renderable:
         - "no_wait"
         - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 # Interactables
 
@@ -302,142 +269,123 @@ create_button:
       type: "String"
       value: ""
       default: ""
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
       value: [ 0.5, 0.5 ]
       default: [ 0.5, 0.5 ]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     sprite:
       type: "File_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       global: ["Button", "sprite"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     sprite_hover:
       type: "File_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       global: ["Button", "sprite_hover"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     sprite_clicked:
       type: "File_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       global: ["Button", "sprite_clicked"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     z_order:
       type: "Int"
       value: 10001
       default: 10001
       global: ["Button", "z_order"]
-      editable: True
-      preview: False
+      flags: ["editable"]
 
     flip:
       type: "Bool"
       value: False
       default: False
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     button_text:
       type: "Container"
-      preview: True
+      flags: ["preview"]
       children:
         position:
           type: "Vector2"
           value: [ 0.5, 0.5 ]
           default: [ 0.5, 0.5 ]
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         center_align:
           type: "Bool"
           value: True
           default: True
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text:
           type: "String"
           value: "Default"
           default: "Default"
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         text_size:
           type: "Int"
           value: 24
           default: 24
           global: ["Text", "size"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text_color:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text_color_hover:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text_color_clicked:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         font:
           type: "File_Font"
           value: "None"
           default: "None"
           global: ["Button", "font"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         z_order: # Button text generate it's z_order based on the parent's. However, the param is still needed
           type: "Int"
           value: 10002
           default: 10002
-          editable: False
-          preview: False
 
     events:
       type: "Array"
-      editable: True
-      preview: False
+      flags: ["editable", "no_exclusion"]
       template:
         event:
           type: "Array_Element"
-          preview: False
+          flags: ["editable"]
           children:
             action:
               type: "Event"
@@ -448,8 +396,7 @@ create_button:
                 - "load_scene"
                 - "quit_game"
                 - "scene_fade_out"
-              editable: True
-              preview: False
+              flags: ["editable"]
 
 # Dialogue
 
@@ -460,40 +407,33 @@ create_dialogue_interface:
       type: "String"
       value: "DialogueFrame"
       default: "DialogueFrame"
-      editable: False
-      preview: False
 
     sprite:
       type: "File_Image"
       value: "None"
       default: "None"
       global: ["Dialogue", "dialogue_frame_sprite"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
       value: [0,0]
       default: [0,0]
       global: ["Dialogue", "dialogue_frame_position"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
       global: ["Dialogue", "dialogue_frame_center_align"]
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     z_order:
       type: "Int"
-      value: 0
-      default: 0
+      value: 9999
+      default: 9999
       global: ["Dialogue", "dialogue_frame_z_order"]
-      editable: True
-      preview: True
 
     post_wait:
       type: "Dropdown"
@@ -503,81 +443,70 @@ create_dialogue_interface:
         - "no_wait"
         - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 dialogue:
   display_name: "Dialogue"
   requirements:
     speaker:
       type: "Container"
-      preview: True
+      flags: ["editable", "preview"]
       children:
         key:
           type: "String"
           value: "SpeakerText"
           default: "SpeakerText"
-          editable: False
-          preview: False
 
         position:
           type: "Vector2"
           value: [0,0]
           default: [0,0]
           global: ["Dialogue", "speaker_text_position"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         center_align:
           type: "Bool"
           value: True
           default: True
           global: ["Dialogue", "speaker_text_center_align"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text:
           type: "String"
           value: ""
           default: ""
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         text_size:
           type: "Int"
           value: 24
           default: 24
           global: ["Dialogue", "speaker_text_size"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text_color:
           type: "Color"
           value: [255, 255, 255]
           default: [255, 255, 255]
           global: ["Dialogue", "speaker_text_color"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         font:
           type: "File_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "speaker_text_font"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         z_order:
           type: "Int"
           value: 0
           default: 0
           global: ["Dialogue", "speaker_text_z_order"]
-          editable: False
-          preview: False
 
         transition:
           type: "Container"
-          preview: False
+          flags: ["editable"]
           children:
             type:
               type: "Dropdown"
@@ -587,94 +516,80 @@ dialogue:
               options:
                 - "fade_in"
                 - "None"
-              editable: True
-              preview: False
+              flags: ["editable"]
 
             speed:
               type: "Int"
               value: 500
               default: 500
               global: [ "Dialogue", "transition_speed" ]
-              editable: True
-              preview: False
+              flags: ["editable"]
 
         wrap_bounds:
           type: "Vector2"
           value: [ 0.2,0.2 ]
           default: [ 0.2,0.2 ]
           global: [ "Dialogue", "speaker_text_wrap_bounds" ]
-          editable: False
-          preview: False
 
     dialogue:
       type: "Container"
-      preview: True
+      flags: ["editable", "preview"]
       children:
         key:
           type: "String"
           value: "DialogueText"
           default: "DialogueText"
-          editable: False
-          preview: False
 
         position:
           type: "Vector2"
           value: [0,0]
           default: [0,0]
           global: ["Dialogue", "dialogue_text_position"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         center_align:
           type: "Bool"
           value: True
           default: True
           global: ["Dialogue", "dialogue_text_center_align"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text:
           type: "Paragraph"
           value: "Default"
           default: "Default"
-          editable: True
-          preview: True
+          flags: ["editable", "preview"]
 
         text_size:
           type: "Int"
           value: 24
           default: 24
           global: ["Dialogue", "dialogue_text_size"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         text_color:
           type: "Color"
           value: [255, 255, 255]
           default: [255, 255, 255]
           global: ["Dialogue", "dialogue_text_color"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         font:
           type: "File_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "dialogue_text_font"]
-          editable: True
-          preview: False
+          flags: ["editable"]
 
         z_order:
           type: "Int"
           value: 0
           default: 0
           global: ["Dialogue", "dialogue_text_z_order"]
-          editable: False
-          preview: False
 
         transition:
           type: "Container"
-          preview: False
+          flags: ["editable"]
           children:
             type:
               type: "Dropdown"
@@ -684,168 +599,143 @@ dialogue:
               options:
                 - "fade_in"
                 - "None"
-              editable: True
-              preview: False
+              flags: ["editable"]
 
             speed:
               type: "Int"
               value: 1000
               default: 1000
               global: ["Dialogue", "transition_speed"]
-              editable: True
-              preview: False
+              flags: ["editable"]
 
         wrap_bounds:
           type: "Vector2"
           value: [ 0.8,0.16 ]
           default: [ 0.8,0.16 ]
           global: [ "Dialogue", "dialogue_text_wrap_bounds" ]
-          editable: False
-          preview: False
 
     post_wait:
       type: "String"
       value: "wait_for_input"
       default: "wait_for_input"
-      editable: False
-      preview: False
+
 
 choice:
   display_name: "Choice"
   requirements:
     choices:
       type: "Array"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
       template:
         choice:
           type: "Array_Element"
-          preview: True
+          flags: ["editable", "preview"]
           children:
             branch:
               type: "String"
               value: ""
               default: ""
-              editable: True
-              preview: True
+              flags: ["editable", "preview"]
 
             position:
               type: "Vector2"
               value: [ 0.5, 0.5 ]
               default: [ 0.5, 0.5 ]
-              editable: True
-              preview: True
+              flags: ["editable", "preview"]
 
             center_align:
               type: "Bool"
               value: True
               default: True
-              editable: False
-              preview: False
 
             sprite:
               type: "File_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: ["Dialogue", "choice_button_sprite"]
-              editable: True
-              preview: True
+              flags: ["editable", "preview"]
 
             sprite_hover:
               type: "File_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_hover" ]
-              editable: True
-              preview: False
+              flags: ["editable"]
 
             sprite_clicked:
               type: "File_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_clicked" ]
-              editable: True
-              preview: False
+              flags: ["editable"]
 
             z_order:
               type: "Int"
               value: 10001
               default: 10001
               global: ["Dialogue", "choice_button_text_size"]
-              editable: False
-              preview: False
 
             button_text:
               type: "Container"
-              preview: True
+              flags: ["editable", "preview"]
               children:
                 position:
                   type: "Vector2"
                   value: [ 0.5, 0.5 ]
                   default: [ 0.5, 0.5 ]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 center_align:
                   type: "Bool"
                   value: True
                   default: True
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 text:
                   type: "String"
                   value: "Default"
                   default: "Default"
-                  editable: True
-                  preview: True
+                  flags: ["editable", "preview"]
 
                 text_size:
                   type: "Int"
                   value: 24
                   default: 24
                   global: ["Dialogue", "choice_button_text_size"]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 text_color:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: ["Dialogue", "choice_button_text_color"]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 text_color_hover:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: [ "Dialogue", "choice_button_text_color_hover" ]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 text_color_clicked:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: [ "Dialogue", "choice_button_text_color_clicked" ]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 font:
                   type: "File_Font"
                   value: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   default: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   global: ["Dialogue", "choice_button_font"]
-                  editable: True
-                  preview: False
+                  flags: ["editable"]
 
                 z_order: # Button text generate it's  z_order based on the parent's. However, the param is still needed
                   type: "Int"
                   value: 10002
                   default: 10002
-                  editable: False
-                  preview: False
 
 # Scene
 
@@ -856,8 +746,7 @@ load_scene:
       type: "File_Data"
       default: ""
       value: ""
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
 scene_fade_in:
   display_name: "Scene Fade In"
@@ -869,15 +758,13 @@ scene_fade_in:
       options:
         - "black"
         - "white"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     speed:
       type: "Int"
       value: 300
       default: 300
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     post_wait:
       type: "Dropdown"
@@ -885,10 +772,8 @@ scene_fade_in:
       default: "wait_until_complete"
       options:
         - "no_wait"
-        - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: False
+      flags: ["editable"]
 
 scene_fade_out:
   display_name: "Scene Fade Out"
@@ -900,15 +785,13 @@ scene_fade_out:
       options:
         - "black"
         - "white"
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     speed:
       type: "Int"
       value: 300
       default: 300
-      editable: True
-      preview: True
+      flags: ["editable", "preview"]
 
     post_wait:
       type: "Dropdown"
@@ -916,10 +799,8 @@ scene_fade_out:
       default: "wait_until_complete"
       options:
         - "no_wait"
-        - "wait_for_input"
         - "wait_until_complete"
-      editable: True
-      preview: False
+      flags: ["editable"]
 
 # Utilities
 

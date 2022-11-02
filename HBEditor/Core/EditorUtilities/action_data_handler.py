@@ -84,9 +84,7 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
                 req_data["children"] = {
                     "action": {
                         "type": "String",
-                        "value": engine_entry[req_name]["action"],
-                        "editable": False,
-                        "preview": False
+                        "value": engine_entry[req_name]["action"]
                     }
                 }
                 req_data["children"].update(event_target_metadata["requirements"])  # Merge in the target req metadata

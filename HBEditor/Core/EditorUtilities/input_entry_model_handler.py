@@ -111,11 +111,6 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         data["value"] = data["default"]
         input_widget.Set(data["value"])
 
-    # Make the option read-only if applicable
-    if "editable" in data:
-        if not data["editable"]:
-            input_widget.SetEditable(2)
-
     name_widget = QLabel(name)
     global_checkbox = SimpleCheckbox()
     global_checkbox.owner = owning_model_item

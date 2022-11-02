@@ -83,26 +83,33 @@ class DetailsPanel(QtWidgets.QWidget):
         # Recursively create an entry for all items within the action_data
         # Note: This provides data to each by reference, so any changes made to data stored in each details entry
         # propagates directly back to the main entry
-        self.AddItems(adh.GetActionRequirements(self.active_entry.action_data))
+        self.AddItems(
+            req_data=adh.GetActionRequirements(self.active_entry.action_data),
+            excluded_properties=self.excluded_properties
+        )
 
         self.details_tree.expandAll()
 
-    def AddItems(self, req_data: dict, parent=None):
+    def AddItems(self, req_data: dict, parent=None, excluded_properties: list = None):
         """
         Recursively adds an InputEntry element into the details tree, including all of its children, for each action
         data dict item provided
         """
         for name, data in req_data.items():
-            # Some reqs are strictly meant to use defaults or globals, and not be edited by the user. In these
-            # circumstances,  don't display them
-            if "editable" in data:
-                if not data["editable"]:
+            if "flags" in data:
+                # Some reqs are strictly meant to use defaults or globals, and not be edited by the user. In these
+                # circumstances,  don't display them
+                if "editable" not in data["flags"]:
                     continue
 
-            # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait')
-            if self.excluded_properties:
-                if name in self.excluded_properties:
-                    continue
+                # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait'). Don't
+                # generate entries for any excluded property. Make an exception if the 'no_exclusion' flag is used
+                elif excluded_properties:
+                    if name in excluded_properties:
+                        if "no_exclusion" not in data["flags"]:
+                            continue
+            else:
+                continue
 
             entry = iemh.Add(
                 owner=self,
@@ -110,13 +117,18 @@ class DetailsPanel(QtWidgets.QWidget):
                 name=name,
                 data=data,
                 parent=parent,
-                excluded_properties=self.excluded_properties,
+                excluded_properties=excluded_properties,
                 signal_func=self.ConnectSignals,
                 refresh_func=self.UserUpdatedInputWidget
             )
 
             if "children" in data:
-                self.AddItems(data["children"], entry)
+                # If an entry includes the 'no_exclusion' flag, then
+                # ignore this exclusion list for all child properties
+                if "no_exclusion" in data["flags"]:
+                    self.AddItems(data["children"], entry)
+                else:
+                    self.AddItems(data["children"], entry, excluded_properties)
 
     def ConnectSignals(self, tree_item):
         """ Connects the InputEntry signals to slots within this class """

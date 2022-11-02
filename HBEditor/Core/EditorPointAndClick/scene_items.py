@@ -78,7 +78,11 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             # could apply a lock which prevents user control). Apply these effects only based on the data
             # from the top-most item
             if "position" in action_data:
-                if not action_data['position']['editable']:
+                if "flags" in action_data["position"]:
+                    if "editable" not in action_data["position"]:
+                        self.SetLocked(True)
+                        self._movement_perm_locked = True
+                else:
                     self.SetLocked(True)
                     self._movement_perm_locked = True
 

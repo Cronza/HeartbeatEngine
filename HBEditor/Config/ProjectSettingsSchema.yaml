@@ -15,15 +15,6 @@ Window:
   resolution: "" # This is generated when choosing a value for 'resolution_options'
   resolution_options: "CUST_Resolution"
 
-Sprite:
-  background_z_order: "Int"
-  z_order: "Int"
-  center_align: "Bool"
-
-Interactable:
-  z_order: "Int"
-  center_align: "Bool"
-
 Text:
   size: "Int"
   color: "Color"
@@ -36,8 +27,8 @@ Button:
   sprite: "File_Image"
   sprite_hover: "File_Image"
   sprite_clicked: "File_Image"
-  font: "File_Font"
   z_order: "Int"
+  font: "File_Font"
 
 Dialogue:
   transition_type: "String"  # TODO: Figure out how to support a Dropdown type here (Game.yaml doesn't have any way of specifying the 'options' yet
@@ -61,6 +52,16 @@ Dialogue:
   dialogue_frame_z_order: "Int"
   dialogue_frame_center_align: "Bool"
   dialogue_frame_position: "Vector2"
+  choice_button_sprite: "File_Image"
+  choice_button_sprite_hover: "File_Image"
+  choice_button_sprite_clicked: "File_Image"
+  choice_button_z_order: "Int"
+  choice_button_center_align: "Bool"
+  choice_button_text_size: "Int"
+  choice_button_text_color: "Color"
+  choice_button_text_color_hover: "Color"
+  choice_button_text_color_clicked: "Color"
+  choice_button_font: "File_Font"
 
 Pause Menu:
   data_file: "File_Data"
@@ -69,14 +70,3 @@ Scene Transitions:
   speed: "Int"
   z_order: "Int"
 
-Choice:
-  button_sprite: "File_Image"
-  button_sprite_hover: "File_Image"
-  button_sprite_clicked: "File_Image"
-  button_text_size: "Int"
-  button_text_color: "Color"
-  button_font: "File_Font"
-  button_text_z_order: "Int"
-  button_text_center_align: "Bool"
-  button_z_order: "Int"
-  button_center_align: "Bool"

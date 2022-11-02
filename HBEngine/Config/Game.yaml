@@ -69,6 +69,7 @@ Dialogue:
   choice_button_sprite: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
   choice_button_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
   choice_button_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
+  choice_button_z_order: 10001
   choice_button_text_size: 24
   choice_button_text_color:
   - 204
@@ -83,6 +84,5 @@ Dialogue:
   - 255
   - 255
   choice_button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  choice_button_z_order: 10001
 Pause Menu:
   data_file: HBEngine/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml
