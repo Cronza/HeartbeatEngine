@@ -29,6 +29,8 @@ class Scene:
         self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
         self.a_manager = ActionManager(self)
 
+        self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
+
         self.pause_menu = None
 
         # Keep track of delta time so time-based actions can be more accurate across systems

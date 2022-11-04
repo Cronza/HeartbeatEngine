@@ -34,6 +34,9 @@ class Interactable(SpriteRenderable):
         # Track whether the previous input frame was clicking to determine whether this interactable was clicked
         self.isClicking = False
 
+        # Since interactions can contain any number of resulting actions, store the list of actions here
+        self.interact_events = []
+
         # Interactable state surfaces
         #@TODO: Setup 'clicked' state
         self.hover_surface = None
@@ -54,23 +57,24 @@ class Interactable(SpriteRenderable):
         super().update()
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
-            # If not already in the hover state...
-            if self.state is State.normal:
-                self.ChangeState(State.hover)
-            else:  # Track whether the user has released their cursor over the sprite
-                if pygame.mouse.get_pressed()[0] == 1:
-                    # Begin the click
-                    self.ChangeState(State.pressed)
-                    self.isClicking = True
-                    self.Interact()
-                elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
-                    # User has released the mouse after clicking this renderable. Reset state
+            if not self.scene.stop_interactions:
+                # If not already in the hover state...
+                if self.state is State.normal:
                     self.ChangeState(State.hover)
-                    self.isClicking = False
-                elif self.isClicking is True:
-                    # End the click
-                    self.ChangeState(State.normal)
-                    self.isClicking = False
+                else:  # Track whether the user has released their cursor over the sprite
+                    if pygame.mouse.get_pressed()[0] == 1:
+                        # Begin the click
+                        self.ChangeState(State.pressed)
+                        self.isClicking = True
+                        self.Interact()
+                    elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
+                        # User has released the mouse after clicking this renderable. Reset state
+                        self.ChangeState(State.hover)
+                        self.isClicking = False
+                    elif self.isClicking is True:
+                        # End the click
+                        self.ChangeState(State.normal)
+                        self.isClicking = False
 
         # If no longer hovering...
         elif self.state is not State.normal:
@@ -91,22 +95,33 @@ class Interactable(SpriteRenderable):
             self.scaled_clicked_surface = self.GetRescaledSurface(multiplier, self.clicked_surface)
 
     def Interact(self):
-        # Check if any events are in use
-        #
         # Events can either be supplied as an array under the plural form "events", or singularly as "event"
         if "events" in self.renderable_data:
-            # Run each event in parallel
+            # Collect and store all event actions
             for array_elem_name, array_elem_data in self.renderable_data["events"].items():
                 # There is a wrapper layer for each event to give them a unique key. Shed this layer through some
                 # questionable parsing
-                event_data = array_elem_data[next(iter(array_elem_data))]
-                self.scene.a_manager.PerformAction(event_data, event_data["action"])
+                self.interact_events.append(array_elem_data[next(iter(array_elem_data))])
+
+            if self.interact_events:
+                # Run the first action, providing a callback in order to continue the remaining events
+                self.scene.stop_interactions = True
+                self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"], self.ContinueInteract)
 
         elif "event" in self.renderable_data:
             event_data = self.renderable_data["event"]
             self.scene.a_manager.PerformAction(event_data, event_data["action"])
         else:
-            print("No events defined for this object - Clicking does nothing")
+            print("No events defined for this object - Interacting does nothing")
+
+    def ContinueInteract(self):
+        self.interact_events.pop(0)
+
+        # If there are still more events, perform them
+        if self.interact_events:
+            self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"], self.ContinueInteract)
+        else:
+            self.scene.stop_interactions = False
 
     def LoadStateSprites(self):
         """

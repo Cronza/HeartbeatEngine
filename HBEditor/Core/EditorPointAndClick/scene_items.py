@@ -79,7 +79,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             # from the top-most item
             if "position" in action_data:
                 if "flags" in action_data["position"]:
-                    if "editable" not in action_data["position"]:
+                    if "editable" not in action_data["position"]["flags"]:
                         self.SetLocked(True)
                         self._movement_perm_locked = True
                 else:

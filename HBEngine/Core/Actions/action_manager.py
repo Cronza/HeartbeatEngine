@@ -38,11 +38,11 @@ class ActionManager:
                     # cause them to close prematurely. It's also difficult to have oversight on what actions might
                     # do, and what completion delegates may do. To avoid any confusion, always run the delegates just
                     # as the action is closing
-                    if action.complete_delegate:
-                        action.complete_delegate()
+                    if action.completion_callback:
+                        action.completion_callback()
                     del self.active_actions[action]
 
-    def PerformAction(self, action_data, action_name, complete_delegate=None):
+    def PerformAction(self, action_data, action_name, completion_callback=None):
         """
         Given an action_data YAML block and an action name, create and run the associated action
         """
@@ -53,8 +53,8 @@ class ActionManager:
         new_action = action(self.scene, action_data, self)
 
         # If the calling function wishes to be informed when the action is completed, opt in here
-        if complete_delegate:
-            new_action.complete_delegate = complete_delegate
+        if completion_callback:
+            new_action.completion_callback = completion_callback
 
         self.active_actions[new_action] = None
 

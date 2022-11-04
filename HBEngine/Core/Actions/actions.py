@@ -42,7 +42,7 @@ class Action:
         self.speed = 500
         self.skippable = True
         self.complete = False
-        self.complete_delegate = None  # Called by the action manager before it deletes the action
+        self.completion_callback = None  # Called by the action manager before it deletes the action
         self.metadata = {}  # Loaded via function
 
     def Start(self):
@@ -866,7 +866,7 @@ class load_scene(Action):
 
 class wait(Action):
     """
-    Waits for a set amount of time before completing
+    Waits for a set amount of timcompletion_callbacke before completing
     """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
@@ -942,14 +942,11 @@ class scene_fade_in(Action):
 
     def Update(self, events):
         self.progress -= (self.speed * self.scene.delta_time)
-        print("Progress: ", self.progress)
-        print("Alpha: ", self.renderable.GetSurface().get_alpha())
         self.renderable.GetSurface().set_alpha(self.progress)
 
         self.scene.Draw()
 
         if self.progress <= self.goal:
-            print("Transition Complete")
             self.Complete()
 
     def Skip(self):
@@ -1000,7 +997,6 @@ class scene_fade_out(Action):
         self.scene.Draw()
 
         if self.progress >= self.goal:
-            print("Transition Complete")
             self.Complete()
 
     def Skip(self):
