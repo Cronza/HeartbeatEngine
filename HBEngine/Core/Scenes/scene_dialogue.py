@@ -60,7 +60,6 @@ class DialogueScene(PointAndClickScene):
                     self.a_manager.PerformAction(data, name)
                     self.dialogue_index += 1
                 elif "wait_until_complete" in data["post_wait"]:
-                    print("Waiting until complete")
                     self.a_manager.PerformAction(data, name, self.ActionComplete)
                 elif "no_wait" in data["post_wait"]:
                     self.a_manager.PerformAction(data, name)

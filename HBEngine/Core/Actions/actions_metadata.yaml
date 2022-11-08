@@ -767,6 +767,15 @@ scene_fade_in:
       default: 300
       flags: ["editable", "preview"]
 
+    post_wait:
+      type: "Dropdown"
+      value: "wait_until_complete"
+      default: "wait_until_complete"
+      options:
+        - "no_wait"
+        - "wait_until_complete"
+      flags: [ "editable" ]
+
 scene_fade_out:
   display_name: "Scene Fade Out"
   requirements:
@@ -784,6 +793,15 @@ scene_fade_out:
       value: 300
       default: 300
       flags: ["editable", "preview"]
+
+    post_wait:
+      type: "Dropdown"
+      value: "wait_until_complete"
+      default: "wait_until_complete"
+      options:
+        - "no_wait"
+        - "wait_until_complete"
+      flags: [ "editable" ]
 
 # Utilities
 

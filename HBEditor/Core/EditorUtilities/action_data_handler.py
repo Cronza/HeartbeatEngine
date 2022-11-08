@@ -29,9 +29,9 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
     conv_data = {}
     if search_term in editor_req_data:
         for req_name, req_data in editor_req_data[search_term].items():
-            # Prevent exporting requirements that are not in use by this editor type
+            # Prevent exporting requirements that are not in use by this editor type unless exempted
             if excluded_properties:
-                if req_name in excluded_properties:
+                if req_name in excluded_properties and "no_exclusion" not in req_data["flags"]:
                     continue
 
             if "global_active" in req_data:
