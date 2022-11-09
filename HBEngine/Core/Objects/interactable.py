@@ -104,9 +104,9 @@ class Interactable(SpriteRenderable):
                 self.interact_events.append(array_elem_data[next(iter(array_elem_data))])
 
             if self.interact_events:
+                self.scene.stop_interactions = True
                 if "post_wait" in self.interact_events[0]:
                     if self.interact_events[0]["post_wait"] == "wait_until_complete":
-                        self.scene.stop_interactions = True
                         self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"], self.ContinueInteract)
                     else:
                         # All other cases use 'no_wait'

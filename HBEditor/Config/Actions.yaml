@@ -49,3 +49,19 @@ Scene:
     - name: "scene_fade_out"
       applicable_editors:
         - Scene_Dialogue
+
+Sound:
+  icon: ":/Icons/AM_Dialogue.png"
+  options:
+    - name: "play_sfx"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "play_music"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "stop_sfx"
+      applicable_editors:
+        - Scene_Dialogue
+    - name: "stop_music"
+      applicable_editors:
+        - Scene_Dialogue

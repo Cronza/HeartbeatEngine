@@ -800,12 +800,6 @@ class stop_sfx(Action):
 
 class play_music(SoundAction):
     #@TODO: Implement end-event so this action completes when the song reaches last frame
-    """
-    Possible Parameters:
-    - music: str
-    - volume : float
-    - loop : bool
-    """
 
     def Start(self):
         self.LoadMetadata(__class__.__name__)
@@ -828,7 +822,7 @@ class play_music(SoundAction):
         pygame.mixer.music.play(loop_count)
         self.scene.active_music = self
 
-        return None
+        self.Complete()
 
     def Update(self, events):
         if not pygame.mixer.music.get_busy():
@@ -926,6 +920,9 @@ class scene_fade_in(Action):
         else:
             raise ValueError(f"'scene_fade_in' action Failed - Invalid color value provided: {self.action_data['color']}")
 
+        if 'speed' in self.action_data:
+            self.speed = self.action_data['speed']
+
         new_sprite = SpriteRenderable(
             self.scene,
             self.action_data
@@ -974,6 +971,9 @@ class scene_fade_out(Action):
             self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
         else:
             raise ValueError(f"'scene_fade_out' action Failed - Invalid color value provided: {self.action_data['color']}")
+
+        if 'speed' in self.action_data:
+            self.speed = self.action_data['speed']
 
         new_sprite = SpriteRenderable(
             self.scene,

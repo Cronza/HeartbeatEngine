@@ -397,6 +397,7 @@ create_button:
                 - "quit_game"
                 - "scene_fade_out"
                 - "scene_fade_in"
+                - "play_sfx"
               flags: ["editable"]
 
 # Dialogue
@@ -802,6 +803,86 @@ scene_fade_out:
         - "no_wait"
         - "wait_until_complete"
       flags: [ "editable" ]
+
+
+play_sfx:
+  display_name: "Play SFX"
+  requirements:
+    key:
+      type: "String"
+      value: "SFX"
+      default: "SFX"
+      flags: ["editable", "preview"]
+
+    sound:
+      type: "File_Sound"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
+
+    volume:
+      type: "Float"
+      value: 1.0
+      default: 1.0
+      flags: ["editable", "preview"]
+
+    post_wait:
+      type: "Dropdown"
+      value: "wait_until_complete"
+      default: "wait_until_complete"
+      options:
+        - "no_wait"
+        - "wait_until_complete"
+      flags: ["editable", "preview", "no_exclusion"]
+
+# Play Music
+play_music:
+  display_name: "Play Music"
+  requirements:
+    music:
+      type: "File_Sound"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
+
+    volume:
+      type: "Float"
+      value: 1.0
+      default: 1.0
+      flags: ["editable", "preview"]
+
+    loop:
+      type: "Bool"
+      value: False
+      default: False
+      flags: ["editable", "preview"]
+
+    post_wait:
+      type: "Dropdown"
+      value: "no_wait"
+      default: "no_wait"
+      options:
+        - "no_wait"
+        - "wait_until_complete"
+      flags: ["editable", "preview"]
+
+stop_sfx:
+  display_name: "Stop SFX"
+  requirements:
+    key:
+      type: "String"
+      value: "SFX"
+      default: "SFX"
+      flags: ["editable", "preview"]
+
+stop_music:
+  display_name: "Stop Music"
+  requirements:
+    key:
+      type: "String"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
 
 # Utilities
 

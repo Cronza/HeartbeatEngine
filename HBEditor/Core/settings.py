@@ -66,7 +66,7 @@ supported_content_types = {
     "Image": "Image Files (*.png *.jpg)",
     "Data": "YAML Files (*.yaml)",
     "Font": "Font Files (*.ttf)",
-    "Sound": "Sound Files (*.mp3 *.wav)",
+    "Sound": "Sound Files (*.mp3 *.wav *.ogg)",
 }
 
 user_project_name = None
