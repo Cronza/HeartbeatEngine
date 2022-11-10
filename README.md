@@ -25,14 +25,20 @@ Currently, the Heartbeat Engine is in core development, so there may be issues d
     ```
     python -m venv <repo_root>/venv
     ```
+
+3. Activate virtual environment
+
+    ```
+    <repo_root>/venv/activate
+    ``` 
     
-3. Install from `requirements.txt`
+4. Install from `requirements.txt`
 
     ```
     <repo_root>/venv/Scripts/pip.exe install -r <repo_root>/requirements.txt
     ```
    
-4. Launch the Editor
+5. Launch the Editor
     
    This step has a few options. There is a simple launch script in the repo root called `launch_editor.bat`. This will launch the editor with a CMD terminal for debug output
    
