@@ -28,8 +28,9 @@ Currently, the Heartbeat Engine is in core development, so there may be issues d
 
 3. Activate virtual environment
 
+    In powershell:
     ```
-    <repo_root>/venv/activate
+    <repo_ root>./venv/Scripts/activate
     ``` 
     
 4. Install from `requirements.txt`
