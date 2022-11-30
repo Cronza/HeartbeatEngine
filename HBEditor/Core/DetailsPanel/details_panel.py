@@ -151,17 +151,52 @@ class DetailsPanel(QtWidgets.QWidget):
                 parent = self.details_tree.invisibleRootItem()
 
             for entry_index in range(0, parent.childCount()):
-                # Each entry is assigned data as reference to the original entry. Any changes we make will propagate
+                # Each entry is assigned data by reference to the original entry. Any changes we make will propagate
                 # directly back to that entry
                 entry = parent.child(entry_index)
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
-
                 if "global" in entry_data:
                     global_checkbox = self.details_tree.itemWidget(entry, 2)
                     entry_data["global_active"] = global_checkbox.Get()
 
-                if entry.childCount() > 0:
+                if entry_data["type"] == "Array":
+                    # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
+                    # entries and the entries recorded in the active_entries' action_data. This issue exists as the
+                    # data stored in the active_entry is the full clone from the actions_metadata, containing all
+                    # requirements whether they're displayed in the editor or not. Since we only generate details
+                    # entries for requirements that are displayed, this means we'd never store the data for any entries
+                    # not visible
+                    #
+                    # If we forcefully update 'children', we'd stomp the hidden requirements. To avoid this, we use
+                    # '.update' which applies changes to keys that already exist. However, since arrays remove data,
+                    # the .update call won't remove the data that we deleted, thus leaving it perpetually there until
+                    # the keys are overriden
+                    #
+                    # To avoid this, we take the unfortunate route of regenerating the entire stored data block from the
+                    # template each time, removing any stagnant data, and updating it with the changes from the
+                    # displayed entries
+
+                    entry_data["children"] = {}
+
+                    for child_index in range(0, entry.childCount()):
+                        # Get the underlying element dict without the top-most key (It's usually replaced by a generated
+                        # one)
+                        # Since array elements use generated key names, the top-most key name of the template needs to
+                        # be changed to match. However, we can't infer or deduce what names to use, so we'll fetch it
+                        # directly from the child entries
+                        child_entry = entry.child(child_index)
+                        child_entry_name = self.details_tree.itemWidget(child_entry, 0).text()
+
+                        # Stomp the stored data with a copy of the template updated with the generated name
+                        template_copy = copy.deepcopy(entry_data["template"])
+                        entry_data["children"][child_entry_name] = template_copy[adh.GetActionName(template_copy)]
+
+                    # Update the children as usual now that the stagnant data has been removed
+                    entry_data["children"].update(self.StoreData(entry, False))
+
+                elif entry.childCount() > 0:
+
                     # We do an update here as not all items within the action_data were displayed (uneditable details
                     # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
                     entry_data["children"].update(self.StoreData(entry, False))
