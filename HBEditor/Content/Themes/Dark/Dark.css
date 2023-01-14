@@ -31,17 +31,23 @@ QToolBar {
   /* maximum icon size */
   background-color: #3F4245;
   border-top: 1px solid #2A2A2B; }
-  QToolBar:separator {
+  QToolBar:separator#horizontal {
     background-color: #2A2A2B;
     height: 1px;
     margin-top: 4px;
     margin-bottom: 4px; }
-  QToolBar#logger {
+  QToolBar:separator#vertical {
+    background-color: #2A2A2B;
+    width: 1px;
+    margin-left: 4px;
+    margin-right: 4px; }
+  QToolBar#vertical {
     /* The logger is pressed against another border above it */
     border-top: 0px solid transparent; }
 
 QToolButton {
   background-color: #3F4245;
+  color: rgba(255, 255, 255, 80%);
   border: 1px solid #3F4245;
   padding: 2px; }
   QToolButton:hover {
@@ -50,6 +56,9 @@ QToolButton {
     background-color: #213D54; }
   QToolButton:menu-indicator {
     image: none; }
+  QToolButton:right-arrow {
+    image: url(":/Icons/Arrow_Right.png");
+    padding: 3px; }
   QToolButton#non-toolbar {
     /* ToolButtons that are used outside of a toolbar */
     background-color: #4E4E52;

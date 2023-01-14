@@ -16,14 +16,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
+#from HBEditor.Core.Outliner.outliner import Outliner
 from HBEditor.Core.Outliner.outliner import Outliner
 
 
 class HBEditorUI:
-    def __init__(self, e_core):
+    def __init__(self, core):
         super().__init__()
 
-        self.e_core = e_core
+        self.core = core
 
     def setupUi(self, MainWindow):
 
@@ -78,22 +79,14 @@ class HBEditorUI:
         # File Menu
         self.file_menu = QtWidgets.QMenu(self.menu_bar)
         self.file_menu.setWindowFlags(self.file_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
-        self.a_new_file = QtWidgets.QAction(main_window)
-        self.a_new_file.triggered.connect(self.e_core.NewFile)
-        self.a_open_file = QtWidgets.QAction(main_window)
-        self.a_open_file.triggered.connect(self.e_core.OpenFile)
         self.a_save_file = QtWidgets.QAction(main_window)
-        self.a_save_file.triggered.connect(self.e_core.Save)
-        self.a_save_file_as = QtWidgets.QAction(main_window)
-        self.a_save_file_as.triggered.connect(self.e_core.SaveAs)
+        self.a_save_file.triggered.connect(self.core.Save)
         self.a_new_project = QtWidgets.QAction(main_window)
-        self.a_new_project.triggered.connect(self.e_core.NewProject)
+        self.a_new_project.triggered.connect(self.core.NewProject)
         self.a_open_project = QtWidgets.QAction(main_window)
-        self.a_open_project.triggered.connect(self.e_core.OpenProject)
-        self.file_menu.addAction(self.a_new_file)
-        self.file_menu.addAction(self.a_open_file)
+        self.a_open_project.triggered.connect(self.core.OpenProject)
         self.file_menu.addAction(self.a_save_file)
-        self.file_menu.addAction(self.a_save_file_as)
+        #self.file_menu.addAction(self.a_save_file_as)
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
 
@@ -101,23 +94,23 @@ class HBEditorUI:
         self.settings_menu = QtWidgets.QMenu(self.menu_bar)
         self.settings_menu.setWindowFlags(self.settings_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_open_project_settings = QtWidgets.QAction(main_window)
-        self.a_open_project_settings.triggered.connect(self.e_core.OpenProjectSettings)
+        self.a_open_project_settings.triggered.connect(self.core.OpenProjectSettings)
         self.settings_menu.addAction(self.a_open_project_settings)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self.menu_bar)
         self.play_menu.setWindowFlags(self.play_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_play_game = QtWidgets.QAction(main_window)
-        self.a_play_game.triggered.connect(self.e_core.Play)
+        self.a_play_game.triggered.connect(self.core.Play)
         self.play_menu.addAction(self.a_play_game)
 
         # Build Menu
         self.build_menu = QtWidgets.QMenu(self.menu_bar)
         self.build_menu.setWindowFlags(self.build_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_build = QtWidgets.QAction(main_window)
-        self.a_build.triggered.connect(self.e_core.Build)
+        self.a_build.triggered.connect(self.core.Build)
         self.a_build_clean = QtWidgets.QAction(main_window)
-        self.a_build_clean.triggered.connect(self.e_core.Clean)
+        self.a_build_clean.triggered.connect(self.core.Clean)
         self.build_menu.addAction(self.a_build)
         self.build_menu.addAction(self.a_build_clean)
 
@@ -137,14 +130,8 @@ class HBEditorUI:
 
         # 'File Menu' Actions
         self.file_menu.setTitle(_translate("MainWindow", "File"))
-        self.a_new_file.setText(_translate("MainWindow", "New File"))
-        self.a_new_file.setShortcut(_translate("MainWindow", "Ctrl+N"))
-        self.a_open_file.setText(_translate("MainWindow", "Open File"))
-        self.a_open_file.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.a_save_file.setText(_translate("MainWindow", "Save"))
         self.a_save_file.setShortcut(_translate("MainWindow", "Ctrl+S"))
-        self.a_save_file_as.setText(_translate("MainWindow", "Save As"))
-        self.a_save_file_as.setShortcut(_translate("MainWindow", "Ctrl+Alt+S"))
         self.a_new_project.setText(_translate("MainWindow", "New Project"))
         self.a_new_project.setShortcut(_translate("MainWindow", "Ctrl+Alt+Shift+N"))
         self.a_open_project.setText(_translate("MainWindow", "Open Project"))
@@ -176,7 +163,7 @@ class HBEditorUI:
         self.main_tab_editor.setVisible(False)
         self.main_tab_editor.setElideMode(0)
         self.main_tab_editor.setTabsClosable(True)
-        self.main_tab_editor.tabCloseRequested.connect(self.RemoveEditorTab)
+        self.main_tab_editor.tabCloseRequested.connect(self.RemoveTab)
         self.main_tab_editor.currentChanged.connect(self.ChangeTab)
 
         self.main_editor_layout.addWidget(self.main_tab_editor)
@@ -189,11 +176,11 @@ class HBEditorUI:
     def ChangeTab(self, index):
         """ Updates the active editor when the tab selection changes """
         if index != -1:
-            self.e_core.active_editor = self.main_tab_editor.widget(index).core
+            self.core.active_editor = self.main_tab_editor.widget(index).core
             if not self.main_tab_editor.isVisible():
                 self.main_tab_editor.setVisible(True)
         else:
-            self.e_core.active_editor = None
+            self.core.active_editor = None
             self.main_tab_editor.setVisible(False)
 
     def CreateBottomTabContainer(self):
@@ -226,8 +213,8 @@ class HBEditorUI:
 
     def CreateOutliner(self):
         """ Creates the outliner window, and adds it to the bottom tab menu """
-        self.outliner = Outliner(self.e_core)
-        self.e_core.outliner = self.outliner
+        self.outliner = Outliner(self.core)
+        self.core.outliner = self.outliner
         self.AddTab(self.outliner.GetUI(), "Outliner", self.bottom_tab_editor)
 
     def AddTab(self, widget, tab_name, target_tab_widget):
@@ -235,22 +222,20 @@ class HBEditorUI:
         tab_index = target_tab_widget.addTab(widget, tab_name)
         target_tab_widget.setCurrentIndex(tab_index)
 
-    def RemoveEditorTab(self, index):
-        """ Remove the tab for the given index (Value is automatically provided by the tab system as an arg) """
+    def RemoveTab(self, index):
+        """ Remove the tab for the given index """
         #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
         Logger.getInstance().Log("Closing editor...")
-
-        editor_widget = self.main_tab_editor.widget(index)
-        del editor_widget
         self.main_tab_editor.removeTab(index)
-
+        if self.main_tab_editor.count() == 0:
+            self.core.active_editor = None
         Logger.getInstance().Log("Editor closed")
 
     def LoadTheme(self, theme_path) -> None:
         """ Given the resource path to a theme .css file, load it and apply it to the editor application """
         theme_file = QtCore.QFile(theme_path)
         if theme_file.open(QtCore.QFile.ReadOnly):
-            self.e_core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
+            self.core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
         else:
             Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
             print(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}")
@@ -260,12 +245,3 @@ class HBEditorUI:
         for font in fonts:
             if QtGui.QFontDatabase.addApplicationFont(font) < 0:
                 Logger.getInstance().Log(f"Failed to load font '{font}'", 4)
-
-#if __name__ == "__main__":
-#    import sys
-#    app = QtWidgets.QApplication(sys.argv)
-#    MainWindow = QtWidgets.QMainWindow()
-    #ui = Ui_MainWindow()
-#    ui.setupUi(MainWindow)
-#    MainWindow.show()
-#    sys.exit(app.exec_())

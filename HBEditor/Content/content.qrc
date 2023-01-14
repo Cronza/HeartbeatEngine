@@ -26,7 +26,6 @@
         <file alias="Color_Wheel.png">Icons/Color_Wheel.png</file>
         <file alias="Color_Wheel_Disabled.png">Icons/Color_Wheel_Disabled.png</file>
         <file alias="Copy.png">Icons/Copy.png</file>
-        <file alias="AM_Dialogue.png">Icons/Dialogue.png</file>
         <file alias="Down.png">Icons/Down.png</file>
         <file alias="Up.png">Icons/Up.png</file>
         <file alias="Close.png">Icons/Close.png</file>
@@ -41,7 +40,9 @@
         <file alias="Small_Minus_Hover.png">Icons/Small_Minus_Hover.png</file>
         <file alias="Small_Plus.png">Icons/Small_Plus.png</file>
         <file alias="Small_Plus_Hover.png">Icons/Small_Plus_Hover.png</file>
+        <file alias="AM_Dialogue.png">Icons/Dialogue.png</file>
         <file alias="AM_Renderable.png">Icons/Renderable.png</file>
+        <file alias="AM_Scene.png">Icons/Scene.png</file>
         <file alias="Engine_Logo.png">Icons/Engine_Logo.png</file>
         <file alias="Trash.png">Icons/Trash.png</file>
         <file alias="Arrow_Down.png">Icons/Arrow_Down.png</file>
@@ -49,7 +50,9 @@
         <file alias="Arrow_Right.png">Icons/Arrow_Right.png</file>
         <file alias="Arrow_Right_Hover.png">Icons/Arrow_Right_Hover.png</file>
         <file alias="Lock.png">Icons/Lock.png</file>
-        <file alias="AM_Scene.png">Icons/Scene.png</file>
+        <file alias="Import.png">Icons/Import.png</file>
+        <file alias="Information.png">Icons/Information.png</file>
+        <file alias="Rename.png">Icons/Rename.png</file>
     </qresource>
     <qresource prefix="Themes">
         <file alias="Dark.css">Themes/Dark/Dark.css</file>

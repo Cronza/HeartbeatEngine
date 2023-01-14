@@ -68,13 +68,21 @@ QToolBar{
     border-top: $size_border solid $col_secondary;
 
     &:separator{
-        background-color: $col_secondary;
-        height: 1px;
-        margin-top: 4px;
-        margin-bottom: 4px;
+        &#horizontal{
+            background-color: $col_secondary;
+            height: 1px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+        &#vertical{
+            background-color: $col_secondary;
+            width: 1px;
+            margin-left: 4px;
+            margin-right: 4px;
+        }
     }
 
-    &#logger{ /* The logger is pressed against another border above it */
+    &#vertical{ /* The logger is pressed against another border above it */
         border-top: 0px solid transparent;
     }
 
@@ -82,6 +90,7 @@ QToolBar{
 }
 QToolButton{
     background-color: $col_primary;
+    color: $col_text;
     border: $size_border solid $col_primary;
     padding: 2px;
     &:hover {
@@ -94,6 +103,12 @@ QToolButton{
 
     &:menu-indicator {
         image: none;
+    }
+
+    &:right-arrow {
+        image: url(":/Icons/Arrow_Right.png");
+        padding: 3px;
+
     }
 
     &#non-toolbar{ /* ToolButtons that are used outside of a toolbar */

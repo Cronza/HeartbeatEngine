@@ -23,7 +23,7 @@ class LoggerUI(QtWidgets.QWidget):
 
         self.l_core = l_core
 
-        self.setObjectName("logger")
+        self.setObjectName("vertical")
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -32,10 +32,7 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Toolbar
         self.logger_toolbar = QtWidgets.QToolBar(self)
-        self.logger_toolbar.setObjectName("logger")
-
-        # Generic Button Settings
-        icon = QtGui.QIcon()
+        self.logger_toolbar.setObjectName("vertical")
 
         # Clear Log Button
         self.logger_toolbar.addAction(

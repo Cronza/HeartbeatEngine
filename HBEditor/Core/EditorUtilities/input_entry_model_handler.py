@@ -80,13 +80,13 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     elif data_type == ParameterType.Float:
         input_widget = InputEntryFloat(data)
     elif data_type == ParameterType.File_Data:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Data"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Data"])
     elif data_type == ParameterType.File_Image:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Image"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Image"])
     elif data_type == ParameterType.File_Font:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Font"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Font"])
     elif data_type == ParameterType.File_Sound:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_content_types["Sound"])
+        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Sound"])
     elif data_type == ParameterType.Dropdown:
         input_widget = InputEntryDropdown(data)
     elif data_type == ParameterType.Container:
