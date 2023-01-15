@@ -363,19 +363,42 @@ class HBEditor:
         else:
             src_full_path = f"{settings.user_project_dir}/{src_partial_path}"
             tar_full_path = f"{settings.user_project_dir}/{tar_partial_path}"
-
+            is_folder = os.path.isdir(src_full_path)
             source_name = os.path.basename(src_full_path)
 
             if not os.path.exists(f"{tar_full_path}/{source_name}"):
-                try:
-                    shutil.move(src_full_path, tar_full_path)
-                except Exception as exc:
-                    Logger.getInstance().Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Please review the exception to understand more\n{exc}", 4)
-                    return False
+                # Check for open editors that might need to be closed prior to performing this action
+                open_files = []
+                files_open = False
+                if is_folder:
+                    open_files = self.CheckForOpenFiles(src_full_path)
+                    files_open = open_files != []
                 else:
-                    settings.MoveAssetRegistration(src_partial_path, source_name, tar_partial_path)
-                    Logger.getInstance().Log(f"Successfully moved '{tar_full_path}'", 2)
-                    return True
+                    files_open = self.CheckIfFileOpen(src_full_path)
+
+                # Confirm with the user that we're okay to proceed
+                result = self.ShowConfirmModificationPrompt(
+                    files_open,
+                    "Move",
+                    "Moving",
+                    src_partial_path
+                )
+                if result:
+                    # Close any related editors
+                    if is_folder:
+                        for f in open_files:
+                            self.CloseEditor(f)
+                    else:
+                        self.CloseEditor(src_full_path)
+                    try:
+                        shutil.move(src_full_path, tar_full_path)
+                    except Exception as exc:
+                        Logger.getInstance().Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Please review the exception to understand more\n{exc}", 4)
+                        return False
+                    else:
+                        settings.MoveAssetRegistration(src_partial_path, source_name, tar_partial_path)
+                        Logger.getInstance().Log(f"Successfully moved '{tar_full_path}'", 2)
+                        return True
             else:
                 self.ShowFileAlreadyExistsPrompt()
 
