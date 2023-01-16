@@ -9,7 +9,7 @@ Game:
   title: "String"
   author: "String"
   company: "String"
-  starting_scene: "File_Data"
+  starting_scene: "Asset_Scene"
 
 Window:
   resolution: "" # This is generated when choosing a value for 'resolution_options'
@@ -18,17 +18,17 @@ Window:
 Text:
   size: "Int"
   color: "Color"
-  font: "File_Font"
+  font: "Asset_Font"
   z_order: "Int"
   center_align: "Bool"
   wrap_bounds: "Vector2"
 
 Button:
-  sprite: "File_Image"
-  sprite_hover: "File_Image"
-  sprite_clicked: "File_Image"
+  sprite: "Asset_Image"
+  sprite_hover: "Asset_Image"
+  sprite_clicked: "Asset_Image"
   z_order: "Int"
-  font: "File_Font"
+  font: "Asset_Font"
 
 Dialogue:
   transition_type: "String"  # TODO: Figure out how to support a Dropdown type here (Game.yaml doesn't have any way of specifying the 'options' yet
@@ -37,34 +37,34 @@ Dialogue:
   speaker_text_position: "Vector2"
   speaker_text_size: "Int"
   speaker_text_color: "Color"
-  speaker_text_font: "File_Font"
+  speaker_text_font: "Asset_Font"
   speaker_text_z_order: "Int"
   speaker_text_center_align: "Bool"
   speaker_text_wrap_bounds: "Vector2"
   dialogue_text_position: "Vector2"
   dialogue_text_size: "Int"
   dialogue_text_color: "Color"
-  dialogue_text_font: "File_Font"
+  dialogue_text_font: "Asset_Font"
   dialogue_text_z_order: "Int"
   dialogue_text_center_align: "Bool"
   dialogue_text_wrap_bounds: "Vector2"
-  dialogue_frame_sprite: "File_Image"
+  dialogue_frame_sprite: "Asset_Image"
   dialogue_frame_z_order: "Int"
   dialogue_frame_center_align: "Bool"
   dialogue_frame_position: "Vector2"
-  choice_button_sprite: "File_Image"
-  choice_button_sprite_hover: "File_Image"
-  choice_button_sprite_clicked: "File_Image"
+  choice_button_sprite: "Asset_Image"
+  choice_button_sprite_hover: "Asset_Image"
+  choice_button_sprite_clicked: "Asset_Image"
   choice_button_z_order: "Int"
   choice_button_center_align: "Bool"
   choice_button_text_size: "Int"
   choice_button_text_color: "Color"
   choice_button_text_color_hover: "Color"
   choice_button_text_color_clicked: "Color"
-  choice_button_font: "File_Font"
+  choice_button_font: "Asset_Font"
 
 Pause Menu:
-  data_file: "File_Data"
+  data_file: "Asset_Data"
 
 Scene Transitions:
   speed: "Int"

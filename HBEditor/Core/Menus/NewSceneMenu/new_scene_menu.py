@@ -66,7 +66,7 @@ class NewSceneMenu(QtWidgets.QDialog):
 
         # Signals
         self.options_list.currentItemChanged.connect(self.UpdateDescription)
-        self.button_box.accepted.connect(self.ValidateNameInput)
+        self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
         # Weird fix: For some reason, QListWidgets don't "select" the first entry by default despite it being
@@ -86,25 +86,6 @@ class NewSceneMenu(QtWidgets.QDialog):
     def GetName(self):
         """ Returns the inputted name """
         return self.name_input.text()
-
-    def ValidateNameInput(self):
-        name_empty = not self.name_input.text()
-        found_invalid_char = any(not char.isalnum() and char != "_" and char != "-" for char in self.name_input.text())
-
-        if name_empty:
-            QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
-                self,
-                "Invalid Name",
-                "No scene name was provided. Please enter a scene name."
-            )
-        elif found_invalid_char:
-            QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
-                self,
-                "Invalid Name",
-                "Scene name contains special characters. Please remove them."
-            )
-        else:
-            self.accept()
 
 
 class FileOption(QtWidgets.QListWidgetItem):

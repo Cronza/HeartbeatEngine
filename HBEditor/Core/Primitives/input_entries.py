@@ -20,13 +20,14 @@ from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
+from HBEditor.Core.Menus.AssetBrowser.asset_browser import AssetBrowser
 
 """
 List of available entries:
     - InputEntryBool
     - InputEntryColor
     - InputEntryDropdown
-    - InputEntryFileSelector
+    - InputEntryAssetSelector
     - InputEntryFloat
     - InputEntryInt
     - InputEntryParagraph
@@ -187,13 +188,13 @@ class InputEntryDropdown(InputEntryBase):
         self.input_widget.style().polish(self.input_widget)
 
 
-class InputEntryFileSelector(InputEntryBase):
-    def __init__(self, data, details_panel, type_filter):
+class InputEntryAssetSelector(InputEntryBase):
+    def __init__(self, data: dict, details_panel: object, type_filter: list):
         super().__init__(data)
 
         self.details_panel = details_panel
 
-        # Store a type filter to restrict what files can be chosen in the browser
+        # Store a type filter to restrict what assets can be chosen in the browser
         self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
@@ -209,7 +210,10 @@ class InputEntryFileSelector(InputEntryBase):
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addWidget(self.file_select_button)
 
-        self.file_select_button.clicked.connect(self.OpenFilePrompt)
+        self.file_select_button.clicked.connect(self.OpenAssetPrompt)
+
+        # Paths are handled using the asset registry. Prevent the user from editing these paths manually
+        self.input_widget.setReadOnly(True)
 
     def Get(self):
         self.data["value"] = self.input_widget.text()
@@ -224,31 +228,20 @@ class InputEntryFileSelector(InputEntryBase):
     def SetEditable(self, state: int):
         if state == 0:
             self.file_select_button.setDisabled(False)
-            self.input_widget.setReadOnly(False)
         elif state == 2:
             self.file_select_button.setDisabled(True)
-            self.input_widget.setReadOnly(True)
 
         self.input_widget.style().polish(self.input_widget)
 
-    def OpenFilePrompt(self) -> str:
-        #@TODO: Replace file browser will popup list of files available in the project
-        """ Prompts the user with a filedialog, accepting an existing file """
-        prompt = FileSystemPrompt(self.details_panel)
-        existing_file = prompt.GetFile(
-            settings.GetProjectContentDirectory(),
-            self.type_filter,
-            "Choose a File to Open"
-        )
-
-        # Did the user choose a value?
-        if existing_file:
-            selected_dir = existing_file
-
-            # Remove the project dir from the path, so that the selected dir only contains a relative path
-            selected_dir = selected_dir.replace(settings.user_project_dir + "/", "")
-            self.input_widget.setText(selected_dir)
-
+    def OpenAssetPrompt(self):
+        """
+        Prompts the user with the AssetBrowser, allowing them to select an asset matching the type
+        for this object
+        """
+        asset_browser = AssetBrowser(self.type_filter)
+        asset_path = asset_browser.GetAsset()
+        if asset_path:
+            self.input_widget.setText(asset_path)
 
 class InputEntryFloat(InputEntryBase):
     def __init__(self, data):

@@ -233,5 +233,6 @@ editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")  # Contains da
 editor_action_metadata = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")  # Contains data that categorizes engine actions, and defines which editors can use which actions
 action_metadata = Reader.ReadAll(f"{engine_root}/Core/Actions/actions_metadata.yaml")  # Contains data relating to how engine actions operate, including additional editor-specific values for how they appear in the editor
 
-asset_registry = {}
+asset_registry = {}  # Loaded when project is loaded
+engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")
 

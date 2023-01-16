@@ -15,6 +15,7 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLabel
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
+from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.Primitives.input_entries import *
 
 
@@ -79,14 +80,6 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget = InputEntryInt(data)
     elif data_type == ParameterType.Float:
         input_widget = InputEntryFloat(data)
-    elif data_type == ParameterType.File_Data:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Data"])
-    elif data_type == ParameterType.File_Image:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Image"])
-    elif data_type == ParameterType.File_Font:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Font"])
-    elif data_type == ParameterType.File_Sound:
-        input_widget = InputEntryFileSelector(data, owner, settings.supported_file_types_cat["Sound"])
     elif data_type == ParameterType.Dropdown:
         input_widget = InputEntryDropdown(data)
     elif data_type == ParameterType.Container:
@@ -100,6 +93,18 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget = InputEntryEvent(data, owning_view, Add, Remove, signal_func, refresh_func, excluded_properties)
     elif data_type == ParameterType.CUST_Resolution:
         input_widget = InputEntryResolution(data)
+
+        # Asset selectors
+    elif data_type == ParameterType.Asset_Scene:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Scene_Dialogue, FileType.Scene_Point_And_Click})
+    elif data_type == ParameterType.Asset_Data:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Data})
+    elif data_type == ParameterType.Asset_Image:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Image})
+    elif data_type == ParameterType.Asset_Font:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Font})
+    elif data_type == ParameterType.Asset_Sound:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Sound})
 
     input_widget.owning_model_item = owning_model_item
     input_widget.Connect()

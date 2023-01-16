@@ -27,7 +27,7 @@ create_sprite:
       flags: ["editable", "preview"]
 
     sprite:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Placeholder.png"
       default: "HBEngine/Content/Sprites/Placeholder.png"
       flags: ["editable", "preview"]
@@ -94,7 +94,7 @@ create_background:
       default: "Background"
 
     sprite:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Placeholder.png"
       default: "HBEngine/Content/Sprites/Placeholder.png"
       flags: ["editable", "preview"]
@@ -173,7 +173,7 @@ create_text:
       flags: ["editable", "preview"]
 
     font:
-      type: "File_Font"
+      type: "Asset_Font"
       value: "None"
       default: "None"
       global: ["Text", "font"]
@@ -284,21 +284,21 @@ create_button:
       flags: ["editable"]
 
     sprite:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       global: ["Button", "sprite"]
       flags: ["editable", "preview"]
 
     sprite_hover:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       global: ["Button", "sprite_hover"]
       flags: ["editable"]
 
     sprite_clicked:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       global: ["Button", "sprite_clicked"]
@@ -368,7 +368,7 @@ create_button:
           flags: ["editable"]
 
         font:
-          type: "File_Font"
+          type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Button", "font"]
@@ -411,7 +411,7 @@ create_dialogue_interface:
       default: "DialogueFrame"
 
     sprite:
-      type: "File_Image"
+      type: "Asset_Image"
       value: "None"
       default: "None"
       global: ["Dialogue", "dialogue_frame_sprite"]
@@ -494,7 +494,7 @@ dialogue:
           flags: ["editable"]
 
         font:
-          type: "File_Font"
+          type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "speaker_text_font"]
@@ -577,7 +577,7 @@ dialogue:
           flags: ["editable"]
 
         font:
-          type: "File_Font"
+          type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "dialogue_text_font"]
@@ -651,21 +651,21 @@ choice:
               default: True
 
             sprite:
-              type: "File_Image"
+              type: "Asset_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: ["Dialogue", "choice_button_sprite"]
               flags: ["editable", "preview"]
 
             sprite_hover:
-              type: "File_Image"
+              type: "Asset_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_hover" ]
               flags: ["editable"]
 
             sprite_clicked:
-              type: "File_Image"
+              type: "Asset_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_clicked" ]
@@ -728,7 +728,7 @@ choice:
                   flags: ["editable"]
 
                 font:
-                  type: "File_Font"
+                  type: "Asset_Font"
                   value: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   default: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   global: ["Dialogue", "choice_button_font"]
@@ -745,7 +745,7 @@ load_scene:
   display_name: "Load Scene"
   requirements:
     scene_file:
-      type: "File_Data"
+      type: "Asset_Scene"
       default: ""
       value: ""
       flags: ["editable", "preview"]
@@ -815,7 +815,7 @@ play_sfx:
       flags: ["editable", "preview"]
 
     sound:
-      type: "File_Sound"
+      type: "Asset_Sound"
       value: ""
       default: ""
       flags: ["editable", "preview"]
@@ -840,7 +840,7 @@ play_music:
   display_name: "Play Music"
   requirements:
     music:
-      type: "File_Sound"
+      type: "Asset_Sound"
       value: ""
       default: ""
       flags: ["editable", "preview"]

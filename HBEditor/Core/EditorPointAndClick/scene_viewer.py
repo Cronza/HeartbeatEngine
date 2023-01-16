@@ -58,6 +58,7 @@ class SceneViewer(QtWidgets.QWidget):
         self.action_menu = ActionMenu(self.AddRenderable, self.core.file_type)
         self.action_toolbar = QtWidgets.QToolBar()
         self.action_toolbar.setOrientation(QtCore.Qt.Vertical)
+        self.action_toolbar.setObjectName("horizontal")
 
         icon = QtGui.QIcon()
 

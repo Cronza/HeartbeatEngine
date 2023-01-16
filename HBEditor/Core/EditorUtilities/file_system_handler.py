@@ -31,7 +31,7 @@ def ResolveFilePath(path: str, default_path: str):
 
     # If the path (assumably) points to the engine, check if the path exists within the engine root
     elif path.startswith("HBEngine"):
-        full_eng_path = f"{settings.engine_root}/{Path(path.replace('HBEngine', '', 1))}"
+        full_eng_path = f"{settings.engine_root}{path[len('HBEngine'):]}"
         if Path(full_eng_path).exists():
             return full_eng_path
 

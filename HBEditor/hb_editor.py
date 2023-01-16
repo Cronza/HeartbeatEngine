@@ -163,18 +163,21 @@ class HBEditor:
             )[0]
 
             if folder_name:
-                # Add the folder name to the current working dir to get a full path
-                full_path = f"{settings.user_project_dir}/{parent_dir}/{folder_name}"
+                if self.ValidateFileName(folder_name):
+                    # Add the folder name to the current working dir to get a full path
+                    full_path = f"{settings.user_project_dir}/{parent_dir}/{folder_name}"
 
-                # Confirm that the folder doesn't already exist. If not, then create it. Otherwise, raise an error
-                if not os.path.exists(full_path):
-                    os.mkdir(full_path)
-                    Logger.getInstance().Log(f"Folder created - {full_path}", 2)
-                    settings.RegisterAssetFolder(f"{parent_dir}/{folder_name}")
-                    return folder_name
+                    # Confirm that the folder doesn't already exist. If not, then create it. Otherwise, raise an error
+                    if not os.path.exists(full_path):
+                        os.mkdir(full_path)
+                        Logger.getInstance().Log(f"Folder created - {full_path}", 2)
+                        settings.RegisterAssetFolder(f"{parent_dir}/{folder_name}")
+                        return folder_name
+                    else:
+                        self.ShowFileAlreadyExistsPrompt()
+                        return ""
                 else:
-                    self.ShowFileAlreadyExistsPrompt()
-                    return ""
+                    self.ShowInvalidFileNamePrompt()
 
         return ""
 
@@ -188,25 +191,28 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_scene_prompt = NewSceneMenu()
+            new_scene_prompt.exec()
+            selected_name = new_scene_prompt.GetName()
+            selected_type = new_scene_prompt.GetSelection()
 
-            if new_scene_prompt.exec():
-                selected_name = new_scene_prompt.GetName()
-                selected_type = new_scene_prompt.GetSelection()
+            if selected_name:
+                if self.ValidateFileName(selected_name):
+                    file_name = f"{selected_name}.yaml"
+                    full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
+                    if not os.path.exists(full_path):
+                        with open(full_path, 'w'):
+                            Logger.getInstance().Log(f"File created - {full_path}", 2)
 
-                file_name = f"{selected_name}.yaml"
-                full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
-                if not os.path.exists(full_path):
-                    with open(full_path, 'w'):
-                        Logger.getInstance().Log(f"File created - {full_path}", 2)
+                        settings.RegisterAsset(parent_dir, file_name, selected_type)
 
-                    settings.RegisterAsset(parent_dir, file_name, selected_type)
-
-                    # Create the editor, then export to initially populate the new file
-                    self.OpenEditor(full_path, selected_type)
-                    self.active_editor.Export()
-                    return file_name, selected_type
+                        # Create the editor, then export to initially populate the new file
+                        self.OpenEditor(full_path, selected_type)
+                        self.active_editor.Export()
+                        return file_name, selected_type
+                    else:
+                        self.ShowFileAlreadyExistsPrompt()
                 else:
-                    self.ShowFileAlreadyExistsPrompt()
+                    self.ShowInvalidFileNamePrompt()
 
         return "", None
 
@@ -534,7 +540,6 @@ class HBEditor:
             # Let's check if we already have an editor open for this file
             result = self.CheckIfFileOpen(target_file_path)
             if result:
-                #@TODO: Should there be a reimport if the user tries to open an opened file? Or maybe a refesh button?
                 Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
                 self.e_ui.main_tab_editor.setCurrentWidget(result)
             else:
@@ -619,18 +624,26 @@ class HBEditor:
 
         return open_files
 
-    def CheckIfFileOpen(self, file_path) -> bool:
-        """ Checks all open editor tabs for the provided file. Returns a bool for whether an editor was found """
+    def CheckIfFileOpen(self, file_path) -> object:
+        """
+        Checks all open editor tabs for the provided file. Returns the editor if found. Otherwise, returns None
+        """
         for tab_index in range(0, self.e_ui.main_tab_editor.count()):
             open_editor = self.e_ui.main_tab_editor.widget(tab_index)
             if open_editor.core.file_path == file_path:
-                return True
+                return open_editor
 
-        return False
+        return None
 
     def ValidateFileName(self, name_no_ext: str) -> bool:
-        """ Validates the given file name for any illegal characters (Ex. ?!$*). If none are found, return True """
-        return not any(not char.isalnum() and char != "_" and char != "-" for char in name_no_ext)
+        """
+        Validates the given file name for any illegal characters (Ex. ?!$*) or reserved words (Ex. HBEngine).
+        If none are found, return True
+        """
+        has_invalid_char = any(not char.isalnum() and char != "_" and char != "-" for char in name_no_ext)
+        has_reserved_word = name_no_ext.lower() == "hbengine"
+
+        return has_invalid_char is False and has_reserved_word is False
 
     def ValidateImportTarget(self, tar_full_path: str, import_dest: str) -> bool:
         """ Given a file path, validate and return a bool for whether it's a valid import target """
@@ -766,7 +779,8 @@ class HBEditor:
         QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "Invalid Name",
-            "The chosen file name contains illegal characters. Please remove them before trying again."
+            "The chosen file name contains illegal characters, or reserved words. Please remove them before "
+            "trying again."
         )
 
     def ShowInternalImportErrorPrompt(self):

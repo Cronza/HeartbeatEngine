@@ -238,6 +238,12 @@ QTableView{
     outline: none;
     color: $col_text;
     selection-background-color: $col_entry_active;
+
+    &:item{
+        &:selected{
+            selection-color: $col_text;
+        }
+    }
 }
 QTreeView{
     border: 0px solid transparent;

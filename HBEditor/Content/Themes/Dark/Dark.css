@@ -156,6 +156,8 @@ QTableView {
   outline: none;
   color: rgba(255, 255, 255, 80%);
   selection-background-color: #1E384D; }
+  QTableView:item:selected {
+    selection-color: rgba(255, 255, 255, 80%); }
 
 QTreeView {
   border: 0px solid transparent;
