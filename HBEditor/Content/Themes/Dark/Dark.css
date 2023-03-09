@@ -357,7 +357,8 @@ QCheckBox:indicator {
 
 QDialog {
   background-color: #3F4245;
-  color: rgba(255, 255, 255, 80%); }
+  color: rgba(255, 255, 255, 80%);
+  border: 1px solid #2A2A2B; }
 
 QPushButton {
   background-color: #4E4E52;

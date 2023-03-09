@@ -13,7 +13,6 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
 from HBEditor.Core import settings
 
 
@@ -100,7 +99,7 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
 
                 for eng_inst_name, eng_inst_data in engine_entry[req_name].items():
                     template_copy = copy.deepcopy(req_data["template"])
-                    template_copy_name = adh.GetActionName(req_data["template"])
+                    template_copy_name = GetActionName(req_data["template"])
                     template_copy_data = template_copy[template_copy_name]
 
                     ConvertActionRequirementsToEditorFormat(template_copy_data, eng_inst_data, "children")  # @todo: This is only touching one entry

@@ -503,6 +503,7 @@ QCheckBox{
 QDialog{
     background-color: $col_primary;
     color: $col_text;
+    border: $size_border solid $col_secondary;
 }
 QPushButton{
     background-color: $col_input;

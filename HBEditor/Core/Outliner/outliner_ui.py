@@ -109,8 +109,9 @@ class OutlinerUI(QtWidgets.QWidget):
         else:
             self.core.OpenFile(item.text())
 
-    def AddAsset(self, name: str, asset_type: FileType):
-        new_asset = OutlinerAsset(asset_type, name)
+    def AddAsset(self, name: str, asset_type: FileType, thumbnail_path: str = ""):
+        new_asset = OutlinerAsset(asset_type, name, thumbnail_path)
+
         self.asset_list.addItem(new_asset)
 
         # Allow folders to be drop targets so assets can be rearranged in the editor
@@ -141,21 +142,24 @@ class AssetList(QtWidgets.QListWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.setFlow(QtWidgets.QListView.LeftToRight)
         self.setResizeMode(QtWidgets.QListView.Adjust)
         self.setViewMode(QtWidgets.QListView.IconMode)
-        self.setUniformItemSizes(True)
-        self.setWordWrap(True)
-        self.setTextElideMode(True)
-        self.setGridSize(QtCore.QSize(64, 64))
-        self.batchSize()
+        self.setIconSize(QtCore.QSize(
+            settings.editor_data["Outliner"]["icon_size"][0],
+            settings.editor_data["Outliner"]["icon_size"][1]
+        ))
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setWordWrap(True)
+
+        # We need very specific control over the rendering for 'IconMode' in order to improve the 'tile' look. This
+        # requires the use of a delegate which lets us override and expand the painting
+        delegate = TileDelegate(parent)
+        self.setItemDelegate(delegate)
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         # Normally we'd need to create a drop object, create its MIME data, etc. However, this setup ensures that we
-        # only care to action on selected items, which is supported out-of-the-box. So, skip all that nonsense and use
-        # whatever is currently selected
+        # only action on selected items, which is supported out-of-the-box
         drop_source = self.selectedItems()[0]  # Multi-select is not currently supported
         drop_target = self.itemAt(event.pos())
         if drop_source is not None and drop_target is not None and drop_source is not drop_target:
@@ -163,15 +167,42 @@ class AssetList(QtWidgets.QListWidget):
 
 
 class OutlinerAsset(QtWidgets.QListWidgetItem):
-    def __init__(self, asset_type: FileType, name: str):
+    def __init__(self, asset_type: FileType, name: str, thumbnail_path: str = ""):
         super().__init__()
         self.setText(name)
 
         self.asset_type = asset_type
-        self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
+        if thumbnail_path:
+            self.setIcon(QtGui.QIcon(QtGui.QPixmap(thumbnail_path)))
+        else:
+            self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
 
     def GetType(self):
         return self.asset_type
+
+
+class TileDelegate(QtWidgets.QStyledItemDelegate):
+    """ A custom style delegate that improves the look of QListView items when in 'IconMode' """
+    # https://stackoverflow.com/questions/59063030/qtreeview-cell-selected-highlight-resize
+    def paint(self, painter, option, index):
+        if not index.isValid():
+            return
+
+        # Load the base style data
+        self.initStyleOption(option, index)
+
+        # Force the selection to include the full width of the row (tile), instead of only encompassing the minimum
+        option.showDecorationSelected = True
+
+        # Paint using the style data stored in 'option'
+        style = option.widget.style() if option.widget else QtGui.QApplication.style()
+        style.drawControl(QtWidgets.QStyle.CE_ItemViewItem, option, painter, option.widget)
+
+    def sizeHint(self, option, index):
+        if not index.isValid():
+            return super(TileDelegate, self).sizeHint(option, index)
+        else:
+            return QtCore.QSize(64, 80)
 
 
 class OutlinerContextMenu(QtWidgets.QMenu):
@@ -229,14 +260,3 @@ class QuickAccessButton(QtWidgets.QToolButton):
         self.SIG_DROP.emit(self.path)
         self.setAttribute(QtCore.Qt.WA_UnderMouse, False)  # Fix for hover state freeze due to QDialogs
         event.acceptProposedAction()
-
-
-#class OutlinerAssetType(Enum):
-#    Folder = 0
-#    File_Data = 1
-#    File_Image = 2
-#    File_Sound = 3
-#    File_Misc = 4
-
-
-

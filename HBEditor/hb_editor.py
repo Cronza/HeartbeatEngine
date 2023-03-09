@@ -448,7 +448,7 @@ class HBEditor:
                         )
         return False
 
-    def Import(self, partial_file_path: str) -> bool:
+    def Import(self, partial_dest_path: str) -> bool:
         """
         Given a partial path with the content folder as the root, prompt the user to choose a file to import. Then,
         go through a series of validations before copying the file into the project and registering it. Returns whether
@@ -457,14 +457,14 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            full_path = f"{settings.user_project_dir}/{partial_file_path}"
+            full_path = f"{settings.user_project_dir}/{partial_dest_path}"
             import_target = QtWidgets.QFileDialog.getOpenFileName(
                 self.e_ui.central_widget,
                 "Choose a file to Import"
             )[0]
 
             if import_target:
-                if self.ValidateImportTarget(import_target, partial_file_path):
+                if self.ValidateImportTarget(import_target, partial_dest_path):
                     tar_name = os.path.basename(import_target)
                     tar_type = settings.supported_file_types[os.path.splitext(tar_name)[1]]
 
@@ -477,8 +477,8 @@ class HBEditor:
                     except Exception as exc:
                         Logger.getInstance().Log(f"Failed to copy '{import_target}' to '{full_path}' - Please review the exception to understand more\n{exc}",4)
                     else:
-                        settings.RegisterAsset(partial_file_path, tar_name, tar_type)
-                        Logger.getInstance().Log(f"Successfully imported file '{partial_file_path}/{tar_name}'", 2)
+                        settings.RegisterAsset(partial_dest_path, tar_name, tar_type)
+                        Logger.getInstance().Log(f"Successfully imported file '{partial_dest_path}/{tar_name}'", 2)
                         return True
 
         return False

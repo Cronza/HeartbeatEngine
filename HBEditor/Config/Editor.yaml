@@ -18,3 +18,8 @@ EditorSettings:
     - ":/Fonts/Dustismo-Italic.ttf"
     - ":/Fonts/Dustismo-Bold.ttf"
     - ":/Fonts/Dustismo-Bold-Italic.ttf"
+
+Outliner:
+  icon_size:
+    - 40
+    - 40

@@ -43,12 +43,6 @@ def LoadProjectSettings():
     user_project_data = Reader.ReadAll(user_project_dir + "/" + project_default_files['Config'])
 
 
-def ConvertPartialToAbsolutePath(partial_path):
-    """ Given a partial path, return an absolute path using the editor's root """
-    global editor_root
-    return editor_root + "/" + partial_path
-
-
 def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
     """
     Registers the provided file. 'parent_path' must be a partial path with the content directory as the root
@@ -193,6 +187,7 @@ engine_root = f"{root}/HBEngine"
 editor_root = f"{root}/HBEditor"
 editor_temp_root = f"{editor_root}/Temp"
 temp_history_path = f"{editor_temp_root}/history.yaml"
+thumbnail_root = "Thumbnails"
 
 heartbeat_file = ".heartbeat"
 project_folder_structure = [
@@ -235,4 +230,3 @@ action_metadata = Reader.ReadAll(f"{engine_root}/Core/Actions/actions_metadata.y
 
 asset_registry = {}  # Loaded when project is loaded
 engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")
-

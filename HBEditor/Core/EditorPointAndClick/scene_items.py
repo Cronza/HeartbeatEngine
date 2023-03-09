@@ -3,10 +3,10 @@ import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.EditorUtilities.font_manager import FontManager
+from HBEditor.Core.EditorUtilities import font_handler
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data_handler as adh
-from HBEditor.Core.EditorUtilities import file_system_handler as fsh
+from HBEditor.Core.EditorUtilities import path_handler as fsh
 
 
 class BaseItem:
@@ -406,7 +406,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.setFont(cur_font)
 
     def UpdateFont(self):
-        new_font = FontManager.LoadCustomFont(fsh.ResolveFontFilePath(self.action_data["font"]["value"]))
+        new_font = font_handler.LoadCustomFont(fsh.ResolveFontFilePath(self.action_data["font"]["value"]))
         self.setFont(new_font)
 
     def UpdateTextColor(self):
