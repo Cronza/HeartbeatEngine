@@ -101,8 +101,9 @@ class Outliner:
         source_path = f"{self.cur_directory}/{source.text()}"
         target_path = f"{self.cur_directory}/{target.text()}"
 
-        if self.hb_core.MoveFileOrFolder(source_path, target_path):
-            self.ui.RemoveAsset(source.text())
+        if target.asset_type == FileType.Folder:
+            if self.hb_core.MoveFileOrFolder(source_path, target_path):
+                self.ui.RemoveAsset(source.text())
 
         self.Populate()
 
@@ -117,8 +118,19 @@ class Outliner:
 
         self.Populate()
 
-    def ImportAsset(self):
-        self.hb_core.Import(self.cur_directory)
+    def ImportAsset(self, import_targets: list = None):
+        if not import_targets:
+            # No specified target, use full import process
+            self.hb_core.Import(self.cur_directory)
+
+        elif len(import_targets) == 1 and not os.path.isdir(import_targets[0]):
+            # Singular target, use partial import process (Warning and error prompts, but no file dialog)
+            self.hb_core.Import(self.cur_directory, import_targets[0])
+
+        else:
+            # N targets, use batch import process (No prompts except for a collective results window)
+            self.hb_core.BatchImport(self.cur_directory, import_targets)
+
         self.Populate()
 
     def GenerateThumbnail(self, path: str) -> str:

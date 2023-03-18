@@ -27,6 +27,7 @@ from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.play_manager import PlayManager
 from HBEditor.Core.Menus.NewSceneMenu.new_scene_menu import NewSceneMenu
 from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
+from HBEditor.Core.Prompts.list_prompt import ListPrompt
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
@@ -148,19 +149,22 @@ class HBEditor:
                     "Please either choose a different project, or create a new project."
                 )
 
-    def NewFolder(self, parent_dir: str) -> str:
+    def NewFolder(self, parent_dir: str, folder_name: str = "", batch_mode: bool = False) -> str:
         """
         Given a partial path with the content folder as the root, prompt the user to create a new directory in that
-        location. If successful, register it and return the folder name. Otherwise, return an empty string
+        location. If 'folder_name' is provided, skip prompting the user, and instead attempt to create a directory using
+        that name. If 'batch_mode' is True, disable prompts. If successful, register it and return the
+        folder name. Otherwise, return an empty string
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            folder_name = QtWidgets.QInputDialog.getText(
-                self.e_ui.central_widget,
-                "New Folder",
-                "Please Enter a Folder Name:"
-            )[0]
+            if not folder_name:
+                folder_name = QtWidgets.QInputDialog.getText(
+                    self.e_ui.central_widget,
+                    "New Folder",
+                    "Please Enter a Folder Name:"
+                )[0]
 
             if folder_name:
                 if self.ValidateFileName(folder_name):
@@ -174,10 +178,10 @@ class HBEditor:
                         settings.RegisterAssetFolder(f"{parent_dir}/{folder_name}")
                         return folder_name
                     else:
-                        self.ShowFileAlreadyExistsPrompt()
+                        self.ShowFileAlreadyExistsPrompt(batch_mode)
                         return ""
                 else:
-                    self.ShowInvalidFileNamePrompt()
+                    self.ShowInvalidFileNamePrompt(batch_mode)
 
         return ""
 
@@ -362,13 +366,20 @@ class HBEditor:
     def MoveFileOrFolder(self, src_partial_path: str, tar_partial_path: str) -> bool:
         """
         Given a source and target partial path with the content folder as the roots, move the source path to the target
-        path, deregistering and registering as appropriate. Return whether the move was successful
+        path, deregistering and registering as appropriate. If the target is a file, then the move automatically fails.
+        Return whether the move was successful
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             src_full_path = f"{settings.user_project_dir}/{src_partial_path}"
             tar_full_path = f"{settings.user_project_dir}/{tar_partial_path}"
+
+            # Only directories are valid targets. Fail silently if the user targeted a file
+            if os.path.isfile(tar_full_path):
+                Logger.getInstance().Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Invalid destination", 3)
+                return False
+
             is_folder = os.path.isdir(src_full_path)
             source_name = os.path.basename(src_full_path)
 
@@ -448,23 +459,27 @@ class HBEditor:
                         )
         return False
 
-    def Import(self, partial_dest_path: str) -> bool:
+    def Import(self, partial_dest_path: str, import_target: str = "", batch_mode: bool = False) -> bool:
         """
         Given a partial path with the content folder as the root, prompt the user to choose a file to import. Then,
-        go through a series of validations before copying the file into the project and registering it. Returns whether
-        the import was successful.
+        go through a series of validations before copying the file into the project and registering it. If
+        'import_target' is provided (as an absolute path), skip prompting the user for a path, and instead attempt to
+        import it instead. If 'batch_mode' is True, disable prompts. Returns whether the import was successful.
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
             full_path = f"{settings.user_project_dir}/{partial_dest_path}"
-            import_target = QtWidgets.QFileDialog.getOpenFileName(
-                self.e_ui.central_widget,
-                "Choose a file to Import"
-            )[0]
+
+            # If no import target is provided, then prompt the user to pick one
+            if not import_target:
+                import_target = QtWidgets.QFileDialog.getOpenFileName(
+                    self.e_ui.central_widget,
+                    "Choose a file to Import"
+                )[0]
 
             if import_target:
-                if self.ValidateImportTarget(import_target, partial_dest_path):
+                if self.ValidateImportTarget(import_target, partial_dest_path, batch_mode):
                     tar_name = os.path.basename(import_target)
                     tar_type = settings.supported_file_types[os.path.splitext(tar_name)[1]]
 
@@ -482,6 +497,38 @@ class HBEditor:
                         return True
 
         return False
+
+    def BatchImport(self, partial_dest_path: str, paths_to_import: list, initial_iter: bool = True):
+        """
+        Given a partial path with the content folder as the root and a list of absolute file paths, import each file. If
+        any are folders, recursively import all child items and folders.This runs in 'batch_mode', which disables error
+        and warning prompts during importing
+        """
+        problematic_files = []
+        for target_index in range(0, len(paths_to_import)):
+            import_target = paths_to_import[target_index]
+            if os.path.isdir(import_target):
+                # Create the folder (even if all children fail to import)
+                self.NewFolder(partial_dest_path, os.path.basename(import_target), True)
+
+                # Collect a list of the child paths (reconstructing them to be absolute paths)
+                contents = os.listdir(import_target)
+                for i in range(0, len(contents)):
+                    contents[i] = os.path.join(import_target, contents[i]).replace("\\", "/")
+
+                # Recursively batch import child items
+                problematic_files.extend(self.BatchImport(f"{partial_dest_path}/{os.path.basename(import_target)}", contents, False))
+            else:
+                if not self.Import(partial_dest_path, import_target, True):
+                    problematic_files.append(import_target)
+
+        if initial_iter:
+            if problematic_files:
+                ListPrompt("Failed to Import", "The following files failed to import", problematic_files).exec()
+
+
+        return problematic_files
+
 
     def Play(self):
         """ Launches the HBEngine, temporarily suspending the HBEditor """
@@ -645,19 +692,20 @@ class HBEditor:
 
         return has_invalid_char is False and has_reserved_word is False
 
-    def ValidateImportTarget(self, tar_full_path: str, import_dest: str) -> bool:
-        """ Given a file path, validate and return a bool for whether it's a valid import target """
+    def ValidateImportTarget(self, tar_full_path: str, import_dest: str, batch_mode: bool = False) -> bool:
+        """ Given a file path, validate and return a bool for whether it's a valid import target. If 'batch_mode' is
+        True, disable prompts """
         tar_name = os.path.basename(tar_full_path)
 
         # Check 1: Is this file type supported?
         tar_ext = os.path.splitext(tar_full_path)[1]
         if tar_ext not in settings.supported_file_types:
-            self.ShowUnsupportedFileTypePrompt()
+            self.ShowUnsupportedFileTypePrompt(batch_mode)
             return False
 
         # Check 2: Does it have an acceptable name? This check will flag extensions as problematic, so strip that
         if not self.ValidateFileName(os.path.splitext(tar_name)[0]):
-            self.ShowInvalidFileNamePrompt()
+            self.ShowInvalidFileNamePrompt(batch_mode)
             return False
 
         # Check 3: Does that item already exist within the project? This checks the asset registry and current
@@ -665,10 +713,10 @@ class HBEditor:
         #          within the project, prohibit any import from within the project's content directory
         if tar_name in settings.GetAssetRegistryFolder(import_dest) or \
                os.path.exists(os.path.join(settings.user_project_dir, import_dest, tar_name).replace("\\", "/")):
-            self.ShowFileAlreadyExistsPrompt()
+            self.ShowFileAlreadyExistsPrompt(batch_mode)
             return False
         elif settings.GetProjectContentDirectory() in tar_full_path:
-            self.ShowInternalImportErrorPrompt()
+            self.ShowInternalImportErrorPrompt(batch_mode)
             return False
 
         # If no checks have failed, then validation complete!
@@ -742,15 +790,8 @@ class HBEditor:
             Logger.getInstance().Log(str(exc), 4)
             return ""
 
-    def ShowFileAlreadyExistsPrompt(self):
-        Logger.getInstance().Log("A file / folder of that name already exists", 4)
-        QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
-            "File / Folder Already Exists",
-            "The file / folder already exists."
-        )
-
     def ShowNoActiveProjectPrompt(self):
+        Logger.getInstance().Log("There is no active project", 4)
         QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "No Active Project",
@@ -758,34 +799,43 @@ class HBEditor:
             "Please either open an existing project, or create a new one."
         )
 
-    def ShowNoStartingScenePrompt(self):
-        QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
+    def ShowFileAlreadyExistsPrompt(self, batch_mode: bool = False):
+        Logger.getInstance().Log("A file / folder of that name already exists", 4)
+        if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
+            self.e_ui.central_widget,
+            "File / Folder Already Exists",
+            "The file / folder already exists."
+        )
+
+    def ShowNoStartingScenePrompt(self, batch_mode: bool = False):
+        Logger.getInstance().Log("There is no starting scene set", 4)
+        if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "No Starting Scene",
             "There is currently no starting scene.\n"
             "Please open the project settings and choose a starting scene."
         )
 
-    def ShowUnsupportedFileTypePrompt(self):
+    def ShowUnsupportedFileTypePrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file type is unsupported", 4)
-        QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
+        if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "Unsupported File Type",
             "The chosen file type is not supported.\n"
         )
 
-    def ShowInvalidFileNamePrompt(self):
+    def ShowInvalidFileNamePrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
-        QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
+        if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "Invalid Name",
             "The chosen file name contains illegal characters, or reserved words. Please remove them before "
             "trying again."
         )
 
-    def ShowInternalImportErrorPrompt(self):
+    def ShowInternalImportErrorPrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
-        QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
+        if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.central_widget,
             "Unable to Import",
             "The import target resides within a project's 'Content' directory, which is prohibited. This is due to"

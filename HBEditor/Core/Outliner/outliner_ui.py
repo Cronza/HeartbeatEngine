@@ -53,7 +53,8 @@ class OutlinerUI(QtWidgets.QWidget):
         self.asset_list = AssetList(self)
         self.asset_list.customContextMenuRequested.connect(self.CreateContextMenu)
         self.asset_list.itemDoubleClicked.connect(self.ProcessAssetDoubleClick)
-        self.asset_list.SIG_DROP.connect(self.core.MoveAsset)
+        self.asset_list.SIG_DROP_INT.connect(self.core.MoveAsset)
+        self.asset_list.SIG_DROP_EXT.connect(self.core.ImportAsset)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.toolbar)
@@ -98,10 +99,16 @@ class OutlinerUI(QtWidgets.QWidget):
         """ When a user clicks a quick access button, switch to the corresponding directory """
         self.MoveToDirectory(path)
 
-    def ProcessQABDrop(self, path: str):
-        """ When the user drops an asset on the Quick Access Buttons, invoke the 'Move' action """
-        selection = self.asset_list.selectedItems()[0]  # Multi-select not currently supported
-        self.core.MoveAssetUsingQAB(f"{self.core.cur_directory}/{selection.text()}", path)
+    def ProcessQABDrop(self, paths: list, ext_files: bool):
+        """
+        When the user drops an asset on the Quick Access Buttons, invoke the 'Move' action if it's a project file
+        or request an import if external
+        """
+        if ext_files:
+            self.core.ImportAsset(paths)
+        else:
+            selection = self.asset_list.selectedItems()[0]  # Multi-select not currently supported
+            self.core.MoveAssetUsingQAB(f"{self.core.cur_directory}/{selection.text()}", paths[0])
 
     def ProcessAssetDoubleClick(self, item: QtWidgets.QListWidgetItem):
         if item.asset_type == FileType.Folder:
@@ -138,7 +145,8 @@ class OutlinerUI(QtWidgets.QWidget):
 
 
 class AssetList(QtWidgets.QListWidget):
-    SIG_DROP = QtCore.pyqtSignal(object, object)
+    SIG_DROP_INT = QtCore.pyqtSignal(object, object)
+    SIG_DROP_EXT = QtCore.pyqtSignal(list)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -157,13 +165,30 @@ class AssetList(QtWidgets.QListWidget):
         delegate = TileDelegate(parent)
         self.setItemDelegate(delegate)
 
+    def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
+        event.acceptProposedAction()
+
+    def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
+        event.acceptProposedAction()
+
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        # Normally we'd need to create a drop object, create its MIME data, etc. However, this setup ensures that we
-        # only action on selected items, which is supported out-of-the-box
-        drop_source = self.selectedItems()[0]  # Multi-select is not currently supported
-        drop_target = self.itemAt(event.pos())
-        if drop_source is not None and drop_target is not None and drop_source is not drop_target:
-            self.SIG_DROP.emit(drop_source, drop_target)
+        urls = event.mimeData().urls()
+        if urls:  # Only external files use URLs
+            # Process all files to ensure they're local files (Further processing is done elsewhere). This is a list
+            # of absolute paths
+            processed_files = []
+            for url in urls:
+                if url.isLocalFile():
+                    processed_files.append(url.toLocalFile())
+
+            if processed_files:
+                self.SIG_DROP_EXT.emit(processed_files)
+
+        else:
+            drop_source = self.selectedItems()[0]  # Multi-select is not currently supported
+            drop_target = self.itemAt(event.pos())
+            if drop_source is not None and drop_target is not None and drop_source is not drop_target:
+                self.SIG_DROP_INT.emit(drop_source, drop_target)
 
 
 class OutlinerAsset(QtWidgets.QListWidgetItem):
@@ -244,12 +269,11 @@ class OutlinerContextMenu(QtWidgets.QMenu):
 
 
 class QuickAccessButton(QtWidgets.QToolButton):
-    SIG_DROP = QtCore.pyqtSignal(str)
+    SIG_DROP = QtCore.pyqtSignal(list, bool)
 
     def __init__(self, parent, path: str, process_func: object=None):
         super().__init__(parent)
         self.setAcceptDrops(True)
-
         self.path = path
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
@@ -257,6 +281,20 @@ class QuickAccessButton(QtWidgets.QToolButton):
         event.acceptProposedAction()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        self.SIG_DROP.emit(self.path)
+        urls = event.mimeData().urls()
+        if urls:  # Only external files use URLs
+            # Process all files to ensure they're local files (Further processing is done elsewhere). This is a list
+            # of absolute paths
+            processed_files = []
+            for url in urls:
+                if url.isLocalFile():
+                    processed_files.append(url.toLocalFile())
+
+            if processed_files:
+                self.SIG_DROP.emit(processed_files, True)
+
+        else:
+            self.SIG_DROP.emit([self.path], False)
+
         self.setAttribute(QtCore.Qt.WA_UnderMouse, False)  # Fix for hover state freeze due to QDialogs
         event.acceptProposedAction()
