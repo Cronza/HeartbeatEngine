@@ -1,19 +1,54 @@
+#  The Heartbeat Engine is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
 #
-# This file is used to define the data requirements for each action specified within the 'actions.py' module, along with
-# how to interact and edit this data within the Heartbeat Editor. The data here is often referred to as 'action_data'
+#  The Heartbeat Engine is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
+#
+# --- Overview ---
+# This file is used to define the parameters and values for each action specified within the 'actions.py' module, as
+# well as how the Heartbeat Editor uses and represents each action. The data here is often referred to as 'action_data'.
+#
+# While the Heartbeat Engine only requires the name and value for any action parameter, the Heartbeat Editor requires
+# extra details pertaining to its display within the Editor. To avoid inflating project data files, these Editor-only
+# parameters are stripped during saving. The result will look something like the following (pulled from a Scene file):
+#
+# - create_background:
+#     key: Background
+#     sprite: Content/Smokestacks.png
+#     position:
+#     - 0
+#     - 0
+#
+# If you open a project data file, you may notice that some parameters are not there. When a parameter has a 'global'
+# value assigned, the Heartbeat Editor strips it during saving. This is to avoid saving the global value, which may
+# become out of date. During runtime, the Heartbeat Engine will use the latest global value for any parameters that are
+# not found.
 
-# Key Index
-#   - 'global' allows the parameter to access a shared, global value that applies across all instances of that action. This
-#      global value can be ignored per-instance if the action has a value specified
-#   - [Editor Only] 'value' is used to store the latest updated value independently of the default
-#   - [Editor Only] 'default' contains the unedited value when loaded from this file. It's kept separate in order to allow resetting of 'value'
+# --- Making Changes ---
+# Whenever a project file references an action here, it typically creates a copy that it updates and stores within
+# itself. As such, any changes to this file may not apply retroactively to other project files.
+#
+# --- Legend ---
+#   - 'global' causes the action to ignore 'default' and 'value', and instead use a value from the project's "game.yaml"
+#     file. The syntax is: [<category>, <value>].
+#   - 'value' is used to store the latest updated value independently of the default.
+#   - [Editor Only] 'default' is used to allow resetting 'value'
 #   - [Editor Only] 'editable' controls whether a parameter can be changed by the user either in the editor, or via editing the file manually.
 #   - [Editor Only] 'type' controls how that parameter is displayed in the editor (IE. Dropdown vs text box)
-#   - [Editor Only] 'preview' controls whether certain editors can show the value of the parameter in additional areas of the interface
-#   - [Editor Only] 'no_exclusion' controls whether to remove editor-specific property exclusions for a property and its children. This
-#     is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and you
-#     you need it available for a particular action
-
+#   - [Editor Only] 'flags' is a list of key words that various sub-editors can use. Options:
+#                   -  'preview' controls whether certain editors can show the value of the parameter in additional areas of the interface
+#                   -  'no_exclusion' controls whether to remove editor-specific property exclusions for a property and its children. This
+#                      is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and you
+#                      you need it available for a particular action
+#   - [Editor Only] 'template' is a special keyword for parameters that allow children to be dynamically created by the
+#                   user. This keyword is only usable with the 'Array' type
 
 # Renderables
 
