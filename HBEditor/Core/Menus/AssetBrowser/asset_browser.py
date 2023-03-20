@@ -1,8 +1,8 @@
-import copy
-
+import copy, os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
+from HBEditor.Core.EditorUtilities import image_handler as ih
 
 
 class AssetBrowser(QtWidgets.QDialog):
@@ -14,7 +14,7 @@ class AssetBrowser(QtWidgets.QDialog):
 
         # Hide the OS header to lock its position
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.resize(400, 300)
+        self.resize(640, 480)
         self.main_layout = QtWidgets.QVBoxLayout(self)
 
         # Options - Search and Active Content Directory
@@ -32,17 +32,22 @@ class AssetBrowser(QtWidgets.QDialog):
         # Asset List
         self.asset_list = QtWidgets.QTableWidget(self)
         self.asset_list.verticalHeader().setObjectName("vertical")
-        self.asset_list.setColumnCount(3)
+        self.asset_list.setColumnCount(4)
         self.asset_list.setShowGrid(False)
-        self.asset_list.setTextElideMode(QtCore.Qt.ElideLeft)
+        self.asset_list.setTextElideMode(QtCore.Qt.ElideRight)
         self.asset_list.setWordWrap(False)
         self.asset_list.horizontalHeader().hide()
         self.asset_list.verticalHeader().hide()
-        self.asset_list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.asset_list.hideColumn(0)  # Hide the thumbnail column by default
+        self.asset_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.asset_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
         self.asset_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.asset_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
         self.asset_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+        self.asset_list.setIconSize(QtCore.QSize(
+            settings.editor_data["Outliner"]["icon_size"][0],
+            settings.editor_data["Outliner"]["icon_size"][1]
+        ))
 
         # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly more tragic way
@@ -66,9 +71,9 @@ class AssetBrowser(QtWidgets.QDialog):
         if self.exec():
             selection = self.asset_list.selectedItems()
             if selection:
-                asset_name = selection[0].text()
-                asset_path = selection[1].text()
-                if selection[0].text():
+                asset_name = selection[1].text()
+                asset_path = selection[2].text()
+                if selection[1].text():
                     if self.GetUsingEngineContent():
                         return f"HBEngine/{asset_path}/{asset_name}"
                     else:
@@ -112,21 +117,38 @@ class AssetBrowser(QtWidgets.QDialog):
         for asset_name, asset_type, asset_path in self.valid_assets:
             self.asset_list.insertRow(self.asset_list.rowCount())
 
-            self.asset_list.setItem(self.asset_list.rowCount() - 1, 0, QtWidgets.QTableWidgetItem(asset_name))
+            # Thumbnail (Only applicable if a thumbnail is available, otherwise the column is hidden)
+            thumbnail = ih.GetThumbnail(f"{asset_path}/{asset_name}")
+            if thumbnail:
+                if self.asset_list.isColumnHidden(0):
+                    self.asset_list.showColumn(0)
 
+                thumbnail_item = QtGui.QIcon(QtGui.QPixmap(thumbnail))
+                self.asset_list.setItem(self.asset_list.rowCount() - 1, 0, QtWidgets.QTableWidgetItem(thumbnail_item, ""))
+
+            # Name
+            self.asset_list.setItem(self.asset_list.rowCount() - 1, 1, QtWidgets.QTableWidgetItem(asset_name))
+
+            # Path
             path_item = QtWidgets.QTableWidgetItem(asset_path)
             path_item.setToolTip(asset_path)
-            self.asset_list.setItem(self.asset_list.rowCount() - 1, 1, path_item)
+            self.asset_list.setItem(self.asset_list.rowCount() - 1, 2, path_item)
 
+            # Type
             type_item = QtWidgets.QTableWidgetItem(asset_type)
             type_item.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignRight)
-            self.asset_list.setItem(self.asset_list.rowCount() - 1, 2, type_item)
+            self.asset_list.setItem(self.asset_list.rowCount() - 1, 3, type_item)
+
+        # If thumbnails are displayed, resize each row to fit them
+        if not self.asset_list.isColumnHidden(0):
+            self.asset_list.resizeRowsToContents()
 
     def SwitchContentDirectories(self):
         """
         Reloads the entry list and valid_assets list based on whether 'content_dirs' is set to the
         project or engine
         """
+        self.asset_list.hideColumn(0)  # Rehide the thumbnail column in case it was previously displayed
         self.asset_list.setRowCount(0)
         if self.GetUsingEngineContent():
             self.valid_assets = self.GetFilteredAssets(settings.engine_asset_registry)
