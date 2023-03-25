@@ -156,9 +156,12 @@ class DetailsPanel(QtWidgets.QWidget):
                 entry = parent.child(entry_index)
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
-                if "global" in entry_data:
+                if "global" in entry_data and "flags" in entry_data:
+                    adh.RemoveFlag("global_active", entry_data)
+
                     global_checkbox = self.details_tree.itemWidget(entry, 2)
-                    entry_data["global_active"] = global_checkbox.Get()
+                    if global_checkbox.Get():
+                        adh.AddFlag("global_active", entry_data)
 
                 if entry_data["type"] == "Array":
                     # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
@@ -214,9 +217,7 @@ class DetailsPanel(QtWidgets.QWidget):
     def Clear(self):
         self.details_tree.clear()
 
-
     ### Slots ###
-
 
     def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
         input_widget = self.details_tree.itemWidget(owning_tree_item, 1)

@@ -20,29 +20,28 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
                                             excluded_properties: list = None):
     """
     Given an action_data dict for a single action, convert its structure into one usable by the HBEngine,
-    then return it
-
-    If excluded_properties is provided, any properties in that list will not be converted, and will not appear in the
-    returned data
+    then return it. If 'excluded_properties' is provided, any properties in that list will not be converted, and will
+    not appear in the returned data. If any items are missing the 'flags' key, they will also not be returned
     """
     conv_data = {}
     if search_term in editor_req_data:
         for req_name, req_data in editor_req_data[search_term].items():
-            # Prevent exporting requirements that are not in use by this editor type unless exempted
             if excluded_properties:
-                if req_name in excluded_properties and "no_exclusion" not in req_data["flags"]:
-                    continue
+                if "flags" in req_data:
+                    # Prevent exporting requirements that are not in use by this editor type unless exempted
+                    if req_name in excluded_properties and "no_exclusion" not in req_data["flags"]:
+                        continue
 
-            if "global_active" in req_data:
-                # Exclude requirements that are pointing to a global setting. The engine will take care of
-                # this at runtime since any global value stored in a file will become outdated as soon as the
-                # global setting is changed
-                if not req_data["global_active"]:
-                    conv_data[req_name] = req_data["value"]
+            if "global" in req_data:
+                if "flags" in req_data:
+                    # Exclude requirements that are pointing to a global setting. The engine will take care of
+                    # this at runtime since any global value stored in a file will become outdated as soon as the
+                    # global setting is changed
+                    if "global_active" not in req_data["flags"]:
+                        conv_data[req_name] = req_data["value"]
 
             elif "value" in req_data:
-                # Containers don't have the 'value' key, and anything with the 'template' key might not have generated
-                # any children with it yet, so we can skip both
+                # Containers don't have the 'value' key
                 conv_data[req_name] = req_data["value"]
 
             if "children" in req_data:
@@ -111,14 +110,14 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
 
             elif "children" not in req_data:
                 if req_name in engine_entry:
-                    # If the req entry isn't found in the engine action data, then it was likely omitted due to a global
-                    # setting being enabled
                     if "global" in req_data:
-                        req_data["global_active"] = False
+                        RemoveFlag("global_active", req_data)
                     req_data["value"] = engine_entry[req_name]
                 else:
                     if "global" in req_data:
-                        req_data["global_active"] = True
+                        # If the req entry isn't found in the engine action data, then it was likely omitted due to a
+                        # global setting being enabled
+                        AddFlag("global_active", req_data)
 
             if "children" in req_data:
                 ConvertActionRequirementsToEditorFormat(req_data, engine_entry[req_name], "children")
@@ -149,3 +148,14 @@ def GetActionRequirements(action_data: dict) -> dict:
     This function is meant to be used by classes that cloned a piece of metadata from the actions_metadata.yaml file
     """
     return action_data[GetActionName(action_data)]["requirements"]
+
+
+def AddFlag(name: str, req_data: dict):
+    """ Adds the provided string to the provided requirements dict if it doesn't already exist """
+    if name not in req_data["flags"]:
+        req_data["flags"].append(name)
+
+def RemoveFlag(name: str, req_data: dict):
+    """ Removes the provided string from the provided requirements dict if it exists """
+    if name in req_data["flags"]:
+        req_data["flags"].remove(name)

@@ -71,87 +71,80 @@ def RegisterAssetFolder(path_to_create: str):
     SaveHeartbeatFile(asset_registry)
 
 
-def DeregisterAsset(parent_path: str, asset_name: str):
+def DeregisterAsset(source_file_path: str, asset_name: str):
     """
     Removes the registration for 'asset_name' at the provided directory. 'parent_path' must be a partial path with
     the content directory as the root
     """
     global asset_registry
-    split_path = parent_path.split("/")
+    split_path = os.path.dirname(source_file_path).split("/")
     cur_depth = asset_registry
     for folder in split_path:
         cur_depth = cur_depth[folder]
-        if asset_name in cur_depth:
-            break
 
-    del cur_depth[asset_name]
+    if asset_name in cur_depth:
+        del cur_depth[asset_name]
 
     SaveHeartbeatFile(asset_registry)
 
 
-def DuplicateAssetRegistration(path_to_clone: str, asset_name: str, new_name: str):
+def DuplicateAssetRegistration(source_file_path: str, asset_name: str, new_name: str):
     """
-    Duplicates the registration for 'asset_name', registering it under 'new_name'. 'path_to_clone' must be a partial path
-    with the content directory as the root
+    Duplicates the registration for 'asset_name', registering it under 'new_name'. 'path_to_clone' must be a
+    partial path with the content directory as the root
     """
     global asset_registry
-    split_path = path_to_clone.split("/")
+    split_path = os.path.dirname(source_file_path).split("/")
     cur_depth = asset_registry
-    clone_source = None
     for folder in split_path:
         cur_depth = cur_depth[folder]
-        if asset_name in cur_depth:
-            clone_source = cur_depth[asset_name]
-            break
 
-    cur_depth[new_name] = clone_source
+    if asset_name in cur_depth:
+        cur_depth[new_name] = cur_depth[asset_name]
 
     SaveHeartbeatFile(asset_registry)
 
 
-def RenameAssetRegistration(path_to_clone: str, asset_name: str, new_name: str):
+def RenameAssetRegistration(source_file_path: str, asset_name: str, new_name: str):
     """ Reregister the provided project path using the new name, removing the registration under the old name """
     global asset_registry
-    split_path = path_to_clone.split("/")
+    split_path = os.path.dirname(source_file_path).split("/")
     cur_depth = asset_registry
-    clone_source = None
     for folder in split_path:
         cur_depth = cur_depth[folder]
-        if asset_name in cur_depth:
-            clone_source = cur_depth[asset_name]
-            break
 
-    del cur_depth[asset_name]
-    cur_depth[new_name] = clone_source
+    if asset_name in cur_depth:
+        source = cur_depth[asset_name]
+        del cur_depth[asset_name]
+        cur_depth[new_name] = source
 
     SaveHeartbeatFile(asset_registry)
 
 
-def MoveAssetRegistration(source_path: str, asset_name: str, target_path: str):
+def MoveAssetRegistration(source_file_path: str, asset_name: str, target_path: str):
     """
-    Moves the registration for 'asset_name' 'from 'source_path' to 'target_path'. Paths must be a partial path with
-    the content directory as the root
+    Moves the registration for 'asset_name' 'from 'source_file_path' to 'target_path'. Paths must be a partial
+    path with the content directory as the root
     """
     global asset_registry
 
     # Find the source data and cache it before removing it
-    split_path = source_path.split("/")
-    cur_depth = asset_registry
-    source_data = None
-    for folder in split_path:
-        cur_depth = cur_depth[folder]
-        if asset_name in cur_depth:
-            source_data = cur_depth[asset_name]
-            break
-    del cur_depth[asset_name]
-
-    # Find the target directory, and create a new registration there
-    split_path = target_path.split("/")
+    split_path = os.path.dirname(source_file_path).split("/")
     cur_depth = asset_registry
     for folder in split_path:
         cur_depth = cur_depth[folder]
 
-    cur_depth[asset_name] = source_data
+    # Only perform the move if we can find the source
+    if asset_name in cur_depth:
+        source_data = cur_depth[asset_name]
+        del cur_depth[asset_name]
+
+        # Find the target directory, and create a new registration there
+        split_path = target_path.split("/")
+        cur_depth = asset_registry
+        for folder in split_path:
+            cur_depth = cur_depth[folder]
+        cur_depth[asset_name] = source_data
 
     SaveHeartbeatFile(asset_registry)
 

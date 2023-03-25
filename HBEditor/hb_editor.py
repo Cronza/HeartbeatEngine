@@ -296,7 +296,7 @@ class HBEditor:
                         Logger.getInstance().Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}",4)
                         return False
                     else:
-                        settings.DuplicateAssetRegistration(os.path.dirname(partial_file_path), orig_name, copy_name)
+                        settings.DuplicateAssetRegistration(partial_file_path, orig_name, copy_name)
                         Logger.getInstance().Log(f"Successfully duplicated file '{full_path}'", 2)
                         return True
 
@@ -352,7 +352,7 @@ class HBEditor:
                             except Exception as exc:
                                 Logger.getInstance().Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}", 4)
                             else:
-                                settings.RenameAssetRegistration(os.path.dirname(partial_file_path), os.path.basename(full_path), os.path.basename(new_full_path))
+                                settings.RenameAssetRegistration(partial_file_path, os.path.basename(full_path), os.path.basename(new_full_path))
                                 self.CloseEditor(full_path)
                                 Logger.getInstance().Log(f"Successfully renamed '{new_full_path}'", 2)
                                 return True

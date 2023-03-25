@@ -123,21 +123,13 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
 
     # The global checkbox isn't universally used, so only use it if relevant. If it's enabled, mark
     # the input widget as uneditable by the user
-    if "global" in data:
+    if "global" in data and "flags" in data:
         owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
-        if "global_active" in data:
-            if data["global_active"]:
-                global_checkbox.Set(True)
-                input_widget.SetEditable(2)
-            else:
-                global_checkbox.Set(False)
-        else:
-            # 'global_active' isn't a part of the metadata, as it is a generated key. If it isn't found, it's because
-            # the data we've received is directly from the metadata and prior to any alteration (Likely during importing
-            # or something
-            data["global_active"] = True
+        if "global_active" in data["flags"]:
             global_checkbox.Set(True)
             input_widget.SetEditable(2)
+        else:
+            global_checkbox.Set(False)
 
         global_checkbox.Connect()
         global_checkbox.SIG_USER_UPDATE.connect(refresh_func)

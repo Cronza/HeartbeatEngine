@@ -67,11 +67,10 @@ class Outliner:
     def DeleteAsset(self):
         selected_items = self.ui.asset_list.selectedItems()  # Multi-select deletions are not supported currently
         if selected_items:
-            is_folder = False
-            if selected_items[0].GetType() == FileType.Folder:
-                is_folder = True
-
-            self.hb_core.DeleteFileOrFolder(f"{self.cur_directory}/{selected_items[0].text()}", is_folder)
+            self.hb_core.DeleteFileOrFolder(
+                f"{self.cur_directory}/{selected_items[0].text()}",
+                selected_items[0].GetType() == FileType.Folder
+            )
             self.Populate()
 
     def DuplicateAsset(self):

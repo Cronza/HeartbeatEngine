@@ -39,7 +39,12 @@ class AssetBrowser(QtWidgets.QDialog):
         self.asset_list.horizontalHeader().hide()
         self.asset_list.verticalHeader().hide()
         self.asset_list.hideColumn(0)  # Hide the thumbnail column by default
+        self.asset_list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+        self.asset_list.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+        self.asset_list.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
         self.asset_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.asset_list.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+
         self.asset_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
         self.asset_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
         self.asset_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
@@ -136,7 +141,6 @@ class AssetBrowser(QtWidgets.QDialog):
 
             # Type
             type_item = QtWidgets.QTableWidgetItem(asset_type)
-            type_item.setTextAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignRight)
             self.asset_list.setItem(self.asset_list.rowCount() - 1, 3, type_item)
 
         # If thumbnails are displayed, resize each row to fit them
