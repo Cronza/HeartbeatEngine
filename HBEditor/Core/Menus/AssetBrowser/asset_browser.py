@@ -76,13 +76,17 @@ class AssetBrowser(QtWidgets.QDialog):
         if self.exec():
             selection = self.asset_list.selectedItems()
             if selection:
-                asset_name = selection[1].text()
-                asset_path = selection[2].text()
-                if selection[1].text():
-                    if self.GetUsingEngineContent():
-                        return f"HBEngine/{asset_path}/{asset_name}"
-                    else:
-                        return f"{asset_path}/{asset_name}"
+                if self.asset_list.isColumnHidden(0):
+                    asset_name = selection[0].text()
+                    asset_path = selection[1].text()
+                else:
+                    asset_name = selection[1].text()
+                    asset_path = selection[2].text()
+
+                if self.GetUsingEngineContent():
+                    return f"HBEngine/{asset_path}/{asset_name}"
+                else:
+                    return f"{asset_path}/{asset_name}"
 
         return ""
 

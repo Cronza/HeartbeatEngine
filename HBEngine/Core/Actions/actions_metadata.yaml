@@ -47,6 +47,7 @@
 #                   -  'no_exclusion' controls whether to remove editor-specific property exclusions for a property and its children. This
 #                      is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and you
 #                      you need it available for a particular action
+#                   - 'global_active' controls whether the parameter will use the global value, or 'value' / 'default'
 #   - [Editor Only] 'template' is a special keyword for parameters that allow children to be dynamically created by the
 #                   user. This keyword is only usable with the 'Array' type
 
@@ -185,7 +186,7 @@ create_text:
       value: True
       default: True
       global: ["Text", "center_align"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     text:
       type: "Paragraph"
@@ -198,35 +199,35 @@ create_text:
       value: 24
       default: 24
       global: ["Text", "size"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     text_color:
       type: "Color"
       value: [255, 255, 255]
       default: [255, 255, 255]
       global: ["Text", "color"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     font:
       type: "Asset_Font"
       value: "None"
       default: "None"
       global: ["Text", "font"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     z_order:
       type: "Int"
       value: 0
       default: 0
       global: ["Text", "z_order"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     wrap_bounds:
       type: "Vector2"
       value: [0.2,0.2]
       default: [0.2,0.2]
       global: ["Text", "wrap_bounds"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     transition:
       type: "Container"
@@ -323,28 +324,28 @@ create_button:
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png"
       global: ["Button", "sprite"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     sprite_hover:
       type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png"
       global: ["Button", "sprite_hover"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     sprite_clicked:
       type: "Asset_Image"
       value: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       default: "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png"
       global: ["Button", "sprite_clicked"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     z_order:
       type: "Int"
       value: 10001
       default: 10001
       global: ["Button", "z_order"]
-      flags: ["editable"]
+      flags: ["editable", "global_active"]
 
     flip:
       type: "Bool"
@@ -379,35 +380,35 @@ create_button:
           value: 24
           default: 24
           global: ["Text", "size"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text_color:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text_color_hover:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text_color_clicked:
           type: "Color"
           value: [ 255, 255, 255 ]
           default: [ 255, 255, 255 ]
           global: ["Text", "color"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         font:
           type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Button", "font"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         z_order: # Button text generate it's z_order based on the parent's. However, the param is still needed
           type: "Int"
@@ -450,27 +451,28 @@ create_dialogue_interface:
       value: "None"
       default: "None"
       global: ["Dialogue", "dialogue_frame_sprite"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     position:
       type: "Vector2"
       value: [0,0]
       default: [0,0]
       global: ["Dialogue", "dialogue_frame_position"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
       global: ["Dialogue", "dialogue_frame_center_align"]
-      flags: ["editable", "preview"]
+      flags: ["editable", "preview", "global_active"]
 
     z_order:
       type: "Int"
       value: 9999
       default: 9999
       global: ["Dialogue", "dialogue_frame_z_order"]
+      flags: ["global_active"]
 
     post_wait:
       type: "Dropdown"
@@ -499,14 +501,14 @@ dialogue:
           value: [0,0]
           default: [0,0]
           global: ["Dialogue", "speaker_text_position"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         center_align:
           type: "Bool"
           value: True
           default: True
           global: ["Dialogue", "speaker_text_center_align"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text:
           type: "String"
@@ -519,27 +521,28 @@ dialogue:
           value: 24
           default: 24
           global: ["Dialogue", "speaker_text_size"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text_color:
           type: "Color"
           value: [255, 255, 255]
           default: [255, 255, 255]
           global: ["Dialogue", "speaker_text_color"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         font:
           type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "speaker_text_font"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         z_order:
           type: "Int"
           value: 0
           default: 0
           global: ["Dialogue", "speaker_text_z_order"]
+          flags: ["global_active"]
 
         transition:
           type: "Container"
@@ -553,20 +556,21 @@ dialogue:
               options:
                 - "fade_in"
                 - "None"
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
             speed:
               type: "Int"
               value: 500
               default: 500
               global: [ "Dialogue", "transition_speed" ]
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
         wrap_bounds:
           type: "Vector2"
           value: [ 0.2,0.2 ]
           default: [ 0.2,0.2 ]
           global: [ "Dialogue", "speaker_text_wrap_bounds" ]
+          flags: ["global_active"]
 
     dialogue:
       type: "Container"
@@ -582,14 +586,14 @@ dialogue:
           value: [0,0]
           default: [0,0]
           global: ["Dialogue", "dialogue_text_position"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         center_align:
           type: "Bool"
           value: True
           default: True
           global: ["Dialogue", "dialogue_text_center_align"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text:
           type: "Paragraph"
@@ -602,27 +606,28 @@ dialogue:
           value: 24
           default: 24
           global: ["Dialogue", "dialogue_text_size"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         text_color:
           type: "Color"
           value: [255, 255, 255]
           default: [255, 255, 255]
           global: ["Dialogue", "dialogue_text_color"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         font:
           type: "Asset_Font"
           value: "None"
           default: "None"
           global: ["Dialogue", "dialogue_text_font"]
-          flags: ["editable"]
+          flags: ["editable", "global_active"]
 
         z_order:
           type: "Int"
           value: 0
           default: 0
           global: ["Dialogue", "dialogue_text_z_order"]
+          flags: ["global_active"]
 
         transition:
           type: "Container"
@@ -636,20 +641,21 @@ dialogue:
               options:
                 - "fade_in"
                 - "None"
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
             speed:
               type: "Int"
               value: 1000
               default: 1000
               global: ["Dialogue", "transition_speed"]
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
         wrap_bounds:
           type: "Vector2"
           value: [ 0.8,0.16 ]
           default: [ 0.8,0.16 ]
           global: [ "Dialogue", "dialogue_text_wrap_bounds" ]
+          flags: ["global_active"]
 
     post_wait:
       type: "String"
@@ -690,27 +696,28 @@ choice:
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: ["Dialogue", "choice_button_sprite"]
-              flags: ["editable", "preview"]
+              flags: ["editable", "preview", "global_active"]
 
             sprite_hover:
               type: "Asset_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_hover" ]
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
             sprite_clicked:
               type: "Asset_Image"
               value: "HBEngine/Content/Sprites/Placeholder.png"
               default: "HBEngine/Content/Sprites/Placeholder.png"
               global: [ "Dialogue", "choice_button_sprite_clicked" ]
-              flags: ["editable"]
+              flags: ["editable", "global_active"]
 
             z_order:
               type: "Int"
               value: 10001
               default: 10001
               global: ["Dialogue", "choice_button_text_size"]
+              flags: ["global_active"]
 
             button_text:
               type: "Container"
@@ -739,35 +746,35 @@ choice:
                   value: 24
                   default: 24
                   global: ["Dialogue", "choice_button_text_size"]
-                  flags: ["editable"]
+                  flags: ["editable", "global_active"]
 
                 text_color:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: ["Dialogue", "choice_button_text_color"]
-                  flags: ["editable"]
+                  flags: ["editable", "global_active"]
 
                 text_color_hover:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: [ "Dialogue", "choice_button_text_color_hover" ]
-                  flags: ["editable"]
+                  flags: ["editable", "global_active"]
 
                 text_color_clicked:
                   type: "Color"
                   value: [ 255, 255, 255 ]
                   default: [ 255, 255, 255 ]
                   global: [ "Dialogue", "choice_button_text_color_clicked" ]
-                  flags: ["editable"]
+                  flags: ["editable", "global_active"]
 
                 font:
                   type: "Asset_Font"
                   value: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   default: "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
                   global: ["Dialogue", "choice_button_font"]
-                  flags: ["editable"]
+                  flags: ["editable", "global_active"]
 
                 z_order: # Button text generate it's  z_order based on the parent's. However, the param is still needed
                   type: "Int"
