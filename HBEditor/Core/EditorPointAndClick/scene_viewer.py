@@ -13,11 +13,9 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from enum import Enum
 from typing import List
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core import settings
-from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
+from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
 from HBEditor.Core.EditorPointAndClick.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction

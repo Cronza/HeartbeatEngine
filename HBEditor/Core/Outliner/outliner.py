@@ -17,7 +17,7 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.Outliner.outliner_ui import OutlinerUI, OutlinerAsset
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorUtilities import image_handler as ih
+from HBEditor.Core.EditorUtilities import image
 
 
 class Outliner:
@@ -42,9 +42,9 @@ class Outliner:
                 self.ui.AddAsset(asset, FileType.Folder)
 
             elif FileType[cur_dir[asset]] == FileType.Asset_Image:
-                thumbnail_path = ih.GetThumbnail(f"{self.cur_directory}/{asset}")
+                thumbnail_path = image.GetThumbnail(f"{self.cur_directory}/{asset}")
                 if not thumbnail_path:
-                    thumbnail_path = ih.GenerateThumbnail(f"{self.cur_directory}/{asset}")
+                    thumbnail_path = image.GenerateThumbnail(f"{self.cur_directory}/{asset}")
 
                 self.ui.AddAsset(asset, FileType[cur_dir[asset]], thumbnail_path)
 

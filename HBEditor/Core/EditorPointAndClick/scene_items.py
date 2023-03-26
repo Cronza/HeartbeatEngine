@@ -3,10 +3,10 @@ import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.EditorUtilities import font_handler
+from HBEditor.Core.EditorUtilities import font
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
-from HBEditor.Core.EditorUtilities import path_handler as fsh
+from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.EditorUtilities import path
 
 
 class BaseItem:
@@ -71,7 +71,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         """
         # Set values for the top-most item
         if not action_data and not parent:
-            action_data = self.action_data[adh.GetActionName(self.action_data)][search_term]
+            action_data = self.action_data[ad.GetActionName(self.action_data)][search_term]
             parent = self
 
             # Some properties have special implications on usability within the editor (IE. position being uneditable
@@ -271,7 +271,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
                 self.setPos(parent_pos)
 
     def UpdateSprite(self):
-        image = QtGui.QPixmap(fsh.ResolveImageFilePath(self.action_data["sprite"]["value"]))
+        image = QtGui.QPixmap(path.ResolveImageFilePath(self.action_data["sprite"]["value"]))
         self.setPixmap(image)
 
     def UpdateZOrder(self):
@@ -406,7 +406,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.setFont(cur_font)
 
     def UpdateFont(self):
-        new_font = font_handler.LoadCustomFont(fsh.ResolveFontFilePath(self.action_data["font"]["value"]))
+        new_font = font.LoadCustomFont(path.ResolveFontFilePath(self.action_data["font"]["value"]))
         self.setFont(new_font)
 
     def UpdateTextColor(self):

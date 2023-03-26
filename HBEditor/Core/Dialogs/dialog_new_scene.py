@@ -17,7 +17,7 @@ from PyQt5.QtCore import Qt
 from HBEditor.Core.DataTypes.file_types import FileType
 
 
-class NewSceneMenu(QtWidgets.QDialog):
+class DialogNewScene(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
 

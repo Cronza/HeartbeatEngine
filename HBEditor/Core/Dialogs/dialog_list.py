@@ -15,7 +15,7 @@
 from PyQt5 import QtWidgets
 
 
-class ListPrompt(QtWidgets.QDialog):
+class DialogList(QtWidgets.QDialog):
     def __init__(self, title: str, body: str, items: list):
         super().__init__()
 

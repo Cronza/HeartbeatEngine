@@ -18,7 +18,7 @@ from HBEditor.Core import settings
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 
-class FileSystemPrompt(QFileDialog):
+class DialogFileSystem(QFileDialog):
     def __init__(self, parent):
         super().__init__(parent)
 

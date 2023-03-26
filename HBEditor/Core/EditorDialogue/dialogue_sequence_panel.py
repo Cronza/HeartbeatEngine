@@ -15,10 +15,9 @@
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core import settings
-from HBEditor.Core.Menus.ActionMenu.action_menu import ActionMenu
+from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
+from HBEditor.Core.EditorUtilities import action_data as ad
 
 
 class DialogueSequencePanel(QtWidgets.QWidget):
@@ -263,7 +262,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
 
-        self.name_widget.setText(adh.GetActionDisplayName(self.action_data))
+        self.name_widget.setText(ad.GetActionDisplayName(self.action_data))
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
 
@@ -280,7 +279,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
-        self.subtext_widget.setText(self.CompileSubtextString(adh.GetActionRequirements(self.action_data)))
+        self.subtext_widget.setText(self.CompileSubtextString(ad.GetActionRequirements(self.action_data)))
 
     def CompileSubtextString(self, req_data):
         """ Given a list of requirements from the actions_metadata file, compile them into a user-friendly string """

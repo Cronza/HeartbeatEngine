@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QMessageBox
 from HBEditor.Core.Logger.logger import Logger
 
 
-class PlayManager:
+class EngineLauncher:
     """
     A manager for operations relating to launch the HBEngine. This class requires that the HBEngine be available
     alongside the HBEditor so the subprocess call works correctly

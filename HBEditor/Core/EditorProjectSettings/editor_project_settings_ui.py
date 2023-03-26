@@ -12,10 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
+from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.Primitives.input_entries import *
-#from HBEditor.Core.Primitives.input_entry_updater import EntryUpdater
-from HBEditor.Core.EditorUtilities import input_entry_model_handler as iemh
+from HBEditor.Core.Primitives import input_entry_handler as ieh
 
 
 class EditorProjectSettingsUI(EditorBaseUI):
@@ -134,7 +133,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
                     "type": schema[setting_name],
                     "value": setting_data
                 }
-                iemh.Add(
+                ieh.Add(
                     owner=self,
                     view=self.settings_tree,
                     name=setting_name,

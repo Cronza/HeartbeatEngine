@@ -15,9 +15,9 @@
 import copy
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
-from HBEditor.Core.BaseClasses.base_editor import EditorBase
+from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
+from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
@@ -98,8 +98,8 @@ class EditorPointAndClick(EditorBase):
                 new_item = self.editor_ui.scene_viewer.AddRenderable(item, True)
 
                 # Apply any imported editor-specific properties
-                if "editor_properties" in item[adh.GetActionName(item)]:
-                    editor_properties = item[adh.GetActionName(item)]["editor_properties"]
+                if "editor_properties" in item[ad.GetActionName(item)]:
+                    editor_properties = item[ad.GetActionName(item)]["editor_properties"]
                     if "locked" in editor_properties:
                         new_item.SetLocked(editor_properties["locked"])
 
@@ -110,7 +110,7 @@ class EditorPointAndClick(EditorBase):
             scene_item_data = scene_item.action_data
 
             # Get the action name
-            converted_action = {"action": adh.GetActionName(scene_item_data)}
+            converted_action = {"action": ad.GetActionName(scene_item_data)}
 
             # Preserve any notable editor-specific properties so that they're available when importing
             # Note: This is subject to change when additional examples are available
@@ -118,8 +118,8 @@ class EditorPointAndClick(EditorBase):
                 converted_action["editor_properties"] = {"locked": scene_item.GetLocked()}
 
             # Collect a converted dict of all requirements for this action (If any are present)
-            converted_requirements = adh.ConvertActionRequirementsToEngineFormat(
-                editor_req_data=scene_item_data[adh.GetActionName(scene_item_data)],
+            converted_requirements = ad.ConvertActionRequirementsToEngineFormat(
+                editor_req_data=scene_item_data[ad.GetActionName(scene_item_data)],
                 excluded_properties=self.excluded_properties
             )
 
@@ -142,7 +142,7 @@ class EditorPointAndClick(EditorBase):
             md_entry = copy.deepcopy(settings.action_metadata[item["action"]])
 
             # Pass the entry by ref, and let the convert func edit it directly
-            adh.ConvertActionRequirementsToEditorFormat(
+            ad.ConvertActionRequirementsToEditorFormat(
                 metadata_entry=md_entry,
                 engine_entry=item,
                 excluded_properties=self.excluded_properties

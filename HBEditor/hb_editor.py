@@ -24,10 +24,10 @@ from HBEditor.Content import content
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.play_manager import PlayManager
-from HBEditor.Core.Menus.NewSceneMenu.new_scene_menu import NewSceneMenu
-from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
-from HBEditor.Core.Prompts.list_prompt import ListPrompt
+from HBEditor.Core.engine_launcher import EngineLauncher
+from HBEditor.Core.Dialogs.dialog_new_scene import DialogNewScene
+from HBEditor.Core.Dialogs.dialog_file_system import DialogFileSystem
+from HBEditor.Core.Dialogs.dialog_list import DialogList
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
@@ -58,7 +58,7 @@ class HBEditor:
         chosen project
         """
         Logger.getInstance().Log("Requesting directory for the new project...'")
-        prompt = FileSystemPrompt(self.main_window)
+        prompt = DialogFileSystem(self.main_window)
         new_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Directory to Create a Project",
@@ -122,7 +122,7 @@ class HBEditor:
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
         Logger.getInstance().Log("Requesting path to project root...")
-        prompt = FileSystemPrompt(self.main_window)
+        prompt = DialogFileSystem(self.main_window)
         existing_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Project Directory",
@@ -194,7 +194,7 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            new_scene_prompt = NewSceneMenu()
+            new_scene_prompt = DialogNewScene()
             new_scene_prompt.exec()
             selected_name = new_scene_prompt.GetName()
             selected_type = new_scene_prompt.GetSelection()
@@ -524,7 +524,7 @@ class HBEditor:
 
         if initial_iter:
             if problematic_files:
-                ListPrompt("Failed to Import", "The following files failed to import", problematic_files).exec()
+                DialogList("Failed to Import", "The following files failed to import", problematic_files).exec()
 
 
         return problematic_files
@@ -537,7 +537,7 @@ class HBEditor:
         elif not settings.user_project_data["Game"]["starting_scene"]:
             self.ShowNoStartingScenePrompt()
         else:
-            p_manager = PlayManager()
+            p_manager = EngineLauncher()
             p_manager.Play(self.e_ui.central_widget, settings.user_project_dir, settings.root)
 
     def Build(self):

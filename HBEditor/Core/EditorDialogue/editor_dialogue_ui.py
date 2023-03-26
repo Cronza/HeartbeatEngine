@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets
-from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
+from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_branches_panel import BranchesPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel

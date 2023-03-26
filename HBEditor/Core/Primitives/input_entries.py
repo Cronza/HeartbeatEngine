@@ -16,11 +16,9 @@ import re
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
-from HBEditor.Core.Prompts.file_system_prompt import FileSystemPrompt
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
-from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.Menus.AssetBrowser.asset_browser import AssetBrowser
+from HBEditor.Core.EditorUtilities import action_data as adh
+from HBEditor.Core.Dialogs.asset_browser import AssetBrowser
 
 """
 List of available entries:

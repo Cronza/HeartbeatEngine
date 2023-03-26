@@ -13,7 +13,8 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.EditorUtilities import action_data_handler as adh, input_entry_model_handler as iemh
+from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.Primitives import input_entry_handler as ieh
 
 
 class DetailsPanel(QtWidgets.QWidget):
@@ -84,7 +85,7 @@ class DetailsPanel(QtWidgets.QWidget):
         # Note: This provides data to each by reference, so any changes made to data stored in each details entry
         # propagates directly back to the main entry
         self.AddItems(
-            req_data=adh.GetActionRequirements(self.active_entry.action_data),
+            req_data=ad.GetActionRequirements(self.active_entry.action_data),
             excluded_properties=self.excluded_properties
         )
 
@@ -111,7 +112,7 @@ class DetailsPanel(QtWidgets.QWidget):
             else:
                 continue
 
-            entry = iemh.Add(
+            entry = ieh.Add(
                 owner=self,
                 view=self.details_tree,
                 name=name,
@@ -157,11 +158,11 @@ class DetailsPanel(QtWidgets.QWidget):
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
                 if "global" in entry_data and "flags" in entry_data:
-                    adh.RemoveFlag("global_active", entry_data)
+                    ad.RemoveFlag("global_active", entry_data)
 
                     global_checkbox = self.details_tree.itemWidget(entry, 2)
                     if global_checkbox.Get():
-                        adh.AddFlag("global_active", entry_data)
+                        ad.AddFlag("global_active", entry_data)
 
                 if entry_data["type"] == "Array":
                     # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
@@ -193,7 +194,7 @@ class DetailsPanel(QtWidgets.QWidget):
 
                         # Stomp the stored data with a copy of the template updated with the generated name
                         template_copy = copy.deepcopy(entry_data["template"])
-                        entry_data["children"][child_entry_name] = template_copy[adh.GetActionName(template_copy)]
+                        entry_data["children"][child_entry_name] = template_copy[ad.GetActionName(template_copy)]
 
                     # Update the children as usual now that the stagnant data has been removed
                     entry_data["children"].update(self.StoreData(entry, False))

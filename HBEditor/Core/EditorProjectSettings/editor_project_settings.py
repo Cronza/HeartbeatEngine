@@ -14,10 +14,10 @@
 """
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.BaseClasses.base_editor import EditorBase
+from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorProjectSettings.editor_project_settings_ui import EditorProjectSettingsUI
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorUtilities import path_handler as fh
+from HBEditor.Core.EditorUtilities import path
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
@@ -30,7 +30,7 @@ class EditorProjectSettings(EditorBase):
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
         self.project_settings_schema = Reader.ReadAll(
-            fh.ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
+            path.ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
         )
 
         self.editor_ui = EditorProjectSettingsUI(self)

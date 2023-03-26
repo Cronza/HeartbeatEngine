@@ -2,7 +2,7 @@ import copy, os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
-from HBEditor.Core.EditorUtilities import image_handler as ih
+from HBEditor.Core.EditorUtilities import image as ih
 
 
 class AssetBrowser(QtWidgets.QDialog):

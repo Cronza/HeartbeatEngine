@@ -15,10 +15,10 @@
 import copy
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.BaseClasses.base_editor import EditorBase
+from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorDialogue.editor_dialogue_ui import EditorDialogueUI
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorUtilities import action_data_handler as adh
+from HBEditor.Core.EditorUtilities import action_data as ad
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
@@ -168,8 +168,8 @@ class EditorDialogue(EditorBase):
             for entry in branch_data["entries"]:
                 # Convert the requirements for this action to the engine format before rebuilding the full entry,
                 # recreating the top level action name key in the process
-                conv_requirements = adh.ConvertActionRequirementsToEngineFormat(entry[adh.GetActionName(entry)])
-                converted_entries.append({adh.GetActionName(entry): conv_requirements})
+                conv_requirements = ad.ConvertActionRequirementsToEngineFormat(entry[ad.GetActionName(entry)])
+                converted_entries.append({ad.GetActionName(entry): conv_requirements})
 
             # Complete the converted branch, and add it to the new dialogue data
             converted_branch["entries"] = converted_entries
@@ -189,11 +189,11 @@ class EditorDialogue(EditorBase):
             for entry in branch_data["entries"]:
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
                 # the matching metadata entry and clone it
-                name = adh.GetActionName(entry)
+                name = ad.GetActionName(entry)
                 metadata_entry = copy.deepcopy(settings.action_metadata[name])
 
                 # Pass the entry by ref, and let the convert func edit it directly
-                adh.ConvertActionRequirementsToEditorFormat(
+                ad.ConvertActionRequirementsToEditorFormat(
                     metadata_entry=metadata_entry,
                     engine_entry=entry[name]
                 )

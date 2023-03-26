@@ -16,7 +16,7 @@ import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.Menus.ActionMenu.action_menu_option import ActionMenuOption
+from HBEditor.Core.ActionMenu.action_menu_option import ActionMenuOption
 
 #@TODO: Should this class be split into a function class & a U.I class?
 
