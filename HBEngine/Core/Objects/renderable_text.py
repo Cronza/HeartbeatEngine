@@ -54,11 +54,14 @@ class TextRenderable(Renderable):
 
         # For new objects, resize initially in case we're already using a scaled resolution
         self.RecalculateSize(self.scene.resolution_multiplier)
-        self.WrapText(self.surface)
+        self.WrapText()
 
-    def WrapText(self, surface):
-        """ Applies text wrapping based on the provided surface area """
-        rect = surface.get_rect()
+    def WrapText(self):
+        """ Clears the surface and redraws / re-wraps the text """
+        # Reset the surface, undoing any previous blitting
+        self.surface.fill((0,0,0,0))
+
+        rect = self.surface.get_rect()
         base_top = rect.top
         line_spacing = -2
         font_height = self.font_obj.size("Tg")[1]
@@ -100,9 +103,9 @@ class TextRenderable(Renderable):
                 if self.center_align:
                     extra_space = self.surface.get_size()[0] - image.get_size()[0]
                     centered_width = rect.left + extra_space / 2
-                    surface.blit(image, (centered_width, base_top))
+                    self.surface.blit(image, (centered_width, base_top))
                 else:
-                    surface.blit(image, (rect.left, base_top))
+                    self.surface.blit(image, (rect.left, base_top))
 
                 base_top += font_height + line_spacing
 

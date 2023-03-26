@@ -26,10 +26,7 @@ class Button(Interactable):
         super().__init__(scene, renderable_data, parent)
         # # Buttons use a container called 'button_text' to store their button text action data. To the user, this is
         # a simplified text renderable as a number of the settings are handled behind-the-scenes here
-
-        # Instead of the user having to provide a key for this, we generate it for them
         self.renderable_data["button_text"]["key"] = f"{self.renderable_data['key']}_Text"
-
         self.renderable_data["button_text"]["wrap_bounds"] = self.ConvertScreenToNorm(  #@TODO: Text cuts off at button bounds. It used to be based on text size which it should be changed to
             (self.surface.get_width(), self.surface.get_height())
         )
@@ -40,7 +37,6 @@ class Button(Interactable):
             self
         )
         self.children.append(self.button_text_renderable)
-        self.scene.active_renderables.Add(self.button_text_renderable)
 
     def GetText(self):
         pass
@@ -58,7 +54,7 @@ class Button(Interactable):
             elif new_state == State.pressed:
                 self.button_text_renderable.text_color = self.button_text_renderable.renderable_data["text_color_clicked"]
 
-        self.button_text_renderable.WrapText(self.button_text_renderable.surface)
+        self.button_text_renderable.WrapText()
 
         super().ChangeState(new_state)
 
