@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-class RenderableGroup():
+class RenderableGroup:
     def __init__(self):
         """
         This class mimics the base pygame sprite group class, but uses a dictionary for the renderable list.

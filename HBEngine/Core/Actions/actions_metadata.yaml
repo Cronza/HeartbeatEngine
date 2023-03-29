@@ -347,12 +347,6 @@ create_button:
       global: ["Button", "z_order"]
       flags: ["editable", "global_active"]
 
-    flip:
-      type: "Bool"
-      value: False
-      default: False
-      flags: ["editable", "preview"]
-
     button_text:
       type: "Container"
       flags: ["editable", "preview"]
@@ -662,7 +656,6 @@ dialogue:
       value: "wait_for_input"
       default: "wait_for_input"
 
-
 choice:
   display_name: "Choice"
   requirements:
@@ -846,6 +839,7 @@ scene_fade_out:
         - "wait_until_complete"
       flags: [ "editable" ]
 
+# Play Music
 
 play_sfx:
   display_name: "Play SFX"
@@ -877,7 +871,6 @@ play_sfx:
         - "wait_until_complete"
       flags: ["editable", "preview", "no_exclusion"]
 
-# Play Music
 play_music:
   display_name: "Play Music"
   requirements:

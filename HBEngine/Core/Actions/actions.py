@@ -341,11 +341,6 @@ class create_button(Action):
             self.action_data
         )
 
-        # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
-                new_renderable.Flip()
-
         self.scene.active_renderables.Add(new_renderable)
 
         self.scene.Draw()

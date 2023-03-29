@@ -160,6 +160,10 @@ class Interactable(SpriteRenderable):
             print("No clicked sprite specified" + state_missing_warning)
             self.clicked_surface = self.surface
 
+    def GetSurface(self):
+        """ Override: Return the appropriate active surface based on state """
+        return self.GetStateSurface(self.state)
+
     def GetStateSurface(self, state):
         """ Based on the provided state, return the corresponding surface (Either scaled of unscaled) """
         if state == State.hover:
@@ -177,6 +181,8 @@ class Interactable(SpriteRenderable):
                 return self.scaled_original_surface
             else:
                 return self.original_surface
+        else:
+            return self.original_surface
 
     def ChangeState(self, new_state: State):
         """ Updates the active interact state with the provided state, refreshing the active surface """
@@ -185,15 +191,15 @@ class Interactable(SpriteRenderable):
         self.scene.Draw()
 
     def Flip(self):
-        #super().Flip()
-
         # Completely override the parent, as interactables use a cached original surface instead of explicitly using
         # the active surface
-
+        print("Flipping Interactable")
         if self.scaled_original_surface:
             self.scaled_original_surface = pygame.transform.flip(self.scaled_original_surface, True, False)
         else:
+            print("Flipping Interactale Original Surface")
             self.original_surface = pygame.transform.flip(self.original_surface, True, False)
+            #self.surface = pygame.transform.flip(self.original_surface, True, False)
 
         # Flip the interactive surfaces along with the base surface
         if self.scaled_hover_surface:

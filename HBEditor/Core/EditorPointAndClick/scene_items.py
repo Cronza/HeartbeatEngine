@@ -92,7 +92,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # IE. {text: '', text_size: '', position: ''}. If 'text' is found, provide all 3 keys
         #
         # Note: Only one of these can appear at any level, otherwise multiple items would share a data block and cause
-        # stomping issue
+        # stomping issues
         new_item = None
 
         for req_name, req_data in action_data.items():
@@ -285,19 +285,22 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
             self.is_centered = False
 
     def UpdateFlip(self, new_transform: QtGui.QTransform):
-        if self.action_data["flip"]["value"]:
-            # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
-            # fact you can't change the origin, we have a hard dependency on knowing whether center align
-            # is active, so we know how to counter the movement from the scaling
-            if self.is_centered:
-                # We need to reverse the movement from center_align in the X (we don't flip in the Y).
-                # m31 represents the amount of horizontal translation that has been applied so far
-                new_transform.translate(-new_transform.m31() * 2, 0)
-            else:
-                new_transform.translate(self.boundingRect().width(), 0)
+        if "flip" in self.action_data:
+            if self.action_data["flip"]["value"]:
+                # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
+                # fact you can't change the origin, we have a hard dependency on knowing whether center align
+                # is active, so we know how to counter the movement from the scaling
+                if self.is_centered:
+                    # We need to reverse the movement from center_align in the X (we don't flip in the Y).
+                    # m31 represents the amount of horizontal translation that has been applied so far
+                    new_transform.translate(-new_transform.m31() * 2, 0)
+                else:
+                    new_transform.translate(self.boundingRect().width(), 0)
 
-            new_transform.scale(-1, 1)
-            self.is_flipped = True
+                new_transform.scale(-1, 1)
+                self.is_flipped = True
+            else:
+                self.is_flipped = False
         else:
             self.is_flipped = False
 
@@ -314,9 +317,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.action_data = action_data
 
         self.is_centered = False
-        self.is_flipped = False
-
-        self.setFlag(self.ItemSendsGeometryChanges)
+        self.setFlag(self.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
         self.document().setDocumentMargin(0)
 

@@ -31,12 +31,6 @@ class SceneViewer(QtWidgets.QWidget):
 
         #@TODO: Rename this to 'owner' to be more explicit
         self.core = core
-
-        # Some U.I elements need to be informed when certain changes happen within the scene (IE. selection change,
-        # state change, etc). They can register by adding themselves to a list which is iterated anytime a notable
-        # change occurs
-        self.change_listeners = []
-
         self.viewer_size = (1280, 720)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
