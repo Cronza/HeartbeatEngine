@@ -71,25 +71,29 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
 
             if req_data["type"] == "Event":
                 # Event types have a unique data structure in that they have generated children based on another
-                # action's metadata. Alongside this, they also have an input_widget that doesn't get saved when
-                # exporting as containers can't have both children and their own values. None of these appear in the
-                # metadata, leading to them being skipped when importing.
+                # action's metadata. Since this data comes from outside the scope of this action, we have to perform
+                # a second cloning
                 #
-                # However, the first child key in the imported block is the 'action' key, which is specially created to
+                # The first child key in the imported block is the 'action' key, which is specially created to
                 # house the value of the input_widget (IE. 'load_scene' -> {'action': 'load_scene'}). Using this action
                 # key, clone the corresponding metadata and update it
-                event_target_metadata = copy.deepcopy(settings.action_metadata[engine_entry[req_name]["action"]])
-                req_data["children"] = {
-                    "action": {
-                        "type": "String",
-                        "value": engine_entry[req_name]["action"]
+                #
+                # If the action block is missing, it's assumed the user selected the null option, or "None". Since this
+                # represents "do nothing", we don't load it in this case
+                if engine_entry[req_name]:
+                    event_target_metadata = copy.deepcopy(settings.action_metadata[engine_entry[req_name]["action"]])
+                    req_data["children"] = {
+                        "action": {
+                            "type": "String",
+                            "value": engine_entry[req_name]["action"]
+                        }
                     }
-                }
-                req_data["children"].update(event_target_metadata["requirements"])  # Merge in the target req metadata
+                    # Merge in the target req metadata
+                    req_data["children"].update(event_target_metadata["requirements"])
 
-                # By default, 'value' will be the entire child dict (IE. {'action': ..., 'scene_file': ...})
-                # Since events use an input_widget, we need to change 'value' to something more appropriate
-                req_data["value"] = engine_entry[req_name]["action"]
+                    # By default, 'value' will be the entire child dict (IE. {'action': ..., 'scene_file': ...})
+                    # Since events use an input_widget, we need to change 'value' to something more appropriate
+                    req_data["value"] = engine_entry[req_name]["action"]
 
             if "template" in req_data:
                 # We need to duplicate the template a number of times equal to the number of instances found

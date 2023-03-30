@@ -537,12 +537,14 @@ class InputEntryArrayElement(InputEntryBase):
 
 
 class InputEntryEvent(InputEntryBase):
+    """
+    A variant of the dropdown entry that uses a pre-set list of options which refer to an action in the
+    actions_metadata. Once an option is selected, all properties related to that action are generated as children
+    to this entry
+    """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, remove_func: callable, signal_func: callable, refresh_func: callable,
                  excluded_properties: dict = None):
-        """ A variant of the dropdown entry that uses a pre-set list of options which refer to an action in the
-         actions_metadata. Once an option is selected, all properties related to that action are generated as children
-         to this entry """
         super().__init__(data)
 
         self.excluded_properties = []
@@ -573,22 +575,23 @@ class InputEntryEvent(InputEntryBase):
         # Delete all existing children, as they're based on the active selection
         for i in range(self.owning_model_item.childCount()):
             self.remove_func(self.owning_model_item.child(0))
-
-        # Since the entry children are properties of the action specified in the input_widget, we also need to specify
-        # the action's name. This doesn't come as a part of the metadata clone, so we need to add the key manually
-        #
-        # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it as
-        # a visible entry, and instead writing it directly into the action_data
         self.data["children"].clear()
-        self.data["children"]["action"] = {
-            "type": "String",
-            "value": self.input_widget.currentText()
-        }
 
-        # Grab the metadata for the event action, and generate children for all of its properties
-        metadata = copy.deepcopy(settings.action_metadata[self.input_widget.currentText()])
-        if metadata["requirements"]:
-            self.AddItems(metadata["requirements"])
+        if self.input_widget.currentText() != "None":
+            # Since the entry children are properties of the action specified in the input_widget, we also need to specify
+            # the action's name. This doesn't come as a part of the metadata clone, so we need to add the key manually
+            #
+            # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it as
+            # a visible entry, and instead writing it directly into the action_data
+            self.data["children"]["action"] = {
+                "type": "String",
+                "value": self.input_widget.currentText()
+            }
+
+            # Grab the metadata for the event action, and generate children for all of its properties
+            metadata = copy.deepcopy(settings.action_metadata[self.input_widget.currentText()])
+            if metadata["requirements"]:
+                self.AddItems(metadata["requirements"])
 
     def AddItems(self, req_data=None, parent=None):
         if not parent:
@@ -628,7 +631,10 @@ class InputEntryEvent(InputEntryBase):
         return self.data
 
     def Set(self, data):
-        self.input_widget.setCurrentIndex(self.input_widget.findText(data))
+        if data:
+            self.input_widget.setCurrentIndex(self.input_widget.findText(data))
+        else:
+            self.input_widget.setCurrentIndex(0)
 
     def Connect(self):
         self.input_widget.activated.connect(self.ChangeEvent)  # 'activated' only happens on user interaction
