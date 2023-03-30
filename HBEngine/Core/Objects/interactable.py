@@ -57,6 +57,7 @@ class Interactable(SpriteRenderable):
         super().update()
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
+            print("Collided")
             if not self.scene.stop_interactions:
                 # If not already in the hover state...
                 if self.state is State.normal:
@@ -66,11 +67,11 @@ class Interactable(SpriteRenderable):
                         # Begin the click
                         self.ChangeState(State.pressed)
                         self.isClicking = True
-                        self.Interact()
                     elif pygame.mouse.get_pressed()[0] == 0 and self.isClicking is True:
                         # User has released the mouse after clicking this renderable. Reset state
                         self.ChangeState(State.hover)
                         self.isClicking = False
+                        self.Interact()
                     elif self.isClicking is True:
                         # End the click
                         self.ChangeState(State.normal)
@@ -78,6 +79,7 @@ class Interactable(SpriteRenderable):
 
         # If no longer hovering...
         elif self.state is not State.normal:
+            self.isClicking = False
             self.ChangeState(State.normal)
 
     def RecalculateSize(self, multiplier):
