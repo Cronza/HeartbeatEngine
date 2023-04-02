@@ -21,7 +21,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     - It can easily be found when using scene.items(), which returns a 1-dimensional array of items (There is no known
     way of just getting the top-most items, so this is workaround)
 
-    Children items don't have the ability to be selected directly. Instead, this item has a boundingrect equal to the
+    Children items don't have the ability to be selected directly. Instead, this item has a bounding rect equal to the
     combined bounding rects of all children, allowing any selection to bubble to this object to decide what should
     happen. When selecting this object, all children are recursively selected as well to allow grouped movement
     """
@@ -31,8 +31,8 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
         self.select_func = select_func
 
-        self.setFlag(self.ItemIsMovable)
-        self.setFlag(self.ItemIsSelectable)
+        self.setFlag(self.ItemIsMovable, True)
+        self.setFlag(self.ItemIsSelectable, True)
         self.setFlag(self.ItemSendsGeometryChanges)
 
         self.setAcceptDrops(True)
@@ -126,7 +126,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
         # that here, use this func as a wrapper to invoke the recursive refresh funcs
-
         if change_tree:
             self.RefreshRecursivePartial(self, change_tree)
         else:
@@ -194,8 +193,8 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             # Always store a normalized position value between 0-1
             #
             # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value that is
-            # altered by any translation applied to the item (Needs additional review to confirm). This breaks features
-            # such as 'center_align'
+            # altered by any translation applied to the item (Needs additional review to confirm). This breaks
+            # features such as 'center_align'
             parent_pos = child.pos()
             item_pos = child.mapFromParent(parent_pos)
             scene_pos = child.mapToScene(item_pos)
@@ -208,7 +207,12 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # Refresh in case position changed while dragging
         self.select_func()
 
+        # Execute the original logic as it is what saves the position of objects internally
         super().mouseReleaseEvent(event)
+
+    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        # Selecting the root will recursively select all of its children
+        self.setSelected(True)
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
@@ -219,7 +223,8 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         self.is_centered = False
         self.is_flipped = False
 
-        self.setFlag(self.ItemSendsGeometryChanges)
+        self.setFlag(self.ItemIsSelectable, False)
+        self.setFlag(self.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
 
     def Refresh(self, changed_entry_name: str = ""):
@@ -304,12 +309,6 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         else:
             self.is_flipped = False
 
-    def Select(self):
-        """ Add this object and all children to the active selection """
-        self.setSelected(True)
-        for child in self.childItems():
-            child.Select()
-
 
 class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
     def __init__(self, action_data: dict, text: str = "Default"):
@@ -317,6 +316,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.action_data = action_data
 
         self.is_centered = False
+        self.setFlag(self.ItemIsSelectable, False)
         self.setFlag(self.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
         self.document().setDocumentMargin(0)
@@ -423,9 +423,3 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             self.is_centered = True
         else:
             self.is_centered = False
-
-    def Select(self):
-        """ Add this object and all children to the active selection """
-        self.setSelected(True)
-        for child in self.childItems():
-            child.Select()

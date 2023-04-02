@@ -183,3 +183,5 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Inform the core so it can take additional actions
         self.core.UpdateActiveSceneItem(selected_items)
+
+

@@ -41,6 +41,7 @@ class SceneView(QtWidgets.QGraphicsView):
         # Enable viewport panning while spacebar is down
         if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
             self.setDragMode(self.ScrollHandDrag)
+            self.setInteractive(False)
 
         super().keyPressEvent(event)
 
@@ -48,6 +49,7 @@ class SceneView(QtWidgets.QGraphicsView):
         # Disable viewport panning once the spacebar is released
         if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
             self.setDragMode(self.RubberBandDrag)
+            self.setInteractive(True)
 
         super().keyReleaseEvent(event)
 
