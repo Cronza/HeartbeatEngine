@@ -19,11 +19,11 @@ from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.Primitives.input_entries import *
 
 
-def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QAbstractItemView,
+def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
         parent: QTreeWidgetItem = None, excluded_properties: list = None,
         signal_func: callable = None, refresh_func: callable = None) -> QTreeWidgetItem:
     """
-    Adds a new InputEntry into the provided QAbstractItemModel, along with its name and global checkbox elements.
+    Adds a new InputEntry into the provided QTreeView, along with its name and global checkbox elements.
     If a parent is provided, the elements are added as a child to it instead. Returns the QTreeWidgetItem
     containing the elements
 

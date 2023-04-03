@@ -187,7 +187,7 @@ class InputEntryDropdown(InputEntryBase):
 
 
 class InputEntryAssetSelector(InputEntryBase):
-    def __init__(self, data: dict, details_panel: object, type_filter: list):
+    def __init__(self, data: dict, details_panel: object, type_filter: set):
         super().__init__(data)
 
         self.details_panel = details_panel
