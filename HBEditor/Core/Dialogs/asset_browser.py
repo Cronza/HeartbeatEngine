@@ -115,7 +115,10 @@ class AssetBrowser(QtWidgets.QDialog):
         self.asset_list.clearSelection()
         search_criteria = self.search_input.text().lower()
         for row in range(0, self.asset_list.rowCount()):
-            asset_name = self.asset_list.item(row, 0).text().lower()
+            if self.asset_list.isColumnHidden(0):
+                asset_name = self.asset_list.item(row, 0).text().lower()
+            else:
+                asset_name = self.asset_list.item(row, 1).text().lower()
             if search_criteria not in asset_name:
                 self.asset_list.hideRow(row)
             else:
