@@ -578,14 +578,16 @@ class InputEntryEvent(InputEntryBase):
         self.data["children"].clear()
 
         if self.input_widget.currentText() != "None":
-            # Since the entry children are properties of the action specified in the input_widget, we also need to specify
-            # the action's name. This doesn't come as a part of the metadata clone, so we need to add the key manually
+            # Since the entry children are properties of the action specified in the input_widget, we also need to
+            # specify the action's name. This doesn't come as a part of the metadata clone, so we need to add the key
+            # manually
             #
-            # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it as
-            # a visible entry, and instead writing it directly into the action_data
+            # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it
+            # as a visible entry, and instead writing it directly into the action_data
             self.data["children"]["action"] = {
                 "type": "String",
-                "value": self.input_widget.currentText()
+                "value": self.input_widget.currentText(),
+                "flags": ["no_exclusion"]
             }
 
             # Grab the metadata for the event action, and generate children for all of its properties

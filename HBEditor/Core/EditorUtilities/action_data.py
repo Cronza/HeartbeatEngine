@@ -41,8 +41,12 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
                         conv_data[req_name] = req_data["value"]
 
             elif "value" in req_data:
-                # Containers don't have the 'value' key
-                conv_data[req_name] = req_data["value"]
+                if "flags" in req_data:
+                    # Exclude parameters that don't have any flags. These are, by default, not editable
+                    # Containers don't have the 'value' key
+                    conv_data[req_name] = req_data["value"]
+                else:
+                    print("Problematic", req_data)
 
             if "children" in req_data:
                 conv_data[req_name] = ConvertActionRequirementsToEngineFormat(req_data, "children")
@@ -85,7 +89,8 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
                     req_data["children"] = {
                         "action": {
                             "type": "String",
-                            "value": engine_entry[req_name]["action"]
+                            "value": engine_entry[req_name]["action"],
+                            "flags": ["no_exclusion"]
                         }
                     }
                     # Merge in the target req metadata
