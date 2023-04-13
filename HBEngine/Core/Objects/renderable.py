@@ -33,9 +33,9 @@ class Renderable(pygame.sprite.Sprite):
         # Renderables require access to the owning scene so that they can keep track of resolution updates
         self.scene = scene
 
-        self.rect = None
+        self.rect = pygame.Rect(0, 0, 0, 0)
         self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
-        self.surface = None  # The active surface
+        self.surface = self.surface = pygame.Surface((0, 0), pygame.SRCALPHA)  # The active surface
         self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
 
         # YAML Parameters
@@ -165,6 +165,7 @@ class Renderable(pygame.sprite.Sprite):
         )
 
     # ***************** TRANSFORM ACTIONS *******************
+
     def Flip(self):
         """ Flips the sprite horizontally. Chooses between the unscaled and scaled surface """
         if self.scaled_surface:

@@ -409,6 +409,12 @@ create_button:
           value: 10002
           default: 10002
 
+        wrap_bounds:
+          type: "Vector2"
+          value: [ 0.2,0.2 ]
+          default: [ 0.2,0.2 ]
+          flags: ["editable"]
+
     events:
       type: "Array"
       flags: ["editable", "no_exclusion"]
@@ -655,6 +661,7 @@ dialogue:
       type: "String"
       value: "wait_for_input"
       default: "wait_for_input"
+      flags: ["no_exclusion"]
 
 choice:
   display_name: "Choice"

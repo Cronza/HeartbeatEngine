@@ -138,28 +138,23 @@ class Interactable(SpriteRenderable):
         Load each of the state sprites in. This is arguably faster than loading them only when necessary, especially
         due to the speed at which they are requested when the user spams the hover or click events
         """
-        state_missing_warning = " - Defaulting the state to use the 'Normal' sprite"
         hover_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
         clicked_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
 
         if "sprite_hover" in self.renderable_data:
-            if self.renderable_data['sprite_hover'] != "":
+            if self.renderable_data['sprite_hover'] != "None" and self.renderable_data['sprite_hover'] != "":
                 self.hover_surface = pygame.image.load(hover_sprite).convert_alpha()
             else:
-                print("No hover sprite specified" + state_missing_warning)
                 self.hover_surface = self.surface
         else:
-            print("No hover sprite specified" + state_missing_warning)
             self.hover_surface = self.surface
 
         if 'sprite_clicked' in self.renderable_data:
-            if self.renderable_data["sprite_clicked"] != "":
+            if self.renderable_data['sprite_clicked'] != "None" and self.renderable_data['sprite_clicked'] != "":
                 self.clicked_surface = pygame.image.load(clicked_sprite).convert_alpha()
             else:
-                print("No clicked sprite specified" + state_missing_warning)
                 self.clicked_surface = self.surface
         else:
-            print("No clicked sprite specified" + state_missing_warning)
             self.clicked_surface = self.surface
 
     def GetSurface(self):
