@@ -276,8 +276,11 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
                 self.setPos(parent_pos)
 
     def UpdateSprite(self):
-        image = QtGui.QPixmap(path.ResolveImageFilePath(self.action_data["sprite"]["value"]))
-        self.setPixmap(image)
+        img_path = path.ResolveFilePath(self.action_data["sprite"]["value"])
+        if img_path:
+            self.setPixmap(QtGui.QPixmap(img_path))
+        else:
+            self.setPixmap(QtGui.QPixmap(":/Icons/SceneItem_Sprite.png"))
 
     def UpdateZOrder(self):
         self.setZValue(float(self.action_data["z_order"]["value"]))
@@ -393,7 +396,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
 
     def UpdateText(self):
         if self.action_data["text"]["value"] == "" or self.action_data["text"]["value"].lower() == "none":
-            self.action_data["text"]["value"] = "Default"
+            self.setPlainText("None")
         else:
             self.setPlainText(self.action_data["text"]["value"])
 

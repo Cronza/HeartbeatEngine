@@ -23,6 +23,9 @@ Interactables:
     - name: "create_button"
       applicable_editors:
         - Scene_Point_And_Click
+    - name: "create_text_button"
+      applicable_editors:
+        - Scene_Point_And_Click
 
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"

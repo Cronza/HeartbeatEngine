@@ -15,10 +15,6 @@
         <file alias="Dustismo-Italic.ttf">Fonts/Dustismo/dustismo_italic.ttf</file>
         <file alias="Dustismo-Bold.ttf">Fonts/Dustismo/dustismo_bold.ttf</file>
         <file alias="Dustismo-Bold-Italic.ttf">Fonts/Dustismo/dustismo_bold_italic.ttf</file>
-
-    </qresource>
-    <qresource prefix="Sprites">
-        <file alias="Placeholder.png">Sprites/Placeholder.png</file>
     </qresource>
     <qresource prefix="Icons">
         <file alias="Checkmark.png">Icons/Checkmark.png</file>
@@ -53,6 +49,7 @@
         <file alias="Import.png">Icons/Import.png</file>
         <file alias="Information.png">Icons/Information.png</file>
         <file alias="Rename.png">Icons/Rename.png</file>
+        <file alias="SceneItem_Sprite.png">Icons/SceneItem_Sprite.png</file>
     </qresource>
     <qresource prefix="Themes">
         <file alias="Dark.css">Themes/Dark/Dark.css</file>

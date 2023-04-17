@@ -53,18 +53,29 @@ class TextRenderable(Renderable):
         self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
-        self.RecalculateSize(self.scene.resolution_multiplier)
+
         self.WrapText()
+        self.RecalculateSize(self.scene.resolution_multiplier)
 
     def WrapText(self):
         """ Clears the surface and redraws / re-wraps the text """
-        # Reset the surface, undoing any previous blitting
-        self.surface.fill((0,0,0,0))
+
+        # Reset the surface back to the full size of wrap_bounds in order to wrap properly
+        size = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
+        self.surface = pygame.Surface(
+            (
+                int(size[0]),
+                int(size[1])
+            ),
+            pygame.SRCALPHA
+        )
 
         rect = self.surface.get_rect()
         base_top = rect.top
-        line_spacing = -2
+        line_spacing = 0
         font_height = self.font_obj.size("Tg")[1]
+        largest_width = 0  # The size of the largest line
+        total_height = 0  # The height of all lines including between-line spacing
 
         # Pre-split the text based on any specified newlines
         text_to_process = self.text.split("\n")
@@ -81,6 +92,7 @@ class TextRenderable(Renderable):
         for line in text_to_process:
 
             processing_complete = False
+
             while not processing_complete:
                 i = 1
 
@@ -96,6 +108,10 @@ class TextRenderable(Renderable):
                 if i < len(line):
                     i = line.rfind(" ", 0, i) + 1
 
+                # Prior to blitting, measure the length of the string and record it if it's the largest so far
+                if self.font_obj.size(line[:i])[0] > largest_width:
+                    largest_width = self.font_obj.size(line[:i])[0]
+
                 # Render the line and blit it to the surface
                 image = self.font_obj.render(line[:i], True, self.text_color)
 
@@ -108,6 +124,7 @@ class TextRenderable(Renderable):
                     self.surface.blit(image, (rect.left, base_top))
 
                 base_top += font_height + line_spacing
+                total_height += font_height + line_spacing
 
                 # Remove the text we just blitted
                 line = line[i:]
@@ -115,5 +132,19 @@ class TextRenderable(Renderable):
                 # Exit if we're finished processing everything in this line
                 if not line:
                     processing_complete = True
+
+        # Now that we have the text organized and blitted correctly on the larger wrap_bounds-based surface, we need to
+        # trim the excess space between the text and the wrap_bounds (Vertically and horizontally).
+        #
+        # Note: Remove 'pygame.SRCALPHA' if you want to force the background to be black for visualization / testing
+        new_surface = pygame.Surface((largest_width, total_height), pygame.SRCALPHA)
+        if self.center_align:
+            new_rect = new_surface.blit(self.surface, (0 - (self.surface.get_width() - largest_width) / 2, 0 - (self.surface.get_height() - total_height) / 2))
+        else:
+            new_rect = new_surface.blit(self.surface, (0, 0))
+
+        self.surface = new_surface
+        self.rect = pygame.Rect(self.rect.x, self.rect.y, new_rect.w, new_rect.h)
+
 
 

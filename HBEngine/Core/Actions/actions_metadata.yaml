@@ -64,8 +64,8 @@ create_sprite:
 
     sprite:
       type: "Asset_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
-      default: "HBEngine/Content/Sprites/Placeholder.png"
+      value: "None"
+      default: "None"
       flags: ["editable", "preview"]
 
     position:
@@ -131,8 +131,8 @@ create_background:
 
     sprite:
       type: "Asset_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
-      default: "HBEngine/Content/Sprites/Placeholder.png"
+      value: "None"
+      default: "None"
       flags: ["editable", "preview"]
 
     position:
@@ -436,6 +436,100 @@ create_button:
                 - "play_sfx"
               flags: ["editable"]
 
+create_text_button:
+  display_name: "Create Button (Text Only)"
+  requirements:
+    key:
+      type: "String"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
+
+    position:
+      type: "Vector2"
+      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
+      flags: ["editable", "preview"]
+
+    center_align:
+      type: "Bool"
+      value: True
+      default: True
+      flags: ["editable"]
+
+    text:
+      type: "String"
+      value: "Default"
+      default: "Default"
+      flags: ["editable", "preview"]
+
+    text_size:
+      type: "Int"
+      value: 24
+      default: 24
+      global: ["Text", "size"]
+      flags: ["editable", "global_active"]
+
+    text_color:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    text_color_hover:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    text_color_clicked:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    font:
+      type: "Asset_Font"
+      value: "None"
+      default: "None"
+      global: ["Button", "font"]
+      flags: ["editable", "global_active"]
+
+    z_order: # Button text generate it's z_order based on the parent's. However, the param is still needed
+      type: "Int"
+      value: 10002
+      default: 10002
+
+    wrap_bounds:
+      type: "Vector2"
+      value: [ 0.2,0.2 ]
+      default: [ 0.2,0.2 ]
+      flags: ["editable"]
+
+    events:
+      type: "Array"
+      flags: ["editable", "no_exclusion"]
+      template:
+        event:
+          type: "Array_Element"
+          flags: ["editable"]
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+                - "scene_fade_out"
+                - "scene_fade_in"
+                - "play_sfx"
+              flags: ["editable"]
+
 # Dialogue
 
 create_dialogue_interface:
@@ -693,22 +787,22 @@ choice:
 
             sprite:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png"
               global: ["Dialogue", "choice_button_sprite"]
               flags: ["editable", "preview", "global_active"]
 
             sprite_hover:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png"
               global: [ "Dialogue", "choice_button_sprite_hover" ]
               flags: ["editable", "global_active"]
 
             sprite_clicked:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png"
               global: [ "Dialogue", "choice_button_sprite_clicked" ]
               flags: ["editable", "global_active"]
 
@@ -776,10 +870,16 @@ choice:
                   global: ["Dialogue", "choice_button_font"]
                   flags: ["editable", "global_active"]
 
-                z_order: # Button text generate it's  z_order based on the parent's. However, the param is still needed
+                z_order: # Button text generate its z_order based on the parent's. However, the param is still needed
                   type: "Int"
                   value: 10002
                   default: 10002
+
+                wrap_bounds:
+                  type: "Vector2"
+                  value: [ 0.25,0.25 ]
+                  default: [ 0.25,0.25 ]
+                  flags: [ "editable" ]
 
 # Scene
 

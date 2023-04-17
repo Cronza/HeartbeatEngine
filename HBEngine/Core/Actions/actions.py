@@ -34,7 +34,7 @@ actions_metadata = Reader.ReadAll(settings.ConvertPartialToAbsolutePath("HBEngin
 
 
 class Action:
-    def __init__(self, scene, action_data, a_manager):
+    def __init__(self, scene, action_data: dict, a_manager, no_draw: bool = False):
         self.scene = scene
         self.action_data = action_data
         self.a_manager = a_manager
@@ -44,6 +44,8 @@ class Action:
         self.complete = False
         self.completion_callback = None  # Called by the action manager before it deletes the action
         self.metadata = {}  # Loaded via function
+
+        self.no_draw = no_draw  # Whether to skip adding any resulting renderables to the draw stack
 
     def Start(self):
         pass
@@ -82,7 +84,6 @@ class Action:
                     action_data[md_req_name] = {}
 
                 self.UpdateFromMetadata(md_req_data, action_data[md_req_name], "children")
-
 
             elif "template" in md_req_data:
                 # Requirements that use templates have a fundamentally unique metadata in that each child is generated
@@ -128,6 +129,7 @@ class Action:
         except Exception as exc:
             print(f"Failed to retrieve global value for key '{key}' - {exc}")
             return None
+
 
 class SoundAction(Action):
     # @TODO: Add Pause function
@@ -201,21 +203,21 @@ class create_sprite(Action):
             self.action_data
         )
 
-        # If the user requested a flip action, do so
         if "flip" in self.action_data:
             if self.action_data["flip"]:
                 new_sprite.Flip()
 
-        self.scene.active_renderables.Add(new_sprite)
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_sprite)
 
-        # Any transitions are applied to the sprite post-load
-        if "None" not in self.action_data["transition"]["type"]:
-            self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_sprite)
-            self.active_transition.Start()
-        else:
-            self.scene.Draw()
-            self.Complete()
+            # Any transitions are applied to the sprite post-load
+            if "None" not in self.action_data["transition"]["type"]:
+                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_sprite)
+                self.active_transition.Start()
+            else:
+                self.scene.Draw()
 
+        self.Complete()
         return new_sprite
 
     def Update(self, events):
@@ -245,49 +247,49 @@ class create_background(Action):
             self.action_data,
         )
 
-        self.scene.active_renderables.Add(new_sprite)
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_sprite)
+            self.scene.Draw()
 
-        self.scene.Draw()
         self.Complete()
-
         return new_sprite
 
 
-class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
-    """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
-    def Start(self):
-        self.LoadMetadata(__class__.__name__)
-        self.skippable = False
-
-        # OVERRIDES WITH NO PROJECT DEFAULTS
-        if 'position' not in self.action_data:
-            self.action_data['position'] = (0, 0)
-
-        # PROJECT DEFAULTS OVERRIDE
-        if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = settings.project_settings['Interactable'][
-                'z_order']
-
-        if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = settings.project_settings['Interactable'][
-                'center_align']
-
-        new_renderable = Interactable(
-            self.scene,
-            self.action_data,
-        )
-
-        # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
-                new_renderable.Flip()
-
-        self.scene.active_renderables.Add(new_renderable)
-
-        self.scene.Draw()
-        self.Complete()
-
-        return new_renderable
+#class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
+#    """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
+#    def Start(self):
+#        self.LoadMetadata(__class__.__name__)
+#        self.skippable = False
+#
+#        # OVERRIDES WITH NO PROJECT DEFAULTS
+#        if 'position' not in self.action_data:
+#            self.action_data['position'] = (0, 0)
+#
+#        # PROJECT DEFAULTS OVERRIDE
+#        if 'z_order' not in self.action_data:
+#            self.action_data['z_order'] = settings.project_settings['Interactable'][
+#                'z_order']
+#
+#        if 'center_align' not in self.action_data:
+#            self.action_data['center_align'] = settings.project_settings['Interactable'][
+#                'center_align']
+#
+#        new_renderable = Interactable(
+#            self.scene,
+#            self.action_data,
+#        )
+#
+#        # If the user requested a flip action, do so
+#        if 'flip' in self.action_data:
+#            if self.action_data['flip']:
+#                new_renderable.Flip()
+#
+#        self.scene.active_renderables.Add(new_renderable)
+#
+#        self.scene.Draw()
+#        self.Complete()
+#
+#        return new_renderable
 
 
 class create_text(Action):
@@ -302,15 +304,16 @@ class create_text(Action):
             self.action_data
         )
 
-        self.scene.active_renderables.Add(new_text_renderable)
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_text_renderable)
 
-        if "None" not in self.action_data["transition"]["type"]:
-            self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
-            self.active_transition.Start()
-        else:
-            self.scene.Draw()
-            self.Complete()
+            if "None" not in self.action_data["transition"]["type"]:
+                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
+                self.active_transition.Start()
+            else:
+                self.scene.Draw()
 
+        self.Complete()
         return new_text_renderable
 
     def Update(self, events):
@@ -341,63 +344,84 @@ class create_button(Action):
             self.action_data
         )
 
-        self.scene.active_renderables.Add(new_renderable)
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_renderable)
+            self.scene.Draw()
 
-        self.scene.Draw()
         self.Complete()
-
         return new_renderable
 
 
-class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
-    """ Creates a simple container renderable with the provided action data. Returns a 'Container' """
-
-    # @TODO: Update to new workflow
+class create_text_button(Action):
+    """
+    Creates a text-only button interactable, and adds it to the renderable stack. Returns a 'Button'
+    """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
-        # Container-specific adjustments
-        self.action_data['position'] = (0, 0)
-        self.action_data['z_order'] = 0
-        self.action_data['center_align'] = False
-
-        # Containers aren't rendered, so use defaults
-        new_renderable = Container(
+        new_renderable = Button(
             self.scene,
-            self.action_data,
+            self.action_data
         )
 
-        self.scene.active_renderables.Add(new_renderable)
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_renderable)
+            self.scene.Draw()
 
-        self.scene.Draw()
         self.Complete()
-
         return new_renderable
+
+
+#class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
+#    """ Creates a simple container renderable with the provided action data. Returns a 'Container' """
+#
+#    # @TODO: Update to new workflow
+#    def Start(self):
+#        self.LoadMetadata(__class__.__name__)
+#        self.skippable = False
+#
+#        # Container-specific adjustments
+#        self.action_data['position'] = (0, 0)
+#        self.action_data['z_order'] = 0
+#        self.action_data['center_align'] = False
+#
+#        # Containers aren't rendered, so use defaults
+#        new_renderable = Container(
+#            self.scene,
+#            self.action_data,
+#        )
+#
+#        self.scene.active_renderables.Add(new_renderable)
+#
+#        self.scene.Draw()
+#        self.Complete()
+#
+#        return new_renderable
 
 
 # -------------- DIALOGUE ACTIONS --------------
 
 
-class create_dialogue_interface(Action):
-    """
-    Creates sprite renderables for the dialogue and speaker text, and assigns them to the renderable stack using
-    pre-configured settings
-    """
-    def Start(self):
-        self.LoadMetadata(__class__.__name__)
-        self.skippable = False
-
-        dialogue_frame = SpriteRenderable(
-            self.scene,
-            self.action_data
-        )
-
-        # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
-        self.scene.active_renderables.Add(dialogue_frame)
-
-        self.scene.Draw()
-        self.Complete()
+#class create_dialogue_interface(Action):
+#    """
+#    Creates sprite renderables for the dialogue and speaker text, and assigns them to the renderable stack using
+#    pre-configured settings
+#    """
+#    def Start(self):
+#        self.LoadMetadata(__class__.__name__)
+#        self.skippable = False
+#
+#        dialogue_frame = SpriteRenderable(
+#            self.scene,
+#            self.action_data
+#        )
+#
+#        # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
+#        self.scene.active_renderables.Add(dialogue_frame)
+#
+#        self.scene.Draw()
+#        self.Complete()
 
 
 class dialogue(Action):
@@ -444,238 +468,238 @@ class dialogue(Action):
         self.Complete()
 
 
-class character_dialogue(Action):
-    """
-    A specialized variant of the 'dialogue' class that uses values from a character file instead of manual inputs
-    Returns None
-    """
+#class character_dialogue(Action):
+#    """
+#    A specialized variant of the 'dialogue' class that uses values from a character file instead of manual inputs
+#    Returns None
+#    """
+#
+#    def Start(self):
+#        self.LoadMetadata(__class__.__name__)
+#
+#        # Dialogue-specific adjustments
+#        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
+#            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
+#        )
+#
+#        #@TODO: Can we consolidate to avoid duplicated if checks for global settings?
+#        # If the user provides a 'character' block, use details from the relevant character data file if it exists, as
+#        # well as any applicable global settings
+#        if 'character' in self.action_data:
+#            character_data = self.scene.character_data[self.action_data['character']]
+#
+#            # Dialogue-specific adjustments
+#            character_data['key'] = 'SpeakerText'
+#
+#            # OVERRIDES WITH NO PROJECT DEFAULTS
+#            assert 'name' in character_data, print(
+#                f"Character file '{self.action_data['character']}' does not have a 'name' param")
+#            character_data['text'] = character_data['name']
+#
+#            assert 'color' in character_data, print(
+#                f"Character file '{self.action_data['character']}' does not have a 'color' param")
+#            character_data['text_color'] = character_data['color']
+#
+#            # PROJECT DEFAULTS
+#            character_data['position'] = settings.project_settings['Dialogue'][
+#                'speaker_text_position']
+#
+#            character_data['z_order'] = settings.project_settings['Dialogue'][
+#                'speaker_z_order']
+#
+#            character_data['center_align'] = settings.project_settings['Dialogue'][
+#                'speaker_center_align']
+#
+#            character_data['font'] = settings.project_settings['Dialogue'][
+#                'speaker_font']
+#
+#            character_data['text_size'] = settings.project_settings['Dialogue'][
+#                'speaker_text_size']
+#
+#            new_character_text = TextRenderable(
+#                self.scene,
+#                character_data
+#            )
+#            # Speaker text does not support transitions currently
+#            self.scene.active_renderables.Add(new_character_text)
+#
+#        # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
+#        # information, and / or any global settings
+#        elif 'speaker' in self.action_data:
+#            # Dialogue-specific adjustments
+#            self.action_data['speaker']['key'] = 'SpeakerText'
+#
+#            # PROJECT DEFAULTS OVERRIDE
+#            if 'position' not in self.action_data['speaker']:
+#                self.action_data['speaker']['position'] = settings.project_settings['Dialogue'][
+#                    'speaker_text_position']
+#
+#            if 'z_order' not in self.action_data['speaker']:
+#                self.action_data['speaker']['z_order'] = settings.project_settings['Dialogue'][
+#                    'speaker_z_order']
+#
+#            if 'center_align' not in self.action_data['speaker']:
+#                self.action_data['speaker']['center_align'] = settings.project_settings['Dialogue'][
+#                    'speaker_center_align']
+#
+#            if 'font' not in self.action_data['speaker']:
+#                self.action_data['speaker']['font'] = settings.project_settings['Dialogue'][
+#                    'speaker_font']
+#
+#            if 'text_size' not in self.action_data['speaker']:
+#                self.action_data['speaker']['text_size'] = settings.project_settings['Dialogue'][
+#                    'speaker_text_size']
+#
+#            if 'text_color' not in self.action_data['speaker']:
+#                self.action_data['speaker']['text_color'] = settings.project_settings['Dialogue'][
+#                    'speaker_text_color']
+#
+#            new_speaker_text = TextRenderable(
+#                self.scene,
+#                self.action_data['speaker']
+#            )
+#            # Speaker text does not support transitions currently
+#            self.scene.active_renderables.Add(new_speaker_text)
+#
+#        # If the user has specified a 'dialogue' block, build the speaker renderable
+#        if 'dialogue' in self.action_data:
+#            # Dialogue-specific adjustments
+#            self.action_data['dialogue']['key'] = 'DialogueText'
+#
+#            # PROJECT DEFAULTS OVERRIDE
+#            if 'position' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['position'] = settings.project_settings['Dialogue'][
+#                    'dialogue_text_position']
+#
+#            if 'z_order' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['z_order'] = settings.project_settings['Dialogue'][
+#                    'dialogue_z_order']
+#
+#            if 'center_align' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['center_align'] = settings.project_settings['Dialogue'][
+#                    'dialogue_center_align']
+#
+#            if 'font' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['font'] = settings.project_settings['Dialogue'][
+#                    'dialogue_font']
+#
+#            if 'text_size' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['text_size'] = settings.project_settings['Dialogue'][
+#                    'dialogue_text_size']
+#
+#            if 'text_color' not in self.action_data['dialogue']:
+#                self.action_data['dialogue']['text_color'] = settings.project_settings['Dialogue'][
+#                    'dialogue_text_color']
+#
+#            new_dialogue_text = TextRenderable(
+#                self.scene,
+#                self.action_data['dialogue']
+#            )
+#
+#            self.scene.active_renderables.Add(new_dialogue_text)
+#
+#            # By default, dialogue text fades in. However, allow the user to override this behaviour
+#            if 'transition' in self.action_data['dialogue']:
+#                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
+#                                                                         new_dialogue_text)
+#                self.active_transition.Start()
+#            else:
+#                self.action_data['dialogue']['transition'] = {
+#                    'type': 'fade_in',
+#                    'speed': 1000
+#                }
+#                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
+#                                                                         new_dialogue_text)
+#                self.active_transition.Start()
+#
+#        return None
+#
+#    def Update(self, events):
+#        if self.active_transition.complete is True:
+#            print("Transition Complete")
+#            self.Complete()
+#        else:
+#            self.active_transition.Update()
+#
+#    def Skip(self):
+#        if self.active_transition:
+#            self.active_transition.Skip()
+#        self.Complete()
 
-    def Start(self):
-        self.LoadMetadata(__class__.__name__)
 
-        # Dialogue-specific adjustments
-        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
-            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
-        )
-
-        #@TODO: Can we consolidate to avoid duplicated if checks for global settings?
-        # If the user provides a 'character' block, use details from the relevant character data file if it exists, as
-        # well as any applicable global settings
-        if 'character' in self.action_data:
-            character_data = self.scene.character_data[self.action_data['character']]
-
-            # Dialogue-specific adjustments
-            character_data['key'] = 'SpeakerText'
-
-            # OVERRIDES WITH NO PROJECT DEFAULTS
-            assert 'name' in character_data, print(
-                f"Character file '{self.action_data['character']}' does not have a 'name' param")
-            character_data['text'] = character_data['name']
-
-            assert 'color' in character_data, print(
-                f"Character file '{self.action_data['character']}' does not have a 'color' param")
-            character_data['text_color'] = character_data['color']
-
-            # PROJECT DEFAULTS
-            character_data['position'] = settings.project_settings['Dialogue'][
-                'speaker_text_position']
-
-            character_data['z_order'] = settings.project_settings['Dialogue'][
-                'speaker_z_order']
-
-            character_data['center_align'] = settings.project_settings['Dialogue'][
-                'speaker_center_align']
-
-            character_data['font'] = settings.project_settings['Dialogue'][
-                'speaker_font']
-
-            character_data['text_size'] = settings.project_settings['Dialogue'][
-                'speaker_text_size']
-
-            new_character_text = TextRenderable(
-                self.scene,
-                character_data
-            )
-            # Speaker text does not support transitions currently
-            self.scene.active_renderables.Add(new_character_text)
-
-        # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
-        # information, and / or any global settings
-        elif 'speaker' in self.action_data:
-            # Dialogue-specific adjustments
-            self.action_data['speaker']['key'] = 'SpeakerText'
-
-            # PROJECT DEFAULTS OVERRIDE
-            if 'position' not in self.action_data['speaker']:
-                self.action_data['speaker']['position'] = settings.project_settings['Dialogue'][
-                    'speaker_text_position']
-
-            if 'z_order' not in self.action_data['speaker']:
-                self.action_data['speaker']['z_order'] = settings.project_settings['Dialogue'][
-                    'speaker_z_order']
-
-            if 'center_align' not in self.action_data['speaker']:
-                self.action_data['speaker']['center_align'] = settings.project_settings['Dialogue'][
-                    'speaker_center_align']
-
-            if 'font' not in self.action_data['speaker']:
-                self.action_data['speaker']['font'] = settings.project_settings['Dialogue'][
-                    'speaker_font']
-
-            if 'text_size' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_size'] = settings.project_settings['Dialogue'][
-                    'speaker_text_size']
-
-            if 'text_color' not in self.action_data['speaker']:
-                self.action_data['speaker']['text_color'] = settings.project_settings['Dialogue'][
-                    'speaker_text_color']
-
-            new_speaker_text = TextRenderable(
-                self.scene,
-                self.action_data['speaker']
-            )
-            # Speaker text does not support transitions currently
-            self.scene.active_renderables.Add(new_speaker_text)
-
-        # If the user has specified a 'dialogue' block, build the speaker renderable
-        if 'dialogue' in self.action_data:
-            # Dialogue-specific adjustments
-            self.action_data['dialogue']['key'] = 'DialogueText'
-
-            # PROJECT DEFAULTS OVERRIDE
-            if 'position' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['position'] = settings.project_settings['Dialogue'][
-                    'dialogue_text_position']
-
-            if 'z_order' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['z_order'] = settings.project_settings['Dialogue'][
-                    'dialogue_z_order']
-
-            if 'center_align' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['center_align'] = settings.project_settings['Dialogue'][
-                    'dialogue_center_align']
-
-            if 'font' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['font'] = settings.project_settings['Dialogue'][
-                    'dialogue_font']
-
-            if 'text_size' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_size'] = settings.project_settings['Dialogue'][
-                    'dialogue_text_size']
-
-            if 'text_color' not in self.action_data['dialogue']:
-                self.action_data['dialogue']['text_color'] = settings.project_settings['Dialogue'][
-                    'dialogue_text_color']
-
-            new_dialogue_text = TextRenderable(
-                self.scene,
-                self.action_data['dialogue']
-            )
-
-            self.scene.active_renderables.Add(new_dialogue_text)
-
-            # By default, dialogue text fades in. However, allow the user to override this behaviour
-            if 'transition' in self.action_data['dialogue']:
-                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
-                                                                         new_dialogue_text)
-                self.active_transition.Start()
-            else:
-                self.action_data['dialogue']['transition'] = {
-                    'type': 'fade_in',
-                    'speed': 1000
-                }
-                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
-                                                                         new_dialogue_text)
-                self.active_transition.Start()
-
-        return None
-
-    def Update(self, events):
-        if self.active_transition.complete is True:
-            print("Transition Complete")
-            self.Complete()
-        else:
-            self.active_transition.Update()
-
-    def Skip(self):
-        if self.active_transition:
-            self.active_transition.Skip()
-        self.Complete()
-
-
-class create_character(Action):
-    """
-    Creates a specialized 'SpriteRenderable' based on character data settings, allowing the developer to move
-    references to specific sprites to a character yaml file, leaving the dialogue sequence agnostic.
-    Returns a 'SpriteRenderable'.
-    This action is only available in DialogueScenes, and requires a 'character' block be provided
-    """
-    def Start(self):
-        self.LoadMetadata(__class__.__name__)
-
-        # Character-specific adjustments
-        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
-            "The active scene is not of the 'DialogueScene' type. This action can not be performed")
-        assert 'character' in self.action_data, print(
-            f"No 'character' block assigned to {self}. This makes for an impossible action!")
-        assert 'name' in self.action_data['character'], print(
-            f"No 'name' value assigned to {self} character block. This makes for an impossible action!")
-        assert 'mood' in self.action_data['character'], print(
-            f"No 'mood' value assigned to {self} character block. This makes for an impossible action!")
-
-        # Get the character data from the scene
-        character_data = self.scene.character_data[self.action_data['character']['name']]
-
-        assert 'moods' in character_data, print(
-            f"Character file '{self.action_data['character']['name']}' does not have a 'moods' block")
-        self.action_data['sprite'] = character_data['moods'][self.action_data['character']['mood']]
-
-        # OVERRIDES WITH NO PROJECT DEFAULTS
-        if 'position' not in self.action_data:
-            self.action_data['position'] = (0, 0)
-
-        # PROJECT DEFAULTS OVERRIDE
-        if 'z_order' not in self.action_data:
-            self.action_data['z_order'] = settings.project_settings['Sprite'][
-                'z_order']
-
-        if 'center_align' not in self.action_data:
-            self.action_data['center_align'] = settings.project_settings['Sprite'][
-                'center_align']
-
-        new_sprite = SpriteRenderable(
-            self.scene,
-            self.action_data
-        )
-
-        # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
-                new_sprite.Flip()
-
-        self.scene.active_renderables.Add(new_sprite)
-
-        # Any transitions are applied to the sprite post-load
-        if 'transition' in self.action_data:
-            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_sprite)
-            self.active_transition.Start()
-        else:
-            self.scene.Draw()
-            self.Complete()
-
-        return new_sprite
-
-    def Update(self, events):
-        if self.active_transition.complete:
-            print("Transition Complete")
-            self.Complete()
-        else:
-            self.active_transition.Update()
-
-    def Skip(self):
-        if self.active_transition:
-            self.active_transition.Skip()
-        self.Complete()
+#class create_character(Action):
+#    """
+#    Creates a specialized 'SpriteRenderable' based on character data settings, allowing the developer to move
+#    references to specific sprites to a character yaml file, leaving the dialogue sequence agnostic.
+#    Returns a 'SpriteRenderable'.
+#    This action is only available in DialogueScenes, and requires a 'character' block be provided
+#    """
+#    def Start(self):
+#        self.LoadMetadata(__class__.__name__)
+#
+#        # Character-specific adjustments
+#        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
+#            "The active scene is not of the 'DialogueScene' type. This action can not be performed")
+#        assert 'character' in self.action_data, print(
+#            f"No 'character' block assigned to {self}. This makes for an impossible action!")
+#        assert 'name' in self.action_data['character'], print(
+#            f"No 'name' value assigned to {self} character block. This makes for an impossible action!")
+#        assert 'mood' in self.action_data['character'], print(
+#            f"No 'mood' value assigned to {self} character block. This makes for an impossible action!")
+#
+#        # Get the character data from the scene
+#        character_data = self.scene.character_data[self.action_data['character']['name']]
+#
+#        assert 'moods' in character_data, print(
+#            f"Character file '{self.action_data['character']['name']}' does not have a 'moods' block")
+#        self.action_data['sprite'] = character_data['moods'][self.action_data['character']['mood']]
+#
+#        # OVERRIDES WITH NO PROJECT DEFAULTS
+#        if 'position' not in self.action_data:
+#            self.action_data['position'] = (0, 0)
+#
+#        # PROJECT DEFAULTS OVERRIDE
+#        if 'z_order' not in self.action_data:
+#            self.action_data['z_order'] = settings.project_settings['Sprite'][
+#                'z_order']
+#
+#        if 'center_align' not in self.action_data:
+#            self.action_data['center_align'] = settings.project_settings['Sprite'][
+#                'center_align']
+#
+#        new_sprite = SpriteRenderable(
+#            self.scene,
+#            self.action_data
+#        )
+#
+#        # If the user requested a flip action, do so
+#        if 'flip' in self.action_data:
+#            if self.action_data['flip']:
+#                new_sprite.Flip()
+#
+#        self.scene.active_renderables.Add(new_sprite)
+#
+#        # Any transitions are applied to the sprite post-load
+#        if 'transition' in self.action_data:
+#            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_sprite)
+#            self.active_transition.Start()
+#        else:
+#            self.scene.Draw()
+#            self.Complete()
+#
+#        return new_sprite
+#
+#    def Update(self, events):
+#        if self.active_transition.complete:
+#            print("Transition Complete")
+#            self.Complete()
+#        else:
+#            self.active_transition.Update()
+#
+#    def Skip(self):
+#        if self.active_transition:
+#            self.active_transition.Skip()
+#        self.Complete()
 
 
 class choice(Action):
@@ -737,6 +761,8 @@ class choose_branch(Action):
 
         self.scene.Draw()
         self.Complete()
+
+        return None
 
 
 # -------------- SOUND ACTIONS --------------

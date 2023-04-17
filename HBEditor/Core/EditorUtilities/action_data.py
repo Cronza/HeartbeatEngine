@@ -45,8 +45,6 @@ def ConvertActionRequirementsToEngineFormat(editor_req_data: dict, search_term="
                     # Exclude parameters that don't have any flags. These are, by default, not editable
                     # Containers don't have the 'value' key
                     conv_data[req_name] = req_data["value"]
-                else:
-                    print("Problematic", req_data)
 
             if "children" in req_data:
                 conv_data[req_name] = ConvertActionRequirementsToEngineFormat(req_data, "children")
