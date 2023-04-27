@@ -57,7 +57,6 @@ class Interactable(SpriteRenderable):
         super().update()
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
-            print("Collided")
             if not self.scene.stop_interactions:
                 # If not already in the hover state...
                 if self.state is State.normal:

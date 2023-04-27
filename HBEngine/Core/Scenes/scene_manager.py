@@ -35,7 +35,6 @@ class SceneManager:
         }
 
         # Load the starting scene defined in the project settings
-        print(settings.project_settings)
         if not settings.project_settings["Game"]["starting_scene"]:
             raise ValueError("No starting scene was provided in the project settings")
         self.LoadScene(settings.project_settings["Game"]["starting_scene"])
@@ -71,6 +70,3 @@ class SceneManager:
     def ResizeScene(self):
         """ Inform the scene object o resize to support a resolution change """
         self.active_scene.Resize()
-
-    def ShowPauseMenu(self):
-        pass

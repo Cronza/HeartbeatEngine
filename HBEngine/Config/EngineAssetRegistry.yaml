@@ -22,5 +22,8 @@ Content:
         Menu_Button_Clicked.png: Asset_Image
       Dialogue:
         Dialogue_Frame.png: Asset_Image
+      Backgrounds:
+        Dark_Transparent_1280x720.png: Asset_Image
     Placeholder.png: Asset_Image
-    Orientation_Lines_1280x720.jpg: Asset_Image
+    Backgrounds:
+      Orientation_Lines_1280x720.jpg: Asset_Image

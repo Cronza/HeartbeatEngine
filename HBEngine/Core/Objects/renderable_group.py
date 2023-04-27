@@ -32,17 +32,22 @@ class RenderableGroup:
                 print(f"Renderable has no key assigned - Removal will be impossible: {renderable}")
             self.renderables[renderable.key] = renderable
 
-    def Remove(self, *key_to_remove):
+    def Remove(self, *key_to_remove) -> bool:
         """
-        Remove the given renderable key from the dict
+        Remove the given renderable key from the dict. Returns whether the key was successfully removed. Returns False
+        if the key was not found
         """
+        print(key_to_remove)
         for key in key_to_remove:
             try:
                 del self.renderables[key]
+                return True
             except KeyError as exc:
                 print(f"Key not found: {exc}")
             except Exception as rexc:
                 print(f"Unknown error while removing: {rexc}")
+
+        return False
 
     def Clear(self):
         self.renderables.clear()
@@ -53,9 +58,20 @@ class RenderableGroup:
 
     def Get(self) -> list:
         """ Returns the list of renderables inside this group"""
-        return self.renderables.values()
+        return list(self.renderables.values())
 
-    def Update(self):
+    def GetFromKey(self, key: str):
+        """ Returns the renderable that matches the given key. Returns 'None' if there is no matching renderable """
+        if key in self.renderables:
+            return self.renderables[key]
+        else:
+            return None
+
+    def Update(self, target: list = None):
+        if not target:
+            target = list(self.renderables.values())
         #@TODO: Is there a safer way of parsing these lists that avoid issues with size changing?
-        for renderable in list(self.renderables.values()):
+        for renderable in target:
             renderable.update()
+            if renderable.children:
+                self.Update(renderable.children)

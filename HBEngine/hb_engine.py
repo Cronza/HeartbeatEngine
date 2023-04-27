@@ -65,7 +65,12 @@ class HBEngine:
                         self.scene_manager.ResizeScene()
                     # Exit
                     if event.key == pygame.K_ESCAPE:
-                        is_running = False
+                        if self.scene_manager.active_scene:
+                            if self.scene_manager.active_scene.paused:
+                                self.scene_manager.active_scene.Unpause()
+                            else:
+                                self.scene_manager.active_scene.Pause()
+
                     if event.type == pygame.QUIT:
                         is_running = False
                     # Debug - FPS

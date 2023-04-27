@@ -216,8 +216,10 @@ class create_sprite(Action):
                 self.active_transition.Start()
             else:
                 self.scene.Draw()
+                self.Complete()
+        else:
+            self.Complete()
 
-        self.Complete()
         return new_sprite
 
     def Update(self, events):
@@ -250,8 +252,8 @@ class create_background(Action):
         if not self.no_draw:
             self.scene.active_renderables.Add(new_sprite)
             self.scene.Draw()
-
         self.Complete()
+
         return new_sprite
 
 
@@ -312,8 +314,10 @@ class create_text(Action):
                 self.active_transition.Start()
             else:
                 self.scene.Draw()
+                self.Complete()
+        else:
+            self.Complete()
 
-        self.Complete()
         return new_text_renderable
 
     def Update(self, events):
@@ -347,8 +351,8 @@ class create_button(Action):
         if not self.no_draw:
             self.scene.active_renderables.Add(new_renderable)
             self.scene.Draw()
-
         self.Complete()
+
         return new_renderable
 
 
@@ -368,8 +372,8 @@ class create_text_button(Action):
         if not self.no_draw:
             self.scene.active_renderables.Add(new_renderable)
             self.scene.Draw()
-
         self.Complete()
+
         return new_renderable
 
 
@@ -880,9 +884,7 @@ class load_scene(Action):
 
 
 class wait(Action):
-    """
-    Waits for a set amount of timcompletion_callbacke before completing
-    """
+    """ Waits for a set amount of time before completing """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.counter = 0
@@ -1024,3 +1026,22 @@ class scene_fade_out(Action):
         self.renderable.GetSurface().set_alpha(self.goal)
         self.scene.Draw()
         self.Complete()
+
+
+# -------------- INTERFACE ACTIONS --------------
+
+
+class pause(Action):
+    """ Requests that the active scene pause the game and show the pause interface. Returns 'None' """
+    def Start(self):
+        self.scene.Pause()
+        self.Complete()
+        return None
+
+class unpause(Action):
+    """ Requests that the active scene unpause the game and remove the pause interface. Returns 'None' """
+    def Start(self):
+        self.scene.Unpause()
+        self.Complete()
+        return None
+

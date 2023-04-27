@@ -1,0 +1,132 @@
+#persistent:
+persistent:
+  # Background
+  - action: create_sprite
+    key: PAUSE_INTERFACE_Background
+    sprite: HBEngine/Content/Sprites/Interface/Backgrounds/Dark_Transparent_1280x720.png
+    position:
+      - 0
+      - 0
+    center_align: false
+    z_order: 100000
+
+  # Title
+  - action: create_text
+    key: PAUSE_INTERFACE_Title
+    position:
+      - 0.15
+      - 0.2
+    text: Paused
+    text_size: 60
+    font: Content/Fonts/DAGGERSQUARE.ttf
+    z_order: 10
+    wrap_bounds:
+      - 0.8
+      - 0.4
+
+  # Resume Button
+  - action: create_text_button
+    key: PAUSE_INTERFACE_Resume_Button
+    position:
+      - 0.15
+      - 0.3
+    center_align: true
+    z_order: 100001
+    text: Resume
+    text_size: 16
+    text_color_hover:
+      - 0
+      - 127
+      - 255
+    wrap_bounds:
+      - 0.2
+      - 0.2
+    events:
+      event_0:
+        action:
+          action: unpause
+
+
+  # Options Button
+  - action: create_text_button
+    key: PAUSE_INTERFACE_Options_Button
+    position:
+      - 0.15
+      - 0.35
+    center_align: true
+    z_order: 100001
+    text: Option
+    text_size: 16
+    text_color_hover:
+      - 0
+      - 127
+      - 255
+    wrap_bounds:
+      - 0.2
+      - 0.2
+    events:
+      event_0:
+        action:
+          action: switch_page
+          page: 1
+
+  # Main Menu Button
+  - action: create_text_button
+    key: PAUSE_INTERFACE_Main_Menu_Button
+    position:
+      - 0.15
+      - 0.4
+    center_align: true
+    z_order: 100001
+    text: Main Menu
+    text_size: 16
+    text_color_hover:
+      - 0
+      - 127
+      - 255
+    wrap_bounds:
+      - 0.2
+      - 0.2
+    events:
+      event_0:
+        action:
+          action: load_scene
+          scene_file: Content/PointAndClick_Testing.yaml
+
+  # Quit Button
+  - action: create_text_button
+    key: PAUSE_INTERFACE_Quit_Button
+    position:
+      - 0.15
+      - 0.45
+    center_align: true
+    z_order: 100001
+    text: Quit
+    text_size: 16
+    text_color_hover:
+      - 0
+      - 127
+      - 255
+    wrap_bounds:
+      - 0.2
+      - 0.2
+    events:
+      event_0:
+        action:
+          action: quit_game
+
+pages:
+  page_Options:
+    # Page Title
+    - action: create_text
+      key: Page_Title
+      position:
+        - 0.4
+        - 0.2
+      text: Options
+      text_size: 60
+      font: Content/Fonts/DAGGERSQUARE.ttf
+      z_order: 10
+      wrap_bounds:
+        - 0.8
+        - 0.4
