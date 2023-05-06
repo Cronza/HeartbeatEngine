@@ -1045,3 +1045,14 @@ class unpause(Action):
         self.Complete()
         return None
 
+class switch_page(Action):
+    """ Requests a page load for the target interface. Returns 'None' """
+    def Start(self):
+        if self.scene.active_interfaces.Exists(self.action_data["owner"]):
+            owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
+            owner.LoadPage(self.action_data["page"])
+
+        self.scene.Draw()
+        self.Complete()
+        return None
+

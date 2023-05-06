@@ -19,16 +19,41 @@ from Tools.HBYaml.hb_yaml import Reader
 
 
 class Interface(Renderable):
-    def __init__(self, scene, interface_data: dict, parent: Renderable = None):
-        self.visible = False
-        if "key" not in interface_data: interface_data["key"] = id(self)
-        if "z_order" not in interface_data: interface_data["z_order"] = 10000
-        super().__init__(scene, interface_data, parent)
+    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+        # Page renderables are independent of the persistent renderables, and can be created and removed at runtime. In
+        # order to faciliate quick removal, keep a list of keys for page renderables as they're created
+        self.page_renderables = []
 
-        if "renderables" in interface_data:
-            for item in interface_data["renderables"]:
+        self.visible = False
+        if "key" not in renderable_data: renderable_data["key"] = id(self)
+        if "z_order" not in renderable_data: renderable_data["z_order"] = 10000
+        super().__init__(scene, renderable_data, parent)
+
+        if "persistent" in renderable_data:
+            for item in renderable_data["persistent"]:
                 self.children.append(
                     self.scene.a_manager.PerformAction(action_data=item, action_name=item['action'], no_draw=True)
                 )
         else:
-            raise ValueError("'renderables' missing from the interface file - No items to display!")
+            raise ValueError("'persistent' missing from the interface file - No items to display!")
+
+    def LoadPage(self, page_name: str) -> bool:
+        """ Unload the prior page if applicable, and load the provided page. Returns whether the load succeeded """
+        if "pages" in self.renderable_data:
+            if page_name in self.renderable_data["pages"]:
+
+                # Wipe existing page renderables if there are any
+                if self.page_renderables:
+                    for renderable in self.page_renderables:
+                        self.children.remove(renderable)
+                    self.page_renderables.clear()
+
+                # Create and record new page renderables
+                for page_action in self.renderable_data["pages"][page_name]:
+                    renderable = self.scene.a_manager.PerformAction(page_action, page_action["action"], no_draw=True)
+                    self.children.append(renderable)
+                    self.page_renderables.append(renderable)
+                return True
+
+        return False
+

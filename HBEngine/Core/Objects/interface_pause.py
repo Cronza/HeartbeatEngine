@@ -15,17 +15,12 @@
 import pygame
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
+from HBEngine.Core.Objects.interface import Interface
 
 
-class InterfacePause(Renderable):
-    def __init__(self, scene, interface_data: dict, parent: Renderable = None):
-        self.visible = False
-        interface_data["key"] = "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
-        interface_data["z_order"] = 10000000000
-        super().__init__(scene, interface_data, parent)
+class InterfacePause(Interface):
+    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+        renderable_data["key"] = "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+        renderable_data["z_order"] = 10000000000
+        super().__init__(scene, renderable_data, parent)
 
-        if "persistent" in interface_data:
-            for item in interface_data["persistent"]:
-                self.children.append(
-                    self.scene.a_manager.PerformAction(action_data=item, action_name=item['action'], no_draw=True)
-                )

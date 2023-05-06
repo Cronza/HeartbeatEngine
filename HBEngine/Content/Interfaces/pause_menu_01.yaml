@@ -1,4 +1,4 @@
-#persistent:
+code_class: interface_pause
 persistent:
   # Background
   - action: create_sprite
@@ -19,7 +19,7 @@ persistent:
     text: Paused
     text_size: 60
     font: Content/Fonts/DAGGERSQUARE.ttf
-    z_order: 10
+    z_order: 100001
     wrap_bounds:
       - 0.8
       - 0.4
@@ -31,7 +31,7 @@ persistent:
       - 0.15
       - 0.3
     center_align: true
-    z_order: 100001
+    z_order: 100002
     text: Resume
     text_size: 16
     text_color_hover:
@@ -54,7 +54,7 @@ persistent:
       - 0.15
       - 0.35
     center_align: true
-    z_order: 100001
+    z_order: 100002
     text: Option
     text_size: 16
     text_color_hover:
@@ -68,16 +68,41 @@ persistent:
       event_0:
         action:
           action: switch_page
-          page: 1
+          owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+          page: page_Options
+
+  # Save Button
+  - action: create_text_button
+    key: PAUSE_INTERFACE_Save_Button
+    position:
+      - 0.15
+      - 0.4
+    center_align: true
+    z_order: 100002
+    text: Save
+    text_size: 16
+    text_color_hover:
+      - 0
+      - 127
+      - 255
+    wrap_bounds:
+      - 0.2
+      - 0.2
+    events:
+      event_0:
+        action:
+          action: switch_page
+          owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+          page: page_Save
 
   # Main Menu Button
   - action: create_text_button
     key: PAUSE_INTERFACE_Main_Menu_Button
     position:
       - 0.15
-      - 0.4
+      - 0.45
     center_align: true
-    z_order: 100001
+    z_order: 100002
     text: Main Menu
     text_size: 16
     text_color_hover:
@@ -98,9 +123,9 @@ persistent:
     key: PAUSE_INTERFACE_Quit_Button
     position:
       - 0.15
-      - 0.45
+      - 0.5
     center_align: true
-    z_order: 100001
+    z_order: 100002
     text: Quit
     text_size: 16
     text_color_hover:
@@ -126,7 +151,22 @@ pages:
       text: Options
       text_size: 60
       font: Content/Fonts/DAGGERSQUARE.ttf
-      z_order: 10
+      z_order: 100001
+      wrap_bounds:
+        - 0.8
+        - 0.4
+
+  page_Save:
+    # Page Title
+    - action: create_text
+      key: Page_Title
+      position:
+        - 0.4
+        - 0.2
+      text: Save
+      text_size: 60
+      font: Content/Fonts/DAGGERSQUARE.ttf
+      z_order: 100001
       wrap_bounds:
         - 0.8
         - 0.4
