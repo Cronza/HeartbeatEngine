@@ -57,6 +57,7 @@ def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
 
     SaveHeartbeatFile(asset_registry)
 
+
 def RegisterAssetFolder(path_to_create: str):
     """ Registers the provided folder path. This must be a partial path with the content directory as the root """
     global asset_registry

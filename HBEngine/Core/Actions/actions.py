@@ -20,6 +20,8 @@ from HBEngine.Core.Objects.renderable_text import TextRenderable
 from HBEngine.Core.Objects.interactable import Interactable
 from HBEngine.Core.Objects.button import Button
 from HBEngine.Core.Objects.choice import Choice
+from HBEngine.Core.Objects.checkbox import Checkbox
+from HBEngine.Core.Objects.audio import Sound, Music
 from HBEngine.Core.Objects.renderable_container import Container
 from Tools.HBYaml.hb_yaml import Reader
 
@@ -108,7 +110,7 @@ class Action:
             elif md_req_name not in action_data:
                 # The item is missing. Update it
                 if "global" in md_req_data:
-                    action_data[md_req_name] = settings.GetProjectGlobal(md_req_data["global"][0], md_req_data["global"][1])
+                    action_data[md_req_name] = settings.GetProjectSetting(md_req_data["global"][0], md_req_data["global"][1])
                 else:
                     action_data[md_req_name] = md_req_data["default"]
 
@@ -133,7 +135,7 @@ class Action:
 
 class SoundAction(Action):
     # @TODO: Add Pause function
-    def __init__(self, scene, action_data, a_manager):
+    def __init__(self, scene, action_data, a_manager, no_draw: bool = False):
         super().__init__(scene, action_data, a_manager)
         self.assigned_channel = None
 
@@ -257,41 +259,28 @@ class create_background(Action):
         return new_sprite
 
 
-#class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
-#    """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable'"""
-#    def Start(self):
-#        self.LoadMetadata(__class__.__name__)
-#        self.skippable = False
-#
-#        # OVERRIDES WITH NO PROJECT DEFAULTS
-#        if 'position' not in self.action_data:
-#            self.action_data['position'] = (0, 0)
-#
-#        # PROJECT DEFAULTS OVERRIDE
-#        if 'z_order' not in self.action_data:
-#            self.action_data['z_order'] = settings.project_settings['Interactable'][
-#                'z_order']
-#
-#        if 'center_align' not in self.action_data:
-#            self.action_data['center_align'] = settings.project_settings['Interactable'][
-#                'center_align']
-#
-#        new_renderable = Interactable(
-#            self.scene,
-#            self.action_data,
-#        )
-#
-#        # If the user requested a flip action, do so
-#        if 'flip' in self.action_data:
-#            if self.action_data['flip']:
-#                new_renderable.Flip()
-#
-#        self.scene.active_renderables.Add(new_renderable)
-#
-#        self.scene.Draw()
-#        self.Complete()
-#
-#        return new_renderable
+class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
+    """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable' """
+    def Start(self):
+        self.LoadMetadata(__class__.__name__)
+        self.skippable = False
+
+        new_renderable = Interactable(
+            self.scene,
+            self.action_data,
+        )
+
+        # If the user requested a flip action, do so
+        if 'flip' in self.action_data:
+            if self.action_data['flip']:
+                new_renderable.Flip()
+
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_renderable)
+            self.scene.Draw()
+        self.Complete()
+
+        return new_renderable
 
 
 class create_text(Action):
@@ -376,6 +365,26 @@ class create_text_button(Action):
 
         return new_renderable
 
+
+class create_checkbox(Action):
+    """
+    Creates a checkbox button interactable, and adds it to the renderable stack. Returns a 'Checkbox'
+    """
+    def Start(self):
+        #self.LoadMetadata(__class__.__name__)
+        self.skippable = False
+
+        new_renderable = Checkbox(
+            self.scene,
+            self.action_data
+        )
+
+        if not self.no_draw:
+            self.scene.active_renderables.Add(new_renderable)
+            self.scene.Draw()
+        self.Complete()
+
+        return new_renderable
 
 #class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
 #    """ Creates a simple container renderable with the provided action data. Returns a 'Container' """
@@ -773,30 +782,22 @@ class choose_branch(Action):
 
 
 class play_sfx(SoundAction):
-    """
-    Possible Parameters:
-    - key: str
-    - sound: str
-    - volume : float
-    """
-
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
-        new_sound = pygame.mixer.Sound(settings.ConvertPartialToAbsolutePath(self.action_data["sound"]))
-        new_sound.set_volume(self.action_data["volume"])
+        new_sound = Sound(self.action_data)
 
-        # Sound objects don't have a way of checking their progress, so let's keep track and monitor
-        # the channel it was assigned to. Once it's empty, it's a good assumption that it's successfully completed
-        self.assigned_channel = new_sound.play(0)
+        # Start the playback (internally stores the channel object)
+        new_sound.Play()
         self.scene.active_sounds[self.action_data["key"]] = new_sound
 
-        return self.assigned_channel
+        return new_sound
 
     def Update(self, events):
-        if not self.assigned_channel.get_busy():
-            self.scene.active_sounds.pop(self.action_data["key"])
-            self.Complete()
+        if not self.scene.active_sounds[self.action_data["key"]].GetBusy():
+            self.scene.active_sounds[self.action_data["key"]].Stop()
+            self.scene.active_sounds.pop(self.action_data["key"])  # Remove from the scene sfx list
+            self.Complete()  # Remove from the action manager
 
     def Skip(self):
         self.scene.active_sounds.pop(self.action_data["key"])
@@ -806,8 +807,6 @@ class play_sfx(SoundAction):
 class stop_sfx(Action):
     """
     Based on a given key, stop and remove the associated sfx from the sound stack
-    Possible Parameters:
-    - key : str
     """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
@@ -830,46 +829,65 @@ class play_music(SoundAction):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
+        new_music = Music(self.action_data)
+
+        #new_music.end_event = #@TODO: This needs to delete the action upon completion or the action will exist forever
         # If the user hasn't removed the previous music, forcefully remove it here without any transition
         if self.scene.active_music:
-            pygame.mixer.music.stop()  # This will invoke the end-event on the existing music action
+            self.scene.active_music.Stop()  # This will invoke the end-event on the existing music action #@TODO: Review if this comment is accurate
+            del self.scene.active_music  # Delete the music
 
-        # The pygame music system doesn't use objects, but instead uses a stream. Any changes made against music
-        # are made to the stream itself
-        pygame.mixer.music.load(settings.ConvertPartialToAbsolutePath(self.action_data["music"]))
-        pygame.mixer.music.set_volume(self.action_data["volume"])
-
-        loop_count = 0
-        if self.action_data["loop"]:
-            loop_count = -1
-
-        # Since there can only be one music item active, there is no need to use a key identifier
-        pygame.mixer.music.play(loop_count)
-        self.scene.active_music = self
+        new_music.Play()
+        self.scene.active_music = new_music
 
         self.Complete()
 
     def Update(self, events):
-        if not pygame.mixer.music.get_busy():
-            print("SFX completed")
+        if not self.scene.active_music.GetBusy(): #@TODO: Review whether this triggers when audio is paused
+            print("Music completed")
             self.Complete()
 
 
 class stop_music(Action):
     """
     Stops the currently active music
-    Possible Parameters:
-    - key : str
     """
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
-        pygame.mixer.music.stop()  # This will invoke the end-event on the existing music action
+        self.scene.active_music.Stop() #@TODO: Update
         self.scene.active_music.complete = True
         self.scene.active_music = None  # DEBUG: Remove once the end-event is implemented
         self.Complete()
+        return None
 
+
+class set_mute(Action):
+    def Start(self):
+        #self.LoadMetadata(__class__.__name__)
+        self.skippable = False
+
+        #print("Set Mute!")
+        # Update the project setting
+        if self.action_data["toggle"]:
+            settings.SetProjectSetting("Audio", "mute", not settings.GetProjectSetting("Audio", "mute"))
+        else:
+            settings.SetProjectSetting("Audio", "mute", self.action_data["value"])
+
+        # Update all active audio objects
+        if settings.GetProjectSetting("Audio", "mute"):
+            for sfx in self.scene.active_sounds.values():
+                sfx.Mute()
+            if self.scene.active_music: self.scene.active_music.Mute()
+        else:
+            for sfx in self.scene.active_sounds.values():
+                sfx.Unmute()
+            if self.scene.active_music: self.scene.active_music.Unmute()
+
+        self.Complete()
+
+        return None
 
 # -------------- UTILITY ACTIONS --------------
 
@@ -1054,5 +1072,35 @@ class switch_page(Action):
 
         self.scene.Draw()
         self.Complete()
+        return None
+
+# -------------- VALUE ACTIONS --------------
+
+class toggle_project_setting(Action):
+    def Start(self):
+        error_msg = "'toggle_project_settings' action Failed -"
+        # Check 1: Ensure the mandatory keys have been provided
+        if "category" not in self.action_data or "setting" not in self.action_data:
+            raise ValueError(f"{error_msg} 'category' or 'setting' not specified'")
+
+        # Check 2: Ensure category exists
+        if self.action_data["category"] not in settings.project_settings:
+            raise ValueError(f"{error_msg} '{self.action_data['category']}' is not a valid project settings category'")
+
+        # Check 3: Ensure the setting exists within the category
+        if self.action_data["setting"] not in settings.project_settings[self.action_data['category']]:
+            raise ValueError(f"{error_msg} '{self.action_data['settings']}' is not a valid setting within the '{self.action_data['category']}' category'")
+
+        # Check 4: Ensure the setting is toggleable (IE. Is a boolean)
+        if not isinstance(settings.project_settings[self.action_data["category"]][self.action_data["setting"]], bool):
+            raise ValueError(f"{error_msg} '{self.action_data['settings']}' is not a toggleable setting")
+
+        # All checks passed. Apply the change
+        settings.project_settings[self.action_data["category"]][self.action_data["setting"]] = not \
+            settings.project_settings[self.action_data["category"]][self.action_data["setting"]]
+
+        # Save the setting to disc
+        settings.SaveProjectSettings()
+
         return None
 

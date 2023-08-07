@@ -116,12 +116,13 @@ class Interactable(SpriteRenderable):
                 else:
                     self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"])
                     self.ContinueInteract()
-
+            else:
+                self.scene.Draw()
         elif "event" in self.renderable_data:
             event_data = self.renderable_data["event"]
             self.scene.a_manager.PerformAction(event_data, event_data["action"])
         else:
-            print("No events defined for this object - Interacting does nothing")
+            self.scene.Draw()
 
     def ContinueInteract(self):
         self.interact_events.pop(0)

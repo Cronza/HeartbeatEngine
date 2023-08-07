@@ -15,6 +15,7 @@
 from __future__ import annotations
 from typing import Union
 import pygame
+from HBEngine.Core import settings
 
 
 class Renderable(pygame.sprite.Sprite):
@@ -30,8 +31,11 @@ class Renderable(pygame.sprite.Sprite):
     def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
         super().__init__()
 
-        # Renderables require access to the owning scene so that they can keep track of resolution updates
         self.scene = scene
+        self.parent = parent
+        self.children = []
+
+        self.connected = False  # Control whether state is determined by an external source
 
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
@@ -44,15 +48,10 @@ class Renderable(pygame.sprite.Sprite):
         self.center_align = True if "center_align" not in self.renderable_data else self.renderable_data['center_align']
         self.z_order = 0 if "z_order" not in self.renderable_data else self.renderable_data['z_order']
 
-        # For indentification in the rendering stack, allow all renderables the ability be to assigned
-        # a unique identifier. This parameter is mandatory, and is considered an exception if not provided
+        # For indentification in the rendering stack, all renderables require a unique identifier
         if 'key' not in self.renderable_data:
             raise ValueError(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
-
         self.key = self.renderable_data['key']
-
-        self.parent = parent
-        self.children = []
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and its surfaces based on the provided size multiplier """
@@ -164,6 +163,27 @@ class Renderable(pygame.sprite.Sprite):
             round(pos[1] - size[1] / 2)
         )
 
+    def Connect(self, connection_data: dict) -> bool:
+        if "type" not in connection_data:
+            return False
+
+        if connection_data["type"] == "project_setting":
+            if "category" not in connection_data or "setting" not in connection_data:
+                return False
+
+            # Add this object as a listener to the connected setting
+            if self not in settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]]:
+                settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]][self] = self.ConnectionUpdate
+
+        self.connected = True
+
+        # Apply the initial state change
+        self.ConnectionUpdate(settings.project_settings[connection_data["category"]][connection_data["setting"]])
+        return True
+
+    def ConnectionUpdate(self, new_value):
+        pass
+
     # ***************** TRANSFORM ACTIONS *******************
 
     def Flip(self):
@@ -172,4 +192,5 @@ class Renderable(pygame.sprite.Sprite):
             self.scaled_surface = pygame.transform.flip(self.scaled_surface, True, False)
         else:
             self.surface = pygame.transform.flip(self.surface, True, False)
+
 

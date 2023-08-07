@@ -26,11 +26,11 @@ class Scene:
 
         self.window = window
         self.scene_manager = scene_manager
+        self.a_manager = ActionManager(self)
         self.active_renderables = RenderableGroup()
         self.active_interfaces = RenderableGroup()
-        self.active_sounds = {}
+        self.active_sounds = {}  # Stores a dict of 'Sound' objects
         self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
-        self.a_manager = ActionManager(self)
 
         self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
         self.paused = False
@@ -60,7 +60,6 @@ class Scene:
     def Draw(self, renderables: list = None, recurse: bool = False):
         if not renderables and recurse is False:
             renderables = self.active_renderables.Get() + self.active_interfaces.Get()
-
         # Don't redraw unless we have items to actually draw. This also prevents last minute draw requests during
         # scene changes while cleanup is happening
         if renderables:
@@ -87,7 +86,14 @@ class Scene:
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change from the scene_manager"""
         if scene_file:
-            self.active_renderables.Clear()
+            self.active_renderables.Clear()  # Clear graphics
+            print("Active Sounds", self.active_sounds)
+            for sound in self.active_sounds.values():  # Clear SFX
+                print("SOUND", sound)
+                sound.Stop()
+            if self.active_music:  # Clear music
+                self.active_music.Stop()
+
             self.scene_manager.LoadScene(scene_file)
         else:
             raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")

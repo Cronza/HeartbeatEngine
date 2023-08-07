@@ -27,6 +27,10 @@ Button:
   sprite: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
   sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
   sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png
+  checkbox_sprite: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
+  checkbox_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
+  checkbox_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
+  checkbox_sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
   z_order: 10001
   font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
 Dialogue:
@@ -78,5 +82,9 @@ Dialogue:
   - 255
   - 255
   choice_button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+Audio:
+  mute: false
+  volume_music: 100
+  volume_sfx: 100
 Pause Menu:
   data_file: HBEngine/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml

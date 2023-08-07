@@ -46,7 +46,6 @@ persistent:
         action:
           action: unpause
 
-
   # Options Button
   - action: create_text_button
     key: PAUSE_INTERFACE_Options_Button
@@ -144,7 +143,7 @@ pages:
   page_Options:
     # Page Title
     - action: create_text
-      key: Page_Title
+      key: PAUSE_INTERFACE_pageOptions_Title
       position:
         - 0.4
         - 0.2
@@ -155,6 +154,42 @@ pages:
       wrap_bounds:
         - 0.8
         - 0.4
+
+    # Mute Button Text
+    - action: create_text
+      key: Page_Title
+      position:
+        - 0.34
+        - 0.3
+      text: Mute
+      text_size: 18
+      z_order: 100001
+
+    # Mute Button
+    - action: create_checkbox
+      key: PAUSE_INTERFACE_pageOptions_Mute_All_Button
+      position:
+        - 0.4
+        - 0.3
+      center_align: true
+      z_order: 100002
+      sprite: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
+      sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
+      sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
+      sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
+      connect:
+        type: project_setting
+        category: Audio
+        setting: mute
+        #group: Audio
+        #name: mute
+      #connect_project_setting:
+      #  category: Audio #@TODO: Maybe do a keyword reservation system? Make all connectable properties unique, and merge project settings with values
+      events:
+        event_0:
+          action:
+            action: set_mute
+            toggle: True
 
   page_Save:
     # Page Title

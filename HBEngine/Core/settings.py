@@ -13,14 +13,26 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from Tools.HBYaml.hb_yaml import Reader
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 root_dir = os.getcwd().replace("\\", "/")
 
 project_root = ""
 project_settings = None
 
-# Some params need to be accessed more immediately than through the settings dict. Declare them here
+active_scene = None  # Managed by scene_manager.py'
+
+# When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
+# to change based on the mute setting), we need a way of tracking who needs to be informed. This dict
+# represents that tracking, by using a structure like the following:
+#
+# {"<Category>": {"<setting>": {"<object_ref>": "<func>"}}}
+#
+# "Func" in this case is the function to invoke when the connected setting is changed
+project_setting_listeners = {}
+
+# --- Settings (Reflective of those found in the 'Game.yaml') ---
+# Window
 resolution = None
 resolution_options = None
 active_resolution = None
@@ -38,18 +50,59 @@ def SetProjectRoot(new_root):
         project_root = root_dir
 
 
-def Evaluate(data_path):
-    """ Reads in the provided project settings file path """
+def LoadProjectSettings(file_path: str = "Config/Game.yaml"):
+    """ Reads in the provided project settings file path. Defaults to 'Config/Game.yaml' if no path is provided """
     global project_settings
     global resolution
     global resolution_options
     global active_resolution
+    global project_setting_listeners
 
-    project_settings = Reader.ReadAll(data_path)
+    file_path = ConvertPartialToAbsolutePath(file_path)
+    project_settings = Reader.ReadAll(file_path)
 
+    # Initialize the listener dict with keys for each available settings
+    for cat, settings in project_settings.items():
+        project_setting_listeners[cat] = {}
+        for name, val in settings.items():
+            project_setting_listeners[cat][name] = {}
+
+    # Apply the effects of various project settings
     resolution = project_settings['Window']['resolution']
     resolution_options = project_settings['Window']['resolution_options']
     active_resolution = tuple(resolution_options[resolution])
+
+
+def SaveProjectSettings(file_path: str = "Config/Game.yaml"):
+    """ Saves the project settings to the provided file path. Defaults to 'Config/Game.yaml' if no path is provided """
+    global project_settings
+
+    file_path = ConvertPartialToAbsolutePath(file_path)
+    Writer.WriteFile(project_settings, file_path)
+
+
+def SetProjectSetting(category: str, setting: str, value: any):
+    global project_settings
+    global project_setting_listeners
+
+    # Sets the target project setting, apply the relevant functional change (IE. Editing 'mute' will mute all audio)
+    if category == "Audio":
+        if setting == "mute":
+            if isinstance(value, bool):
+                project_settings[category][setting] = value
+
+    # Inform any applicable listeners
+    for listener_name, connect_func in project_setting_listeners[category][setting].items():
+        connect_func(value)
+
+    # Save changes
+    SaveProjectSettings()
+
+
+def GetProjectSetting(category, key):
+    """ Returns the value from the global setting defined in 'Game.yaml' that matches the provided category and key """
+    global project_settings
+    return project_settings[category][key]
 
 
 def ConvertPartialToAbsolutePath(partial_path):
@@ -79,8 +132,3 @@ def ConvertPartialToAbsolutePath(partial_path):
     else:
         return project_root + "/" + partial_path
 
-
-def GetProjectGlobal(category, key):
-    """ Returns the value from the global setting defined in 'Game.yaml' that matches the provided category and key """
-    global project_settings
-    return project_settings[category][key]

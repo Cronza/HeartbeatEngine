@@ -19,85 +19,92 @@ from HBEngine.Core import settings
 from pygame import mixer
 
 
-class HBEngine:
-    def __init__(self, project_path):
-        #@TODO: What is the right way to handle this?
-        if not project_path:
-            print("Warning: No project path provided - Defaulting to the engine root")
+clock = None
+window = None
+scene_manager = None  # Declare the scene manager, but we'll initialize it during the game loop
 
-        settings.SetProjectRoot(project_path)
-        settings.Evaluate(settings.ConvertPartialToAbsolutePath("Config/Game.yaml"))
+# DEBUG TRIGGERS
+show_fps = False
 
-        pygame.display.set_caption(settings.project_settings['Game']['title'])
 
-        # Declare the scene manager, but we'll initialize it during the game loop
-        self.scene_manager = None
+def Initialize(project_path):
+    # @TODO: What is the right way to handle this?
+    if not project_path:
+        print("Warning: No project path provided - Defaulting to the engine root")
 
-        # DEBUG TRIGGERS
-        self.show_fps = False
+    settings.SetProjectRoot(project_path)
+    settings.LoadProjectSettings()
 
-    def Main(self):
+    pygame.display.set_caption(settings.project_settings['Game']['title'])
 
-        pygame.init()
-        mixer.init()
-        clock = pygame.time.Clock()
-        window = pygame.display.set_mode(settings.active_resolution)
 
-        self.scene_manager = SceneManager(window)
+def Main():
+    global clock
+    global window
+    global scene_manager
+    global show_fps
 
-        # Start the game loop
-        is_running = True
-        while is_running is True:
-            events = pygame.event.get()
+    pygame.init()
+    mixer.init()
+    clock = pygame.time.Clock()
+    window = pygame.display.set_mode(settings.active_resolution)
 
-            # Handle all system actions
-            for event in events:
+    scene_manager = SceneManager(window)
+
+    # Start the game loop
+    is_running = True
+    while is_running is True:
+        events = pygame.event.get()
+
+        # Handle all system actions
+        for event in events:
+            if event.type == pygame.QUIT:
+                is_running = False
+            if event.type == pygame.KEYDOWN:
+                # Maximize
+                if event.key == pygame.K_1:
+                    UpdateResolution(1, pygame.FULLSCREEN)
+                    scene_manager.ResizeScene()
+                # Minimize
+                if event.key == pygame.K_2:
+                    UpdateResolution(0)
+                    scene_manager.ResizeScene()
+                # Exit
+                if event.key == pygame.K_ESCAPE:
+                    if settings.active_scene:
+                        if settings.active_scene.paused:
+                            settings.active_scene.Unpause()
+                        else:
+                            settings.active_scene.Pause()
+
                 if event.type == pygame.QUIT:
                     is_running = False
-                if event.type == pygame.KEYDOWN:
-                    # Maximize
-                    if event.key == pygame.K_1:
-                        self.UpdateResolution(1, pygame.FULLSCREEN)
-                        self.scene_manager.ResizeScene()
-                    # Minimize
-                    if event.key == pygame.K_2:
-                        self.UpdateResolution(0)
-                        self.scene_manager.ResizeScene()
-                    # Exit
-                    if event.key == pygame.K_ESCAPE:
-                        if self.scene_manager.active_scene:
-                            if self.scene_manager.active_scene.paused:
-                                self.scene_manager.active_scene.Unpause()
-                            else:
-                                self.scene_manager.active_scene.Pause()
+                # Debug - FPS
+                if event.key == pygame.K_F3:
+                    show_fps = not show_fps
 
-                    if event.type == pygame.QUIT:
-                        is_running = False
-                    # Debug - FPS
-                    if event.key == pygame.K_F3:
-                        self.show_fps = not self.show_fps
+        # Update scene logic. This drives the core game functionality
+        settings.active_scene.Update(events)
 
-            # Update scene logic. This drives the core game functionality
-            self.scene_manager.active_scene.Update(events)
+        # Debug Logging
+        if show_fps:
+            print(clock.get_fps())
 
-            # Debug Logging
-            if self.show_fps:
-                print(clock.get_fps())
+        # Refresh any changes
+        pygame.display.update()
 
-            # Refresh any changes
-            pygame.display.update()
+        # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
+        # on actions
+        settings.active_scene.delta_time = clock.tick(60) / 1000
 
-            # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
-            # on actions
-            self.scene_manager.active_scene.delta_time = clock.tick(60) / 1000
 
-    def UpdateResolution(self, new_size_index, flag=0):
-        # Use the given, but always add HWSURFACE and DOUBLEBUF
-        if not settings.resolution == new_size_index:
-            settings.resolution = new_size_index
-            pygame.display.set_mode(settings.resolution_options[new_size_index], flag)
+def UpdateResolution(self, new_size_index, flag=0):
+    # Use the given, but always add HWSURFACE and DOUBLEBUF
+    if not settings.resolution == new_size_index:
+        settings.resolution = new_size_index
+        pygame.display.set_mode(settings.resolution_options[new_size_index], flag)
 
-            self.scene_manager.active_scene.Draw()
+        settings.active_scene.Draw()
 
 
 if __name__ == "__main__":
@@ -105,5 +112,5 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--project_path", type=str, nargs="?", const="", help="A file path for a HBEngine Project")
     args = parser.parse_args()
     print(args)
-    engine = HBEngine(args.project_path)
-    engine.Main()
+    Initialize(args.project_path)
+    Main()
