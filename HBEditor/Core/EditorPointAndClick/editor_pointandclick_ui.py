@@ -16,6 +16,7 @@ from PyQt5 import QtWidgets
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorPointAndClick.scene_viewer import SceneViewer
+from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 
 
 class EditorPointAndClickUI(EditorBaseUI):
@@ -32,14 +33,22 @@ class EditorPointAndClickUI(EditorBaseUI):
 
         self.scene_viewer = SceneViewer(self.core)
         self.details = DetailsPanel(self.core.excluded_properties)
+        self.scene_settings = SceneSettings()
+        self.scene_settings.Populate()
 
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
+        # Add a sub tab widget for details, settings, etc
+        self.sub_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_tab_widget.setElideMode(0)
+        self.sub_tab_widget.addTab(self.details, "Details")
+        self.sub_tab_widget.addTab(self.scene_settings, "Scene Settings")
+
         # Assign everything to the main widget
         self.main_layout.addWidget(self.main_resize_container)
         self.main_resize_container.addWidget(self.scene_viewer)
-        self.main_resize_container.addWidget(self.details)
+        self.main_resize_container.addWidget(self.sub_tab_widget)
 
         # Adjust the space allocation to favor the settings section
         self.main_resize_container.setStretchFactor(1, 0)

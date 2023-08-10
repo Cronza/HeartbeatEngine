@@ -30,9 +30,6 @@ Interactables:
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"
   options:
-    - name: "create_dialogue_interface"
-      applicable_editors:
-        - Scene_Dialogue
     - name: "dialogue"
       applicable_editors:
         - Scene_Dialogue
@@ -68,3 +65,7 @@ Sound:
     - name: "stop_music"
       applicable_editors:
         - Scene_Dialogue
+    - name: "set_mute"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click

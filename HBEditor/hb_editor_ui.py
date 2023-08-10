@@ -16,7 +16,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-#from HBEditor.Core.Outliner.outliner import Outliner
 from HBEditor.Core.Outliner.outliner import Outliner
 
 

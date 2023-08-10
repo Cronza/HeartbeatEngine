@@ -362,6 +362,7 @@ create_interactable:
                 - "scene_fade_out"
                 - "scene_fade_in"
                 - "play_sfx"
+                - "set_mute"
               flags: ["editable"]
 
 create_button:
@@ -572,6 +573,7 @@ create_checkbox:
                 - "scene_fade_out"
                 - "scene_fade_in"
                 - "play_sfx"
+                - "set_mute"
               flags: ["editable"]
 
 create_text_button:
@@ -666,55 +668,10 @@ create_text_button:
                 - "scene_fade_out"
                 - "scene_fade_in"
                 - "play_sfx"
+                - "set_mute"
               flags: ["editable"]
 
 # Dialogue
-
-create_dialogue_interface:
-  display_name: "Create Dialogue Interface"
-  requirements:
-    key:
-      type: "String"
-      value: "DialogueFrame"
-      default: "DialogueFrame"
-
-    sprite:
-      type: "Asset_Image"
-      value: "None"
-      default: "None"
-      global: ["Dialogue", "dialogue_frame_sprite"]
-      flags: ["editable", "preview", "global_active"]
-
-    position:
-      type: "Vector2"
-      value: [0,0]
-      default: [0,0]
-      global: ["Dialogue", "dialogue_frame_position"]
-      flags: ["editable", "preview", "global_active"]
-
-    center_align:
-      type: "Bool"
-      value: True
-      default: True
-      global: ["Dialogue", "dialogue_frame_center_align"]
-      flags: ["editable", "preview", "global_active"]
-
-    z_order:
-      type: "Int"
-      value: 9999
-      default: 9999
-      global: ["Dialogue", "dialogue_frame_z_order"]
-      flags: ["global_active"]
-
-    post_wait:
-      type: "Dropdown"
-      value: "no_wait"
-      default: "no_wait"
-      options:
-        - "no_wait"
-        - "wait_for_input"
-        - "wait_until_complete"
-      flags: ["editable", "preview"]
 
 dialogue:
   display_name: "Dialogue"

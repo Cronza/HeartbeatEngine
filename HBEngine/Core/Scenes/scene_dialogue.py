@@ -75,15 +75,20 @@ class DialogueScene(PointAndClickScene):
 
     def LoadSceneData(self):
         """ Load the full dialogue structure, and load the first action """
-        self.dialogue_data = self.scene_data['dialogue']
+        if "dialogue" in self.scene_data:
+            self.dialogue_data = self.scene_data['dialogue']
 
-        # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
-        #if 'characters' in self.scene_data:
-            #self.LoadCharacters()
-        if self.scene_data["scene_settings"]["interface"]:
-            self.LoadInterface(self.scene_data["scene_settings"]["interface"])
+            # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
+            #if 'characters' in self.scene_data:
+                #self.LoadCharacters()
 
-        self.LoadAction()
+            # Load any applicable interfaces
+            if self.scene_data["scene_settings"]["interface"]:
+                self.LoadInterface(self.scene_data["scene_settings"]["interface"])
+
+            self.LoadAction()
+        else:
+            raise ValueError("'dialogue' missing from the scene file")
 
     def SwitchDialogueBranch(self, branch):
         """ Given a branch name within the active dialogue file, switch to using it """

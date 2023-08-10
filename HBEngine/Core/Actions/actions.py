@@ -416,27 +416,6 @@ class create_checkbox(Action):
 # -------------- DIALOGUE ACTIONS --------------
 
 
-#class create_dialogue_interface(Action):
-#    """
-#    Creates sprite renderables for the dialogue and speaker text, and assigns them to the renderable stack using
-#    pre-configured settings
-#    """
-#    def Start(self):
-#        self.LoadMetadata(__class__.__name__)
-#        self.skippable = False
-#
-#        dialogue_frame = SpriteRenderable(
-#            self.scene,
-#            self.action_data
-#        )
-#
-#        # Add the dialogue interface to the sprite group so they exist until explicitly unloaded
-#        self.scene.active_renderables.Add(dialogue_frame)
-#
-#        self.scene.Draw()
-#        self.Complete()
-
-
 class dialogue(Action):
     """
     Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings.

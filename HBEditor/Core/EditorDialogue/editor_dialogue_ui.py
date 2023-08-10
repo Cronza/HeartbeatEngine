@@ -33,9 +33,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.dialogue_sequence = DialogueSequencePanel(self.core)
         self.details = DetailsPanel()
         self.scene_settings = SceneSettings()
-        self.scene_settings.Populate(
-            {"interface": "HBEngine/Content/Interfaces/dialogue_01.interface"}
-        )
+        self.scene_settings.Populate()
 
         # The dialogue editor makes use of the "Choice" input widget, which requires a reference
         # to the branches list
