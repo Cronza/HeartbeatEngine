@@ -371,7 +371,7 @@ class create_checkbox(Action):
     Creates a checkbox button interactable, and adds it to the renderable stack. Returns a 'Checkbox'
     """
     def Start(self):
-        #self.LoadMetadata(__class__.__name__)
+        self.LoadMetadata(__class__.__name__)
         self.skippable = False
 
         new_renderable = Checkbox(

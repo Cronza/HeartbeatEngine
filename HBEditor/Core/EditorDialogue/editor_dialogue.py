@@ -113,9 +113,17 @@ class EditorDialogue(EditorBase):
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
+        # Collect the scene settings
+        scene_data = {"scene_settings": self.editor_ui.scene_settings.GetData()}
+        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="scene_settings")
+
+        # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()
+
+        # Merge the collected data
         data_to_export = {
             "type": FileType.Scene_Dialogue.name,
+            "scene_settings": conv_scene_data,
             "dialogue": self.ConvertDialogueFileToEngineFormat(data_to_export)
         }
 
@@ -142,7 +150,10 @@ class EditorDialogue(EditorBase):
         if file_data:
             converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
 
-            # The main branch is treated specially since we don't need to create it
+            # Populate the scene settings
+            self.editor_ui.scene_settings.Populate(file_data["scene_settings"])
+
+            # The main branch is treated uniquely since we don't need to create it
             for branch_name, branch_data in converted_data.items():
                 if not branch_name == "Main":
                     self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])

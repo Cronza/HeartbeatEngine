@@ -17,6 +17,7 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_branches_panel import BranchesPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
+from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 
 
 class EditorDialogueUI(EditorBaseUI):
@@ -31,6 +32,10 @@ class EditorDialogueUI(EditorBaseUI):
         self.branches = BranchesPanel(self.core)
         self.dialogue_sequence = DialogueSequencePanel(self.core)
         self.details = DetailsPanel()
+        self.scene_settings = SceneSettings()
+        self.scene_settings.Populate(
+            {"interface": "HBEngine/Content/Interfaces/dialogue_01.interface"}
+        )
 
         # The dialogue editor makes use of the "Choice" input widget, which requires a reference
         # to the branches list
@@ -39,11 +44,17 @@ class EditorDialogueUI(EditorBaseUI):
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
+        # Add a sub tab widget for details, settings, etc
+        self.sub_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_tab_widget.setElideMode(0)
+        self.sub_tab_widget.addTab(self.details, "Details")
+        self.sub_tab_widget.addTab(self.scene_settings, "Scene Settings")
+
         # Add everything to the editor interface
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
         self.main_resize_container.addWidget(self.branches)
         self.main_resize_container.addWidget(self.dialogue_sequence)
-        self.main_resize_container.addWidget(self.details)
+        self.main_resize_container.addWidget(self.sub_tab_widget)
 
-        # Adjust the main view so its consuming as much space as possible
+        # Adjust the main view so it's consuming as much space as possible
         self.main_resize_container.setStretchFactor(1, 10)

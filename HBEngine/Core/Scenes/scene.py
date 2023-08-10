@@ -150,7 +150,7 @@ class Scene:
 
     def Pause(self):
         # @TODO: Implement a per-scene flag that controls whether pausing is allowed
-        self.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.yaml", InterfacePause)
+        self.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
         self.Draw()
         self.paused = True
 

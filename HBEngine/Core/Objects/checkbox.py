@@ -22,9 +22,9 @@ class Checkbox(Interactable):
         self.check_icon_renderable.visible = False
 
         # Setup Connections
-        if "connect" in self.renderable_data:
-            if not self.Connect(self.renderable_data["connect"]):
-                print(f"Unable to setup connection for '{self.key}'. Please review the connection settings")
+        if "connect_project_setting" in self.renderable_data:
+            if not self.ConnectProjectSetting(self.renderable_data["connect_project_setting"]):
+                print(f"Unable to setup project setting connection for '{self.key}'. Please review the connection settings")
 
     def Interact(self):
         # If a connection has been established, then the check state is determined by the connected value. If no
@@ -39,5 +39,4 @@ class Checkbox(Interactable):
         self.scene.Draw()  # Draw to apply the icon changes
 
     def ConnectionUpdate(self, new_value):
-        print("New Value", new_value)
         self.check_icon_renderable.visible = new_value

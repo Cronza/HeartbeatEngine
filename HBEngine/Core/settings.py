@@ -95,7 +95,7 @@ def SetProjectSetting(category: str, setting: str, value: any):
     for listener_name, connect_func in project_setting_listeners[category][setting].items():
         connect_func(value)
 
-    # Save changes
+    # Save changes to ensure persistence for all changes
     SaveProjectSettings()
 
 

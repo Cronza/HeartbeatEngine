@@ -537,6 +537,22 @@ create_checkbox:
       global: ["Button", "z_order"]
       flags: ["editable", "global_active"]
 
+    connect_project_setting:
+      type: "Container"
+      flags: [ "editable", "preview" ]
+      children:
+        category:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
+        setting:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
     events:
       type: "Array"
       flags: ["editable", "no_exclusion"]

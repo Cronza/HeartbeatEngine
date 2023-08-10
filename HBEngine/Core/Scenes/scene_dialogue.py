@@ -80,8 +80,8 @@ class DialogueScene(PointAndClickScene):
         # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
         #if 'characters' in self.scene_data:
             #self.LoadCharacters()
-        if "interface" in self.scene_data:
-            self.LoadInterface(self.scene_data["interface"])
+        if self.scene_data["scene_settings"]["interface"]:
+            self.LoadInterface(self.scene_data["scene_settings"]["interface"])
 
         self.LoadAction()
 

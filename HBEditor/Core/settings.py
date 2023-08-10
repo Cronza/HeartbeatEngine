@@ -196,13 +196,14 @@ project_default_files = {
 
 # The master dict of file types supported by the engine / editor
 supported_file_types = {
+    ".interface": FileType.Interface,
     ".png": FileType.Asset_Image,
     ".jpg": FileType.Asset_Image,
     ".yaml": FileType.Asset_Data,
     ".ttf": FileType.Asset_Font,
     ".mp3": FileType.Asset_Sound,
     ".wav": FileType.Asset_Sound,
-    ".ogg": FileType.Asset_Sound,
+    ".ogg": FileType.Asset_Sound
 }
 
 # A dict of types of files, and the individual formats which are supported in the engine / editor. This is a

@@ -163,17 +163,13 @@ class Renderable(pygame.sprite.Sprite):
             round(pos[1] - size[1] / 2)
         )
 
-    def Connect(self, connection_data: dict) -> bool:
-        if "type" not in connection_data:
+    def ConnectProjectSetting(self, connection_data: dict) -> bool:
+        if "category" not in connection_data or "setting" not in connection_data:
             return False
 
-        if connection_data["type"] == "project_setting":
-            if "category" not in connection_data or "setting" not in connection_data:
-                return False
-
-            # Add this object as a listener to the connected setting
-            if self not in settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]]:
-                settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]][self] = self.ConnectionUpdate
+        # Add this object as a listener to the connected setting
+        if self not in settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]]:
+            settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]][self] = self.ConnectionUpdate
 
         self.connected = True
 

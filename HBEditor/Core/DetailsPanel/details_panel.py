@@ -30,11 +30,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.setContentsMargins(0, 0, 0, 0)
         self.details_layout.setSpacing(0)
 
-        # Create title
-        self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setObjectName("h1")
-        self.details_title.setText("Details")
-
         # Create the toolbar
         #self.details_toolbar = QtWidgets.QToolBar(self)
 
@@ -67,7 +62,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
-        self.details_layout.addWidget(self.details_title)
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):

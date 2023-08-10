@@ -1,6 +1,9 @@
 # This file contains a registry of engine content files that are accessible by users. This file is manually maintained,
 # and should not be touched
 Content:
+  Interfaces:
+    pause_menu_01.interface: Interface
+    dialogue_01.interface: Interface
   Fonts:
     Comfortaa:
       Comfortaa-Bold.ttf: Asset_Font

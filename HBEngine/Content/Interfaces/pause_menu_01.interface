@@ -177,14 +177,9 @@ pages:
       sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
       sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
       sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
-      connect:
-        type: project_setting
+      connect_project_setting:
         category: Audio
         setting: mute
-        #group: Audio
-        #name: mute
-      #connect_project_setting:
-      #  category: Audio #@TODO: Maybe do a keyword reservation system? Make all connectable properties unique, and merge project settings with values
       events:
         event_0:
           action:
