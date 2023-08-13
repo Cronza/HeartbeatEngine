@@ -1,18 +1,15 @@
+# Created by Cronza
 code_class: interface_pause
 persistent:
   # Background
-  - action: create_sprite
-    key: PAUSE_INTERFACE_Background
+  - action: create_background
+    key: "!&INTERFACE_PAUSE_Background&!"
     sprite: HBEngine/Content/Sprites/Interface/Backgrounds/Dark_Transparent_1280x720.png
-    position:
-      - 0
-      - 0
-    center_align: false
     z_order: 100000
 
   # Title
   - action: create_text
-    key: PAUSE_INTERFACE_Title
+    key: "!&INTERFACE_PAUSE_Title&!"
     position:
       - 0.15
       - 0.2
@@ -26,7 +23,7 @@ persistent:
 
   # Resume Button
   - action: create_text_button
-    key: PAUSE_INTERFACE_Resume_Button
+    key: "!&INTERFACE_PAUSE_Resume_Button&!"
     position:
       - 0.15
       - 0.3
@@ -48,7 +45,7 @@ persistent:
 
   # Options Button
   - action: create_text_button
-    key: PAUSE_INTERFACE_Options_Button
+    key: "!&INTERFACE_PAUSE_Options_Button&!"
     position:
       - 0.15
       - 0.35
@@ -72,7 +69,7 @@ persistent:
 
   # Save Button
   - action: create_text_button
-    key: PAUSE_INTERFACE_Save_Button
+    key: "!&INTERFACE_PAUSE_Save_Button&!"
     position:
       - 0.15
       - 0.4
@@ -96,7 +93,7 @@ persistent:
 
   # Main Menu Button
   - action: create_text_button
-    key: PAUSE_INTERFACE_Main_Menu_Button
+    key: "!&INTERFACE_PAUSE_Main_Menu_Button&!"
     position:
       - 0.15
       - 0.45
@@ -115,11 +112,11 @@ persistent:
       event_0:
         action:
           action: load_scene
-          scene_file: Content/PointAndClick_Testing.yaml
+          scene_file: Content/Main_Menu.yaml
 
   # Quit Button
   - action: create_text_button
-    key: PAUSE_INTERFACE_Quit_Button
+    key: "!&INTERFACE_PAUSE_Quit_Button&!"
     position:
       - 0.15
       - 0.5
@@ -143,7 +140,7 @@ pages:
   page_Options:
     # Page Title
     - action: create_text
-      key: PAUSE_INTERFACE_pageOptions_Title
+      key: "!&INTERFACE_PAUSE_pageOptions_Title&!"
       position:
         - 0.4
         - 0.2
@@ -157,7 +154,7 @@ pages:
 
     # Mute Button Text
     - action: create_text
-      key: Page_Title
+      key: "!&INTERFACE_PAUSE_pageOptions_Mute_All_Button_Text&!"
       position:
         - 0.34
         - 0.3
@@ -167,7 +164,7 @@ pages:
 
     # Mute Button
     - action: create_checkbox
-      key: PAUSE_INTERFACE_pageOptions_Mute_All_Button
+      key: "!&INTERFACE_PAUSE_pageOptions_Mute_All_Button&!"
       position:
         - 0.4
         - 0.3
@@ -189,7 +186,7 @@ pages:
   page_Save:
     # Page Title
     - action: create_text
-      key: Page_Title
+      key: "!&INTERFACE_PAUSE_pageSave_Title&!"
       position:
         - 0.4
         - 0.2

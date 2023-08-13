@@ -258,6 +258,22 @@ create_text:
         - "wait_until_complete"
       flags: ["editable", "preview"]
 
+    connect_project_setting:
+      type: "Container"
+      flags: [ "editable", "preview" ]
+      children:
+        category:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
+        setting:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
 remove_renderable:
   display_name: "Remove Renderable"
   requirements:
@@ -481,6 +497,28 @@ create_button:
           value: [ 0.2,0.2 ]
           default: [ 0.2,0.2 ]
           flags: ["editable"]
+
+    events:
+      type: "Array"
+      flags: [ "editable", "no_exclusion" ]
+      template:
+        event:
+          type: "Array_Element"
+          flags: [ "editable" ]
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+                - "scene_fade_out"
+                - "scene_fade_in"
+                - "play_sfx"
+                - "set_mute"
+              flags: [ "editable" ]
 
 create_checkbox:
   display_name: "Create Checkbox"

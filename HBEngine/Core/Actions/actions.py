@@ -1035,12 +1035,14 @@ class pause(Action):
         self.Complete()
         return None
 
+
 class unpause(Action):
     """ Requests that the active scene unpause the game and remove the pause interface. Returns 'None' """
     def Start(self):
         self.scene.Unpause()
         self.Complete()
         return None
+
 
 class switch_page(Action):
     """ Requests a page load for the target interface. Returns 'None' """
@@ -1053,33 +1055,14 @@ class switch_page(Action):
         self.Complete()
         return None
 
-# -------------- VALUE ACTIONS --------------
 
-class toggle_project_setting(Action):
+class remove_page(Action):
+    """ Removes the target interface and all of its children. Returns 'None' """
     def Start(self):
-        error_msg = "'toggle_project_settings' action Failed -"
-        # Check 1: Ensure the mandatory keys have been provided
-        if "category" not in self.action_data or "setting" not in self.action_data:
-            raise ValueError(f"{error_msg} 'category' or 'setting' not specified'")
+        if self.scene.active_interfaces.Exists(self.action_data["owner"]):
+            owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
+            owner.RemovePage()
 
-        # Check 2: Ensure category exists
-        if self.action_data["category"] not in settings.project_settings:
-            raise ValueError(f"{error_msg} '{self.action_data['category']}' is not a valid project settings category'")
-
-        # Check 3: Ensure the setting exists within the category
-        if self.action_data["setting"] not in settings.project_settings[self.action_data['category']]:
-            raise ValueError(f"{error_msg} '{self.action_data['settings']}' is not a valid setting within the '{self.action_data['category']}' category'")
-
-        # Check 4: Ensure the setting is toggleable (IE. Is a boolean)
-        if not isinstance(settings.project_settings[self.action_data["category"]][self.action_data["setting"]], bool):
-            raise ValueError(f"{error_msg} '{self.action_data['settings']}' is not a toggleable setting")
-
-        # All checks passed. Apply the change
-        settings.project_settings[self.action_data["category"]][self.action_data["setting"]] = not \
-            settings.project_settings[self.action_data["category"]][self.action_data["setting"]]
-
-        # Save the setting to disc
-        settings.SaveProjectSettings()
-
+        self.scene.Draw()
+        self.Complete()
         return None
-

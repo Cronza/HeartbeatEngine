@@ -1,21 +1,19 @@
 # Created by Cronza
-
 code_class: interface
-
-# Settings
-key: "!&INTERFACE_Dialogue&!"
-z_order: 10000
-show_transition:
-  type: fade_in
-  speed: 1000
-hide_transition:
-  type: fade_out
-  speed: 1000
+key: "!&INTERFACE_DIALOGUE&!"
+settings:
+    z_order: 10000
+    show_transition:
+      type: fade_in
+      speed: 1000
+    hide_transition:
+      type: fade_out
+    speed: 1000
 
 persistent:
   # Dialogue Frame
   - action: create_sprite
-    key: "!&INTERFACE_Dialogue_Frame&!"
+    key: "!&INTERFACE_DIALOGUE_Frame&!"
     sprite: HBEngine/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
     position:
       - 0.5
@@ -25,7 +23,7 @@ persistent:
 
   # Main Menu Button
   - action: create_text_button
-    key: "!&INTERFACE_Main_Menu_Button&!"
+    key: "!&INTERFACE_DIALOGUE_Main_Menu_Button&!"
     position:
       - 0.3
       - 0.96
@@ -48,11 +46,11 @@ persistent:
       event_0:
         action:
           action: load_scene
-          scene_file: Content/PointAndClick_Testing.yaml
+          scene_file: Content/Main_Menu.yaml
 
   # Quick Save Button
   - action: create_text_button
-    key: "!&INTERFACE_Quick_Save_Button&!"
+    key: "!&INTERFACE_DIALOGUE_Quick_Save_Button&!"
     position:
       - 0.375
       - 0.96
@@ -75,7 +73,7 @@ persistent:
 
   # Quick Load Button
   - action: create_text_button
-    key: "!&INTERFACE_Quick_Load_Button&!"
+    key: "!&INTERFACE_DIALOGUE_Quick_Load_Button&!"
     position:
       - 0.45
       - 0.96

@@ -38,15 +38,14 @@ class Interface(Renderable):
             raise ValueError("'persistent' missing from the interface file - No items to display!")
 
     def LoadPage(self, page_name: str) -> bool:
-        """ Unload the prior page if applicable, and load the provided page. Returns whether the load succeeded """
+        """
+        Unload the prior page if applicable, and load the provided page. Only one page is supported at a time.
+        Returns whether the load succeeded
+        """
         if "pages" in self.renderable_data:
             if page_name in self.renderable_data["pages"]:
-
-                # Wipe existing page renderables if there are any
                 if self.page_renderables:
-                    for renderable in self.page_renderables:
-                        self.children.remove(renderable)
-                    self.page_renderables.clear()
+                    self.RemovePage()
 
                 # Create and record new page renderables
                 for page_action in self.renderable_data["pages"][page_name]:
@@ -56,4 +55,11 @@ class Interface(Renderable):
                 return True
 
         return False
+
+    def RemovePage(self):
+        """ Removes all active page renderables """
+        # Wipe existing page renderables if there are any
+        for renderable in self.page_renderables:
+            self.children.remove(renderable)
+        self.page_renderables.clear()
 

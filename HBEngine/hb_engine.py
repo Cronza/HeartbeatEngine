@@ -72,10 +72,11 @@ def Main():
                 # Exit
                 if event.key == pygame.K_ESCAPE:
                     if settings.active_scene:
-                        if settings.active_scene.paused:
-                            settings.active_scene.Unpause()
-                        else:
-                            settings.active_scene.Pause()
+                        if settings.active_scene.allow_pausing:
+                            if settings.active_scene.paused:
+                                settings.active_scene.Unpause()
+                            else:
+                                settings.active_scene.Pause()
 
                 if event.type == pygame.QUIT:
                     is_running = False

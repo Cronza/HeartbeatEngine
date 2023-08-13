@@ -39,4 +39,7 @@ class Checkbox(Interactable):
         self.scene.Draw()  # Draw to apply the icon changes
 
     def ConnectionUpdate(self, new_value):
-        self.check_icon_renderable.visible = new_value
+        if isinstance(new_value, bool):
+            self.check_icon_renderable.visible = new_value
+        else:
+            raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'bool'")

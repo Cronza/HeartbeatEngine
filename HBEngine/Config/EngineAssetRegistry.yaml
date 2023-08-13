@@ -4,6 +4,7 @@ Content:
   Interfaces:
     pause_menu_01.interface: Interface
     dialogue_01.interface: Interface
+    main_menu_01.interface: Interface
   Fonts:
     Comfortaa:
       Comfortaa-Bold.ttf: Asset_Font
@@ -30,3 +31,4 @@ Content:
     Placeholder.png: Asset_Image
     Backgrounds:
       Orientation_Lines_1280x720.jpg: Asset_Image
+      Basic_Dark_1280x720.jpg: Asset_Image

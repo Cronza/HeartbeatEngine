@@ -54,6 +54,12 @@ class SceneSettings(QtWidgets.QWidget):
                 "default": "",
                 "value": "",
                 "flags": ["editable"]
+            },
+            "allow_pausing": {
+                "type": "Bool",
+                "default": "True",
+                "value": "True",
+                "flags": ["editable"]
             }
         }
 
@@ -62,6 +68,8 @@ class SceneSettings(QtWidgets.QWidget):
                 entries["interface"]["value"] = data["interface"]
             if "description" in data:
                 entries["description"]["value"] = data["description"]
+            if "allow_pausing" in data:
+                entries["allow_pausing"]["value"] = data["allow_pausing"]
 
         for name, data in entries.items():
             ieh.Add(

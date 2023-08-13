@@ -24,6 +24,9 @@ from Tools.HBYaml.hb_yaml import Reader
 class Scene:
     def __init__(self, scene_data_file, window, scene_manager):
 
+        # Read in the active scene data
+        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
+
         self.window = window
         self.scene_manager = scene_manager
         self.a_manager = ActionManager(self)
@@ -33,13 +36,11 @@ class Scene:
         self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
 
         self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
+        self.allow_pausing = self.scene_data["scene_settings"]["allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
         self.paused = False
 
         # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
-
-        # Read in the active scene data
-        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:

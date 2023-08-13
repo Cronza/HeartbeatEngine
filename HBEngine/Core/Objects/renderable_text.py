@@ -17,6 +17,7 @@ import pygame.freetype
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core import settings
 
+
 class TextRenderable(Renderable):
     """
     The Text Renderable class is the base class for renderable text elements in the HBEngine. This includes:
@@ -53,9 +54,13 @@ class TextRenderable(Renderable):
         self.rect = self.surface.get_rect()
 
         # For new objects, resize initially in case we're already using a scaled resolution
-
         self.WrapText()
         self.RecalculateSize(self.scene.resolution_multiplier)
+
+        # Setup Connections
+        if "connect_project_setting" in self.renderable_data:
+            if not self.ConnectProjectSetting(self.renderable_data["connect_project_setting"]):
+                print(f"Unable to setup project setting connection for '{self.key}'. Please review the connection settings")
 
     def WrapText(self):
         """ Clears the surface and redraws / re-wraps the text """
@@ -69,8 +74,8 @@ class TextRenderable(Renderable):
             ),
             pygame.SRCALPHA
         )
-
         rect = self.surface.get_rect()
+
         base_top = rect.top
         line_spacing = 0
         font_height = self.font_obj.size("Tg")[1]
@@ -90,9 +95,7 @@ class TextRenderable(Renderable):
 
         # Process each line, applying wrapping where necessary
         for line in text_to_process:
-
             processing_complete = False
-
             while not processing_complete:
                 i = 1
 
@@ -146,5 +149,11 @@ class TextRenderable(Renderable):
         self.surface = new_surface
         self.rect = pygame.Rect(self.rect.x, self.rect.y, new_rect.w, new_rect.h)
 
-
+    def ConnectionUpdate(self, new_value):
+        if isinstance(new_value, str):
+            self.text = new_value
+            self.WrapText()
+            self.RecalculateSize(self.scene.resolution_multiplier)
+        else:
+            raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'str'")
 
