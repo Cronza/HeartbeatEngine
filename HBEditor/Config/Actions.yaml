@@ -5,14 +5,17 @@ Renderables:
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "create_background"
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "create_text"
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "remove_renderable"
       applicable_editors:
         - Scene_Dialogue
@@ -23,9 +26,11 @@ Interactables:
     - name: "create_button"
       applicable_editors:
         - Scene_Point_And_Click
+        - Interface
     - name: "create_text_button"
       applicable_editors:
         - Scene_Point_And_Click
+        - Interface
 
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"

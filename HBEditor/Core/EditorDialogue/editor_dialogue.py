@@ -29,7 +29,7 @@ class EditorDialogue(EditorBase):
         self.file_type = FileType.Scene_Dialogue
 
         self.editor_ui = EditorDialogueUI(self)
-        self.editor_ui.branches.CreateBranch(
+        self.editor_ui.branches_panel.CreateEntry(
             "Main",
             "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
@@ -61,28 +61,28 @@ class EditorDialogue(EditorBase):
             self.editor_ui.dialogue_sequence.Clear()
 
         # Load any entries in the new branch (if applicable)
-        if new_branch.branch_data:
-            for entry in new_branch.branch_data:
+        if new_branch.data:
+            for entry in new_branch.data:
                 self.editor_ui.dialogue_sequence.AddEntry(entry, None, True)
 
     def StoreActiveData(self, cur_branch):
         """ Updates the active branch with all active dialogue entries """
         # Clear the contents of the current branch since we're forcefully updating it
-        cur_branch.branch_data.clear()
+        cur_branch.data.clear()
 
         dialogue_table = self.editor_ui.dialogue_sequence.dialogue_table
         num_of_entries = dialogue_table.rowCount()
         for entry_index in range(num_of_entries):
             dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
-            cur_branch.branch_data.append(dialogue_entry.action_data)
+            cur_branch.data.append(dialogue_entry.action_data)
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in the loaded file, including all branches, and returns them as a dict """
         data_to_export = {}
-        branch_count = self.editor_ui.branches.branches_list.count()
+        branch_count = self.editor_ui.branches_panel.GetCount()
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the containing item widget
-            branch = self.editor_ui.branches.branches_list.itemWidget(self.editor_ui.branches.branches_list.item(index))
+            branch = self.editor_ui.branches_panel.GetEntryItemWidget(index)
 
             # Before we save, let's be extra sure the current information in the details panel is cached properly
             self.editor_ui.details.StoreData()
@@ -90,7 +90,7 @@ class EditorDialogue(EditorBase):
             # If a branch is currently active, then it's likely to of not updated its cached branch data (Only
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
             # differently by scanning the current dialogue entries
-            if branch is self.editor_ui.branches.active_branch:
+            if branch is self.editor_ui.branches_panel.active_entry:
                 Logger.getInstance().Log("Scanning dialogue entries...")
                 self.StoreActiveData(branch)
 
@@ -114,16 +114,16 @@ class EditorDialogue(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        scene_data = {"scene_settings": self.editor_ui.scene_settings.GetData()}
-        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="scene_settings")
+        scene_data = {"settings": self.editor_ui.scene_settings.GetData()}
+        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="settings")
 
         # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()
 
         # Merge the collected data
         data_to_export = {
-            "type": FileType.Scene_Dialogue.name,
-            "scene_settings": conv_scene_data,
+            "type": self.file_type.name,
+            "settings": conv_scene_data,
             "dialogue": self.ConvertDialogueFileToEngineFormat(data_to_export)
         }
 
@@ -133,7 +133,7 @@ class EditorDialogue(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {FileType.Scene_Dialogue.name}\n" +
+                metadata=f"# Type: {self.file_type.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
@@ -148,21 +148,21 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
-            converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
-
             # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["scene_settings"])
+            self.editor_ui.scene_settings.Populate(file_data["settings"])
 
-            # The main branch is treated uniquely since we don't need to create it
+            # Populate the branches and dialogue sequence
+            converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
             for branch_name, branch_data in converted_data.items():
+                # The main branch is treated uniquely since we don't need to create it
                 if not branch_name == "Main":
-                    self.editor_ui.branches.CreateBranch(branch_name, branch_data["description"])
+                    self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"])
 
                 for action in branch_data["entries"]:
                     self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
 
             # Select the main branch by default
-            self.editor_ui.branches.ChangeBranch(0)
+            self.editor_ui.branches_panel.ChangeEntry(0)
 
     def ConvertDialogueFileToEngineFormat(self, action_data: dict):
         """

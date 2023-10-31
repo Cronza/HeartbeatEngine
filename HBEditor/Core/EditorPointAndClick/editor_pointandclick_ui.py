@@ -14,8 +14,8 @@
 """
 from PyQt5 import QtWidgets
 from HBEditor.Core.base_editor_ui import EditorBaseUI
-from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
-from HBEditor.Core.EditorPointAndClick.scene_viewer import SceneViewer
+from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
+from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 
 
@@ -31,7 +31,7 @@ class EditorPointAndClickUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.scene_viewer = SceneViewer(self.core)
+        self.scene_viewer = SceneViewer(self.core, self.core.UpdateActiveSceneItem)
         self.details = DetailsPanel(self.core.excluded_properties)
         self.scene_settings = SceneSettings()
         self.scene_settings.Populate()

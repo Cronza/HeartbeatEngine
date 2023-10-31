@@ -83,8 +83,8 @@ class DialogueScene(PointAndClickScene):
                 #self.LoadCharacters()
 
             # Load any applicable interfaces
-            if self.scene_data["scene_settings"]["interface"]:
-                self.LoadInterface(self.scene_data["scene_settings"]["interface"])
+            if self.scene_data["settings"]["interface"]:
+                self.LoadInterface(self.scene_data["settings"]["interface"])
 
             self.LoadAction()
         else:

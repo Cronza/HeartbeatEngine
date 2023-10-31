@@ -14,9 +14,9 @@
 """
 from PyQt5 import QtWidgets
 from HBEditor.Core.base_editor_ui import EditorBaseUI
-from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
-from HBEditor.Core.EditorDialogue.dialogue_branches_panel import BranchesPanel
+from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
+from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
 from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 
 
@@ -29,7 +29,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.branches = BranchesPanel(self.core)
+        self.branches_panel = GroupsPanel(self.core.SwitchBranches, title="Branches")
         self.dialogue_sequence = DialogueSequencePanel(self.core)
         self.details = DetailsPanel()
         self.scene_settings = SceneSettings()
@@ -37,7 +37,7 @@ class EditorDialogueUI(EditorBaseUI):
 
         # The dialogue editor makes use of the "Choice" input widget, which requires a reference
         # to the branches list
-        self.details.branch_list = self.branches.branches_list
+        self.details.branch_list = self.branches_panel.entry_list
 
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
@@ -50,7 +50,7 @@ class EditorDialogueUI(EditorBaseUI):
 
         # Add everything to the editor interface
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        self.main_resize_container.addWidget(self.branches)
+        self.main_resize_container.addWidget(self.branches_panel)
         self.main_resize_container.addWidget(self.dialogue_sequence)
         self.main_resize_container.addWidget(self.sub_tab_widget)
 

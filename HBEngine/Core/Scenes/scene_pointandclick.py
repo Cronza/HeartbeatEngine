@@ -21,8 +21,8 @@ class PointAndClickScene(Scene):
 
     def LoadSceneData(self):
         # Load any applicable interfaces
-        if self.scene_data["scene_settings"]["interface"]:
-            self.LoadInterface(self.scene_data["scene_settings"]["interface"])
+        if self.scene_data["settings"]["interface"]:
+            self.LoadInterface(self.scene_data["settings"]["interface"])
 
         # Render scene items
         if "scene_items" in self.scene_data:

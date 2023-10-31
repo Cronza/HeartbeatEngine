@@ -1,95 +1,98 @@
 # Created by Cronza
-code_class: interface
+type: Interface
 key: "!&INTERFACE_DIALOGUE&!"
 settings:
-    z_order: 10000
-    show_transition:
-      type: fade_in
-      speed: 1000
-    hide_transition:
-      type: fade_out
+  z_order: 10000
+  show_transition:
+    type: fade_in
     speed: 1000
+  hide_transition:
+    type: fade_out
+  speed: 1000
 
-persistent:
-  # Dialogue Frame
-  - action: create_sprite
-    key: "!&INTERFACE_DIALOGUE_Frame&!"
-    sprite: HBEngine/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
-    position:
-      - 0.5
-      - 0.8
-    center_align: true
-    z_order: 10000
+pages:
+  Persistent:
+    description: ''
+    items:
+      # Dialogue Frame
+      - action: create_sprite
+        key: "!&INTERFACE_DIALOGUE_Frame&!"
+        sprite: HBEngine/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
+        position:
+          - 0.5
+          - 0.8
+        center_align: true
+        z_order: 10000
 
-  # Main Menu Button
-  - action: create_text_button
-    key: "!&INTERFACE_DIALOGUE_Main_Menu_Button&!"
-    position:
-      - 0.3
-      - 0.96
-    center_align: true
-    z_order: 10001
-    text: Menu
-    text_size: 16
-    text_color_hover:
-      - 92
-      - 176
-      - 255
-    text_color_clicked:
-      - 255
-      - 111
-      - 111
-    wrap_bounds:
-      - 0.06
-      - 0.05
-    events:
-      event_0:
-        action:
-          action: load_scene
-          scene_file: Content/Main_Menu.yaml
+      # Main Menu Button
+      - action: create_text_button
+        key: "!&INTERFACE_DIALOGUE_Main_Menu_Button&!"
+        position:
+          - 0.3
+          - 0.96
+        center_align: true
+        z_order: 10001
+        text: Menu
+        text_size: 16
+        text_color_hover:
+          - 92
+          - 176
+          - 255
+        text_color_clicked:
+          - 255
+          - 111
+          - 111
+        wrap_bounds:
+          - 0.06
+          - 0.05
+        events:
+          event_0:
+            action:
+              action: load_scene
+              scene_file: ''
 
-  # Quick Save Button
-  - action: create_text_button
-    key: "!&INTERFACE_DIALOGUE_Quick_Save_Button&!"
-    position:
-      - 0.375
-      - 0.96
-    center_align: true
-    z_order: 10001
-    text: Q. Save
-    text_size: 16
-    text_color_hover:
-      - 92
-      - 176
-      - 255
-    text_color_clicked:
-      - 255
-      - 111
-      - 111
-    wrap_bounds:
-      - 0.2
-      - 0.2
-    events: {}
+      # Quick Save Button
+      - action: create_text_button
+        key: "!&INTERFACE_DIALOGUE_Quick_Save_Button&!"
+        position:
+          - 0.375
+          - 0.96
+        center_align: true
+        z_order: 10001
+        text: Q. Save
+        text_size: 16
+        text_color_hover:
+          - 92
+          - 176
+          - 255
+        text_color_clicked:
+          - 255
+          - 111
+          - 111
+        wrap_bounds:
+          - 0.2
+          - 0.2
+        events: { }
 
-  # Quick Load Button
-  - action: create_text_button
-    key: "!&INTERFACE_DIALOGUE_Quick_Load_Button&!"
-    position:
-      - 0.45
-      - 0.96
-    center_align: true
-    z_order: 10001
-    text: Q. Load
-    text_size: 16
-    text_color_hover:
-      - 92
-      - 176
-      - 255
-    text_color_clicked:
-      - 255
-      - 111
-      - 111
-    wrap_bounds:
-      - 0.2
-      - 0.2
-    events: {}
+      # Quick Load Button
+      - action: create_text_button
+        key: "!&INTERFACE_DIALOGUE_Quick_Load_Button&!"
+        position:
+          - 0.45
+          - 0.96
+        center_align: true
+        z_order: 10001
+        text: Q. Load
+        text_size: 16
+        text_color_hover:
+          - 92
+          - 176
+          - 255
+        text_color_clicked:
+          - 255
+          - 111
+          - 111
+        wrap_bounds:
+          - 0.2
+          - 0.2
+        events: { }

@@ -164,7 +164,16 @@ class Renderable(pygame.sprite.Sprite):
         )
 
     def ConnectProjectSetting(self, connection_data: dict) -> bool:
-        if "category" not in connection_data or "setting" not in connection_data:
+        if "category" in connection_data:
+            if connection_data["category"] == "":
+                return False
+        else:
+            return False
+
+        if "setting" in connection_data:
+            if connection_data["setting"] == "":
+                return False
+        else:
             return False
 
         # Add this object as a listener to the connected setting

@@ -25,6 +25,7 @@ class SceneSettings(QtWidgets.QWidget):
         self.main_layout.setSpacing(0)
 
         self.settings_tree = QtWidgets.QTreeWidget(self)
+        self.settings_tree.setObjectName("no-top")
         self.settings_tree.setColumnCount(2)
         self.settings_tree.setHeaderLabels(['Name', 'Input'])
         self.settings_tree.setAutoScroll(False)

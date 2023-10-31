@@ -67,15 +67,15 @@ class EditorPointAndClick(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        scene_data = {"scene_settings": self.editor_ui.scene_settings.GetData()}
-        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="scene_settings")
+        scene_data = {"settings": self.editor_ui.scene_settings.GetData()}
+        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="settings")
 
         # Get an engine-formatted list of scene items
         conv_scene_items = self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
 
         data_to_export = {
             "type": FileType.Scene_Point_And_Click.name,
-            "scene_settings": conv_scene_data,
+            "settings": conv_scene_data,
             "scene_items": conv_scene_items
         }
         Logger.getInstance().Log("Writing data to file...")
@@ -83,7 +83,7 @@ class EditorPointAndClick(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {FileType.Scene_Point_And_Click.name}\n" +
+                metadata=f"# Type: {self.file_type.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             Logger.getInstance().Log("File Exported!", 2)
@@ -101,7 +101,7 @@ class EditorPointAndClick(EditorBase):
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
 
             # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["scene_settings"])
+            self.editor_ui.scene_settings.Populate(file_data["settings"])
 
             for item in conv_scene_items:
                 new_item = self.editor_ui.scene_viewer.AddRenderable(item, True)

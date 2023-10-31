@@ -127,8 +127,8 @@ def ConvertActionRequirementsToEditorFormat(metadata_entry: dict, engine_entry: 
                         AddFlag("global_active", req_data)
 
             if "children" in req_data:
-                ConvertActionRequirementsToEditorFormat(req_data, engine_entry[req_name], "children")
-
+                if req_name in engine_entry:
+                    ConvertActionRequirementsToEditorFormat(req_data, engine_entry[req_name], "children")
 
 def GetActionName(action_data: dict) -> str:
     """

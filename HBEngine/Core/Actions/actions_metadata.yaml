@@ -128,6 +128,7 @@ create_background:
       type: "String"
       value: "Background"
       default: "Background"
+      flags: ["editable"]
 
     sprite:
       type: "Asset_Image"
@@ -1178,6 +1179,40 @@ set_mute:
       type: "Bool"
       value: True
       default: True
+      flags: [ "editable" ]
+
+# Interface
+
+pause:
+  display_name: "Pause"
+  requirements: {}
+
+unpause:
+  display_name: "Unpause"
+  requirements: {}
+
+switch_page:
+  display_name: "Switch page"
+  requirements:
+    owner:
+      type: "String"
+      value: ""
+      default: ""
+      flags: [ "editable" ]
+
+    page:
+      type: "String"
+      value: ""
+      default: ""
+      flags: [ "editable" ]
+
+remove_page:
+  display_name: "Pause"
+  requirements:
+    owner:
+      type: "String"
+      value: ""
+      default: ""
       flags: [ "editable" ]
 
 # Utilities

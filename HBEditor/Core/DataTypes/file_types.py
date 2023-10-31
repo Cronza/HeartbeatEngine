@@ -44,6 +44,7 @@ class FileTypeDescriptions:
 class FileTypeIcons:
     icons = {
         FileType.Folder: ":/Icons/Folder.png",
+        FileType.Interface: ":/Icons/Interface.png",
         FileType.Project_Settings: ":/Icons/File.png",
         FileType.Scene_Dialogue: ":/Icons/File.png",
         FileType.Scene_Point_And_Click: ":/Icons/File.png",

@@ -61,6 +61,11 @@ class Outliner:
         if asset_name:
             self.ui.AddAsset(asset_name, asset_type)
 
+    def CreateInterface(self):
+        asset_name, asset_type = self.hb_core.NewInterface(self.cur_directory)
+        if asset_name:
+            self.ui.AddAsset(asset_name, asset_type)
+
     def OpenFile(self, asset_name: str):
         self.hb_core.OpenFile(f"{self.cur_directory}/{asset_name}")
 

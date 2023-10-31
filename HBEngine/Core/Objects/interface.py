@@ -29,13 +29,13 @@ class Interface(Renderable):
         if "z_order" not in renderable_data: renderable_data["z_order"] = 10000
         super().__init__(scene, renderable_data, parent)
 
-        if "persistent" in renderable_data:
-            for item in renderable_data["persistent"]:
+        if "Persistent" in renderable_data["pages"]:
+            for item in renderable_data["pages"]["Persistent"]["items"]:
                 self.children.append(
                     self.scene.a_manager.PerformAction(action_data=item, action_name=item['action'], no_draw=True)
                 )
         else:
-            raise ValueError("'persistent' missing from the interface file - No items to display!")
+            raise ValueError("'Persistent' missing from the interface file - No items to display!")
 
     def LoadPage(self, page_name: str) -> bool:
         """
@@ -48,7 +48,7 @@ class Interface(Renderable):
                     self.RemovePage()
 
                 # Create and record new page renderables
-                for page_action in self.renderable_data["pages"][page_name]:
+                for page_action in self.renderable_data["pages"][page_name]["items"]:
                     renderable = self.scene.a_manager.PerformAction(page_action, page_action["action"], no_draw=True)
                     self.children.append(renderable)
                     self.page_renderables.append(renderable)

@@ -87,4 +87,4 @@ Audio:
   volume_music: 100
   volume_sfx: 100
 Pause Menu:
-  data_file: HBEngine/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml
+  data_file: ''

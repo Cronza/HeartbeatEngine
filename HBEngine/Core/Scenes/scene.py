@@ -36,7 +36,7 @@ class Scene:
         self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
 
         self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
-        self.allow_pausing = self.scene_data["scene_settings"]["allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
+        self.allow_pausing = self.scene_data["settings"]["allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
         self.paused = False
 
         # Keep track of delta time so time-based actions can be more accurate across systems
@@ -73,10 +73,10 @@ class Scene:
                     self.window.blit(item.GetSurface(), (item.rect.x, item.rect.y))
 
                 #@TODO: Review if this causes redundant drawing
-                #@TODO: This doesn't handle nested children
                 # Draw any child renderables after drawing the parent
                 if item.children:
-                    for child in item.children:
+                    children = sorted(item.children, key=lambda child_item: child_item.z_order)
+                    for child in children:
                         if child.visible:
                             self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
@@ -88,9 +88,7 @@ class Scene:
         """ Clears all renderables, and requests a scene change from the scene_manager"""
         if scene_file:
             self.active_renderables.Clear()  # Clear graphics
-            print("Active Sounds", self.active_sounds)
             for sound in self.active_sounds.values():  # Clear SFX
-                print("SOUND", sound)
                 sound.Stop()
             if self.active_music:  # Clear music
                 self.active_music.Stop()

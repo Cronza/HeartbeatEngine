@@ -73,7 +73,7 @@ Audio:
   volume_sfx: "Int"
 
 Pause Menu:
-  data_file: "Asset_Data"
+  data_file: "Asset_Interface"
 
 Scene Transitions:
   speed: "Int"
