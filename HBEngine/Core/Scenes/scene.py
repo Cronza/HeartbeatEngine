@@ -15,6 +15,8 @@
 import pygame
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable_group import RenderableGroup
+from HBEngine.Core.Objects.interface import Interface
+from HBEngine.Core.Objects.interface_pause import InterfacePause
 from HBEngine.Core.Actions.action_manager import ActionManager
 from Tools.HBYaml.hb_yaml import Reader
 
@@ -22,22 +24,23 @@ from Tools.HBYaml.hb_yaml import Reader
 class Scene:
     def __init__(self, scene_data_file, window, scene_manager):
 
+        # Read in the active scene data
+        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
+
         self.window = window
         self.scene_manager = scene_manager
-        self.active_renderables = RenderableGroup()
-        self.active_sounds = {}
-        self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
         self.a_manager = ActionManager(self)
+        self.active_renderables = RenderableGroup()
+        self.active_interfaces = RenderableGroup()
+        self.active_sounds = {}  # Stores a dict of 'Sound' objects
+        self.active_music = None  # Only one music stream is supported. Stores a 'SoundAction'
 
         self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
-
-        self.pause_menu = None
+        self.allow_pausing = self.scene_data["settings"]["allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
+        self.paused = False
 
         # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
-
-        # Read in the active scene data
-        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
 
         # Load any cached data on the scene manager
         if not self.scene_manager.resolution_multiplier:
@@ -48,25 +51,21 @@ class Scene:
         self.LoadSceneData()
 
     def Update(self, events):
-        self.active_renderables.Update()
-        self.a_manager.Update(events)
+        if not self.paused:
+            self.active_interfaces.Update()  # @TODO: Disable updates from all interfaces besides the pause interface
+            self.active_renderables.Update()
+            self.a_manager.Update(events)
+        else:
+            self.active_interfaces.Update([self.active_interfaces.GetFromKey("!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&")])
 
-        # Pause Menu
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    #@TODO: TEMP HACK
-                    if self.active_renderables.Exists('Pause_Menu'):
-                        print("Pause Menu Open")
-                    else:
-                        self.pause_menu = self.a_manager.PerformAction(self.scene_manager.pause_menu_data, "create_container")
-
-    def Draw(self):
+    def Draw(self, renderables: list = None, recurse: bool = False):
+        if not renderables and recurse is False:
+            renderables = self.active_renderables.Get() + self.active_interfaces.Get()
         # Don't redraw unless we have items to actually draw. This also prevents last minute draw requests during
         # scene changes while cleanup is happening
-        if self.active_renderables.Get():
-            # Sort the renderable elements by their z-order (Lowest to Highest)
-            renderables = sorted(self.active_renderables.Get(), key=lambda renderable: renderable.z_order)
+        if renderables:
+            # Sort the renderable elements by their z-order (Lowest to Highest).
+            renderables = sorted(renderables, key=lambda renderable: renderable.z_order)
 
             # Draw any renderables using the screen space multiplier to fit the new resolution
             for item in renderables:
@@ -76,14 +75,24 @@ class Scene:
                 #@TODO: Review if this causes redundant drawing
                 # Draw any child renderables after drawing the parent
                 if item.children:
-                    for child in item.children:
+                    children = sorted(item.children, key=lambda child_item: child_item.z_order)
+                    for child in children:
                         if child.visible:
                             self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+
+                            # Recurse if this child has children
+                            if child.children:
+                                self.Draw(child.children, True)
 
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change from the scene_manager"""
         if scene_file:
-            self.active_renderables.Clear()
+            self.active_renderables.Clear()  # Clear graphics
+            for sound in self.active_sounds.values():  # Clear SFX
+                sound.Stop()
+            if self.active_music:  # Clear music
+                self.active_music.Stop()
+
             self.scene_manager.LoadScene(scene_file)
         else:
             raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
@@ -111,6 +120,13 @@ class Scene:
         """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """
         raise NotImplementedError("'LoadSceneData' not implemented")
 
+    def LoadInterface(self, interface_file: str, interface_class: type = Interface):
+        interface = interface_class(
+            self,
+            Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file))
+        )
+        self.active_interfaces.Add(interface)
+
     def CalculateScreenSizeMultiplier(self, old_resolution, new_resolution):
         """
         Based on a source and target resolution,
@@ -130,3 +146,15 @@ class Scene:
             final_resolution.append(old_resolution[1] / new_resolution[1])
 
         return tuple(final_resolution)
+
+    def Pause(self):
+        # @TODO: Implement a per-scene flag that controls whether pausing is allowed
+        self.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
+        self.Draw()
+        self.paused = True
+
+    def Unpause(self):
+        # @TODO: Implement a per-scene flag that controls whether pausing is allowed
+        self.active_interfaces.Remove("!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&")
+        self.Draw()
+        self.paused = False

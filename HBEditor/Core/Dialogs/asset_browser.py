@@ -76,17 +76,21 @@ class AssetBrowser(QtWidgets.QDialog):
         if self.exec():
             selection = self.asset_list.selectedItems()
             if selection:
-                if self.asset_list.isColumnHidden(0):
-                    asset_name = selection[0].text()
-                    asset_path = selection[1].text()
-                else:
-                    asset_name = selection[1].text()
-                    asset_path = selection[2].text()
 
-                if self.GetUsingEngineContent():
-                    return f"HBEngine/{asset_path}/{asset_name}"
+                if self.asset_list.selectedIndexes()[0].row() == 0:
+                    return "None"
                 else:
-                    return f"{asset_path}/{asset_name}"
+                    if self.asset_list.isColumnHidden(0):
+                        asset_name = selection[0].text()
+                        asset_path = selection[1].text()
+                    else:
+                        asset_name = selection[1].text()
+                        asset_path = selection[2].text()
+
+                    if self.GetUsingEngineContent():
+                        return f"HBEngine/{asset_path}/{asset_name}"
+                    else:
+                        return f"{asset_path}/{asset_name}"
 
         return ""
 
@@ -126,6 +130,12 @@ class AssetBrowser(QtWidgets.QDialog):
 
     def GenerateAssetEntries(self):
         """ Create an entry for each asset in 'valid_assets', then add them to 'asset_list' """
+
+        # Always add a 'None' option as the first choice
+        self.asset_list.insertRow(self.asset_list.rowCount())
+        self.asset_list.setItem(self.asset_list.rowCount() - 1, 1, QtWidgets.QTableWidgetItem("None"))
+        #self.asset_list.setItem(self.asset_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(""))
+
         for asset_name, asset_type, asset_path in self.valid_assets:
             self.asset_list.insertRow(self.asset_list.rowCount())
 

@@ -30,11 +30,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.setContentsMargins(0, 0, 0, 0)
         self.details_layout.setSpacing(0)
 
-        # Create title
-        self.details_title = QtWidgets.QLabel(self)
-        self.details_title.setObjectName("h1")
-        self.details_title.setText("Details")
-
         # Create the toolbar
         #self.details_toolbar = QtWidgets.QToolBar(self)
 
@@ -46,6 +41,7 @@ class DetailsPanel(QtWidgets.QWidget):
         # Create Details List
         #@TODO: Investigate implementing 'dataChanged' signal so the Array entry can bubble up a refresh call
         self.details_tree = QtWidgets.QTreeWidget(self)
+        self.details_tree.setObjectName("no-top")
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
@@ -67,7 +63,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
-        self.details_layout.addWidget(self.details_title)
         self.details_layout.addWidget(self.details_tree)
 
     def Populate(self, selected_entry):

@@ -47,10 +47,11 @@ class SimpleCheckbox(QtWidgets.QWidget):
         """ Returns whether the checkbox is checked """
         return self.checkbox.isChecked()
 
-    def Set(self, value) -> None:
+    def Set(self, value: bool) -> None:
         self.checkbox.setChecked(value)
 
     def Connect(self):
+        #@TODO: Investigate moving this to init
         self.checkbox.stateChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owner, self.Get()))
 
     def Disconnect(self):

@@ -16,8 +16,8 @@ import copy
 from typing import List
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
-from HBEditor.Core.EditorPointAndClick.scene_view import SceneView, Scene
-from HBEditor.Core.EditorPointAndClick.scene_items import RootItem
+from HBEditor.Core.EditorCommon.SceneViewer.scene_view import SceneView, Scene
+from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 from HBEditor.Core.Primitives.input_entries import InputEntryAssetSelector
 from HBEditor.Core.DataTypes.file_types import FileType
@@ -27,13 +27,22 @@ class SceneViewer(QtWidgets.QWidget):
     """
     The core scene viewer for the Point & Click editor. Allows the user to build scenes with interactable &
     non-interactable objects
+
+    Param 'selection_change_func': Called when an selection has changed. Returns list of selected items
+    Param 'add_func': Called when a new item is added. Returns the added item
     """
-    def __init__(self, core):
+    def __init__(self,
+                 core,
+                 selection_change_func: callable = None,
+                 add_func: callable = None):
         super().__init__()
 
         #@TODO: Rename this to 'owner' to be more explicit
         self.core = core
         self.viewer_size = (1280, 720)
+
+        self.selection_change_func = selection_change_func
+        self.add_func = add_func
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -49,7 +58,7 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Title Bar - Title
         self.title = QtWidgets.QLabel(self)
-        self.title.setText("Scene Viewer")
+        self.title.setText("Viewer")
         self.title.setObjectName("h1")
         self.title_bar_layout.addWidget(self.title)
         #self.title_bar_layout.addSpacerItem(QtWidgets.QSpacerItem())
@@ -110,8 +119,6 @@ class SceneViewer(QtWidgets.QWidget):
         self.sub_layout.addWidget(self.view)
         self.main_layout.addLayout(self.sub_layout)
 
-
-        
         self.view.show()
 
     def AddRenderable(self, action_data, skip_selection: bool = False) -> RootItem:
@@ -134,6 +141,9 @@ class SceneViewer(QtWidgets.QWidget):
         if not skip_selection:
             self.scene.clearSelection()
             new_item.setSelected(True)
+
+        if self.add_func:
+            self.add_func(new_item)
 
         return new_item
 
@@ -197,36 +207,12 @@ class SceneViewer(QtWidgets.QWidget):
         self.lock_button.Toggle(lock)
 
         # Inform the core so it can take additional actions
-        self.core.UpdateActiveSceneItem(selected_items)
+        if self.selection_change_func:
+            self.selection_change_func(selected_items) #@TODO: Document how to know that this takes params
 
+    def Clear(self):
+        """ Removes all items from scene """
+        self.scene.clear()
 
-class DialogSceneSettings(QtWidgets.QDialog):
-    def __init__(self):
-        super().__init__()
-
-        # Hide the OS header to lock its position
-        self.setWindowTitle("Scene Settings")
-        self.setWindowIcon(QtGui.QIcon(":/Icons/Engine_Logo.png"))
-        self.resize(400, 300)
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-
-        # Background
-        self.background_layout = QtWidgets.QHBoxLayout(self)
-        self.background_label = QtWidgets.QLabel("Background")
-        self.background_layout.addWidget(self.background_label)
-        self.background_input = InputEntryAssetSelector({}, None, {FileType.Asset_Image})
-        self.background_layout.addWidget(self.background_input)
-        self.main_layout.addLayout(self.background_layout)
-
-        # Description
-        self.description_label = QtWidgets.QLabel("Description")
-        self.main_layout.addWidget(self.description_label)
-        self.description_input = QtWidgets.QPlainTextEdit(self)
-        self.description_input.setPlaceholderText("A place to put a high-level description of the scene...")
-        self.main_layout.addWidget(self.description_input)
-
-        # Confirmation Buttons
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
-        self.main_layout.addWidget(self.button_box)
+        # Clear will destroy the default background of the scene. We need to ensure it's recreated
+        self.scene.AddDefaultBackground()

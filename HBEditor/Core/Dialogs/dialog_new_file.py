@@ -17,12 +17,12 @@ from PyQt5.QtCore import Qt
 from HBEditor.Core.DataTypes.file_types import FileType
 
 
-class DialogNewScene(QtWidgets.QDialog):
-    def __init__(self):
+class DialogNewFile(QtWidgets.QDialog):
+    def __init__(self, icon: str, window_title: str = "Choose a File Type"):
         super().__init__()
 
-        self.setWindowIcon(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")))
-        self.setWindowTitle("Choose a Scene Type")
+        self.setWindowIcon(QtGui.QIcon(QtGui.QPixmap(icon)))
+        self.setWindowTitle(window_title)
 
         self.resize(400, 300)
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -32,18 +32,6 @@ class DialogNewScene(QtWidgets.QDialog):
         self.buttons_layout = QtWidgets.QHBoxLayout(self)
 
         self.options_list = QtWidgets.QListWidget()
-        FileOption(
-            FileType.Scene_Dialogue,
-            "Scene (Dialogue)",
-            "A scene containing a sequence of dialogue between characters. These files may contain additional branches",
-            self.options_list
-        )
-        FileOption(
-            FileType.Scene_Point_And_Click,
-            "Scene (Point & Click)",
-            "A scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
-            self.options_list
-        )
 
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
@@ -68,10 +56,6 @@ class DialogNewScene(QtWidgets.QDialog):
         self.options_list.currentItemChanged.connect(self.UpdateDescription)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-
-        # Weird fix: For some reason, QListWidgets don't "select" the first entry by default despite it being
-        # considered the "currentitem". This makes for a weird visual bug, so let's forcefully select it
-        self.options_list.setCurrentRow(0)
 
     def UpdateDescription(self):
         """ Updates the displayed description for the selected option """
@@ -104,4 +88,23 @@ class FileOption(QtWidgets.QListWidgetItem):
         return self.file_type
 
 
+class DialogNewScene(DialogNewFile):
+    def __init__(self):
+        super().__init__(":/Icons/AM_Scene.png", "Choose a Scene Type")
 
+        FileOption(
+            FileType.Scene_Dialogue,
+            "Scene (Dialogue)",
+            "A scene containing a sequence of dialogue between characters. These files may contain additional branches",
+            self.options_list
+        )
+        FileOption(
+            FileType.Scene_Point_And_Click,
+            "Scene (Point & Click)",
+            "A scene with interactable objects. Perfect for designing Point & Click scenes, or interactive maps",
+            self.options_list
+        )
+
+        # Weird fix: For some reason, QListWidgets don't "select" the first entry by default despite it being
+        # considered the "currentitem". This makes for a visual bug, so let's forcefully select it
+        self.options_list.setCurrentRow(0)

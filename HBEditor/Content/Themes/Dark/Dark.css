@@ -140,14 +140,14 @@ QHeaderView {
     QHeaderView#outliner:section {
       border-top: 0px solid transparent; }
 
-QListView#dialogue-branch-panel:item {
+QListView#groups-panel:item {
   border: 0px solid transparent;
   background-color: #2A2A2B;
   outline: none;
   color: rgba(255, 255, 255, 80%);
   selection-background-color: #1E384D;
   selection-color: rgba(255, 255, 255, 80%); }
-  QListView#dialogue-branch-panel:item:selected {
+  QListView#groups-panel:item:selected {
     background-color: #1E384D; }
 
 QTableView {
@@ -165,20 +165,9 @@ QTreeView {
   background-color: #2A2A2B;
   outline: none;
   qproperty-indentation: 10; }
-  QTreeView#outliner {
-    /* The outliner doesn't use any padding */
-    border: 0px solid transparent;
-    background-color: #2A2A2B; }
-    QTreeView#outliner:item {
-      padding: 0px;
-      background-color: #2A2A2B;
-      color: rgba(255, 255, 255, 80%);
-      selection-background-color: #585D61;
-      selection-color: rgba(255, 255, 255, 80%); }
-      QTreeView#outliner:item:hover {
-        background-color: #2D5373; }
-      QTreeView#outliner:item:selected:active {
-        background-color: #1E384D; }
+  QTreeView#no-top {
+    /* Remove the top border */
+    border-top: 0px solid transparent; }
   QTreeView:item {
     padding: 3px;
     background-color: #2A2A2B; }

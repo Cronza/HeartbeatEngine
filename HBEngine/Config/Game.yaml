@@ -27,6 +27,10 @@ Button:
   sprite: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
   sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
   sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png
+  checkbox_sprite: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
+  checkbox_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
+  checkbox_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
+  checkbox_sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
   z_order: 10001
   font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
 Dialogue:
@@ -41,7 +45,7 @@ Dialogue:
   - 253
   - 253
   speaker_text_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  speaker_text_z_order: 10000
+  speaker_text_z_order: 10001
   speaker_text_center_align: true
   speaker_text_wrap_bounds:
   - 0.25
@@ -55,17 +59,11 @@ Dialogue:
   - 253
   - 253
   dialogue_text_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  dialogue_text_z_order: 10000
+  dialogue_text_z_order: 10001
   dialogue_text_center_align: false
   dialogue_text_wrap_bounds:
   - 0.8
   - 0.16
-  dialogue_frame_sprite: HBEngine/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
-  dialogue_frame_z_order: 9999
-  dialogue_frame_center_align: true
-  dialogue_frame_position:
-  - 0.5
-  - 0.8
   choice_button_sprite: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
   choice_button_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
   choice_button_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
@@ -84,5 +82,9 @@ Dialogue:
   - 255
   - 255
   choice_button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+Audio:
+  mute: false
+  volume_music: 100
+  volume_sfx: 100
 Pause Menu:
-  data_file: HBEngine/Content/Objects/Interface/PauseMenu/Test_Pause_Menu_01.yaml
+  data_file: ''

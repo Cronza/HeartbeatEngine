@@ -60,8 +60,10 @@ class Scene(QtWidgets.QGraphicsScene):
         super().__init__(rect)
 
         self.scene_size = rect  # type: QtCore.QRectF
+        self.AddDefaultBackground()
 
-        # Create a default background (since the scene is, by default, transparent)
+    def AddDefaultBackground(self):
+        """ Create a default background (since the scene is, by default, transparent) """
         self.setBackgroundBrush(QtCore.Qt.darkGray)
         background = self.addRect(
             QtCore.QRectF(0, 0, self.scene_size.width(), self.scene_size.height()),

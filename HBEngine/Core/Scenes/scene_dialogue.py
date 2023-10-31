@@ -29,18 +29,19 @@ class DialogueScene(PointAndClickScene):
     def Update(self, events):
         super().Update(events)
 
-        for event in events:
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    # Skip the running action if it's able to be skipped
-                    if self.a_manager.active_actions:
-                        for action in self.a_manager.active_actions:
-                            if action.skippable:
-                                action.Skip()
+        if not self.paused:
+            for event in events:
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_SPACE:
+                        # Skip the running action if it's able to be skipped
+                        if self.a_manager.active_actions:
+                            for action in self.a_manager.active_actions:
+                                if action.skippable:
+                                    action.Skip()
 
-                    # No actions active. Go to next
-                    else:
-                        self.LoadAction()
+                        # No actions active. Go to next
+                        else:
+                            self.LoadAction()
 
     def LoadAction(self):
         """
@@ -54,7 +55,6 @@ class DialogueScene(PointAndClickScene):
             # to access the action data stored as the value
             name = next(iter(action_data))
             data = action_data[name]
-
             if "post_wait" in data:
                 if "wait_for_input" in data["post_wait"]:
                     self.a_manager.PerformAction(data, name)
@@ -75,13 +75,20 @@ class DialogueScene(PointAndClickScene):
 
     def LoadSceneData(self):
         """ Load the full dialogue structure, and load the first action """
-        self.dialogue_data = self.scene_data['dialogue']
+        if "dialogue" in self.scene_data:
+            self.dialogue_data = self.scene_data['dialogue']
 
-        # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
-        #if 'characters' in self.scene_data:
-            #self.LoadCharacters()
+            # Dialogue Scenes can read speaker files in order to prepare a variety of values for the dialogue to reference
+            #if 'characters' in self.scene_data:
+                #self.LoadCharacters()
 
-        self.LoadAction()
+            # Load any applicable interfaces
+            if self.scene_data["settings"]["interface"]:
+                self.LoadInterface(self.scene_data["settings"]["interface"])
+
+            self.LoadAction()
+        else:
+            raise ValueError("'dialogue' missing from the scene file")
 
     def SwitchDialogueBranch(self, branch):
         """ Given a branch name within the active dialogue file, switch to using it """

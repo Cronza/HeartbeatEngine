@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import os
+import os, errno
 import sys
 import shutil
 import re
@@ -25,12 +25,15 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.engine_launcher import EngineLauncher
-from HBEditor.Core.Dialogs.dialog_new_scene import DialogNewScene
+from HBEditor.Core.Dialogs.dialog_new_file import DialogNewScene
+from HBEditor.Core.EditorInterface.dialog_new_interface import DialogNewInterface
 from HBEditor.Core.Dialogs.dialog_file_system import DialogFileSystem
 from HBEditor.Core.Dialogs.dialog_list import DialogList
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
+from HBEditor.Core.EditorInterface.editor_interface import EditorInterface
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from HBEditor.Core.EditorUtilities import path
 from Tools.HBBuilder.hb_builder import HBBuilder
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
@@ -220,6 +223,52 @@ class HBEditor:
 
         return "", None
 
+    def NewInterface(self, parent_dir: str) -> tuple:
+        """
+        Given a partial path with the content folder as the root, prompt the user to create a new interface in that
+        location. If successful, register that file in the asset registry and return the name and type of the file.
+        Otherwise, return "", None
+        """
+        if not settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            new_interface_prompt = DialogNewInterface()
+            new_interface_prompt.exec()
+            selected_name = new_interface_prompt.GetName()
+            selected_template_path = new_interface_prompt.GetSelection()
+
+            if selected_name:
+                if self.ValidateFileName(selected_name):
+                    file_name = f"{selected_name}.interface"
+                    full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
+
+                    if not os.path.exists(full_path):
+                        # Create the interface file. If the user chose to create using a template, we need to clone
+                        # that file into the project instead
+                        if selected_template_path:
+                            shutil.copy(path.ResolveFilePath(selected_template_path), full_path)
+                        else:
+                            with open(full_path, 'w'):
+                                Logger.getInstance().Log(f"File created - {full_path}", 2)
+
+                        settings.RegisterAsset(parent_dir, file_name, FileType.Interface)
+
+                        # Create the editor, then export to initially populate the new file. If the user chose to create
+                        # using a template, import it instead and skip the initial export
+                        if selected_template_path:
+                            self.OpenEditor(full_path, FileType.Interface, True)
+                        else:
+                            self.OpenEditor(full_path, FileType.Interface)
+                            self.active_editor.Export()
+
+                        return file_name, FileType.Interface
+                    else:
+                        self.ShowFileAlreadyExistsPrompt()
+                else:
+                    self.ShowInvalidFileNamePrompt()
+
+        return "", None
+
     def DeleteFileOrFolder(self, partial_file_path: str, is_folder: True) -> bool:
         """
         Given a partial path with the content folder as the root, prompt the user for confirmation before deleting
@@ -256,11 +305,17 @@ class HBEditor:
                 else:
                     self.CloseEditor(full_path)
 
+                # Delete the file or folder
                 try:
                     if is_folder:
                         shutil.rmtree(full_path)
                     else:
-                        os.remove(full_path)
+                        try:
+                            os.remove(full_path)
+                        except OSError as exc:
+                            if exc.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
+                                raise exc
+
                 except Exception as exc:
                     Logger.getInstance().Log(f"Failed to delete '{full_path}' - Please review the exception to understand more\n{exc}", 4)
                 else:
@@ -429,14 +484,18 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
+            full_path = f"{settings.user_project_dir}/{partial_file_path}"
 
             # Validate whether the selected file is capable of being opened
             # Note: This is expected to change in a future release
+            if ".interface" in partial_file_path:
+                file_type = FileType.Interface
+                self.OpenEditor(full_path, file_type, True)
+                return True
             if ".yaml" not in partial_file_path:
                 Logger.getInstance().Log("File type does not have any interact functionality", 3)
                 return False
             else:
-                full_path = f"{settings.user_project_dir}/{partial_file_path}"
                 # Read the first line to determine the type of file
                 with open(full_path) as f:
                     # Check the metadata at the top of the file to see which file type this is
@@ -575,12 +634,13 @@ class HBEditor:
             if self.active_editor:
                 self.active_editor.Export()
 
-    def OpenEditor(self, target_file_path, editor_type, import_file=False):
+    def OpenEditor(self, target_file_path: str, editor_type: FileType, import_file: bool =False):
         """ Creates an editor tab based on the provided file information """
         if not settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
             editor_classes = {
                 FileType.Scene_Dialogue: EditorDialogue,
                 FileType.Scene_Point_And_Click: EditorPointAndClick,
+                FileType.Interface: EditorInterface,
                 FileType.Project_Settings: EditorProjectSettings
              }
 

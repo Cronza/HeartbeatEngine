@@ -45,7 +45,7 @@
 #   - [Editor Only] 'flags' is a list of key words that various sub-editors can use. Options:
 #                   -  'preview' controls whether certain editors can show the value of the parameter in additional areas of the interface
 #                   -  'no_exclusion' controls whether to remove editor-specific property exclusions for a property and its children. This
-#                      is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and you
+#                      is necessary when editors such as PointAndClick have blanket exclusions for properties such as 'post_wait', and
 #                      you need it available for a particular action
 #                   - 'global_active' controls whether the parameter will use the global value, or 'value' / 'default'
 #   - [Editor Only] 'template' is a special keyword for parameters that allow children to be dynamically created by the
@@ -64,8 +64,8 @@ create_sprite:
 
     sprite:
       type: "Asset_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
-      default: "HBEngine/Content/Sprites/Placeholder.png"
+      value: "None"
+      default: "None"
       flags: ["editable", "preview"]
 
     position:
@@ -128,11 +128,12 @@ create_background:
       type: "String"
       value: "Background"
       default: "Background"
+      flags: ["editable"]
 
     sprite:
       type: "Asset_Image"
-      value: "HBEngine/Content/Sprites/Placeholder.png"
-      default: "HBEngine/Content/Sprites/Placeholder.png"
+      value: "None"
+      default: "None"
       flags: ["editable", "preview"]
 
     position:
@@ -258,6 +259,22 @@ create_text:
         - "wait_until_complete"
       flags: ["editable", "preview"]
 
+    connect_project_setting:
+      type: "Container"
+      flags: [ "editable", "preview" ]
+      children:
+        category:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
+        setting:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
 remove_renderable:
   display_name: "Remove Renderable"
   requirements:
@@ -297,6 +314,73 @@ remove_renderable:
       flags: ["editable", "preview"]
 
 # Interactables
+
+create_interactable:
+  display_name: "Create Interactable"
+  requirements:
+    key:
+      type: "String"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
+
+    position:
+      type: "Vector2"
+      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
+      flags: ["editable", "preview"]
+
+    center_align:
+      type: "Bool"
+      value: True
+      default: True
+      flags: ["editable"]
+
+    sprite:
+      type: "Asset_Image"
+      value: "None"
+      default: "None"
+      flags: ["editable", "preview"]
+
+    sprite_hover:
+      type: "Asset_Image"
+      value: "None"
+      default: "None"
+      flags: ["editable", "preview"]
+
+    sprite_clicked:
+      type: "Asset_Image"
+      value: "None"
+      default: "None"
+      flags: ["editable", "preview"]
+
+    z_order:
+      type: "Int"
+      value: 0
+      default: 0
+      flags: ["editable"]
+
+    events:
+      type: "Array"
+      flags: ["editable", "no_exclusion"]
+      template:
+        event:
+          type: "Array_Element"
+          flags: ["editable"]
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+                - "scene_fade_out"
+                - "scene_fade_in"
+                - "play_sfx"
+                - "set_mute"
+              flags: ["editable"]
 
 create_button:
   display_name: "Create Button"
@@ -409,6 +493,106 @@ create_button:
           value: 10002
           default: 10002
 
+        wrap_bounds:
+          type: "Vector2"
+          value: [ 0.2,0.2 ]
+          default: [ 0.2,0.2 ]
+          flags: ["editable"]
+
+    events:
+      type: "Array"
+      flags: [ "editable", "no_exclusion" ]
+      template:
+        event:
+          type: "Array_Element"
+          flags: [ "editable" ]
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+                - "scene_fade_out"
+                - "scene_fade_in"
+                - "play_sfx"
+                - "set_mute"
+              flags: [ "editable" ]
+
+create_checkbox:
+  display_name: "Create Checkbox"
+  requirements:
+    key:
+      type: "String"
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
+
+    position:
+      type: "Vector2"
+      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
+      flags: ["editable", "preview"]
+
+    center_align:
+      type: "Bool"
+      value: True
+      default: True
+      flags: ["editable"]
+
+    sprite:
+      type: "Asset_Image"
+      value: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png"
+      default: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png"
+      global: ["Button", "checkbox_sprite"]
+      flags: ["editable", "preview", "global_active"]
+
+    sprite_hover:
+      type: "Asset_Image"
+      value: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png"
+      default: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png"
+      global: ["Button", "checkbox_sprite_hover"]
+      flags: ["editable", "global_active"]
+
+    sprite_clicked:
+      type: "Asset_Image"
+      value: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png"
+      default: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png"
+      global: ["Button", "checkbox_sprite_clicked"]
+      flags: ["editable", "global_active"]
+
+    sprite_icon:
+      type: "Asset_Image"
+      value: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png"
+      default: "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png"
+      global: [ "Button", "checkbox_sprite_icon" ]
+      flags: [ "editable", "global_active" ]
+
+    z_order:
+      type: "Int"
+      value: 10001
+      default: 10001
+      global: ["Button", "z_order"]
+      flags: ["editable", "global_active"]
+
+    connect_project_setting:
+      type: "Container"
+      flags: [ "editable", "preview" ]
+      children:
+        category:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
+        setting:
+          type: "String"
+          value: ""
+          default: ""
+          flags: [ "editable", "preview" ]
+
     events:
       type: "Array"
       flags: ["editable", "no_exclusion"]
@@ -428,55 +612,105 @@ create_button:
                 - "scene_fade_out"
                 - "scene_fade_in"
                 - "play_sfx"
+                - "set_mute"
               flags: ["editable"]
 
-# Dialogue
-
-create_dialogue_interface:
-  display_name: "Create Dialogue Interface"
+create_text_button:
+  display_name: "Create Button (Text Only)"
   requirements:
     key:
       type: "String"
-      value: "DialogueFrame"
-      default: "DialogueFrame"
-
-    sprite:
-      type: "Asset_Image"
-      value: "None"
-      default: "None"
-      global: ["Dialogue", "dialogue_frame_sprite"]
-      flags: ["editable", "preview", "global_active"]
+      value: ""
+      default: ""
+      flags: ["editable", "preview"]
 
     position:
       type: "Vector2"
-      value: [0,0]
-      default: [0,0]
-      global: ["Dialogue", "dialogue_frame_position"]
-      flags: ["editable", "preview", "global_active"]
+      value: [ 0.5, 0.5 ]
+      default: [ 0.5, 0.5 ]
+      flags: ["editable", "preview"]
 
     center_align:
       type: "Bool"
       value: True
       default: True
-      global: ["Dialogue", "dialogue_frame_center_align"]
-      flags: ["editable", "preview", "global_active"]
+      flags: ["editable"]
 
-    z_order:
-      type: "Int"
-      value: 9999
-      default: 9999
-      global: ["Dialogue", "dialogue_frame_z_order"]
-      flags: ["global_active"]
-
-    post_wait:
-      type: "Dropdown"
-      value: "no_wait"
-      default: "no_wait"
-      options:
-        - "no_wait"
-        - "wait_for_input"
-        - "wait_until_complete"
+    text:
+      type: "String"
+      value: "Default"
+      default: "Default"
       flags: ["editable", "preview"]
+
+    text_size:
+      type: "Int"
+      value: 24
+      default: 24
+      global: ["Text", "size"]
+      flags: ["editable", "global_active"]
+
+    text_color:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    text_color_hover:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    text_color_clicked:
+      type: "Color"
+      value: [ 255, 255, 255 ]
+      default: [ 255, 255, 255 ]
+      global: ["Text", "color"]
+      flags: ["editable", "global_active"]
+
+    font:
+      type: "Asset_Font"
+      value: "None"
+      default: "None"
+      global: ["Button", "font"]
+      flags: ["editable", "global_active"]
+
+    z_order: # Button text generate it's z_order based on the parent's. However, the param is still needed
+      type: "Int"
+      value: 10002
+      default: 10002
+
+    wrap_bounds:
+      type: "Vector2"
+      value: [ 0.2,0.2 ]
+      default: [ 0.2,0.2 ]
+      flags: ["editable"]
+
+    events:
+      type: "Array"
+      flags: ["editable", "no_exclusion"]
+      template:
+        event:
+          type: "Array_Element"
+          flags: ["editable"]
+          children:
+            action:
+              type: "Event"
+              value: "None"
+              default: "None"
+              options:
+                - "None"
+                - "load_scene"
+                - "quit_game"
+                - "scene_fade_out"
+                - "scene_fade_in"
+                - "play_sfx"
+                - "set_mute"
+              flags: ["editable"]
+
+# Dialogue
 
 dialogue:
   display_name: "Dialogue"
@@ -655,6 +889,7 @@ dialogue:
       type: "String"
       value: "wait_for_input"
       default: "wait_for_input"
+      flags: ["no_exclusion"]
 
 choice:
   display_name: "Choice"
@@ -686,22 +921,22 @@ choice:
 
             sprite:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png"
               global: ["Dialogue", "choice_button_sprite"]
               flags: ["editable", "preview", "global_active"]
 
             sprite_hover:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png"
               global: [ "Dialogue", "choice_button_sprite_hover" ]
               flags: ["editable", "global_active"]
 
             sprite_clicked:
               type: "Asset_Image"
-              value: "HBEngine/Content/Sprites/Placeholder.png"
-              default: "HBEngine/Content/Sprites/Placeholder.png"
+              value: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png"
+              default: "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png"
               global: [ "Dialogue", "choice_button_sprite_clicked" ]
               flags: ["editable", "global_active"]
 
@@ -769,10 +1004,16 @@ choice:
                   global: ["Dialogue", "choice_button_font"]
                   flags: ["editable", "global_active"]
 
-                z_order: # Button text generate it's  z_order based on the parent's. However, the param is still needed
+                z_order: # Button text generate its z_order based on the parent's. However, the param is still needed
                   type: "Int"
                   value: 10002
                   default: 10002
+
+                wrap_bounds:
+                  type: "Vector2"
+                  value: [ 0.25,0.25 ]
+                  default: [ 0.25,0.25 ]
+                  flags: [ "editable" ]
 
 # Scene
 
@@ -839,7 +1080,7 @@ scene_fade_out:
         - "wait_until_complete"
       flags: [ "editable" ]
 
-# Play Music
+# Audio
 
 play_sfx:
   display_name: "Play SFX"
@@ -862,6 +1103,12 @@ play_sfx:
       default: 1.0
       flags: ["editable", "preview"]
 
+    loop:
+      type: "Bool"
+      value: False
+      default: False
+      flags: [ "editable", "preview" ]
+
     post_wait:
       type: "Dropdown"
       value: "wait_until_complete"
@@ -870,6 +1117,15 @@ play_sfx:
         - "no_wait"
         - "wait_until_complete"
       flags: ["editable", "preview", "no_exclusion"]
+
+stop_sfx:
+  display_name: "Stop SFX"
+  requirements:
+    key:
+      type: "String"
+      value: "SFX"
+      default: "SFX"
+      flags: ["editable", "preview"]
 
 play_music:
   display_name: "Play Music"
@@ -901,15 +1157,6 @@ play_music:
         - "wait_until_complete"
       flags: ["editable", "preview"]
 
-stop_sfx:
-  display_name: "Stop SFX"
-  requirements:
-    key:
-      type: "String"
-      value: "SFX"
-      default: "SFX"
-      flags: ["editable", "preview"]
-
 stop_music:
   display_name: "Stop Music"
   requirements:
@@ -918,6 +1165,55 @@ stop_music:
       value: ""
       default: ""
       flags: ["editable", "preview"]
+
+set_mute:
+  display_name: "Set Mute"
+  requirements:
+    toggle:
+      type: "Bool"
+      value: True
+      default: True
+      flags: [ "editable" ]
+
+    value:
+      type: "Bool"
+      value: True
+      default: True
+      flags: [ "editable" ]
+
+# Interface
+
+pause:
+  display_name: "Pause"
+  requirements: {}
+
+unpause:
+  display_name: "Unpause"
+  requirements: {}
+
+switch_page:
+  display_name: "Switch page"
+  requirements:
+    owner:
+      type: "String"
+      value: ""
+      default: ""
+      flags: [ "editable" ]
+
+    page:
+      type: "String"
+      value: ""
+      default: ""
+      flags: [ "editable" ]
+
+remove_page:
+  display_name: "Pause"
+  requirements:
+    owner:
+      type: "String"
+      value: ""
+      default: ""
+      flags: [ "editable" ]
 
 # Utilities
 

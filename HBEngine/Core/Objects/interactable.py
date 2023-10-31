@@ -57,7 +57,6 @@ class Interactable(SpriteRenderable):
         super().update()
         # If being hovered...
         if self.rect.collidepoint(pygame.mouse.get_pos()):
-            print("Collided")
             if not self.scene.stop_interactions:
                 # If not already in the hover state...
                 if self.state is State.normal:
@@ -117,12 +116,13 @@ class Interactable(SpriteRenderable):
                 else:
                     self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"])
                     self.ContinueInteract()
-
+            else:
+                self.scene.Draw()
         elif "event" in self.renderable_data:
             event_data = self.renderable_data["event"]
             self.scene.a_manager.PerformAction(event_data, event_data["action"])
         else:
-            print("No events defined for this object - Interacting does nothing")
+            self.scene.Draw()
 
     def ContinueInteract(self):
         self.interact_events.pop(0)
@@ -138,28 +138,23 @@ class Interactable(SpriteRenderable):
         Load each of the state sprites in. This is arguably faster than loading them only when necessary, especially
         due to the speed at which they are requested when the user spams the hover or click events
         """
-        state_missing_warning = " - Defaulting the state to use the 'Normal' sprite"
-        hover_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
-        clicked_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
 
         if "sprite_hover" in self.renderable_data:
-            if self.renderable_data['sprite_hover'] != "":
+            hover_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_hover"])
+            if self.renderable_data['sprite_hover'] != "None" and self.renderable_data['sprite_hover'] != "":
                 self.hover_surface = pygame.image.load(hover_sprite).convert_alpha()
             else:
-                print("No hover sprite specified" + state_missing_warning)
                 self.hover_surface = self.surface
         else:
-            print("No hover sprite specified" + state_missing_warning)
             self.hover_surface = self.surface
 
         if 'sprite_clicked' in self.renderable_data:
-            if self.renderable_data["sprite_clicked"] != "":
+            clicked_sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data["sprite_clicked"])
+            if self.renderable_data['sprite_clicked'] != "None" and self.renderable_data['sprite_clicked'] != "":
                 self.clicked_surface = pygame.image.load(clicked_sprite).convert_alpha()
             else:
-                print("No clicked sprite specified" + state_missing_warning)
                 self.clicked_surface = self.surface
         else:
-            print("No clicked sprite specified" + state_missing_warning)
             self.clicked_surface = self.surface
 
     def GetSurface(self):

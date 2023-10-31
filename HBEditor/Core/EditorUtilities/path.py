@@ -18,7 +18,6 @@ from HBEditor.Core import settings
 
 
 # Default files that live in the engine content directory and are available to all projects
-DEFAULT_SPRITE = "Content/Sprites/Placeholder.png"
 DEFAULT_FONT = "Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
 
 
@@ -27,15 +26,13 @@ def ConvertPartialToAbsolutePath(partial_path):
     return f"{settings.editor_root}/{partial_path}"
 
 
-def ResolveFilePath(path: str, default_path: str):
-    """ Given a relative image path, return an absolute variant """
-    # If the user provided a null path, return the default sprite
-    if path == "" or path.lower() == "none":
-        Logger.getInstance().Log(f"No path provided - Loading default file: '{default_path}'", 3)
-        return f"{settings.engine_root}/{default_path}"
-
+def ResolveFilePath(path: str, fallback_path: str = ""):
+    """
+    Given a relative file path, return an absolute variant. If 'fallback_path' is provided, load it instead if
+    'path' can not be found or is null
+    """
     # If the path (assumably) points to the engine, check if the path exists within the engine root
-    elif path.startswith("HBEngine"):
+    if path.startswith("HBEngine"):
         full_eng_path = f"{settings.engine_root}{path[len('HBEngine'):]}"
         if Path(full_eng_path).exists():
             return full_eng_path
@@ -45,13 +42,11 @@ def ResolveFilePath(path: str, default_path: str):
         if Path(f"{settings.user_project_dir}/{path}").exists():
             return f"{settings.user_project_dir}/{path}"
         else:
-            Logger.getInstance().Log(f"File does not Exist: '{path}' - Loading default file: '{default_path}'", 3)
-            return f"{settings.engine_root}/{default_path}"
-
-
-def ResolveImageFilePath(path: str,):
-    """ Given a relative image path, return an absolute variant """
-    return ResolveFilePath(path, DEFAULT_SPRITE)
+            if fallback_path:
+                Logger.getInstance().Log(f"File does not Exist: '{path}' - Loading default file: '{fallback_path}'", 3)
+                return f"{settings.engine_root}/{fallback_path}"
+            else:
+                Logger.getInstance().Log(f"File does not Exist: '{path}'", 3)
 
 
 def ResolveFontFilePath(path: str):

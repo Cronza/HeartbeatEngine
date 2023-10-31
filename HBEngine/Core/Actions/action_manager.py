@@ -42,15 +42,16 @@ class ActionManager:
                         action.completion_callback()
                     del self.active_actions[action]
 
-    def PerformAction(self, action_data, action_name, completion_callback=None):
+    def PerformAction(self, action_data: dict, action_name: str, completion_callback: callable = None, no_draw: bool = False):
         """
-        Given an action_data YAML block and an action name, create and run the associated action
+        Given an action_data YAML block and an action name, create and run the associated action. Return anything
+        that the action opts to return
         """
 
         # Fetch the action function corresponding to the next action index
         action = self.GetAction(action_name)
 
-        new_action = action(self.scene, action_data, self)
+        new_action = action(self.scene, action_data, self, no_draw)
 
         # If the calling function wishes to be informed when the action is completed, opt in here
         if completion_callback:
@@ -63,7 +64,7 @@ class ActionManager:
 
     def GetAction(self, action_name):
         """
-        Returns the object associated with the provided action text
+        Returns the object associated with the provided action text. Returns 'None' if the action isn't found
         """
         # Get a list of the action objects in the form of a list of tuples (object_name, object),
         # and use the given action text as a lookup for an action in the list. If found, return it, otherwise

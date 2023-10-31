@@ -5,14 +5,17 @@ Renderables:
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "create_background"
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "create_text"
       applicable_editors:
         - Scene_Dialogue
         - Scene_Point_And_Click
+        - Interface
     - name: "remove_renderable"
       applicable_editors:
         - Scene_Dialogue
@@ -23,13 +26,15 @@ Interactables:
     - name: "create_button"
       applicable_editors:
         - Scene_Point_And_Click
+        - Interface
+    - name: "create_text_button"
+      applicable_editors:
+        - Scene_Point_And_Click
+        - Interface
 
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"
   options:
-    - name: "create_dialogue_interface"
-      applicable_editors:
-        - Scene_Dialogue
     - name: "dialogue"
       applicable_editors:
         - Scene_Dialogue
@@ -65,3 +70,7 @@ Sound:
     - name: "stop_music"
       applicable_editors:
         - Scene_Dialogue
+    - name: "set_mute"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click

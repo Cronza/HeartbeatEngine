@@ -25,20 +25,24 @@ class SpriteRenderable(Renderable):
         - Backgrounds
         - etc
     """
-    def __init__(self, scene, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None):
+    def __init__(self, scene, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None,
+                 use_placeholder: bool = True):
         super().__init__(scene, renderable_data, parent)
 
-        # YAML Parameters
-        sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
+        if "sprite" in self.renderable_data:
+            if self.renderable_data['sprite'] != "None" and self.renderable_data['sprite'] != "":
+                sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
 
-        try:
-            self.surface = pygame.image.load(sprite).convert_alpha()
-            self.rect = self.surface.get_rect()
-        except Exception as exc:
-            raise ValueError(f"Failed to load sprite: '{sprite}' - Either the file was not found, or it is not a "
-                  f"supported file type") from None  # PEP 409: Suppressing exception context
+                try:
+                    self.surface = pygame.image.load(sprite).convert_alpha()
+                    self.rect = self.surface.get_rect()
+                except Exception as exc:
+                    raise ValueError(f"Failed to load sprite: '{sprite}' - Either the file was not found, or it is not a "
+                          f"supported file type\n Exception: {exc}") from None  # PEP 409: Suppressing exception context
 
-        # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
-        # to defer this though if they need to do any additional work beforehand
-        if initial_rescale:
-            self.RecalculateSize(self.scene.resolution_multiplier)
+                # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
+                # to defer this though if they need to do any additional work beforehand
+                if initial_rescale:
+                    self.RecalculateSize(self.scene.resolution_multiplier)
+
+

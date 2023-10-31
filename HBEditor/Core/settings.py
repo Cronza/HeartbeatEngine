@@ -57,6 +57,7 @@ def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
 
     SaveHeartbeatFile(asset_registry)
 
+
 def RegisterAssetFolder(path_to_create: str):
     """ Registers the provided folder path. This must be a partial path with the content directory as the root """
     global asset_registry
@@ -195,13 +196,14 @@ project_default_files = {
 
 # The master dict of file types supported by the engine / editor
 supported_file_types = {
+    ".interface": FileType.Interface,
     ".png": FileType.Asset_Image,
     ".jpg": FileType.Asset_Image,
     ".yaml": FileType.Asset_Data,
     ".ttf": FileType.Asset_Font,
     ".mp3": FileType.Asset_Sound,
     ".wav": FileType.Asset_Sound,
-    ".ogg": FileType.Asset_Sound,
+    ".ogg": FileType.Asset_Sound
 }
 
 # A dict of types of files, and the individual formats which are supported in the engine / editor. This is a

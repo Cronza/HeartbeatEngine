@@ -18,12 +18,13 @@ from enum import Enum
 class FileType(Enum):
     Folder = 1
     Project_Settings = 2
-    Scene_Dialogue = 3
-    Scene_Point_And_Click = 4
-    Asset_Data = 5
-    Asset_Image = 6
-    Asset_Font = 7
-    Asset_Sound = 8
+    Interface = 3
+    Scene_Dialogue = 4
+    Scene_Point_And_Click = 5
+    Asset_Data = 6
+    Asset_Image = 7
+    Asset_Font = 8
+    Asset_Sound = 9
     #Character = 3
 
 
@@ -43,6 +44,7 @@ class FileTypeDescriptions:
 class FileTypeIcons:
     icons = {
         FileType.Folder: ":/Icons/Folder.png",
+        FileType.Interface: ":/Icons/Interface.png",
         FileType.Project_Settings: ":/Icons/File.png",
         FileType.Scene_Dialogue: ":/Icons/File.png",
         FileType.Scene_Point_And_Click: ":/Icons/File.png",

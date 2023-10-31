@@ -1,10 +1,7 @@
-import math
 import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities import font
-from HBEditor.Core.DetailsPanel.base_source_entry import SourceEntry
+from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core.EditorUtilities import path
 
@@ -39,6 +36,10 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
 
         self._movement_locked = False  # User controlled
         self._movement_perm_locked = False  # System enforced - Disables the usage of 'movement_locked'
+
+        # If the implementing editor desires organizing by group, track the group who owns this widget by using a unique
+        # ID. This is commonly the name of the group
+        self.owner_id = ""
 
     def GetLocked(self):
         if self._movement_perm_locked:
@@ -276,8 +277,11 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
                 self.setPos(parent_pos)
 
     def UpdateSprite(self):
-        image = QtGui.QPixmap(path.ResolveImageFilePath(self.action_data["sprite"]["value"]))
-        self.setPixmap(image)
+        img_path = path.ResolveFilePath(self.action_data["sprite"]["value"])
+        if img_path:
+            self.setPixmap(QtGui.QPixmap(img_path))
+        else:
+            self.setPixmap(QtGui.QPixmap(":/Icons/SceneItem_Sprite.png"))
 
     def UpdateZOrder(self):
         self.setZValue(float(self.action_data["z_order"]["value"]))
@@ -393,7 +397,7 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
 
     def UpdateText(self):
         if self.action_data["text"]["value"] == "" or self.action_data["text"]["value"].lower() == "none":
-            self.action_data["text"]["value"] = "Default"
+            self.setPlainText("None")
         else:
             self.setPlainText(self.action_data["text"]["value"])
 

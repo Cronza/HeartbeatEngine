@@ -197,10 +197,14 @@ class OutlinerAsset(QtWidgets.QListWidgetItem):
         self.setText(name)
 
         self.asset_type = asset_type
-        if thumbnail_path:
-            self.setIcon(QtGui.QIcon(QtGui.QPixmap(thumbnail_path)))
-        else:
-            self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
+        try:
+            if thumbnail_path:
+                self.setIcon(QtGui.QIcon(QtGui.QPixmap(thumbnail_path)))
+            else:
+                self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
+        except:
+            Logger.getInstance().Log(f"Unable to load icon for file type '{self.asset_type}' - Using generic default")
+            self.setIcon(QtGui.QIcon(QtGui.QPixmap(":/Icons/File.png")))
 
     def GetType(self):
         return self.asset_type
@@ -262,6 +266,10 @@ class OutlinerContextMenu(QtWidgets.QMenu):
             a_new_scene = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")), "Create Scene", self)
             a_new_scene.triggered.connect(self.core.CreateScene)
             self.addAction(a_new_scene)
+
+            a_new_interface = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Interface.png")), "Create Interface", self)
+            a_new_interface.triggered.connect(self.core.CreateInterface)
+            self.addAction(a_new_interface)
 
         if active_selection:
             a_details = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Information.png")), "Details", self)

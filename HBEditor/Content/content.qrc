@@ -15,10 +15,6 @@
         <file alias="Dustismo-Italic.ttf">Fonts/Dustismo/dustismo_italic.ttf</file>
         <file alias="Dustismo-Bold.ttf">Fonts/Dustismo/dustismo_bold.ttf</file>
         <file alias="Dustismo-Bold-Italic.ttf">Fonts/Dustismo/dustismo_bold_italic.ttf</file>
-
-    </qresource>
-    <qresource prefix="Sprites">
-        <file alias="Placeholder.png">Sprites/Placeholder.png</file>
     </qresource>
     <qresource prefix="Icons">
         <file alias="Checkmark.png">Icons/Checkmark.png</file>
@@ -53,10 +49,18 @@
         <file alias="Import.png">Icons/Import.png</file>
         <file alias="Information.png">Icons/Information.png</file>
         <file alias="Rename.png">Icons/Rename.png</file>
+        <file alias="SceneItem_Sprite.png">Icons/SceneItem_Sprite.png</file>
+        <file alias="Interface.png">Icons/Interface.png</file>
     </qresource>
     <qresource prefix="Themes">
         <file alias="Dark.css">Themes/Dark/Dark.css</file>
         <file alias="Light.css">Themes/Light/Light.css</file>
+    </qresource>
+    <qresource prefix="Images">
+        <file alias="Template_Blank.jpg">Images/Thumbnails/Template_Blank.jpg</file>
+        <file alias="Template_Interface_Dialogue.jpg">Images/Thumbnails/Template_Interface_Dialogue.jpg</file>
+        <file alias="Template_Interface_Main_Menu.jpg">Images/Thumbnails/Template_Interface_Main_Menu.jpg</file>
+        <file alias="Template_Interface_Pause_Menu.jpg">Images/Thumbnails/Template_Interface_Pause_Menu.jpg</file>
     </qresource>
 </RCC>
 

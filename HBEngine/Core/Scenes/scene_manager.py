@@ -23,7 +23,6 @@ class SceneManager:
 
         # Objects
         self.window = window
-        self.active_scene = None
 
         # Cached Values (Scene agnostic)
         self.resolution_multiplier = None  # Null by default to allow the starting scene to generate a starting value
@@ -35,7 +34,6 @@ class SceneManager:
         }
 
         # Load the starting scene defined in the project settings
-        print(settings.project_settings)
         if not settings.project_settings["Game"]["starting_scene"]:
             raise ValueError("No starting scene was provided in the project settings")
         self.LoadScene(settings.project_settings["Game"]["starting_scene"])
@@ -57,8 +55,8 @@ class SceneManager:
 
         if scene_type is not None:
             if scene_type in self.scene_types:
-                del self.active_scene
-                self.active_scene = self.scene_types[scene_type](
+                del settings.active_scene
+                settings.active_scene = self.scene_types[scene_type](
                     scene_file,
                     self.window,
                     self
@@ -70,7 +68,4 @@ class SceneManager:
 
     def ResizeScene(self):
         """ Inform the scene object o resize to support a resolution change """
-        self.active_scene.Resize()
-
-    def ShowPauseMenu(self):
-        pass
+        settings.active_scene.Resize()
