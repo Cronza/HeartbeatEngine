@@ -145,6 +145,44 @@ class SoundAction(Action):
 
 class remove_renderable(Action):
     """ Based on a given key, remove the associated renderable from the renderable stack """
+    ACTION_DATA = {
+        "display_name": "Remove Renderable",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "transition": {
+                "type": "Container",
+                "flags": ["preview"],
+                "children": {
+                    "type": {
+                        "type": "Dropdown",
+                        "value": "None",
+                        "default": "None",
+                        "options": ["None", "fade_out"],
+                        "flags": ["editable", "preview"],
+                    },
+                    "speed": {
+                        "type": "Int",
+                        "value": 500,
+                        "default": 500,
+                        "flags": ["editable", "preview"],
+                    },
+                },
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "no_wait",
+                "default": "no_wait",
+                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+                "flags": ["editable", "preview"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -197,6 +235,74 @@ class remove_renderable(Action):
 
 class create_sprite(Action):
     """ Create a sprite renderable using passed in settings. Returns a 'SpriteRenderable' """
+    ACTION_DATA = {
+        "display_name": "Create Sprite",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "sprite": {
+                "type": "Asset_Image",
+                "value": "None",
+                "default": "None",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable", "preview"],
+            },
+            "z_order": {
+                "type": "Int",
+                "value": 0,
+                "default": 0,
+                "flags": ["editable", "preview"],
+            },
+            "flip": {
+                "type": "Bool",
+                "value": False,
+                "default": False,
+                "flags": ["editable"],
+            },
+            "transition": {
+                "type": "Container",
+                "flags": ["preview"],
+                "children": {
+                    "type": {
+                        "type": "Dropdown",
+                        "value": "None",
+                        "default": "None",
+                        "options": ["None", "fade_in"],
+                        "flags": ["editable", "preview"],
+                    },
+                    "speed": {
+                        "type": "Int",
+                        "value": 500,
+                        "default": 500,
+                        "flags": ["editable", "preview"],
+                    },
+                },
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "wait_for_input",
+                "default": "wait_for_input",
+                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+                "flags": ["editable", "preview"],
+            },
+        },
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -241,6 +347,41 @@ class create_background(Action):
     Creates a pre-configured 'SpriteRenderable' suitable as a background image. Returns a
     'SpriteRenderable'
     """
+
+    ACTION_DATA = {
+        "display_name": "Create Background",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "Background",
+                "default": "Background",
+                "flags": ["editable"],
+            },
+            "sprite": {
+                "type": "Asset_Image",
+                "value": "None",
+                "default": "None",
+                "flags": ["editable", "preview"],
+            },
+            "position": {"type": "Vector2", "value": [0, 0], "default": [0, 0]},
+            "center_align": {"type": "Bool", "value": False, "default": False},
+            "z_order": {"type": "Int", "value": -9999, "default": -9999},
+            "flip": {
+                "type": "Bool",
+                "value": False,
+                "default": False,
+                "flags": ["editable"],
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "no_wait",
+                "default": "no_wait",
+                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+                "flags": ["editable", "preview"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -261,6 +402,76 @@ class create_background(Action):
 
 class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable' """
+    ACTION_DATA = {
+        "display_name": "Create Interactable",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+            "sprite": {
+                "type": "Asset_Image",
+                "value": "None",
+                "default": "None",
+                "flags": ["editable", "preview"],
+            },
+            "sprite_hover": {
+                "type": "Asset_Image",
+                "value": "None",
+                "default": "None",
+                "flags": ["editable", "preview"],
+            },
+            "sprite_clicked": {
+                "type": "Asset_Image",
+                "value": "None",
+                "default": "None",
+                "flags": ["editable", "preview"],
+            },
+            "z_order": {"type": "Int", "value": 0, "default": 0, "flags": ["editable"]},
+            "events": {
+                "type": "Array",
+                "flags": ["editable", "no_exclusion"],
+                "template": {
+                    "event": {
+                        "type": "Array_Element",
+                        "flags": ["editable"],
+                        "children": {
+                            "action": {
+                                "type": "Event",
+                                "value": "None",
+                                "default": "None",
+                                "options": [
+                                    "None",
+                                    "load_scene",
+                                    "quit_game",
+                                    "scene_fade_out",
+                                    "scene_fade_in",
+                                    "play_sfx",
+                                    "set_mute",
+                                ],
+                                "flags": ["editable"],
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -287,6 +498,116 @@ class create_text(Action):
     """
     Create a TextRenderable at the target location, with the given settings. Returns a 'TextRenderable'
     """
+    ACTION_DATA = {
+        "display_name": "Create Text",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "global": ["Text", "center_align"],
+                "flags": ["editable", "global_active"],
+            },
+            "text": {
+                "type": "Paragraph",
+                "value": "Default",
+                "default": "Default",
+                "flags": ["editable", "preview"],
+            },
+            "text_size": {
+                "type": "Int",
+                "value": 24,
+                "default": 24,
+                "global": ["Text", "size"],
+                "flags": ["editable", "preview", "global_active"],
+            },
+            "text_color": {
+                "type": "Color",
+                "value": [255, 255, 255],
+                "default": [255, 255, 255],
+                "global": ["Text", "color"],
+                "flags": ["editable", "preview", "global_active"],
+            },
+            "font": {
+                "type": "Asset_Font",
+                "value": "None",
+                "default": "None",
+                "global": ["Text", "font"],
+                "flags": ["editable", "global_active"],
+            },
+            "z_order": {
+                "type": "Int",
+                "value": 0,
+                "default": 0,
+                "global": ["Text", "z_order"],
+                "flags": ["editable", "preview", "global_active"],
+            },
+            "wrap_bounds": {
+                "type": "Vector2",
+                "value": [0.2, 0.2],
+                "default": [0.2, 0.2],
+                "global": ["Text", "wrap_bounds"],
+                "flags": ["editable", "global_active"],
+            },
+            "transition": {
+                "type": "Container",
+                "flags": ["preview"],
+                "children": {
+                    "type": {
+                        "type": "Dropdown",
+                        "value": "None",
+                        "default": "None",
+                        "options": ["None", "fade_in"],
+                        "flags": ["editable", "preview"],
+                    },
+                    "speed": {
+                        "type": "Int",
+                        "value": 500,
+                        "default": 500,
+                        "flags": ["editable", "preview"],
+                    },
+                },
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "wait_for_input",
+                "default": "wait_for_input",
+                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+                "flags": ["editable", "preview"],
+            },
+            "connect_project_setting": {
+                "type": "Container",
+                "flags": ["editable", "preview"],
+                "children": {
+                    "category": {
+                        "type": "String",
+                        "value": "",
+                        "default": "",
+                        "flags": ["editable", "preview"],
+                    },
+                    "setting": {
+                        "type": "String",
+                        "value": "",
+                        "default": "",
+                        "flags": ["editable", "preview"],
+                    },
+                },
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -325,6 +646,151 @@ class create_button(Action):
     """
     Creates a button interactable, and adds it to the renderable stack. Returns a 'Button'
     """
+    ACTION_DATA = {
+        "display_name": "Create Button",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+            "sprite": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
+                "global": ["Button", "sprite"],
+                "flags": ["editable", "preview", "global_active"],
+            },
+            "sprite_hover": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
+                "global": ["Button", "sprite_hover"],
+                "flags": ["editable", "global_active"],
+            },
+            "sprite_clicked": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
+                "global": ["Button", "sprite_clicked"],
+                "flags": ["editable", "global_active"],
+            },
+            "z_order": {
+                "type": "Int",
+                "value": 10001,
+                "default": 10001,
+                "global": ["Button", "z_order"],
+                "flags": ["editable", "global_active"],
+            },
+            "button_text": {
+                "type": "Container",
+                "flags": ["editable", "preview"],
+                "children": {
+                    "position": {
+                        "type": "Vector2",
+                        "value": [0.5, 0.5],
+                        "default": [0.5, 0.5],
+                        "flags": ["editable", "preview"],
+                    },
+                    "center_align": {
+                        "type": "Bool",
+                        "value": True,
+                        "default": True,
+                        "flags": ["editable"],
+                    },
+                    "text": {
+                        "type": "String",
+                        "value": "Default",
+                        "default": "Default",
+                        "flags": ["editable", "preview"],
+                    },
+                    "text_size": {
+                        "type": "Int",
+                        "value": 24,
+                        "default": 24,
+                        "global": ["Text", "size"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text_color": {
+                        "type": "Color",
+                        "value": [255, 255, 255],
+                        "default": [255, 255, 255],
+                        "global": ["Text", "color"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text_color_hover": {
+                        "type": "Color",
+                        "value": [255, 255, 255],
+                        "default": [255, 255, 255],
+                        "global": ["Text", "color"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text_color_clicked": {
+                        "type": "Color",
+                        "value": [255, 255, 255],
+                        "default": [255, 255, 255],
+                        "global": ["Text", "color"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "font": {
+                        "type": "Asset_Font",
+                        "value": "None",
+                        "default": "None",
+                        "global": ["Button", "font"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "z_order": {"type": "Int", "value": 10002, "default": 10002},
+                    "wrap_bounds": {
+                        "type": "Vector2",
+                        "value": [0.2, 0.2],
+                        "default": [0.2, 0.2],
+                        "flags": ["editable"],
+                    },
+                },
+            },
+            "events": {
+                "type": "Array",
+                "flags": ["editable", "no_exclusion"],
+                "template": {
+                    "event": {
+                        "type": "Array_Element",
+                        "flags": ["editable"],
+                        "children": {
+                            "action": {
+                                "type": "Event",
+                                "value": "None",
+                                "default": "None",
+                                "options": [
+                                    "None",
+                                    "load_scene",
+                                    "quit_game",
+                                    "scene_fade_out",
+                                    "scene_fade_in",
+                                    "play_sfx",
+                                    "set_mute",
+                                ],
+                                "flags": ["editable"],
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -349,6 +815,105 @@ class create_text_button(Action):
     """
     Creates a text-only button interactable, and adds it to the renderable stack. Returns a 'Button'
     """
+    ACTION_DATA = {
+        "display_name": "Create Button (Text Only)",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+            "text": {
+                "type": "String",
+                "value": "Default",
+                "default": "Default",
+                "flags": ["editable", "preview"],
+            },
+            "text_size": {
+                "type": "Int",
+                "value": 24,
+                "default": 24,
+                "global": ["Text", "size"],
+                "flags": ["editable", "global_active"],
+            },
+            "text_color": {
+                "type": "Color",
+                "value": [255, 255, 255],
+                "default": [255, 255, 255],
+                "global": ["Text", "color"],
+                "flags": ["editable", "global_active"],
+            },
+            "text_color_hover": {
+                "type": "Color",
+                "value": [255, 255, 255],
+                "default": [255, 255, 255],
+                "global": ["Text", "color"],
+                "flags": ["editable", "global_active"],
+            },
+            "text_color_clicked": {
+                "type": "Color",
+                "value": [255, 255, 255],
+                "default": [255, 255, 255],
+                "global": ["Text", "color"],
+                "flags": ["editable", "global_active"],
+            },
+            "font": {
+                "type": "Asset_Font",
+                "value": "None",
+                "default": "None",
+                "global": ["Button", "font"],
+                "flags": ["editable", "global_active"],
+            },
+            "z_order": {"type": "Int", "value": 10002, "default": 10002},
+            "wrap_bounds": {
+                "type": "Vector2",
+                "value": [0.2, 0.2],
+                "default": [0.2, 0.2],
+                "flags": ["editable"],
+            },
+            "events": {
+                "type": "Array",
+                "flags": ["editable", "no_exclusion"],
+                "template": {
+                    "event": {
+                        "type": "Array_Element",
+                        "flags": ["editable"],
+                        "children": {
+                            "action": {
+                                "type": "Event",
+                                "value": "None",
+                                "default": "None",
+                                "options": [
+                                    "None",
+                                    "load_scene",
+                                    "quit_game",
+                                    "scene_fade_out",
+                                    "scene_fade_in",
+                                    "play_sfx",
+                                    "set_mute",
+                                ],
+                                "flags": ["editable"],
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -370,6 +935,110 @@ class create_checkbox(Action):
     """
     Creates a checkbox button interactable, and adds it to the renderable stack. Returns a 'Checkbox'
     """
+    ACTION_DATA = {
+        "display_name": "Create Checkbox",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "position": {
+                "type": "Vector2",
+                "value": [0.5, 0.5],
+                "default": [0.5, 0.5],
+                "flags": ["editable", "preview"],
+            },
+            "center_align": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+            "sprite": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
+                "global": ["Button", "checkbox_sprite"],
+                "flags": ["editable", "preview", "global_active"],
+            },
+            "sprite_hover": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
+                "global": ["Button", "checkbox_sprite_hover"],
+                "flags": ["editable", "global_active"],
+            },
+            "sprite_clicked": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
+                "global": ["Button", "checkbox_sprite_clicked"],
+                "flags": ["editable", "global_active"],
+            },
+            "sprite_icon": {
+                "type": "Asset_Image",
+                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
+                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
+                "global": ["Button", "checkbox_sprite_icon"],
+                "flags": ["editable", "global_active"],
+            },
+            "z_order": {
+                "type": "Int",
+                "value": 10001,
+                "default": 10001,
+                "global": ["Button", "z_order"],
+                "flags": ["editable", "global_active"],
+            },
+            "connect_project_setting": {
+                "type": "Container",
+                "flags": ["editable", "preview"],
+                "children": {
+                    "category": {
+                        "type": "String",
+                        "value": "",
+                        "default": "",
+                        "flags": ["editable", "preview"],
+                    },
+                    "setting": {
+                        "type": "String",
+                        "value": "",
+                        "default": "",
+                        "flags": ["editable", "preview"],
+                    },
+                },
+            },
+            "events": {
+                "type": "Array",
+                "flags": ["editable", "no_exclusion"],
+                "template": {
+                    "event": {
+                        "type": "Array_Element",
+                        "flags": ["editable"],
+                        "children": {
+                            "action": {
+                                "type": "Event",
+                                "value": "None",
+                                "default": "None",
+                                "options": [
+                                    "None",
+                                    "load_scene",
+                                    "quit_game",
+                                    "scene_fade_out",
+                                    "scene_fade_in",
+                                    "play_sfx",
+                                    "set_mute",
+                                ],
+                                "flags": ["editable"],
+                            }
+                        },
+                    }
+                },
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -421,6 +1090,192 @@ class dialogue(Action):
     Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings.
     If the user specifies a 'character' block, create a speaker text using the character details instead. Returns None
     """
+    ACTION_DATA = {
+        "display_name": "Dialogue",
+        "requirements": {
+            "speaker": {
+                "type": "Container",
+                "flags": ["editable", "preview"],
+                "children": {
+                    "key": {
+                        "type": "String",
+                        "value": "SpeakerText",
+                        "default": "SpeakerText",
+                    },
+                    "position": {
+                        "type": "Vector2",
+                        "value": [0, 0],
+                        "default": [0, 0],
+                        "global": ["Dialogue", "speaker_text_position"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "center_align": {
+                        "type": "Bool",
+                        "value": True,
+                        "default": True,
+                        "global": ["Dialogue", "speaker_text_center_align"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text": {
+                        "type": "String",
+                        "value": "",
+                        "default": "",
+                        "flags": ["editable", "preview"],
+                    },
+                    "text_size": {
+                        "type": "Int",
+                        "value": 24,
+                        "default": 24,
+                        "global": ["Dialogue", "speaker_text_size"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text_color": {
+                        "type": "Color",
+                        "value": [255, 255, 255],
+                        "default": [255, 255, 255],
+                        "global": ["Dialogue", "speaker_text_color"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "font": {
+                        "type": "Asset_Font",
+                        "value": "None",
+                        "default": "None",
+                        "global": ["Dialogue", "speaker_text_font"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "z_order": {
+                        "type": "Int",
+                        "value": 0,
+                        "default": 0,
+                        "global": ["Dialogue", "speaker_text_z_order"],
+                        "flags": ["global_active"],
+                    },
+                    "transition": {
+                        "type": "Container",
+                        "flags": ["editable"],
+                        "children": {
+                            "type": {
+                                "type": "Dropdown",
+                                "value": "None",
+                                "default": "None",
+                                "global": ["Dialogue", "transition_type"],
+                                "options": ["fade_in", "None"],
+                                "flags": ["editable", "global_active"],
+                            },
+                            "speed": {
+                                "type": "Int",
+                                "value": 500,
+                                "default": 500,
+                                "global": ["Dialogue", "transition_speed"],
+                                "flags": ["editable", "global_active"],
+                            },
+                        },
+                    },
+                    "wrap_bounds": {
+                        "type": "Vector2",
+                        "value": [0.2, 0.2],
+                        "default": [0.2, 0.2],
+                        "global": ["Dialogue", "speaker_text_wrap_bounds"],
+                        "flags": ["global_active"],
+                    },
+                },
+            },
+            "dialogue": {
+                "type": "Container",
+                "flags": ["editable", "preview"],
+                "children": {
+                    "key": {
+                        "type": "String",
+                        "value": "DialogueText",
+                        "default": "DialogueText",
+                    },
+                    "position": {
+                        "type": "Vector2",
+                        "value": [0, 0],
+                        "default": [0, 0],
+                        "global": ["Dialogue", "dialogue_text_position"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "center_align": {
+                        "type": "Bool",
+                        "value": True,
+                        "default": True,
+                        "global": ["Dialogue", "dialogue_text_center_align"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text": {
+                        "type": "Paragraph",
+                        "value": "Default",
+                        "default": "Default",
+                        "flags": ["editable", "preview"],
+                    },
+                    "text_size": {
+                        "type": "Int",
+                        "value": 24,
+                        "default": 24,
+                        "global": ["Dialogue", "dialogue_text_size"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "text_color": {
+                        "type": "Color",
+                        "value": [255, 255, 255],
+                        "default": [255, 255, 255],
+                        "global": ["Dialogue", "dialogue_text_color"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "font": {
+                        "type": "Asset_Font",
+                        "value": "None",
+                        "default": "None",
+                        "global": ["Dialogue", "dialogue_text_font"],
+                        "flags": ["editable", "global_active"],
+                    },
+                    "z_order": {
+                        "type": "Int",
+                        "value": 0,
+                        "default": 0,
+                        "global": ["Dialogue", "dialogue_text_z_order"],
+                        "flags": ["global_active"],
+                    },
+                    "transition": {
+                        "type": "Container",
+                        "flags": ["editable"],
+                        "children": {
+                            "type": {
+                                "type": "Dropdown",
+                                "value": "fade_in",
+                                "default": "fade_in",
+                                "global": ["Dialogue", "transition_type"],
+                                "options": ["fade_in", "None"],
+                                "flags": ["editable", "global_active"],
+                            },
+                            "speed": {
+                                "type": "Int",
+                                "value": 1000,
+                                "default": 1000,
+                                "global": ["Dialogue", "transition_speed"],
+                                "flags": ["editable", "global_active"],
+                            },
+                        },
+                    },
+                    "wrap_bounds": {
+                        "type": "Vector2",
+                        "value": [0.8, 0.16],
+                        "default": [0.8, 0.16],
+                        "global": ["Dialogue", "dialogue_text_wrap_bounds"],
+                        "flags": ["global_active"],
+                    },
+                },
+            },
+            "post_wait": {
+                "type": "String",
+                "value": "wait_for_input",
+                "default": "wait_for_input",
+                "flags": ["no_exclusion"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -695,6 +1550,150 @@ class dialogue(Action):
 
 
 class choice(Action):
+    ACTION_DATA = {
+        "display_name": "Choice",
+        "requirements": {
+            "choices": {
+                "type": "Array",
+                "flags": ["editable", "preview"],
+                "template": {
+                    "choice": {
+                        "type": "Array_Element",
+                        "flags": ["editable", "preview"],
+                        "children": {
+                            "branch": {
+                                "type": "String",
+                                "value": "",
+                                "default": "",
+                                "flags": ["editable", "preview"],
+                            },
+                            "position": {
+                                "type": "Vector2",
+                                "value": [0.5, 0.5],
+                                "default": [0.5, 0.5],
+                                "flags": ["editable", "preview"],
+                            },
+                            "center_align": {
+                                "type": "Bool",
+                                "value": True,
+                                "default": True,
+                            },
+                            "sprite": {
+                                "type": "Asset_Image",
+                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
+                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
+                                "global": ["Dialogue", "choice_button_sprite"],
+                                "flags": ["editable", "preview", "global_active"],
+                            },
+                            "sprite_hover": {
+                                "type": "Asset_Image",
+                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
+                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
+                                "global": ["Dialogue", "choice_button_sprite_hover"],
+                                "flags": ["editable", "global_active"],
+                            },
+                            "sprite_clicked": {
+                                "type": "Asset_Image",
+                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
+                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
+                                "global": ["Dialogue", "choice_button_sprite_clicked"],
+                                "flags": ["editable", "global_active"],
+                            },
+                            "z_order": {
+                                "type": "Int",
+                                "value": 10001,
+                                "default": 10001,
+                                "global": ["Dialogue", "choice_button_text_size"],
+                                "flags": ["global_active"],
+                            },
+                            "button_text": {
+                                "type": "Container",
+                                "flags": ["editable", "preview"],
+                                "children": {
+                                    "position": {
+                                        "type": "Vector2",
+                                        "value": [0.5, 0.5],
+                                        "default": [0.5, 0.5],
+                                        "flags": ["editable"],
+                                    },
+                                    "center_align": {
+                                        "type": "Bool",
+                                        "value": True,
+                                        "default": True,
+                                        "flags": ["editable"],
+                                    },
+                                    "text": {
+                                        "type": "String",
+                                        "value": "Default",
+                                        "default": "Default",
+                                        "flags": ["editable", "preview"],
+                                    },
+                                    "text_size": {
+                                        "type": "Int",
+                                        "value": 24,
+                                        "default": 24,
+                                        "global": [
+                                            "Dialogue",
+                                            "choice_button_text_size",
+                                        ],
+                                        "flags": ["editable", "global_active"],
+                                    },
+                                    "text_color": {
+                                        "type": "Color",
+                                        "value": [255, 255, 255],
+                                        "default": [255, 255, 255],
+                                        "global": [
+                                            "Dialogue",
+                                            "choice_button_text_color",
+                                        ],
+                                        "flags": ["editable", "global_active"],
+                                    },
+                                    "text_color_hover": {
+                                        "type": "Color",
+                                        "value": [255, 255, 255],
+                                        "default": [255, 255, 255],
+                                        "global": [
+                                            "Dialogue",
+                                            "choice_button_text_color_hover",
+                                        ],
+                                        "flags": ["editable", "global_active"],
+                                    },
+                                    "text_color_clicked": {
+                                        "type": "Color",
+                                        "value": [255, 255, 255],
+                                        "default": [255, 255, 255],
+                                        "global": [
+                                            "Dialogue",
+                                            "choice_button_text_color_clicked",
+                                        ],
+                                        "flags": ["editable", "global_active"],
+                                    },
+                                    "font": {
+                                        "type": "Asset_Font",
+                                        "value": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
+                                        "default": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
+                                        "global": ["Dialogue", "choice_button_font"],
+                                        "flags": ["editable", "global_active"],
+                                    },
+                                    "z_order": {
+                                        "type": "Int",
+                                        "value": 10002,
+                                        "default": 10002,
+                                    },
+                                    "wrap_bounds": {
+                                        "type": "Vector2",
+                                        "value": [0.25, 0.25],
+                                        "default": [0.25, 0.25],
+                                        "flags": ["editable"],
+                                    },
+                                },
+                            },
+                        },
+                    }
+                },
+            }
+        }
+    }
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -761,6 +1760,43 @@ class choose_branch(Action):
 
 
 class play_sfx(SoundAction):
+    ACTION_DATA = {
+        "display_name": "Play SFX",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "SFX",
+                "default": "SFX",
+                "flags": ["editable", "preview"],
+            },
+            "sound": {
+                "type": "Asset_Sound",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "volume": {
+                "type": "Float",
+                "value": 1.0,
+                "default": 1.0,
+                "flags": ["editable", "preview"],
+            },
+            "loop": {
+                "type": "Bool",
+                "value": False,
+                "default": False,
+                "flags": ["editable", "preview"],
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "wait_until_complete",
+                "default": "wait_until_complete",
+                "options": ["no_wait", "wait_until_complete"],
+                "flags": ["editable", "preview", "no_exclusion"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -787,6 +1823,18 @@ class stop_sfx(Action):
     """
     Based on a given key, stop and remove the associated sfx from the sound stack
     """
+    ACTION_DATA = {
+        "display_name": "Stop SFX",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "SFX",
+                "default": "SFX",
+                "flags": ["editable", "preview"],
+            }
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -803,6 +1851,36 @@ class stop_sfx(Action):
 
 class play_music(SoundAction):
     #@TODO: Implement end-event so this action completes when the song reaches last frame
+    ACTION_DATA = {
+        "display_name": "Play Music",
+        "requirements": {
+            "music": {
+                "type": "Asset_Sound",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            },
+            "volume": {
+                "type": "Float",
+                "value": 1.0,
+                "default": 1.0,
+                "flags": ["editable", "preview"],
+            },
+            "loop": {
+                "type": "Bool",
+                "value": False,
+                "default": False,
+                "flags": ["editable", "preview"],
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "no_wait",
+                "default": "no_wait",
+                "options": ["no_wait", "wait_until_complete"],
+                "flags": ["editable", "preview"],
+            },
+        }
+    }
 
     def Start(self):
         self.LoadMetadata(__class__.__name__)
@@ -831,6 +1909,18 @@ class stop_music(Action):
     """
     Stops the currently active music
     """
+    ACTION_DATA = {
+        "display_name": "Stop Music",
+        "requirements": {
+            "key": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable", "preview"],
+            }
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -843,6 +1933,24 @@ class stop_music(Action):
 
 
 class set_mute(Action):
+    ACTION_DATA = {
+        "display_name": "Set Mute",
+        "requirements": {
+            "toggle": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+            "value": {
+                "type": "Bool",
+                "value": True,
+                "default": True,
+                "flags": ["editable"],
+            },
+        }
+    }
+
     def Start(self):
         #self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -873,6 +1981,18 @@ class set_mute(Action):
 
 class load_scene(Action):
     """ Switches scenes to the one specified in the action data """
+    ACTION_DATA = {
+        "display_name": "Load Scene",
+        "requirements": {
+            "scene_file": {
+                "type": "Asset_Scene",
+                "default": "",
+                "value": "",
+                "flags": ["editable", "preview"],
+            }
+        }
+    }
+
     def Start(self):
         self.skippable = False
 
@@ -906,6 +2026,11 @@ class quit_game(Action):
     Immediately closes the game
     This is not meant to be called during scenes, but is available as an action for inputs, buttons, etc
     """
+    ACTION_DATA = {
+        "display_name": "Quit Game",
+        "requirements": {}
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
         self.skippable = False
@@ -926,6 +2051,32 @@ class scene_fade_in(Action):
 
     Returns 'SpriteRenderable'
     """
+    ACTION_DATA = {
+        "display_name": "Scene Fade In",
+        "requirements": {
+            "color": {
+                "type": "Dropdown",
+                "value": "black",
+                "default": "black",
+                "options": ["black", "white"],
+                "flags": ["editable", "preview"],
+            },
+            "speed": {
+                "type": "Int",
+                "value": 300,
+                "default": 300,
+                "flags": ["editable", "preview"],
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "wait_until_complete",
+                "default": "wait_until_complete",
+                "options": ["no_wait", "wait_until_complete"],
+                "flags": ["editable"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -978,6 +2129,32 @@ class scene_fade_out(Action):
 
     Returns 'SpriteRenderable'
     """
+    ACTION_DATA = {
+        "display_name": "Scene Fade Out",
+        "requirements": {
+            "color": {
+                "type": "Dropdown",
+                "value": "black",
+                "default": "black",
+                "options": ["black", "white"],
+                "flags": ["editable", "preview"],
+            },
+            "speed": {
+                "type": "Int",
+                "value": 300,
+                "default": 300,
+                "flags": ["editable", "preview"],
+            },
+            "post_wait": {
+                "type": "Dropdown",
+                "value": "wait_until_complete",
+                "default": "wait_until_complete",
+                "options": ["no_wait", "wait_until_complete"],
+                "flags": ["editable"],
+            },
+        }
+    }
+
     def Start(self):
         self.LoadMetadata(__class__.__name__)
 
@@ -1030,6 +2207,11 @@ class scene_fade_out(Action):
 
 class pause(Action):
     """ Requests that the active scene pause the game and show the pause interface. Returns 'None' """
+    ACTION_DATA = {
+        "display_name": "Pause",
+        "requirements": {}
+    }
+
     def Start(self):
         self.scene.Pause()
         self.Complete()
@@ -1038,6 +2220,11 @@ class pause(Action):
 
 class unpause(Action):
     """ Requests that the active scene unpause the game and remove the pause interface. Returns 'None' """
+    ACTION_DATA = {
+        "display_name": "Unpause",
+        "requirements": {}
+    }
+
     def Start(self):
         self.scene.Unpause()
         self.Complete()
@@ -1046,6 +2233,24 @@ class unpause(Action):
 
 class switch_page(Action):
     """ Requests a page load for the target interface. Returns 'None' """
+    ACTION_DATA = {
+        "display_name": "Switch page",
+        "requirements": {
+            "owner": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable"],
+            },
+            "page": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable"],
+            },
+        }
+    }
+
     def Start(self):
         if self.scene.active_interfaces.Exists(self.action_data["owner"]):
             owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
@@ -1058,6 +2263,18 @@ class switch_page(Action):
 
 class remove_page(Action):
     """ Removes the target interface and all of its children. Returns 'None' """
+    ACTION_DATA = {
+        "display_name": "Pause",
+        "requirements": {
+            "owner": {
+                "type": "String",
+                "value": "",
+                "default": "",
+                "flags": ["editable"],
+            }
+        }
+    }
+
     def Start(self):
         if self.scene.active_interfaces.Exists(self.action_data["owner"]):
             owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
