@@ -63,10 +63,11 @@ class EditorDialogue(EditorBase):
         # Load any entries in the new branch (if applicable)
         if new_branch.data:
             for entry in new_branch.data:
-                self.editor_ui.dialogue_sequence.AddEntry(entry, None, True)
+                action_name, action_data = next(iter(entry.items()))
+                self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
 
     def StoreActiveData(self, cur_branch):
-        """ Updates the active branch with all active dialogue entries """
+        """ Updates the active branch with the data from all active dialogue entries """
         # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.data.clear()
 
@@ -74,14 +75,14 @@ class EditorDialogue(EditorBase):
         num_of_entries = dialogue_table.rowCount()
         for entry_index in range(num_of_entries):
             dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
-            cur_branch.data.append(dialogue_entry.action_data)
+            cur_branch.data.append({dialogue_entry.GetName(): dialogue_entry.Get()})
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in the loaded file, including all branches, and returns them as a dict """
         data_to_export = {}
         branch_count = self.editor_ui.branches_panel.GetCount()
         for index in range(0, branch_count):
-            # Get the actual branch entry widget instead of the containing item widget
+            # Get the actual branch entry widget instead of the container
             branch = self.editor_ui.branches_panel.GetEntryItemWidget(index)
 
             # Before we save, let's be extra sure the current information in the details panel is cached properly
@@ -114,8 +115,7 @@ class EditorDialogue(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        scene_data = {"settings": self.editor_ui.scene_settings.GetData()}
-        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="settings")
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
 
         # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()
@@ -124,7 +124,7 @@ class EditorDialogue(EditorBase):
         data_to_export = {
             "type": self.file_type.name,
             "settings": conv_scene_data,
-            "dialogue": self.ConvertDialogueFileToEngineFormat(data_to_export)
+            "dialogue": self.ConvertDialogueToEngineFormat(data_to_export)
         }
 
         # Write the data out
@@ -152,21 +152,22 @@ class EditorDialogue(EditorBase):
             self.editor_ui.scene_settings.Populate(file_data["settings"])
 
             # Populate the branches and dialogue sequence
-            converted_data = self.ConvertDialogueFileToEditorFormat(file_data["dialogue"])
+            converted_data = self.ConvertDialogueToEditorFormat(file_data["dialogue"])
             for branch_name, branch_data in converted_data.items():
                 # The main branch is treated uniquely since we don't need to create it
                 if not branch_name == "Main":
                     self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"])
 
-                for action in branch_data["entries"]:
-                    self.editor_ui.dialogue_sequence.AddEntry(action, None, True)
+                for entry in branch_data["entries"]:
+                    action_name, action_data = next(iter(entry.items()))
+                    self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
 
             # Select the main branch by default
             self.editor_ui.branches_panel.ChangeEntry(0)
 
-    def ConvertDialogueFileToEngineFormat(self, action_data: dict):
+    def ConvertDialogueToEngineFormat(self, action_data: dict):
         """
-        Given a full dict of dialogue file data in editor format (branches and all), convert it to the engine format
+        Given a dict of dialogue branches and their actions in editor format, convert them to the engine format.
         Return the converted dict
         """
         new_dialogue_data = {}
@@ -177,10 +178,10 @@ class EditorDialogue(EditorBase):
 
             converted_entries = []
             for entry in branch_data["entries"]:
-                # Convert the requirements for this action to the engine format before rebuilding the full entry,
-                # recreating the top level action name key in the process
-                conv_requirements = ad.ConvertActionRequirementsToEngineFormat(entry[ad.GetActionName(entry)])
-                converted_entries.append({ad.GetActionName(entry): conv_requirements})
+                # Convert the data for this action to the engine format before rebuilding the full entry
+                action_name, action_data = next(iter(entry.items()))
+                conv_ad = ad.ConvertParamDataToEngineFormat(action_data)
+                converted_entries.append({action_name: conv_ad})
 
             # Complete the converted branch, and add it to the new dialogue data
             converted_branch["entries"] = converted_entries
@@ -188,7 +189,7 @@ class EditorDialogue(EditorBase):
 
         return new_dialogue_data
 
-    def ConvertDialogueFileToEditorFormat(self, action_data):
+    def ConvertDialogueToEditorFormat(self, action_data):
         """
         Given a full dict of dialogue file data in engine format (branches and all), convert it to the editor format by
         rebuilding the structure based on lookups in the ActionDatabase
@@ -199,17 +200,17 @@ class EditorDialogue(EditorBase):
             converted_entries = []
             for entry in branch_data["entries"]:
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
-                # the matching metadata entry and clone it
-                name = ad.GetActionName(entry)
-                metadata_entry = copy.deepcopy(settings.action_metadata[name])
+                # the matching ACTION_DATA and clone it
+                action_name, action_data = next(iter(entry.items()))
+                base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
 
                 # Pass the entry by ref, and let the convert func edit it directly
-                ad.ConvertActionRequirementsToEditorFormat(
-                    metadata_entry=metadata_entry,
-                    engine_entry=entry[name]
+                ad.ConvertActionDataToEditorFormat(
+                    base_action_data=base_ad_clone,
+                    action_data=action_data
                 )
 
-                converted_entries.append({name: metadata_entry})
+                converted_entries.append({action_name: base_ad_clone})
 
             # Update the branch entries with the newly converted ones
             branch_data["entries"] = converted_entries

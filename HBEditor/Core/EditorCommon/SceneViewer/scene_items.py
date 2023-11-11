@@ -23,8 +23,9 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     happen. When selecting this object, all children are recursively selected as well to allow grouped movement
     """
 
-    def __init__(self, action_data: dict, select_func: callable):
+    def __init__(self, action_name: str, action_data: dict, select_func: callable):
         super().__init__(None)
+        self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
         self.select_func = select_func
 
@@ -65,14 +66,14 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         return True
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
-                         pixmap: QtGui.QPixmap = None, text: str = "", search_term: str = "requirements"):
+                         pixmap: QtGui.QPixmap = None, text: str = ""):
         """
         Recursively generate child items in the tree for each item in the action_data. All items are created with
-        the full requirements data block
+        the full parameters data block
         """
         # Set values for the top-most item
         if not action_data and not parent:
-            action_data = self.action_data[ad.GetActionName(self.action_data)][search_term]
+            action_data = self.action_data
             parent = self
 
             # Some properties have special implications on usability within the editor (IE. position being uneditable
@@ -87,7 +88,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                     self.SetLocked(True)
                     self._movement_perm_locked = True
 
-        # In order to determine what child to spawn, we need to look through all the requirements at a given
+        # In order to determine what child to spawn, we need to look through all the parameters at a given
         # level, and see if certain names appear. If they do, we give them the full data block
         #
         # IE. {text: '', text_size: '', position: ''}. If 'text' is found, provide all 3 keys
@@ -96,8 +97,8 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # stomping issues
         new_item = None
 
-        for req_name, req_data in action_data.items():
-            if req_name == "sprite":
+        for param_name, param_data in action_data.items():
+            if param_name == "sprite":
                 new_item = SpriteItem(
                     action_data=action_data,  # Pass by ref
                     pixmap=pixmap
@@ -106,7 +107,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            elif req_name == "text":
+            elif param_name == "text":
                 new_item = TextItem(
                     action_data=action_data,  # Pass by ref
                     text=text
@@ -115,13 +116,12 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            if "children" in req_data:
+            if "children" in param_data:
                 self.GenerateChildren(
                     parent=new_item,
-                    action_data=req_data["children"],
+                    action_data=param_data["children"],
                     pixmap=pixmap,
-                    text=text,
-                    search_term="children"
+                    text=text
                 )
 
     def Refresh(self, change_tree: list = None):

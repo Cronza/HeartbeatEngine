@@ -31,8 +31,9 @@ class Interface(Renderable):
 
         if "Persistent" in renderable_data["pages"]:
             for item in renderable_data["pages"]["Persistent"]["items"]:
+                action_name, action_data = next(iter(item.items()))
                 self.children.append(
-                    self.scene.a_manager.PerformAction(action_data=item, action_name=item['action'], no_draw=True)
+                    self.scene.a_manager.PerformAction(action_data=action_data, action_name=action_name, no_draw=True)
                 )
         else:
             raise ValueError("'Persistent' missing from the interface file - No items to display!")

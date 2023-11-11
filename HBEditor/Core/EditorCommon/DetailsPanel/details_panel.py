@@ -76,22 +76,22 @@ class DetailsPanel(QtWidgets.QWidget):
 
         self.Clear()
 
-        # Recursively create an entry for all items within the action_data
+        # Recursively create an entry for all parameters within the action_data
         # Note: This provides data to each by reference, so any changes made to data stored in each details entry
         # propagates directly back to the main entry
         self.AddItems(
-            req_data=ad.GetActionRequirements(self.active_entry.action_data),
+            action_data=self.active_entry.action_data,
             excluded_properties=self.excluded_properties
         )
 
         self.details_tree.expandAll()
 
-    def AddItems(self, req_data: dict, parent=None, excluded_properties: list = None):
+    def AddItems(self, action_data: dict, parent=None, excluded_properties: list = None):
         """
         Recursively adds an InputEntry element into the details tree, including all of its children, for each action
         data dict item provided
         """
-        for name, data in req_data.items():
+        for name, data in action_data.items():
             if "flags" in data:
                 # Some reqs are strictly meant to use defaults or globals, and not be edited by the user. In these
                 # circumstances,  don't display them
@@ -161,9 +161,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
                 if entry_data["type"] == "Array":
                     # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
-                    # entries and the entries recorded in the active_entries' action_data. This issue exists as the
-                    # data stored in the active_entry is the full clone from the actions_metadata, containing all
-                    # requirements whether they're displayed in the editor or not. Since we only generate details
+                    # entries and the entries recorded in the action_data for the active entry. This issue exists as the
+                    # data stored in the active_entry is the full clone from the ACTION_DATA, containing all
+                    # parameters whether they're displayed in the editor or not. Since we only generate details
                     # entries for requirements that are displayed, this means we'd never store the data for any entries
                     # not visible
                     #

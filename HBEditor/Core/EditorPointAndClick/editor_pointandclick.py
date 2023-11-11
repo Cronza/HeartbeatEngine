@@ -67,17 +67,15 @@ class EditorPointAndClick(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        scene_data = {"settings": self.editor_ui.scene_settings.GetData()}
-        conv_scene_data = ad.ConvertActionRequirementsToEngineFormat(scene_data, search_term="settings")
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
 
-        # Get an engine-formatted list of scene items
-        conv_scene_items = self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
-
+        # Merge the collected data
         data_to_export = {
             "type": FileType.Scene_Point_And_Click.name,
             "settings": conv_scene_data,
-            "scene_items": conv_scene_items
+            "scene_items": self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
+
         Logger.getInstance().Log("Writing data to file...")
         try:
             Writer.WriteFile(
@@ -104,41 +102,29 @@ class EditorPointAndClick(EditorBase):
             self.editor_ui.scene_settings.Populate(file_data["settings"])
 
             for item in conv_scene_items:
-                new_item = self.editor_ui.scene_viewer.AddRenderable(item, True)
+                action_name, action_data = next(iter(item.items()))
+                new_item = self.editor_ui.scene_viewer.AddRenderable(action_name, action_data, True)
 
                 # Apply any imported editor-specific properties
-                if "editor_properties" in item[ad.GetActionName(item)]:
-                    editor_properties = item[ad.GetActionName(item)]["editor_properties"]
+                if "editor_properties" in action_data:
+                    editor_properties = action_data["editor_properties"]
                     if "locked" in editor_properties:
                         new_item.SetLocked(editor_properties["locked"])
 
     def ConvertSceneItemsToEngineFormat(self, scene_items: list):
         """ Build and return a list of the data from all active scene items converted to engine format """
-        converted_entries = []
+        conv_entries = []
         for scene_item in scene_items:
-            scene_item_data = scene_item.action_data
+            conv_ad = ad.ConvertParamDataToEngineFormat(scene_item.action_data)
 
-            # Get the action name
-            converted_action = {"action": ad.GetActionName(scene_item_data)}
-
-            # Preserve any notable editor-specific properties so that they're available when importing
+            # Preserve any notable editor-specific parameters so that they're available when importing
             # Note: This is subject to change when additional examples are available
             if scene_item.GetLocked():
-                converted_action["editor_properties"] = {"locked": scene_item.GetLocked()}
+                conv_ad["editor_properties"] = {"locked": scene_item.GetLocked()}
 
-            # Collect a converted dict of all requirements for this action (If any are present)
-            converted_requirements = ad.ConvertActionRequirementsToEngineFormat(
-                editor_req_data=scene_item_data[ad.GetActionName(scene_item_data)],
-                excluded_properties=self.excluded_properties
-            )
+            conv_entries.append({scene_item.action_name: conv_ad})
 
-            if converted_requirements:
-                converted_action.update(converted_requirements)
-
-            # Add the newly converted action
-            converted_entries.append(converted_action)
-
-        return converted_entries
+        return conv_entries
 
     def ConvertSceneItemsToEditorFormat(self, action_data):
         """
@@ -147,20 +133,22 @@ class EditorPointAndClick(EditorBase):
         """
         conv_items = []
         for item in action_data:
-            # Using the name of the action, look it up in the actions_metadata and clone it
-            md_entry = copy.deepcopy(settings.action_metadata[item["action"]])
+            # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
+            # the matching ACTION_DATA and clone it
+            action_name, action_data = next(iter(item.items()))
+            base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
 
             # Pass the entry by ref, and let the convert func edit it directly
-            ad.ConvertActionRequirementsToEditorFormat(
-                metadata_entry=md_entry,
-                engine_entry=item,
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=base_ad_clone,
+                action_data=action_data,
                 excluded_properties=self.excluded_properties
             )
 
             # Import the editor-specific properties in order to preserve editing state for items
             if "editor_properties" in item:
-                md_entry["editor_properties"] = item["editor_properties"]
+                base_ad_clone["editor_properties"] = item["editor_properties"]
 
-            conv_items.append({item["action"]: md_entry})
+            conv_items.append({action_name: base_ad_clone})
 
         return conv_items

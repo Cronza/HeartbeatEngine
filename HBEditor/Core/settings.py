@@ -13,8 +13,11 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
+import inspect
+import copy
 from PyQt5 import QtGui
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEngine.Core.Actions import actions
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
@@ -176,6 +179,11 @@ def SaveHeartbeatFile(data: dict):
     Writer.WriteFile(data, f"{user_project_dir}/{heartbeat_file}", GetMetadataString())
 
 
+def GetActionData(action_name: str) -> dict:
+    """ Returns a copy of the 'ACTION_DATA' for an engine action that matches the provided name """
+    return copy.deepcopy(_engine_actions[action_name].ACTION_DATA)
+
+
 root = os.getcwd().replace("\\", "/")
 engine_root = f"{root}/HBEngine"
 editor_root = f"{root}/HBEditor"
@@ -219,9 +227,14 @@ user_project_name = None
 user_project_dir = None
 user_project_data = None  # The contents of the project's 'Game.yaml' file
 
-editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")  # Contains data relating to how the editor functions
-editor_action_metadata = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")  # Contains data that categorizes engine actions, and defines which editors can use which actions
-action_metadata = Reader.ReadAll(f"{engine_root}/Core/Actions/actions_metadata.yaml")  # Contains data relating to how engine actions operate, including additional editor-specific values for how they appear in the editor
-
 asset_registry = {}  # Loaded when project is loaded
 engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")
+
+# Contains data relating to how the editor functions
+editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")
+
+# Contains categorized engine actions and definitions for which editors can use which actions
+available_actions = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")
+
+# A list of action classes available in the HBEngine. This is not meant to be accessed outside this file
+_engine_actions = dict(inspect.getmembers(actions, lambda obj: inspect.isclass(obj) and obj.__module__ == actions.__name__))

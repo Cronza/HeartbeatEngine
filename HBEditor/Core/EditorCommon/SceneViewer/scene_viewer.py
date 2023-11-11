@@ -21,6 +21,7 @@ from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 from HBEditor.Core.Primitives.input_entries import InputEntryAssetSelector
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core import settings
 
 
 class SceneViewer(QtWidgets.QWidget):
@@ -121,9 +122,19 @@ class SceneViewer(QtWidgets.QWidget):
 
         self.view.show()
 
-    def AddRenderable(self, action_data, skip_selection: bool = False) -> RootItem:
-        """ Add an item to the scene view. Return the newly created item """
+    def AddRenderable(self, action_name: str, action_data: dict = None, skip_selection: bool = False) -> RootItem:
+        """
+        Add an item to the scene view. If 'action_data' is provided, populate the entry using it instead
+
+        Return the newly created item.
+        """
+
+        if not action_data:
+            # Load a fresh copy of the ACTION_DATA
+            action_data = settings.GetActionData(action_name)
+
         new_item = RootItem(
+            action_name=action_name,
             action_data=action_data,
             select_func=self.UpdateActiveSceneItem
         )

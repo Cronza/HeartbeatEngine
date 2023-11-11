@@ -25,27 +25,95 @@ from HBEngine.Core.Objects.audio import Sound, Music
 from HBEngine.Core.Objects.renderable_container import Container
 from Tools.HBYaml.hb_yaml import Reader
 
+"""
+----------------
+--- Overview ---
+----------------
 
-# Load the metadata that contains the data definitions for what each
-# action accepts for 'action_data', and what globals are in use by any
-# action
-actions_metadata = Reader.ReadAll(settings.ConvertPartialToAbsolutePath("HBEngine/Core/Actions/actions_metadata.yaml"))
+This file contains every action available to a user when building their games. These actions range from creating
+renderables such as sprites (create_sprite) and buttons (create_button), to affecting state such as with
+pausing (pause) and muting (set_mute).
+
+Due to the open-ended nature of what actions do, they use a specialized Dictionary structure to house their
+parameters. This can be found in the 'ACTION_DATA' class attribute. 
+
+-----------------------------------
+--- Understanding 'ACTION_DATA' ---
+-----------------------------------
+The 'ACTION_DATA' listed for each action not only contains the parameters and their values for that action, but also 
+Editor-Specific details for how they're represented in the editor. This structure is referred to as the "Expanded" 
+structure.
+ 
+When users create project files (Scenes, interfaces, etc), they utilize Actions to populate those files. Those actions 
+are saved within the project files in a different format of what is found in this file. An example of this looks like:
+
+create_background:
+  key: Background
+  sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
+  flip: false
+  post_wait: no_wait
+
+As you can see, everything except for the parameter name and value have been stripped out. This is called the 
+"Simplified" format. The Heartbeat Engine uses this format when reading in project files, but also uses the Expanded 
+format of 'ACTION_DATA' to ensure that no parameter is missing. The Heartbeat Editor specifically uses the 
+Expanded format of 'ACTION_DATA', but saves files using the Simplified format.
+
+-----------------------------------
+--- Populating 'ACTION_DATA' ---
+-----------------------------------
+
+Actions do not require that ACTION_DATA be populated, and can simply have it be "ACTION_DATA = {}"
+
+However, when populated, ACTION_DATA lists every parameter that the action requires. These parameters can be anything, 
+whether that is the sprite used for an image or the volume level for an SFX. This list is optional, but when used can
+look like the following:
+
+{
+    "key": {
+        "type": "String",
+        "value": "",
+        "default": "",
+        "flags": ["editable", "preview"]
+    }
+}
+
+---------------------------------
+--- Parameter Entry Legend ---
+---------------------------------
+    global:   Causes the action to ignore 'default' and 'value', and instead use a value from the project's "Game.yaml"
+              file. The syntax is: [<category>, <value>].
+    value:    Used to store the latest updated value independently of the default.
+
+    [Editor Specific]
+    default:  Used to allow resetting 'value' 
+    editable: Controls whether a parameter can be changed by the user either in the editor
+    type:     Controls which input widget is used when displayed in the editor (IE. Dropdown vs Text Box)
+    template: A special keyword for parameters that allow children to be dynamically created by the
+              user. This keyword is only usable with the 'Array' type
+    flags:    A list of key words that various sub-editors use. Options:
+        preview:        Controls whether certain editors can show the value of the parameter in additional areas of 
+                        the interface
+        no_exclusion:   Controls whether to remove editor-specific property exclusions for a property and its children. 
+                        This is necessary when editors such as 'PointAndClick' have blanket exclusions for properties 
+                        such as 'post_wait', and you need it available for a particular action
+        global_active:  Controls whether the parameter will use the global value or 'value'
+    
+"""
 
 
 # -------------- BASE ACTIONS --------------
 
 
 class Action:
-    def __init__(self, scene, action_data: dict, a_manager, no_draw: bool = False):
+    def __init__(self, scene, simplified_ad: dict, a_manager, no_draw: bool = False):
         self.scene = scene
-        self.action_data = action_data
+        self.simplified_ad = simplified_ad  # User-provided action data using the simplified structure
         self.a_manager = a_manager
         self.active_transition = None
         self.speed = 500
         self.skippable = True
         self.complete = False
         self.completion_callback = None  # Called by the action manager before it deletes the action
-        self.metadata = {}  # Loaded via function
 
         self.no_draw = no_draw  # Whether to skip adding any resulting renderables to the draw stack
 
@@ -61,36 +129,32 @@ class Action:
     def Complete(self):
         self.complete = True
 
-    def LoadMetadata(self, action_name: str, recurse: bool = False):
+    def UpdatedSimpAD(self, ACTION_DATA: dict, simplified_ad: dict = None):
         """
-        Given an action name, set the 'metadata' variable using the corresponding data found in the
-        actions_metadata.yaml file
-        """
-        # We have to take a parameter for the action name here because '__class__.__name__' returns the base class name
-        # when running under code defined in the base class
-        self.metadata = copy.deepcopy(actions_metadata[action_name])
-
-        # Compare the action_data against the metadata. If any items found within the metadata are missing in the
-        # action_data, we can assume it was not edited or modified by the user, and that we can defer to either the
-        # global value or the default
-        self.UpdateFromMetadata(self.metadata, self.action_data)
-
-    def UpdateFromMetadata(self, metadata: dict, action_data: dict, search_term: str = "requirements"):
-        """
-        Recursively compares the provided action_data against the provided metadata, updating the former when
+        Recursively compares the action's 'simplified_ad' against the provided 'ACTION_DATA', updating the former when
         it is missing data found in the latter
+
+        This update performs the following adjustments:
+        - Adds parameters that are missing from the Simplified format using the unedited data from the Expanded format
+        - Replaces values with global values if a parameter is using a global setting
         """
-        for md_req_name, md_req_data in metadata[search_term].items():
-            if "children" in md_req_data:
-                if md_req_name not in action_data:
-                    action_data[md_req_name] = {}
 
-                self.UpdateFromMetadata(md_req_data, action_data[md_req_name], "children")
+        if not simplified_ad:
+            simplified_ad = self.simplified_ad
 
-            elif "template" in md_req_data:
-                # Requirements that use templates have a fundamentally unique metadata in that each child is generated
-                # from the template instead of being instrinctically a part of the metadata to begin with. Due to this,
-                # we must compare the action_data against the metadata template specifically
+        for param_name, param_data in ACTION_DATA.items():
+            if "children" in param_data:
+                if param_name not in simplified_ad:
+                    # Param not found in the simplified data. Skip recursive update for children
+                    pass
+
+                # Param found in simplified data. Recursively update the children as well
+                self.UpdatedSimpAD(param_data["children"], simplified_ad[param_name])
+
+            elif "template" in param_data:
+                # Parameters that use templates have a unique data structure in that each child is
+                # generated from the template instead of being a part of the data to begin with. Due to this,
+                # we must compare the simplified data against the template specifically
                 #
                 # The template data structure is usually a few layers deep. Example:
                 #    choices: (Array)
@@ -98,39 +162,23 @@ class Action:
                 #            ...
 
                 # Because the top level key names for ArrayElements are generated, we can't do a typical key name
-                # search (IE. 'choice_01' instead of 'choice' which matches the metadata). Instead, we're accessing the
-                # value dict directly
-                template_data = list(md_req_data["template"].values())[0]
+                # search (IE. 'choice_01' instead of 'choice' which matches the ACTION_DATA). Instead, we're accessing
+                # the values dict directly
+                template_data = list(param_data["template"].values())[0]
 
                 # Update each ArrayElement
-                for element_name, element_data in action_data[md_req_name].items():
+                for element_name, element_data in simplified_ad[param_name].items():
                     # Skip a level as this is the "ArrayElement" container
-                    self.UpdateFromMetadata(template_data, element_data, "children")
 
-            elif md_req_name not in action_data:
-                # The item is missing. Update it
-                if "global" in md_req_data:
-                    action_data[md_req_name] = settings.GetProjectSetting(md_req_data["global"][0], md_req_data["global"][1])
+                    self.UpdatedSimpAD(template_data["children"], element_data)
+
+            elif param_name not in simplified_ad:
+                if "global" in param_data:
+                    # Global active. Set 'value' to the corresponding global value
+                    simplified_ad[param_name] = settings.GetProjectSetting(param_data["global"][0], param_data["global"][1])
                 else:
-                    action_data[md_req_name] = md_req_data["default"]
-
-    def GetMetadataValue(self, key):
-        """ Returns the value for the given requirements key (IE. 'position') """
-        return self.metadata["requirements"][key]["value"]
-
-    def GetMetadataGlobal(self, key):
-        """
-        Returns the global value for the given requirements key (IE. 'position').
-
-        This value is returned as a list, with the first index being the name of the category where the global is
-        stored, and the second index being the name of the global value. If the specified parameter does not have a
-        global value, then return None
-        """
-        try:
-            return self.metadata["requirements"][key]["global"]
-        except Exception as exc:
-            print(f"Failed to retrieve global value for key '{key}' - {exc}")
-            return None
+                    # No global active. Use default value from the expanded data
+                    simplified_ad[param_name] = param_data["default"]
 
 
 class SoundAction(Action):
@@ -145,48 +193,46 @@ class SoundAction(Action):
 
 class remove_renderable(Action):
     """ Based on a given key, remove the associated renderable from the renderable stack """
+    DISPLAY_NAME = "Remove Renderable"
     ACTION_DATA = {
-        "display_name": "Remove Renderable",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "transition": {
-                "type": "Container",
-                "flags": ["preview"],
-                "children": {
-                    "type": {
-                        "type": "Dropdown",
-                        "value": "None",
-                        "default": "None",
-                        "options": ["None", "fade_out"],
-                        "flags": ["editable", "preview"],
-                    },
-                    "speed": {
-                        "type": "Int",
-                        "value": 500,
-                        "default": 500,
-                        "flags": ["editable", "preview"],
-                    },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "transition": {
+            "type": "Container",
+            "flags": ["preview"],
+            "children": {
+                "type": {
+                    "type": "Dropdown",
+                    "value": "None",
+                    "default": "None",
+                    "options": ["None", "fade_out"],
+                    "flags": ["editable", "preview"],
+                },
+                "speed": {
+                    "type": "Int",
+                    "value": 500,
+                    "default": 500,
+                    "flags": ["editable", "preview"],
                 },
             },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "no_wait",
-                "default": "no_wait",
-                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-                "flags": ["editable", "preview"],
-            },
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "no_wait",
+            "default": "no_wait",
+            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        renderable = self.scene.active_renderables.renderables[self.action_data['key']]
+        renderable = self.scene.active_renderables.renderables[self.simplified_ad['key']]
         children = []
 
         if isinstance(renderable, Container):
@@ -194,7 +240,7 @@ class remove_renderable(Action):
             children = renderable.GetAllChildren()
 
         # Any transitions are applied to the sprite pre-unload
-        if "None" not in self.action_data["transition"]["type"]:
+        if "None" not in self.simplified_ad["transition"]["type"]:
             if children:
                 # In order to apply the transition to each and every child of the container, we merge the surfaces
                 # and combine them into the container surface. That way, the rendering only manages a single
@@ -208,7 +254,7 @@ class remove_renderable(Action):
 
                 renderable.visible = True
 
-            self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], renderable)
+            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], renderable)
             self.active_transition.Start()
         else:
             if children:
@@ -216,13 +262,13 @@ class remove_renderable(Action):
                 for child in children:
                     self.scene.active_renderables.Remove(child.key)
 
-            self.scene.active_renderables.Remove(self.action_data["key"])
+            self.scene.active_renderables.Remove(self.simplified_ad["key"])
             self.scene.Draw()
             self.Complete()
 
     def Update(self, events):
         if self.active_transition.complete is True:
-            self.scene.active_renderables.Remove(self.action_data["key"])
+            self.scene.active_renderables.Remove(self.simplified_ad["key"])
             self.Complete()
         else:
             self.active_transition.Update()
@@ -235,92 +281,89 @@ class remove_renderable(Action):
 
 class create_sprite(Action):
     """ Create a sprite renderable using passed in settings. Returns a 'SpriteRenderable' """
+    DISPLAY_NAME = "Create Sprite"
     ACTION_DATA = {
-        "display_name": "Create Sprite",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "sprite": {
-                "type": "Asset_Image",
-                "value": "None",
-                "default": "None",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable", "preview"],
-            },
-            "z_order": {
-                "type": "Int",
-                "value": 0,
-                "default": 0,
-                "flags": ["editable", "preview"],
-            },
-            "flip": {
-                "type": "Bool",
-                "value": False,
-                "default": False,
-                "flags": ["editable"],
-            },
-            "transition": {
-                "type": "Container",
-                "flags": ["preview"],
-                "children": {
-                    "type": {
-                        "type": "Dropdown",
-                        "value": "None",
-                        "default": "None",
-                        "options": ["None", "fade_in"],
-                        "flags": ["editable", "preview"],
-                    },
-                    "speed": {
-                        "type": "Int",
-                        "value": 500,
-                        "default": 500,
-                        "flags": ["editable", "preview"],
-                    },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "sprite": {
+            "type": "Asset_Image",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable", "preview"],
+        },
+        "z_order": {
+            "type": "Int",
+            "value": 0,
+            "default": 0,
+            "flags": ["editable", "preview"],
+        },
+        "flip": {
+            "type": "Bool",
+            "value": False,
+            "default": False,
+            "flags": ["editable"],
+        },
+        "transition": {
+            "type": "Container",
+            "flags": ["preview"],
+            "children": {
+                "type": {
+                    "type": "Dropdown",
+                    "value": "None",
+                    "default": "None",
+                    "options": ["None", "fade_in"],
+                    "flags": ["editable", "preview"],
+                },
+                "speed": {
+                    "type": "Int",
+                    "value": 500,
+                    "default": 500,
+                    "flags": ["editable", "preview"],
                 },
             },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "wait_for_input",
-                "default": "wait_for_input",
-                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-                "flags": ["editable", "preview"],
-            },
         },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "wait_for_input",
+            "default": "wait_for_input",
+            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+            "flags": ["editable", "preview"],
+        }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
-
+        self.UpdatedSimpAD(self.ACTION_DATA)
         new_sprite = SpriteRenderable(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
-        if "flip" in self.action_data:
-            if self.action_data["flip"]:
+        if "flip" in self.simplified_ad:
+            if self.simplified_ad["flip"]:
                 new_sprite.Flip()
 
         if not self.no_draw:
             self.scene.active_renderables.Add(new_sprite)
 
             # Any transitions are applied to the sprite post-load
-            if "None" not in self.action_data["transition"]["type"]:
-                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_sprite)
+            if "None" not in self.simplified_ad["transition"]["type"]:
+                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], new_sprite)
                 self.active_transition.Start()
             else:
                 self.scene.Draw()
@@ -347,49 +390,46 @@ class create_background(Action):
     Creates a pre-configured 'SpriteRenderable' suitable as a background image. Returns a
     'SpriteRenderable'
     """
-
+    DISPLAY_NAME = "Create Background"
     ACTION_DATA = {
-        "display_name": "Create Background",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "Background",
-                "default": "Background",
-                "flags": ["editable"],
-            },
-            "sprite": {
-                "type": "Asset_Image",
-                "value": "None",
-                "default": "None",
-                "flags": ["editable", "preview"],
-            },
-            "position": {"type": "Vector2", "value": [0, 0], "default": [0, 0]},
-            "center_align": {"type": "Bool", "value": False, "default": False},
-            "z_order": {"type": "Int", "value": -9999, "default": -9999},
-            "flip": {
-                "type": "Bool",
-                "value": False,
-                "default": False,
-                "flags": ["editable"],
-            },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "no_wait",
-                "default": "no_wait",
-                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-                "flags": ["editable", "preview"],
-            },
-        }
+        "key": {
+            "type": "String",
+            "value": "Background",
+            "default": "Background",
+            "flags": ["editable"],
+        },
+        "sprite": {
+            "type": "Asset_Image",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        },
+        "position": {"type": "Vector2", "value": [0, 0], "default": [0, 0]},
+        "center_align": {"type": "Bool", "value": False, "default": False},
+        "z_order": {"type": "Int", "value": -9999, "default": -9999},
+        "flip": {
+            "type": "Bool",
+            "value": False,
+            "default": False,
+            "flags": ["editable"],
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "no_wait",
+            "default": "no_wait",
+            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+            "flags": ["editable", "preview"],
+        },
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
         self.skippable = False
 
         new_sprite = SpriteRenderable(
             self.scene,
-            self.action_data,
+            self.simplified_ad,
         )
 
         if not self.no_draw:
@@ -402,88 +442,86 @@ class create_background(Action):
 
 class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable' """
+    DISPLAY_NAME = "Create Interactable"
     ACTION_DATA = {
-        "display_name": "Create Interactable",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
-            "sprite": {
-                "type": "Asset_Image",
-                "value": "None",
-                "default": "None",
-                "flags": ["editable", "preview"],
-            },
-            "sprite_hover": {
-                "type": "Asset_Image",
-                "value": "None",
-                "default": "None",
-                "flags": ["editable", "preview"],
-            },
-            "sprite_clicked": {
-                "type": "Asset_Image",
-                "value": "None",
-                "default": "None",
-                "flags": ["editable", "preview"],
-            },
-            "z_order": {"type": "Int", "value": 0, "default": 0, "flags": ["editable"]},
-            "events": {
-                "type": "Array",
-                "flags": ["editable", "no_exclusion"],
-                "template": {
-                    "event": {
-                        "type": "Array_Element",
-                        "flags": ["editable"],
-                        "children": {
-                            "action": {
-                                "type": "Event",
-                                "value": "None",
-                                "default": "None",
-                                "options": [
-                                    "None",
-                                    "load_scene",
-                                    "quit_game",
-                                    "scene_fade_out",
-                                    "scene_fade_in",
-                                    "play_sfx",
-                                    "set_mute",
-                                ],
-                                "flags": ["editable"],
-                            }
-                        },
-                    }
-                },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
+        },
+        "sprite": {
+            "type": "Asset_Image",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        },
+        "sprite_hover": {
+            "type": "Asset_Image",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        },
+        "sprite_clicked": {
+            "type": "Asset_Image",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        },
+        "z_order": {"type": "Int", "value": 0, "default": 0, "flags": ["editable"]},
+        "events": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "event": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "action": {
+                            "type": "Event",
+                            "value": "None",
+                            "default": "None",
+                            "options": [
+                                "None",
+                                "load_scene",
+                                "quit_game",
+                                "scene_fade_out",
+                                "scene_fade_in",
+                                "play_sfx",
+                                "set_mute",
+                            ],
+                            "flags": ["editable"],
+                        }
+                    },
+                }
             },
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         new_renderable = Interactable(
             self.scene,
-            self.action_data,
+            self.simplified_ad,
         )
 
         # If the user requested a flip action, do so
-        if 'flip' in self.action_data:
-            if self.action_data['flip']:
+        if 'flip' in self.simplified_ad:
+            if self.simplified_ad['flip']:
                 new_renderable.Flip()
 
         if not self.no_draw:
@@ -498,129 +536,127 @@ class create_text(Action):
     """
     Create a TextRenderable at the target location, with the given settings. Returns a 'TextRenderable'
     """
+    DISPLAY_NAME = "Create Text"
     ACTION_DATA = {
-        "display_name": "Create Text",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "global": ["Text", "center_align"],
-                "flags": ["editable", "global_active"],
-            },
-            "text": {
-                "type": "Paragraph",
-                "value": "Default",
-                "default": "Default",
-                "flags": ["editable", "preview"],
-            },
-            "text_size": {
-                "type": "Int",
-                "value": 24,
-                "default": 24,
-                "global": ["Text", "size"],
-                "flags": ["editable", "preview", "global_active"],
-            },
-            "text_color": {
-                "type": "Color",
-                "value": [255, 255, 255],
-                "default": [255, 255, 255],
-                "global": ["Text", "color"],
-                "flags": ["editable", "preview", "global_active"],
-            },
-            "font": {
-                "type": "Asset_Font",
-                "value": "None",
-                "default": "None",
-                "global": ["Text", "font"],
-                "flags": ["editable", "global_active"],
-            },
-            "z_order": {
-                "type": "Int",
-                "value": 0,
-                "default": 0,
-                "global": ["Text", "z_order"],
-                "flags": ["editable", "preview", "global_active"],
-            },
-            "wrap_bounds": {
-                "type": "Vector2",
-                "value": [0.2, 0.2],
-                "default": [0.2, 0.2],
-                "global": ["Text", "wrap_bounds"],
-                "flags": ["editable", "global_active"],
-            },
-            "transition": {
-                "type": "Container",
-                "flags": ["preview"],
-                "children": {
-                    "type": {
-                        "type": "Dropdown",
-                        "value": "None",
-                        "default": "None",
-                        "options": ["None", "fade_in"],
-                        "flags": ["editable", "preview"],
-                    },
-                    "speed": {
-                        "type": "Int",
-                        "value": 500,
-                        "default": 500,
-                        "flags": ["editable", "preview"],
-                    },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "global": ["Text", "center_align"],
+            "flags": ["editable", "global_active"],
+        },
+        "text": {
+            "type": "Paragraph",
+            "value": "Default",
+            "default": "Default",
+            "flags": ["editable", "preview"],
+        },
+        "text_size": {
+            "type": "Int",
+            "value": 24,
+            "default": 24,
+            "global": ["Text", "size"],
+            "flags": ["editable", "preview", "global_active"],
+        },
+        "text_color": {
+            "type": "Color",
+            "value": [255, 255, 255],
+            "default": [255, 255, 255],
+            "global": ["Text", "color"],
+            "flags": ["editable", "preview", "global_active"],
+        },
+        "font": {
+            "type": "Asset_Font",
+            "value": "None",
+            "default": "None",
+            "global": ["Text", "font"],
+            "flags": ["editable", "global_active"],
+        },
+        "z_order": {
+            "type": "Int",
+            "value": 0,
+            "default": 0,
+            "global": ["Text", "z_order"],
+            "flags": ["editable", "preview", "global_active"],
+        },
+        "wrap_bounds": {
+            "type": "Vector2",
+            "value": [0.2, 0.2],
+            "default": [0.2, 0.2],
+            "global": ["Text", "wrap_bounds"],
+            "flags": ["editable", "global_active"],
+        },
+        "transition": {
+            "type": "Container",
+            "flags": ["preview"],
+            "children": {
+                "type": {
+                    "type": "Dropdown",
+                    "value": "None",
+                    "default": "None",
+                    "options": ["None", "fade_in"],
+                    "flags": ["editable", "preview"],
+                },
+                "speed": {
+                    "type": "Int",
+                    "value": 500,
+                    "default": 500,
+                    "flags": ["editable", "preview"],
                 },
             },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "wait_for_input",
-                "default": "wait_for_input",
-                "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-                "flags": ["editable", "preview"],
-            },
-            "connect_project_setting": {
-                "type": "Container",
-                "flags": ["editable", "preview"],
-                "children": {
-                    "category": {
-                        "type": "String",
-                        "value": "",
-                        "default": "",
-                        "flags": ["editable", "preview"],
-                    },
-                    "setting": {
-                        "type": "String",
-                        "value": "",
-                        "default": "",
-                        "flags": ["editable", "preview"],
-                    },
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "wait_for_input",
+            "default": "wait_for_input",
+            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
+            "flags": ["editable", "preview"],
+        },
+        "connect_project_setting": {
+            "type": "Container",
+            "flags": ["editable", "preview"],
+            "children": {
+                "category": {
+                    "type": "String",
+                    "value": "",
+                    "default": "",
+                    "flags": ["editable", "preview"],
+                },
+                "setting": {
+                    "type": "String",
+                    "value": "",
+                    "default": "",
+                    "flags": ["editable", "preview"],
                 },
             },
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
         new_text_renderable = TextRenderable(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         if not self.no_draw:
             self.scene.active_renderables.Add(new_text_renderable)
 
-            if "None" not in self.action_data["transition"]["type"]:
-                self.active_transition = self.a_manager.CreateTransition(self.action_data["transition"], new_text_renderable)
+            if "None" not in self.simplified_ad["transition"]["type"]:
+                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], new_text_renderable)
                 self.active_transition.Start()
             else:
                 self.scene.Draw()
@@ -646,161 +682,163 @@ class create_button(Action):
     """
     Creates a button interactable, and adds it to the renderable stack. Returns a 'Button'
     """
+    DISPLAY_NAME = "Create Button"
     ACTION_DATA = {
-        "display_name": "Create Button",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
-            "sprite": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
-                "global": ["Button", "sprite"],
-                "flags": ["editable", "preview", "global_active"],
-            },
-            "sprite_hover": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
-                "global": ["Button", "sprite_hover"],
-                "flags": ["editable", "global_active"],
-            },
-            "sprite_clicked": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
-                "global": ["Button", "sprite_clicked"],
-                "flags": ["editable", "global_active"],
-            },
-            "z_order": {
-                "type": "Int",
-                "value": 10001,
-                "default": 10001,
-                "global": ["Button", "z_order"],
-                "flags": ["editable", "global_active"],
-            },
-            "button_text": {
-                "type": "Container",
-                "flags": ["editable", "preview"],
-                "children": {
-                    "position": {
-                        "type": "Vector2",
-                        "value": [0.5, 0.5],
-                        "default": [0.5, 0.5],
-                        "flags": ["editable", "preview"],
-                    },
-                    "center_align": {
-                        "type": "Bool",
-                        "value": True,
-                        "default": True,
-                        "flags": ["editable"],
-                    },
-                    "text": {
-                        "type": "String",
-                        "value": "Default",
-                        "default": "Default",
-                        "flags": ["editable", "preview"],
-                    },
-                    "text_size": {
-                        "type": "Int",
-                        "value": 24,
-                        "default": 24,
-                        "global": ["Text", "size"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text_color": {
-                        "type": "Color",
-                        "value": [255, 255, 255],
-                        "default": [255, 255, 255],
-                        "global": ["Text", "color"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text_color_hover": {
-                        "type": "Color",
-                        "value": [255, 255, 255],
-                        "default": [255, 255, 255],
-                        "global": ["Text", "color"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text_color_clicked": {
-                        "type": "Color",
-                        "value": [255, 255, 255],
-                        "default": [255, 255, 255],
-                        "global": ["Text", "color"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "font": {
-                        "type": "Asset_Font",
-                        "value": "None",
-                        "default": "None",
-                        "global": ["Button", "font"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "z_order": {"type": "Int", "value": 10002, "default": 10002},
-                    "wrap_bounds": {
-                        "type": "Vector2",
-                        "value": [0.2, 0.2],
-                        "default": [0.2, 0.2],
-                        "flags": ["editable"],
-                    },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
+        },
+        "sprite": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
+            "global": ["Button", "sprite"],
+            "flags": ["editable", "preview", "global_active"],
+        },
+        "sprite_hover": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
+            "global": ["Button", "sprite_hover"],
+            "flags": ["editable", "global_active"],
+        },
+        "sprite_clicked": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
+            "global": ["Button", "sprite_clicked"],
+            "flags": ["editable", "global_active"],
+        },
+        "z_order": {
+            "type": "Int",
+            "value": 10001,
+            "default": 10001,
+            "global": ["Button", "z_order"],
+            "flags": ["editable", "global_active"],
+        },
+        "button_text": {
+            "type": "Container",
+            "flags": ["editable", "preview"],
+            "children": {
+                "position": {
+                    "type": "Vector2",
+                    "value": [0.5, 0.5],
+                    "default": [0.5, 0.5],
+                    "flags": ["editable", "preview"],
                 },
-            },
-            "events": {
-                "type": "Array",
-                "flags": ["editable", "no_exclusion"],
-                "template": {
-                    "event": {
-                        "type": "Array_Element",
-                        "flags": ["editable"],
-                        "children": {
-                            "action": {
-                                "type": "Event",
-                                "value": "None",
-                                "default": "None",
-                                "options": [
-                                    "None",
-                                    "load_scene",
-                                    "quit_game",
-                                    "scene_fade_out",
-                                    "scene_fade_in",
-                                    "play_sfx",
-                                    "set_mute",
-                                ],
-                                "flags": ["editable"],
-                            }
-                        },
-                    }
+                "center_align": {
+                    "type": "Bool",
+                    "value": True,
+                    "default": True,
+                    "flags": ["editable"],
                 },
+                "text": {
+                    "type": "String",
+                    "value": "Default",
+                    "default": "Default",
+                    "flags": ["editable", "preview"],
+                },
+                "text_size": {
+                    "type": "Int",
+                    "value": 24,
+                    "default": 24,
+                    "global": ["Text", "size"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text_color": {
+                    "type": "Color",
+                    "value": [255, 255, 255],
+                    "default": [255, 255, 255],
+                    "global": ["Text", "color"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text_color_hover": {
+                    "type": "Color",
+                    "value": [255, 255, 255],
+                    "default": [255, 255, 255],
+                    "global": ["Text", "color"],
+                    "flags": ["editable", "global_active"]
+                },
+                "text_color_clicked": {
+                    "type": "Color",
+                    "value": [255, 255, 255],
+                    "default": [255, 255, 255],
+                    "global": ["Text", "color"],
+                    "flags": ["editable", "global_active"]
+                },
+                "font": {
+                    "type": "Asset_Font",
+                    "value": "None",
+                    "default": "None",
+                    "global": ["Button", "font"],
+                    "flags": ["editable", "global_active"]
+                },
+                "wrap_bounds": {
+                    "type": "Vector2",
+                    "value": [0.2, 0.2],
+                    "default": [0.2, 0.2],
+                    "flags": ["editable"],
+                },
+                "z_order": {
+                    "type": "Int",
+                    "value": 10002,
+                    "default": 10002
+                }
+            },
+        },
+        "events": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "event": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "action": {
+                            "type": "Event",
+                            "value": "None",
+                            "default": "None",
+                            "options": [
+                                "None",
+                                "load_scene",
+                                "quit_game",
+                                "scene_fade_out",
+                                "scene_fade_in",
+                                "play_sfx",
+                                "set_mute",
+                            ],
+                            "flags": ["editable"],
+                        }
+                    },
+                }
             },
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         # System defined overrides
-        self.action_data["button_text"]["z_order"] = self.action_data["z_order"] + 1
+        self.simplified_ad["button_text"]["z_order"] = self.simplified_ad["z_order"] + 1
 
         new_renderable = Button(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         if not self.no_draw:
@@ -815,112 +853,110 @@ class create_text_button(Action):
     """
     Creates a text-only button interactable, and adds it to the renderable stack. Returns a 'Button'
     """
+    DISPLAY_NAME = "Create Button (Text Only)"
     ACTION_DATA = {
-        "display_name": "Create Button (Text Only)",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
-            "text": {
-                "type": "String",
-                "value": "Default",
-                "default": "Default",
-                "flags": ["editable", "preview"],
-            },
-            "text_size": {
-                "type": "Int",
-                "value": 24,
-                "default": 24,
-                "global": ["Text", "size"],
-                "flags": ["editable", "global_active"],
-            },
-            "text_color": {
-                "type": "Color",
-                "value": [255, 255, 255],
-                "default": [255, 255, 255],
-                "global": ["Text", "color"],
-                "flags": ["editable", "global_active"],
-            },
-            "text_color_hover": {
-                "type": "Color",
-                "value": [255, 255, 255],
-                "default": [255, 255, 255],
-                "global": ["Text", "color"],
-                "flags": ["editable", "global_active"],
-            },
-            "text_color_clicked": {
-                "type": "Color",
-                "value": [255, 255, 255],
-                "default": [255, 255, 255],
-                "global": ["Text", "color"],
-                "flags": ["editable", "global_active"],
-            },
-            "font": {
-                "type": "Asset_Font",
-                "value": "None",
-                "default": "None",
-                "global": ["Button", "font"],
-                "flags": ["editable", "global_active"],
-            },
-            "z_order": {"type": "Int", "value": 10002, "default": 10002},
-            "wrap_bounds": {
-                "type": "Vector2",
-                "value": [0.2, 0.2],
-                "default": [0.2, 0.2],
-                "flags": ["editable"],
-            },
-            "events": {
-                "type": "Array",
-                "flags": ["editable", "no_exclusion"],
-                "template": {
-                    "event": {
-                        "type": "Array_Element",
-                        "flags": ["editable"],
-                        "children": {
-                            "action": {
-                                "type": "Event",
-                                "value": "None",
-                                "default": "None",
-                                "options": [
-                                    "None",
-                                    "load_scene",
-                                    "quit_game",
-                                    "scene_fade_out",
-                                    "scene_fade_in",
-                                    "play_sfx",
-                                    "set_mute",
-                                ],
-                                "flags": ["editable"],
-                            }
-                        },
-                    }
-                },
-            },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
+        },
+        "text": {
+            "type": "String",
+            "value": "Default",
+            "default": "Default",
+            "flags": ["editable", "preview"],
+        },
+        "text_size": {
+            "type": "Int",
+            "value": 24,
+            "default": 24,
+            "global": ["Text", "size"],
+            "flags": ["editable", "global_active"],
+        },
+        "text_color": {
+            "type": "Color",
+            "value": [255, 255, 255],
+            "default": [255, 255, 255],
+            "global": ["Text", "color"],
+            "flags": ["editable", "global_active"],
+        },
+        "text_color_hover": {
+            "type": "Color",
+            "value": [255, 255, 255],
+            "default": [255, 255, 255],
+            "global": ["Text", "color"],
+            "flags": ["editable", "global_active"],
+        },
+        "text_color_clicked": {
+            "type": "Color",
+            "value": [255, 255, 255],
+            "default": [255, 255, 255],
+            "global": ["Text", "color"],
+            "flags": ["editable", "global_active"],
+        },
+        "font": {
+            "type": "Asset_Font",
+            "value": "None",
+            "default": "None",
+            "global": ["Button", "font"],
+            "flags": ["editable", "global_active"],
+        },
+        "z_order": {"type": "Int", "value": 10002, "default": 10002},
+        "wrap_bounds": {
+            "type": "Vector2",
+            "value": [0.2, 0.2],
+            "default": [0.2, 0.2],
+            "flags": ["editable"],
+        },
+        "events": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "event": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "action": {
+                            "type": "Event",
+                            "value": "None",
+                            "default": "None",
+                            "options": [
+                                "None",
+                                "load_scene",
+                                "quit_game",
+                                "scene_fade_out",
+                                "scene_fade_in",
+                                "play_sfx",
+                                "set_mute",
+                            ],
+                            "flags": ["editable"],
+                        }
+                    },
+                }
+            }
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         new_renderable = Button(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         if not self.no_draw:
@@ -935,117 +971,115 @@ class create_checkbox(Action):
     """
     Creates a checkbox button interactable, and adds it to the renderable stack. Returns a 'Checkbox'
     """
+    DISPLAY_NAME = "Create Checkbox"
     ACTION_DATA = {
-        "display_name": "Create Checkbox",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "position": {
-                "type": "Vector2",
-                "value": [0.5, 0.5],
-                "default": [0.5, 0.5],
-                "flags": ["editable", "preview"],
-            },
-            "center_align": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
-            "sprite": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
-                "global": ["Button", "checkbox_sprite"],
-                "flags": ["editable", "preview", "global_active"],
-            },
-            "sprite_hover": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
-                "global": ["Button", "checkbox_sprite_hover"],
-                "flags": ["editable", "global_active"],
-            },
-            "sprite_clicked": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
-                "global": ["Button", "checkbox_sprite_clicked"],
-                "flags": ["editable", "global_active"],
-            },
-            "sprite_icon": {
-                "type": "Asset_Image",
-                "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
-                "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
-                "global": ["Button", "checkbox_sprite_icon"],
-                "flags": ["editable", "global_active"],
-            },
-            "z_order": {
-                "type": "Int",
-                "value": 10001,
-                "default": 10001,
-                "global": ["Button", "z_order"],
-                "flags": ["editable", "global_active"],
-            },
-            "connect_project_setting": {
-                "type": "Container",
-                "flags": ["editable", "preview"],
-                "children": {
-                    "category": {
-                        "type": "String",
-                        "value": "",
-                        "default": "",
-                        "flags": ["editable", "preview"],
-                    },
-                    "setting": {
-                        "type": "String",
-                        "value": "",
-                        "default": "",
-                        "flags": ["editable", "preview"],
-                    },
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "default": [0.5, 0.5],
+            "flags": ["editable", "preview"],
+        },
+        "center_align": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
+        },
+        "sprite": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
+            "global": ["Button", "checkbox_sprite"],
+            "flags": ["editable", "preview", "global_active"],
+        },
+        "sprite_hover": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
+            "global": ["Button", "checkbox_sprite_hover"],
+            "flags": ["editable", "global_active"],
+        },
+        "sprite_clicked": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
+            "global": ["Button", "checkbox_sprite_clicked"],
+            "flags": ["editable", "global_active"],
+        },
+        "sprite_icon": {
+            "type": "Asset_Image",
+            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
+            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
+            "global": ["Button", "checkbox_sprite_icon"],
+            "flags": ["editable", "global_active"],
+        },
+        "z_order": {
+            "type": "Int",
+            "value": 10001,
+            "default": 10001,
+            "global": ["Button", "z_order"],
+            "flags": ["editable", "global_active"],
+        },
+        "connect_project_setting": {
+            "type": "Container",
+            "flags": ["editable", "preview"],
+            "children": {
+                "category": {
+                    "type": "String",
+                    "value": "",
+                    "default": "",
+                    "flags": ["editable", "preview"],
+                },
+                "setting": {
+                    "type": "String",
+                    "value": "",
+                    "default": "",
+                    "flags": ["editable", "preview"],
                 },
             },
-            "events": {
-                "type": "Array",
-                "flags": ["editable", "no_exclusion"],
-                "template": {
-                    "event": {
-                        "type": "Array_Element",
-                        "flags": ["editable"],
-                        "children": {
-                            "action": {
-                                "type": "Event",
-                                "value": "None",
-                                "default": "None",
-                                "options": [
-                                    "None",
-                                    "load_scene",
-                                    "quit_game",
-                                    "scene_fade_out",
-                                    "scene_fade_in",
-                                    "play_sfx",
-                                    "set_mute",
-                                ],
-                                "flags": ["editable"],
-                            }
-                        },
-                    }
-                },
+        },
+        "events": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "event": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "action": {
+                            "type": "Event",
+                            "value": "None",
+                            "default": "None",
+                            "options": [
+                                "None",
+                                "load_scene",
+                                "quit_game",
+                                "scene_fade_out",
+                                "scene_fade_in",
+                                "play_sfx",
+                                "set_mute",
+                            ],
+                            "flags": ["editable"],
+                        }
+                    },
+                }
             },
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         new_renderable = Checkbox(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         if not self.no_draw:
@@ -1060,18 +1094,18 @@ class create_checkbox(Action):
 #
 #    # @TODO: Update to new workflow
 #    def Start(self):
-#        self.LoadMetadata(__class__.__name__)
+#        self.UpdatedSimpAD(self.ACTION_DATA)
 #        self.skippable = False
 #
 #        # Container-specific adjustments
-#        self.action_data['position'] = (0, 0)
-#        self.action_data['z_order'] = 0
-#        self.action_data['center_align'] = False
+#        self.ACTION_DATA['position'] = (0, 0)
+#        self.ACTION_DATA['z_order'] = 0
+#        self.ACTION_DATA['center_align'] = False
 #
 #        # Containers aren't rendered, so use defaults
 #        new_renderable = Container(
 #            self.scene,
-#            self.action_data,
+#            self.ACTION_DATA,
 #        )
 #
 #        self.scene.active_renderables.Add(new_renderable)
@@ -1090,211 +1124,209 @@ class dialogue(Action):
     Create dialogue and speaker text renderables, and add them to the renderable stack using pre-configured settings.
     If the user specifies a 'character' block, create a speaker text using the character details instead. Returns None
     """
+    DISPLAY_NAME = "Dialogue"
     ACTION_DATA = {
-        "display_name": "Dialogue",
-        "requirements": {
-            "speaker": {
-                "type": "Container",
-                "flags": ["editable", "preview"],
-                "children": {
-                    "key": {
-                        "type": "String",
-                        "value": "SpeakerText",
-                        "default": "SpeakerText",
-                    },
-                    "position": {
-                        "type": "Vector2",
-                        "value": [0, 0],
-                        "default": [0, 0],
-                        "global": ["Dialogue", "speaker_text_position"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "center_align": {
-                        "type": "Bool",
-                        "value": True,
-                        "default": True,
-                        "global": ["Dialogue", "speaker_text_center_align"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text": {
-                        "type": "String",
-                        "value": "",
-                        "default": "",
-                        "flags": ["editable", "preview"],
-                    },
-                    "text_size": {
-                        "type": "Int",
-                        "value": 24,
-                        "default": 24,
-                        "global": ["Dialogue", "speaker_text_size"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text_color": {
-                        "type": "Color",
-                        "value": [255, 255, 255],
-                        "default": [255, 255, 255],
-                        "global": ["Dialogue", "speaker_text_color"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "font": {
-                        "type": "Asset_Font",
-                        "value": "None",
-                        "default": "None",
-                        "global": ["Dialogue", "speaker_text_font"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "z_order": {
-                        "type": "Int",
-                        "value": 0,
-                        "default": 0,
-                        "global": ["Dialogue", "speaker_text_z_order"],
-                        "flags": ["global_active"],
-                    },
-                    "transition": {
-                        "type": "Container",
-                        "flags": ["editable"],
-                        "children": {
-                            "type": {
-                                "type": "Dropdown",
-                                "value": "None",
-                                "default": "None",
-                                "global": ["Dialogue", "transition_type"],
-                                "options": ["fade_in", "None"],
-                                "flags": ["editable", "global_active"],
-                            },
-                            "speed": {
-                                "type": "Int",
-                                "value": 500,
-                                "default": 500,
-                                "global": ["Dialogue", "transition_speed"],
-                                "flags": ["editable", "global_active"],
-                            },
+        "speaker": {
+            "type": "Container",
+            "flags": ["editable", "preview"],
+            "children": {
+                "key": {
+                    "type": "String",
+                    "value": "SpeakerText",
+                    "default": "SpeakerText",
+                },
+                "position": {
+                    "type": "Vector2",
+                    "value": [0, 0],
+                    "default": [0, 0],
+                    "global": ["Dialogue", "speaker_text_position"],
+                    "flags": ["editable", "global_active"],
+                },
+                "center_align": {
+                    "type": "Bool",
+                    "value": True,
+                    "default": True,
+                    "global": ["Dialogue", "speaker_text_center_align"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text": {
+                    "type": "String",
+                    "value": "",
+                    "default": "",
+                    "flags": ["editable", "preview"],
+                },
+                "text_size": {
+                    "type": "Int",
+                    "value": 24,
+                    "default": 24,
+                    "global": ["Dialogue", "speaker_text_size"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text_color": {
+                    "type": "Color",
+                    "value": [255, 255, 255],
+                    "default": [255, 255, 255],
+                    "global": ["Dialogue", "speaker_text_color"],
+                    "flags": ["editable", "global_active"],
+                },
+                "font": {
+                    "type": "Asset_Font",
+                    "value": "None",
+                    "default": "None",
+                    "global": ["Dialogue", "speaker_text_font"],
+                    "flags": ["editable", "global_active"],
+                },
+                "z_order": {
+                    "type": "Int",
+                    "value": 0,
+                    "default": 0,
+                    "global": ["Dialogue", "speaker_text_z_order"],
+                    "flags": ["global_active"],
+                },
+                "transition": {
+                    "type": "Container",
+                    "flags": ["editable"],
+                    "children": {
+                        "type": {
+                            "type": "Dropdown",
+                            "value": "None",
+                            "default": "None",
+                            "global": ["Dialogue", "transition_type"],
+                            "options": ["fade_in", "None"],
+                            "flags": ["editable", "global_active"],
+                        },
+                        "speed": {
+                            "type": "Int",
+                            "value": 500,
+                            "default": 500,
+                            "global": ["Dialogue", "transition_speed"],
+                            "flags": ["editable", "global_active"],
                         },
                     },
-                    "wrap_bounds": {
-                        "type": "Vector2",
-                        "value": [0.2, 0.2],
-                        "default": [0.2, 0.2],
-                        "global": ["Dialogue", "speaker_text_wrap_bounds"],
-                        "flags": ["global_active"],
-                    },
+                },
+                "wrap_bounds": {
+                    "type": "Vector2",
+                    "value": [0.2, 0.2],
+                    "default": [0.2, 0.2],
+                    "global": ["Dialogue", "speaker_text_wrap_bounds"],
+                    "flags": ["global_active"],
                 },
             },
-            "dialogue": {
-                "type": "Container",
-                "flags": ["editable", "preview"],
-                "children": {
-                    "key": {
-                        "type": "String",
-                        "value": "DialogueText",
-                        "default": "DialogueText",
-                    },
-                    "position": {
-                        "type": "Vector2",
-                        "value": [0, 0],
-                        "default": [0, 0],
-                        "global": ["Dialogue", "dialogue_text_position"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "center_align": {
-                        "type": "Bool",
-                        "value": True,
-                        "default": True,
-                        "global": ["Dialogue", "dialogue_text_center_align"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text": {
-                        "type": "Paragraph",
-                        "value": "Default",
-                        "default": "Default",
-                        "flags": ["editable", "preview"],
-                    },
-                    "text_size": {
-                        "type": "Int",
-                        "value": 24,
-                        "default": 24,
-                        "global": ["Dialogue", "dialogue_text_size"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "text_color": {
-                        "type": "Color",
-                        "value": [255, 255, 255],
-                        "default": [255, 255, 255],
-                        "global": ["Dialogue", "dialogue_text_color"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "font": {
-                        "type": "Asset_Font",
-                        "value": "None",
-                        "default": "None",
-                        "global": ["Dialogue", "dialogue_text_font"],
-                        "flags": ["editable", "global_active"],
-                    },
-                    "z_order": {
-                        "type": "Int",
-                        "value": 0,
-                        "default": 0,
-                        "global": ["Dialogue", "dialogue_text_z_order"],
-                        "flags": ["global_active"],
-                    },
-                    "transition": {
-                        "type": "Container",
-                        "flags": ["editable"],
-                        "children": {
-                            "type": {
-                                "type": "Dropdown",
-                                "value": "fade_in",
-                                "default": "fade_in",
-                                "global": ["Dialogue", "transition_type"],
-                                "options": ["fade_in", "None"],
-                                "flags": ["editable", "global_active"],
-                            },
-                            "speed": {
-                                "type": "Int",
-                                "value": 1000,
-                                "default": 1000,
-                                "global": ["Dialogue", "transition_speed"],
-                                "flags": ["editable", "global_active"],
-                            },
+        },
+        "dialogue": {
+            "type": "Container",
+            "flags": ["editable", "preview"],
+            "children": {
+                "key": {
+                    "type": "String",
+                    "value": "DialogueText",
+                    "default": "DialogueText",
+                },
+                "position": {
+                    "type": "Vector2",
+                    "value": [0, 0],
+                    "default": [0, 0],
+                    "global": ["Dialogue", "dialogue_text_position"],
+                    "flags": ["editable", "global_active"],
+                },
+                "center_align": {
+                    "type": "Bool",
+                    "value": True,
+                    "default": True,
+                    "global": ["Dialogue", "dialogue_text_center_align"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text": {
+                    "type": "Paragraph",
+                    "value": "Default",
+                    "default": "Default",
+                    "flags": ["editable", "preview"],
+                },
+                "text_size": {
+                    "type": "Int",
+                    "value": 24,
+                    "default": 24,
+                    "global": ["Dialogue", "dialogue_text_size"],
+                    "flags": ["editable", "global_active"],
+                },
+                "text_color": {
+                    "type": "Color",
+                    "value": [255, 255, 255],
+                    "default": [255, 255, 255],
+                    "global": ["Dialogue", "dialogue_text_color"],
+                    "flags": ["editable", "global_active"],
+                },
+                "font": {
+                    "type": "Asset_Font",
+                    "value": "None",
+                    "default": "None",
+                    "global": ["Dialogue", "dialogue_text_font"],
+                    "flags": ["editable", "global_active"],
+                },
+                "z_order": {
+                    "type": "Int",
+                    "value": 0,
+                    "default": 0,
+                    "global": ["Dialogue", "dialogue_text_z_order"],
+                    "flags": ["global_active"],
+                },
+                "transition": {
+                    "type": "Container",
+                    "flags": ["editable"],
+                    "children": {
+                        "type": {
+                            "type": "Dropdown",
+                            "value": "fade_in",
+                            "default": "fade_in",
+                            "global": ["Dialogue", "transition_type"],
+                            "options": ["fade_in", "None"],
+                            "flags": ["editable", "global_active"],
+                        },
+                        "speed": {
+                            "type": "Int",
+                            "value": 1000,
+                            "default": 1000,
+                            "global": ["Dialogue", "transition_speed"],
+                            "flags": ["editable", "global_active"],
                         },
                     },
-                    "wrap_bounds": {
-                        "type": "Vector2",
-                        "value": [0.8, 0.16],
-                        "default": [0.8, 0.16],
-                        "global": ["Dialogue", "dialogue_text_wrap_bounds"],
-                        "flags": ["global_active"],
-                    },
+                },
+                "wrap_bounds": {
+                    "type": "Vector2",
+                    "value": [0.8, 0.16],
+                    "default": [0.8, 0.16],
+                    "global": ["Dialogue", "dialogue_text_wrap_bounds"],
+                    "flags": ["global_active"],
                 },
             },
-            "post_wait": {
-                "type": "String",
-                "value": "wait_for_input",
-                "default": "wait_for_input",
-                "flags": ["no_exclusion"],
-            },
+        },
+        "post_wait": {
+            "type": "String",
+            "value": "wait_for_input",
+            "default": "wait_for_input",
+            "flags": ["no_exclusion"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
         new_speaker_text = TextRenderable(
             self.scene,
-            self.action_data["speaker"]
+            self.simplified_ad["speaker"]
         )
 
         new_dialogue_text = TextRenderable(
             self.scene,
-            self.action_data["dialogue"]
+            self.simplified_ad["dialogue"]
         )
 
         self.scene.active_renderables.Add(new_speaker_text)
         self.scene.active_renderables.Add(new_dialogue_text)
 
         # Note: Speaker text does not support transitions currently
-        if self.action_data["dialogue"]["transition"]["type"] != "None":
-            self.active_transition = self.a_manager.CreateTransition(self.action_data["dialogue"]["transition"], new_dialogue_text)
+        if self.simplified_ad["dialogue"]["transition"]["type"] != "None":
+            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["dialogue"]["transition"], new_dialogue_text)
             self.active_transition.Start()
         else:
             self.scene.Draw()
@@ -1322,7 +1354,7 @@ class dialogue(Action):
 #    """
 #
 #    def Start(self):
-#        self.LoadMetadata(__class__.__name__)
+#        self.UpdatedSimpAD(self.ACTION_DATA)
 #
 #        # Dialogue-specific adjustments
 #        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
@@ -1332,19 +1364,19 @@ class dialogue(Action):
 #        #@TODO: Can we consolidate to avoid duplicated if checks for global settings?
 #        # If the user provides a 'character' block, use details from the relevant character data file if it exists, as
 #        # well as any applicable global settings
-#        if 'character' in self.action_data:
-#            character_data = self.scene.character_data[self.action_data['character']]
+#        if 'character' in self.simplified_ad:
+#            character_data = self.scene.character_data[self.simplified_ad['character']]
 #
 #            # Dialogue-specific adjustments
 #            character_data['key'] = 'SpeakerText'
 #
 #            # OVERRIDES WITH NO PROJECT DEFAULTS
 #            assert 'name' in character_data, print(
-#                f"Character file '{self.action_data['character']}' does not have a 'name' param")
+#                f"Character file '{self.simplified_ad['character']}' does not have a 'name' param")
 #            character_data['text'] = character_data['name']
 #
 #            assert 'color' in character_data, print(
-#                f"Character file '{self.action_data['character']}' does not have a 'color' param")
+#                f"Character file '{self.simplified_ad['character']}' does not have a 'color' param")
 #            character_data['text_color'] = character_data['color']
 #
 #            # PROJECT DEFAULTS
@@ -1372,90 +1404,90 @@ class dialogue(Action):
 #
 #        # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
 #        # information, and / or any global settings
-#        elif 'speaker' in self.action_data:
+#        elif 'speaker' in self.simplified_ad:
 #            # Dialogue-specific adjustments
-#            self.action_data['speaker']['key'] = 'SpeakerText'
+#            self.simplified_ad['speaker']['key'] = 'SpeakerText'
 #
 #            # PROJECT DEFAULTS OVERRIDE
-#            if 'position' not in self.action_data['speaker']:
-#                self.action_data['speaker']['position'] = settings.project_settings['Dialogue'][
+#            if 'position' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['position'] = settings.project_settings['Dialogue'][
 #                    'speaker_text_position']
 #
-#            if 'z_order' not in self.action_data['speaker']:
-#                self.action_data['speaker']['z_order'] = settings.project_settings['Dialogue'][
+#            if 'z_order' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['z_order'] = settings.project_settings['Dialogue'][
 #                    'speaker_z_order']
 #
-#            if 'center_align' not in self.action_data['speaker']:
-#                self.action_data['speaker']['center_align'] = settings.project_settings['Dialogue'][
+#            if 'center_align' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['center_align'] = settings.project_settings['Dialogue'][
 #                    'speaker_center_align']
 #
-#            if 'font' not in self.action_data['speaker']:
-#                self.action_data['speaker']['font'] = settings.project_settings['Dialogue'][
+#            if 'font' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['font'] = settings.project_settings['Dialogue'][
 #                    'speaker_font']
 #
-#            if 'text_size' not in self.action_data['speaker']:
-#                self.action_data['speaker']['text_size'] = settings.project_settings['Dialogue'][
+#            if 'text_size' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['text_size'] = settings.project_settings['Dialogue'][
 #                    'speaker_text_size']
 #
-#            if 'text_color' not in self.action_data['speaker']:
-#                self.action_data['speaker']['text_color'] = settings.project_settings['Dialogue'][
+#            if 'text_color' not in self.simplified_ad['speaker']:
+#                self.simplified_ad['speaker']['text_color'] = settings.project_settings['Dialogue'][
 #                    'speaker_text_color']
 #
 #            new_speaker_text = TextRenderable(
 #                self.scene,
-#                self.action_data['speaker']
+#                self.simplified_ad['speaker']
 #            )
 #            # Speaker text does not support transitions currently
 #            self.scene.active_renderables.Add(new_speaker_text)
 #
 #        # If the user has specified a 'dialogue' block, build the speaker renderable
-#        if 'dialogue' in self.action_data:
+#        if 'dialogue' in self.simplified_ad:
 #            # Dialogue-specific adjustments
-#            self.action_data['dialogue']['key'] = 'DialogueText'
+#            self.simplified_ad['dialogue']['key'] = 'DialogueText'
 #
 #            # PROJECT DEFAULTS OVERRIDE
-#            if 'position' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['position'] = settings.project_settings['Dialogue'][
+#            if 'position' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['position'] = settings.project_settings['Dialogue'][
 #                    'dialogue_text_position']
 #
-#            if 'z_order' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['z_order'] = settings.project_settings['Dialogue'][
+#            if 'z_order' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['z_order'] = settings.project_settings['Dialogue'][
 #                    'dialogue_z_order']
 #
-#            if 'center_align' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['center_align'] = settings.project_settings['Dialogue'][
+#            if 'center_align' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['center_align'] = settings.project_settings['Dialogue'][
 #                    'dialogue_center_align']
 #
-#            if 'font' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['font'] = settings.project_settings['Dialogue'][
+#            if 'font' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['font'] = settings.project_settings['Dialogue'][
 #                    'dialogue_font']
 #
-#            if 'text_size' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['text_size'] = settings.project_settings['Dialogue'][
+#            if 'text_size' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['text_size'] = settings.project_settings['Dialogue'][
 #                    'dialogue_text_size']
 #
-#            if 'text_color' not in self.action_data['dialogue']:
-#                self.action_data['dialogue']['text_color'] = settings.project_settings['Dialogue'][
+#            if 'text_color' not in self.simplified_ad['dialogue']:
+#                self.simplified_ad['dialogue']['text_color'] = settings.project_settings['Dialogue'][
 #                    'dialogue_text_color']
 #
 #            new_dialogue_text = TextRenderable(
 #                self.scene,
-#                self.action_data['dialogue']
+#                self.simplified_ad['dialogue']
 #            )
 #
 #            self.scene.active_renderables.Add(new_dialogue_text)
 #
 #            # By default, dialogue text fades in. However, allow the user to override this behaviour
-#            if 'transition' in self.action_data['dialogue']:
-#                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
+#            if 'transition' in self.simplified_ad['dialogue']:
+#                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['dialogue']['transition'],
 #                                                                         new_dialogue_text)
 #                self.active_transition.Start()
 #            else:
-#                self.action_data['dialogue']['transition'] = {
+#                self.simplified_ad['dialogue']['transition'] = {
 #                    'type': 'fade_in',
 #                    'speed': 1000
 #                }
-#                self.active_transition = self.a_manager.CreateTransition(self.action_data['dialogue']['transition'],
+#                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['dialogue']['transition'],
 #                                                                         new_dialogue_text)
 #                self.active_transition.Start()
 #
@@ -1482,53 +1514,53 @@ class dialogue(Action):
 #    This action is only available in DialogueScenes, and requires a 'character' block be provided
 #    """
 #    def Start(self):
-#        self.LoadMetadata(__class__.__name__)
+#        self.UpdatedSimpAD(self.ACTION_DATA)
 #
 #        # Character-specific adjustments
 #        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
 #            "The active scene is not of the 'DialogueScene' type. This action can not be performed")
-#        assert 'character' in self.action_data, print(
+#        assert 'character' in self.simplified_ad, print(
 #            f"No 'character' block assigned to {self}. This makes for an impossible action!")
-#        assert 'name' in self.action_data['character'], print(
+#        assert 'name' in self.simplified_ad['character'], print(
 #            f"No 'name' value assigned to {self} character block. This makes for an impossible action!")
-#        assert 'mood' in self.action_data['character'], print(
+#        assert 'mood' in self.simplified_ad['character'], print(
 #            f"No 'mood' value assigned to {self} character block. This makes for an impossible action!")
 #
 #        # Get the character data from the scene
-#        character_data = self.scene.character_data[self.action_data['character']['name']]
+#        character_data = self.scene.character_data[self.simplified_ad['character']['name']]
 #
 #        assert 'moods' in character_data, print(
-#            f"Character file '{self.action_data['character']['name']}' does not have a 'moods' block")
-#        self.action_data['sprite'] = character_data['moods'][self.action_data['character']['mood']]
+#            f"Character file '{self.simplified_ad['character']['name']}' does not have a 'moods' block")
+#        self.simplified_ad['sprite'] = character_data['moods'][self.simplified_ad['character']['mood']]
 #
 #        # OVERRIDES WITH NO PROJECT DEFAULTS
-#        if 'position' not in self.action_data:
-#            self.action_data['position'] = (0, 0)
+#        if 'position' not in self.simplified_ad:
+#            self.simplified_ad['position'] = (0, 0)
 #
 #        # PROJECT DEFAULTS OVERRIDE
-#        if 'z_order' not in self.action_data:
-#            self.action_data['z_order'] = settings.project_settings['Sprite'][
+#        if 'z_order' not in self.simplified_ad:
+#            self.simplified_ad['z_order'] = settings.project_settings['Sprite'][
 #                'z_order']
 #
-#        if 'center_align' not in self.action_data:
-#            self.action_data['center_align'] = settings.project_settings['Sprite'][
+#        if 'center_align' not in self.simplified_ad:
+#            self.simplified_ad['center_align'] = settings.project_settings['Sprite'][
 #                'center_align']
 #
 #        new_sprite = SpriteRenderable(
 #            self.scene,
-#            self.action_data
+#            self.simplified_ad
 #        )
 #
 #        # If the user requested a flip action, do so
-#        if 'flip' in self.action_data:
-#            if self.action_data['flip']:
+#        if 'flip' in self.simplified_ad:
+#            if self.simplified_ad['flip']:
 #                new_sprite.Flip()
 #
 #        self.scene.active_renderables.Add(new_sprite)
 #
 #        # Any transitions are applied to the sprite post-load
-#        if 'transition' in self.action_data:
-#            self.active_transition = self.a_manager.CreateTransition(self.action_data['transition'], new_sprite)
+#        if 'transition' in self.simplified_ad:
+#            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['transition'], new_sprite)
 #            self.active_transition.Start()
 #        else:
 #            self.scene.Draw()
@@ -1550,170 +1582,169 @@ class dialogue(Action):
 
 
 class choice(Action):
+    DISPLAY_NAME = "Choice"
     ACTION_DATA = {
-        "display_name": "Choice",
-        "requirements": {
-            "choices": {
-                "type": "Array",
-                "flags": ["editable", "preview"],
-                "template": {
-                    "choice": {
-                        "type": "Array_Element",
-                        "flags": ["editable", "preview"],
-                        "children": {
-                            "branch": {
-                                "type": "String",
-                                "value": "",
-                                "default": "",
-                                "flags": ["editable", "preview"],
-                            },
-                            "position": {
-                                "type": "Vector2",
-                                "value": [0.5, 0.5],
-                                "default": [0.5, 0.5],
-                                "flags": ["editable", "preview"],
-                            },
-                            "center_align": {
-                                "type": "Bool",
-                                "value": True,
-                                "default": True,
-                            },
-                            "sprite": {
-                                "type": "Asset_Image",
-                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
-                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
-                                "global": ["Dialogue", "choice_button_sprite"],
-                                "flags": ["editable", "preview", "global_active"],
-                            },
-                            "sprite_hover": {
-                                "type": "Asset_Image",
-                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
-                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
-                                "global": ["Dialogue", "choice_button_sprite_hover"],
-                                "flags": ["editable", "global_active"],
-                            },
-                            "sprite_clicked": {
-                                "type": "Asset_Image",
-                                "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
-                                "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
-                                "global": ["Dialogue", "choice_button_sprite_clicked"],
-                                "flags": ["editable", "global_active"],
-                            },
-                            "z_order": {
-                                "type": "Int",
-                                "value": 10001,
-                                "default": 10001,
-                                "global": ["Dialogue", "choice_button_text_size"],
-                                "flags": ["global_active"],
-                            },
-                            "button_text": {
-                                "type": "Container",
-                                "flags": ["editable", "preview"],
-                                "children": {
-                                    "position": {
-                                        "type": "Vector2",
-                                        "value": [0.5, 0.5],
-                                        "default": [0.5, 0.5],
-                                        "flags": ["editable"],
-                                    },
-                                    "center_align": {
-                                        "type": "Bool",
-                                        "value": True,
-                                        "default": True,
-                                        "flags": ["editable"],
-                                    },
-                                    "text": {
-                                        "type": "String",
-                                        "value": "Default",
-                                        "default": "Default",
-                                        "flags": ["editable", "preview"],
-                                    },
-                                    "text_size": {
-                                        "type": "Int",
-                                        "value": 24,
-                                        "default": 24,
-                                        "global": [
-                                            "Dialogue",
-                                            "choice_button_text_size",
-                                        ],
-                                        "flags": ["editable", "global_active"],
-                                    },
-                                    "text_color": {
-                                        "type": "Color",
-                                        "value": [255, 255, 255],
-                                        "default": [255, 255, 255],
-                                        "global": [
-                                            "Dialogue",
-                                            "choice_button_text_color",
-                                        ],
-                                        "flags": ["editable", "global_active"],
-                                    },
-                                    "text_color_hover": {
-                                        "type": "Color",
-                                        "value": [255, 255, 255],
-                                        "default": [255, 255, 255],
-                                        "global": [
-                                            "Dialogue",
-                                            "choice_button_text_color_hover",
-                                        ],
-                                        "flags": ["editable", "global_active"],
-                                    },
-                                    "text_color_clicked": {
-                                        "type": "Color",
-                                        "value": [255, 255, 255],
-                                        "default": [255, 255, 255],
-                                        "global": [
-                                            "Dialogue",
-                                            "choice_button_text_color_clicked",
-                                        ],
-                                        "flags": ["editable", "global_active"],
-                                    },
-                                    "font": {
-                                        "type": "Asset_Font",
-                                        "value": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
-                                        "default": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
-                                        "global": ["Dialogue", "choice_button_font"],
-                                        "flags": ["editable", "global_active"],
-                                    },
-                                    "z_order": {
-                                        "type": "Int",
-                                        "value": 10002,
-                                        "default": 10002,
-                                    },
-                                    "wrap_bounds": {
-                                        "type": "Vector2",
-                                        "value": [0.25, 0.25],
-                                        "default": [0.25, 0.25],
-                                        "flags": ["editable"],
-                                    },
-                                },
-                            },
+        "choices": {
+            "type": "Array",
+            "flags": ["editable", "preview"],
+            "template": {
+                "choice": {
+                    "type": "Array_Element",
+                    "flags": ["editable", "preview"],
+                    "children": {
+                        "branch": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable", "preview"],
                         },
+                        "position": {
+                            "type": "Vector2",
+                            "value": [0.5, 0.5],
+                            "default": [0.5, 0.5],
+                            "flags": ["editable", "preview"],
+                        },
+                        "center_align": {
+                            "type": "Bool",
+                            "value": True,
+                            "default": True,
+                        },
+                        "sprite": {
+                            "type": "Asset_Image",
+                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
+                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
+                            "global": ["Dialogue", "choice_button_sprite"],
+                            "flags": ["editable", "preview", "global_active"],
+                        },
+                        "sprite_hover": {
+                            "type": "Asset_Image",
+                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
+                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
+                            "global": ["Dialogue", "choice_button_sprite_hover"],
+                            "flags": ["editable", "global_active"],
+                        },
+                        "sprite_clicked": {
+                            "type": "Asset_Image",
+                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
+                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
+                            "global": ["Dialogue", "choice_button_sprite_clicked"],
+                            "flags": ["editable", "global_active"],
+                        },
+                        "z_order": {
+                            "type": "Int",
+                            "value": 10001,
+                            "default": 10001,
+                            "global": ["Dialogue", "choice_button_text_size"],
+                            "flags": ["global_active"],
+                        },
+                        "button_text": {
+                            "type": "Container",
+                            "flags": ["editable", "preview"],
+                            "children": {
+                                "position": {
+                                    "type": "Vector2",
+                                    "value": [0.5, 0.5],
+                                    "default": [0.5, 0.5],
+                                    "flags": ["editable"],
+                                },
+                                "center_align": {
+                                    "type": "Bool",
+                                    "value": True,
+                                    "default": True,
+                                    "flags": ["editable"],
+                                },
+                                "text": {
+                                    "type": "String",
+                                    "value": "Default",
+                                    "default": "Default",
+                                    "flags": ["editable", "preview"],
+                                },
+                                "text_size": {
+                                    "type": "Int",
+                                    "value": 24,
+                                    "default": 24,
+                                    "global": [
+                                        "Dialogue",
+                                        "choice_button_text_size",
+                                    ],
+                                    "flags": ["editable", "global_active"],
+                                },
+                                "text_color": {
+                                    "type": "Color",
+                                    "value": [255, 255, 255],
+                                    "default": [255, 255, 255],
+                                    "global": [
+                                        "Dialogue",
+                                        "choice_button_text_color",
+                                    ],
+                                    "flags": ["editable", "global_active"],
+                                },
+                                "text_color_hover": {
+                                    "type": "Color",
+                                    "value": [255, 255, 255],
+                                    "default": [255, 255, 255],
+                                    "global": [
+                                        "Dialogue",
+                                        "choice_button_text_color_hover",
+                                    ],
+                                    "flags": ["editable", "global_active"],
+                                },
+                                "text_color_clicked": {
+                                    "type": "Color",
+                                    "value": [255, 255, 255],
+                                    "default": [255, 255, 255],
+                                    "global": [
+                                        "Dialogue",
+                                        "choice_button_text_color_clicked",
+                                    ],
+                                    "flags": ["editable", "global_active"],
+                                },
+                                "font": {
+                                    "type": "Asset_Font",
+                                    "value": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
+                                    "default": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
+                                    "global": ["Dialogue", "choice_button_font"],
+                                    "flags": ["editable", "global_active"],
+                                },
+                                "z_order": {
+                                    "type": "Int",
+                                    "value": 10002,
+                                    "default": 10002,
+                                },
+                                "wrap_bounds": {
+                                    "type": "Vector2",
+                                    "value": [0.25, 0.25],
+                                    "default": [0.25, 0.25],
+                                    "flags": ["editable"],
+                                }
+                            }
+                        }
                     }
-                },
+                }
             }
         }
     }
+
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         # Create an object that acts as a parent for all the choice buttons. When this is deleted, the buttons
         # will be deleted with it
-        self.action_data["position"] = (0, 0)
-        self.action_data["z_order"] = 0
-        self.action_data["center_align"] = False
-        self.action_data["key"] = "Choice"
+        self.simplified_ad["position"] = (0, 0)
+        self.simplified_ad["z_order"] = 0
+        self.simplified_ad["center_align"] = False
+        self.simplified_ad["key"] = "Choice"
         new_renderable = Choice(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         # Generate a button for each choice, adding them to the active renderables group for access to updates
         # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
         #
         # Because we the data comes from the 'template' key, we don't have a mechanism to load from the action
-        for choice_name, choice_data in self.action_data["choices"].items():
+        for choice_name, choice_data in self.simplified_ad["choices"].items():
             # Define what the button does when clicked
             choice_data["event"] = {
                 "action": "choose_branch",
@@ -1737,8 +1768,10 @@ class choice(Action):
 
 
 class choose_branch(Action):
+    DISPLAY_NAME = "Choose Branch"
+    ACTION_DATA = {} #@TODO: Review
     def Start(self):
-        #self.LoadMetadata(__class__.__name__)
+        #self.UpdatedSimpAD(self.ACTION_DATA)
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
@@ -1748,7 +1781,7 @@ class choose_branch(Action):
                 "remove_renderable"
             )
 
-        self.scene.SwitchDialogueBranch(self.action_data['branch'])
+        self.scene.SwitchDialogueBranch(self.ACTION_DATA['branch'])
 
         self.scene.Draw()
         self.Complete()
@@ -1760,62 +1793,60 @@ class choose_branch(Action):
 
 
 class play_sfx(SoundAction):
+    DISPLAY_NAME = "Play SFX"
     ACTION_DATA = {
-        "display_name": "Play SFX",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "SFX",
-                "default": "SFX",
-                "flags": ["editable", "preview"],
-            },
-            "sound": {
-                "type": "Asset_Sound",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "volume": {
-                "type": "Float",
-                "value": 1.0,
-                "default": 1.0,
-                "flags": ["editable", "preview"],
-            },
-            "loop": {
-                "type": "Bool",
-                "value": False,
-                "default": False,
-                "flags": ["editable", "preview"],
-            },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "wait_until_complete",
-                "default": "wait_until_complete",
-                "options": ["no_wait", "wait_until_complete"],
-                "flags": ["editable", "preview", "no_exclusion"],
-            },
+        "key": {
+            "type": "String",
+            "value": "SFX",
+            "default": "SFX",
+            "flags": ["editable", "preview"],
+        },
+        "sound": {
+            "type": "Asset_Sound",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "volume": {
+            "type": "Float",
+            "value": 1.0,
+            "default": 1.0,
+            "flags": ["editable", "preview"],
+        },
+        "loop": {
+            "type": "Bool",
+            "value": False,
+            "default": False,
+            "flags": ["editable", "preview"],
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "wait_until_complete",
+            "default": "wait_until_complete",
+            "options": ["no_wait", "wait_until_complete"],
+            "flags": ["editable", "preview", "no_exclusion"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
-        new_sound = Sound(self.action_data)
+        new_sound = Sound(self.simplified_ad)
 
         # Start the playback (internally stores the channel object)
         new_sound.Play()
-        self.scene.active_sounds[self.action_data["key"]] = new_sound
+        self.scene.active_sounds[self.simplified_ad["key"]] = new_sound
 
         return new_sound
 
     def Update(self, events):
-        if not self.scene.active_sounds[self.action_data["key"]].GetBusy():
-            self.scene.active_sounds[self.action_data["key"]].Stop()
-            self.scene.active_sounds.pop(self.action_data["key"])  # Remove from the scene sfx list
+        if not self.scene.active_sounds[self.simplified_ad["key"]].GetBusy():
+            self.scene.active_sounds[self.simplified_ad["key"]].Stop()
+            self.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove from the scene sfx list
             self.Complete()  # Remove from the action manager
 
     def Skip(self):
-        self.scene.active_sounds.pop(self.action_data["key"])
+        self.scene.active_sounds.pop(self.simplified_ad["key"])
         self.Complete()
 
 
@@ -1823,26 +1854,24 @@ class stop_sfx(Action):
     """
     Based on a given key, stop and remove the associated sfx from the sound stack
     """
+    DISPLAY_NAME = "Stop SFX"
     ACTION_DATA = {
-        "display_name": "Stop SFX",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "SFX",
-                "default": "SFX",
-                "flags": ["editable", "preview"],
-            }
+        "key": {
+            "type": "String",
+            "value": "SFX",
+            "default": "SFX",
+            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
-        if "key" in self.action_data:
-            self.scene.active_sounds[self.action_data["key"]].stop()  # Stop the sound
-            del self.scene.active_sounds[self.action_data["key"]]  # Delete the sound
-            self.scene.active_sounds.pop(self.action_data["key"])  # Remove key
+        if "key" in self.simplified_ad:
+            self.scene.active_sounds[self.simplified_ad["key"]].stop()  # Stop the sound
+            del self.scene.active_sounds[self.simplified_ad["key"]]  # Delete the sound
+            self.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove key
 
             self.Complete()
         else:
@@ -1851,42 +1880,40 @@ class stop_sfx(Action):
 
 class play_music(SoundAction):
     #@TODO: Implement end-event so this action completes when the song reaches last frame
+    DISPLAY_NAME = "Play Music"
     ACTION_DATA = {
-        "display_name": "Play Music",
-        "requirements": {
-            "music": {
-                "type": "Asset_Sound",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            },
-            "volume": {
-                "type": "Float",
-                "value": 1.0,
-                "default": 1.0,
-                "flags": ["editable", "preview"],
-            },
-            "loop": {
-                "type": "Bool",
-                "value": False,
-                "default": False,
-                "flags": ["editable", "preview"],
-            },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "no_wait",
-                "default": "no_wait",
-                "options": ["no_wait", "wait_until_complete"],
-                "flags": ["editable", "preview"],
-            },
+        "music": {
+            "type": "Asset_Sound",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "volume": {
+            "type": "Float",
+            "value": 1.0,
+            "default": 1.0,
+            "flags": ["editable", "preview"],
+        },
+        "loop": {
+            "type": "Bool",
+            "value": False,
+            "default": False,
+            "flags": ["editable", "preview"],
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "no_wait",
+            "default": "no_wait",
+            "options": ["no_wait", "wait_until_complete"],
+            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
-        new_music = Music(self.action_data)
+        new_music = Music(self.simplified_ad)
 
         #new_music.end_event = #@TODO: This needs to delete the action upon completion or the action will exist forever
         # If the user hasn't removed the previous music, forcefully remove it here without any transition
@@ -1909,20 +1936,18 @@ class stop_music(Action):
     """
     Stops the currently active music
     """
+    DISPLAY_NAME = "Stop Music"
     ACTION_DATA = {
-        "display_name": "Stop Music",
-        "requirements": {
-            "key": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable", "preview"],
-            }
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
         self.scene.active_music.Stop() #@TODO: Update
@@ -1933,34 +1958,31 @@ class stop_music(Action):
 
 
 class set_mute(Action):
+    DISPLAY_NAME = "Set Mute"
     ACTION_DATA = {
-        "display_name": "Set Mute",
-        "requirements": {
-            "toggle": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
-            "value": {
-                "type": "Bool",
-                "value": True,
-                "default": True,
-                "flags": ["editable"],
-            },
+        "toggle": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
+        },
+        "value": {
+            "type": "Bool",
+            "value": True,
+            "default": True,
+            "flags": ["editable"],
         }
     }
 
     def Start(self):
-        #self.LoadMetadata(__class__.__name__)
+        #self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
 
-        #print("Set Mute!")
         # Update the project setting
-        if self.action_data["toggle"]:
+        if self.simplified_ad["toggle"]:
             settings.SetProjectSetting("Audio", "mute", not settings.GetProjectSetting("Audio", "mute"))
         else:
-            settings.SetProjectSetting("Audio", "mute", self.action_data["value"])
+            settings.SetProjectSetting("Audio", "mute", self.simplified_ad["value"])
 
         # Update all active audio objects
         if settings.GetProjectSetting("Audio", "mute"):
@@ -1981,31 +2003,32 @@ class set_mute(Action):
 
 class load_scene(Action):
     """ Switches scenes to the one specified in the action data """
+    DISPLAY_NAME = "Load Scene"
     ACTION_DATA = {
-        "display_name": "Load Scene",
-        "requirements": {
-            "scene_file": {
-                "type": "Asset_Scene",
-                "default": "",
-                "value": "",
-                "flags": ["editable", "preview"],
-            }
+        "scene_file": {
+            "type": "Asset_Scene",
+            "default": "",
+            "value": "",
+            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
         self.skippable = False
 
-        self.scene.SwitchScene(self.action_data["scene_file"])
+        self.scene.SwitchScene(self.simplified_ad["scene_file"])
         self.Complete()
 
 
 class wait(Action):
     """ Waits for a set amount of time before completing """
+    DISPLAY_NAME = "Wait"
+    ACTION_DATA = {} #@TODO: Review
+
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.counter = 0
-        self.target = self.action_data["seconds"]
+        self.target = self.simplified_ad["seconds"]
 
         return None
 
@@ -2026,13 +2049,11 @@ class quit_game(Action):
     Immediately closes the game
     This is not meant to be called during scenes, but is available as an action for inputs, buttons, etc
     """
-    ACTION_DATA = {
-        "display_name": "Quit Game",
-        "requirements": {}
-    }
+    DISPLAY_NAME = "Quit Game"
+    ACTION_DATA = {}
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
         self.skippable = False
         pygame.quit()
         exit()
@@ -2051,52 +2072,50 @@ class scene_fade_in(Action):
 
     Returns 'SpriteRenderable'
     """
+    DISPLAY_NAME = "Scene Fade In"
     ACTION_DATA = {
-        "display_name": "Scene Fade In",
-        "requirements": {
-            "color": {
-                "type": "Dropdown",
-                "value": "black",
-                "default": "black",
-                "options": ["black", "white"],
-                "flags": ["editable", "preview"],
-            },
-            "speed": {
-                "type": "Int",
-                "value": 300,
-                "default": 300,
-                "flags": ["editable", "preview"],
-            },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "wait_until_complete",
-                "default": "wait_until_complete",
-                "options": ["no_wait", "wait_until_complete"],
-                "flags": ["editable"],
-            },
+        "color": {
+            "type": "Dropdown",
+            "value": "black",
+            "default": "black",
+            "options": ["black", "white"],
+            "flags": ["editable", "preview"],
+        },
+        "speed": {
+            "type": "Int",
+            "value": 300,
+            "default": 300,
+            "flags": ["editable", "preview"],
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "wait_until_complete",
+            "default": "wait_until_complete",
+            "options": ["no_wait", "wait_until_complete"],
+            "flags": ["editable"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
-        self.action_data['key'] = 'Transition_SceneFade'
-        self.action_data['z_order'] = 9999999999999999999
-        self.action_data['center_align'] = False
+        self.simplified_ad['key'] = 'Transition_SceneFade'
+        self.simplified_ad['z_order'] = 9999999999999999999
+        self.simplified_ad['center_align'] = False
 
-        if self.action_data["color"] == "black":
-            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
-        elif self.action_data["color"] == "white":
-            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
+        if self.simplified_ad["color"] == "black":
+            self.simplified_ad['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
+        elif self.simplified_ad["color"] == "white":
+            self.simplified_ad['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
         else:
-            raise ValueError(f"'scene_fade_in' action Failed - Invalid color value provided: {self.action_data['color']}")
+            raise ValueError(f"'scene_fade_in' action Failed - Invalid color value provided: {self.simplified_ad['color']}")
 
-        if 'speed' in self.action_data:
-            self.speed = self.action_data['speed']
+        if 'speed' in self.simplified_ad:
+            self.speed = self.simplified_ad['speed']
 
         new_sprite = SpriteRenderable(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
 
         self.scene.active_renderables.Add(new_sprite)
@@ -2129,52 +2148,50 @@ class scene_fade_out(Action):
 
     Returns 'SpriteRenderable'
     """
+    DISPLAY_NAME = "Scene Fade Out"
     ACTION_DATA = {
-        "display_name": "Scene Fade Out",
-        "requirements": {
-            "color": {
-                "type": "Dropdown",
-                "value": "black",
-                "default": "black",
-                "options": ["black", "white"],
-                "flags": ["editable", "preview"],
-            },
-            "speed": {
-                "type": "Int",
-                "value": 300,
-                "default": 300,
-                "flags": ["editable", "preview"],
-            },
-            "post_wait": {
-                "type": "Dropdown",
-                "value": "wait_until_complete",
-                "default": "wait_until_complete",
-                "options": ["no_wait", "wait_until_complete"],
-                "flags": ["editable"],
-            },
+        "color": {
+            "type": "Dropdown",
+            "value": "black",
+            "default": "black",
+            "options": ["black", "white"],
+            "flags": ["editable", "preview"],
+        },
+        "speed": {
+            "type": "Int",
+            "value": 300,
+            "default": 300,
+            "flags": ["editable", "preview"],
+        },
+        "post_wait": {
+            "type": "Dropdown",
+            "value": "wait_until_complete",
+            "default": "wait_until_complete",
+            "options": ["no_wait", "wait_until_complete"],
+            "flags": ["editable"],
         }
     }
 
     def Start(self):
-        self.LoadMetadata(__class__.__name__)
+        self.UpdatedSimpAD(self.ACTION_DATA)
 
-        self.action_data['key'] = 'Transition_SceneFade'
-        self.action_data['z_order'] = 9999999999999999999
-        self.action_data['center_align'] = False
+        self.simplified_ad['key'] = 'Transition_SceneFade'
+        self.simplified_ad['z_order'] = 9999999999999999999
+        self.simplified_ad['center_align'] = False
 
-        if self.action_data["color"] == "black":
-            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
-        elif self.action_data["color"] == "white":
-            self.action_data['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
+        if self.simplified_ad["color"] == "black":
+            self.simplified_ad['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_black.png"
+        elif self.simplified_ad["color"] == "white":
+            self.simplified_ad['sprite'] = "HBEngine/Content/Sprites/TransitionEffects/transition_fade_white.png"
         else:
-            raise ValueError(f"'scene_fade_out' action Failed - Invalid color value provided: {self.action_data['color']}")
+            raise ValueError(f"'scene_fade_out' action Failed - Invalid color value provided: {self.simplified_ad['color']}")
 
-        if 'speed' in self.action_data:
-            self.speed = self.action_data['speed']
+        if 'speed' in self.simplified_ad:
+            self.speed = self.simplified_ad['speed']
 
         new_sprite = SpriteRenderable(
             self.scene,
-            self.action_data
+            self.simplified_ad
         )
         new_sprite.GetSurface().set_alpha(0)
 
@@ -2207,10 +2224,8 @@ class scene_fade_out(Action):
 
 class pause(Action):
     """ Requests that the active scene pause the game and show the pause interface. Returns 'None' """
-    ACTION_DATA = {
-        "display_name": "Pause",
-        "requirements": {}
-    }
+    DISPLAY_NAME = "Pause"
+    ACTION_DATA = {}
 
     def Start(self):
         self.scene.Pause()
@@ -2220,10 +2235,8 @@ class pause(Action):
 
 class unpause(Action):
     """ Requests that the active scene unpause the game and remove the pause interface. Returns 'None' """
-    ACTION_DATA = {
-        "display_name": "Unpause",
-        "requirements": {}
-    }
+    DISPLAY_NAME = "Unpause"
+    ACTION_DATA = {}
 
     def Start(self):
         self.scene.Unpause()
@@ -2233,28 +2246,26 @@ class unpause(Action):
 
 class switch_page(Action):
     """ Requests a page load for the target interface. Returns 'None' """
+    DISPLAY_NAME = "Switch Page"
     ACTION_DATA = {
-        "display_name": "Switch page",
-        "requirements": {
-            "owner": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable"],
-            },
-            "page": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable"],
-            },
+        "owner": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable"],
+        },
+        "page": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable"],
         }
     }
 
     def Start(self):
-        if self.scene.active_interfaces.Exists(self.action_data["owner"]):
-            owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
-            owner.LoadPage(self.action_data["page"])
+        if self.scene.active_interfaces.Exists(self.simplified_ad["owner"]):
+            owner = self.scene.active_interfaces.GetFromKey(self.simplified_ad["owner"])
+            owner.LoadPage(self.simplified_ad["page"])
 
         self.scene.Draw()
         self.Complete()
@@ -2263,21 +2274,19 @@ class switch_page(Action):
 
 class remove_page(Action):
     """ Removes the target interface and all of its children. Returns 'None' """
+    DISPLAY_NAME = "Remove Page"
     ACTION_DATA = {
-        "display_name": "Pause",
-        "requirements": {
-            "owner": {
-                "type": "String",
-                "value": "",
-                "default": "",
-                "flags": ["editable"],
-            }
+        "owner": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable"],
         }
     }
 
     def Start(self):
-        if self.scene.active_interfaces.Exists(self.action_data["owner"]):
-            owner = self.scene.active_interfaces.GetFromKey(self.action_data["owner"])
+        if self.scene.active_interfaces.Exists(self.simplified_ad["owner"]):
+            owner = self.scene.active_interfaces.GetFromKey(self.simplified_ad["owner"])
             owner.RemovePage()
 
         self.scene.Draw()

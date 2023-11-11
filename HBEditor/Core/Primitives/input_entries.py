@@ -450,7 +450,7 @@ class InputEntryTuple(InputEntryBase):
 class InputEntryArray(InputEntryBase):
     """
     A highly specialized container that allows the generation of child entries based on a template defined in
-    the actions_metadata
+    the ACTION_DATA
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, refresh_func: callable,
@@ -538,9 +538,8 @@ class InputEntryArrayElement(InputEntryBase):
 
 class InputEntryEvent(InputEntryBase):
     """
-    A variant of the dropdown entry that uses a pre-set list of options which refer to an action in the
-    actions_metadata. Once an option is selected, all properties related to that action are generated as children
-    to this entry
+    A variant of the dropdown entry that uses a pre-set list of options which refer to an engine action. Once an option
+    is selected, all properties related to that action are generated as children to this entry
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, remove_func: callable, signal_func: callable, refresh_func: callable,
@@ -579,7 +578,7 @@ class InputEntryEvent(InputEntryBase):
 
         if self.input_widget.currentText() != "None":
             # Since the entry children are properties of the action specified in the input_widget, we also need to
-            # specify the action's name. This doesn't come as a part of the metadata clone, so we need to add the key
+            # specify the action's name. This doesn't come as a part of the ACTION_DATA clone, so we need to add the key
             # manually
             #
             # For all intents and purposes, this doesn't need to be edited by the user, so we're opting out of adding it
@@ -590,17 +589,17 @@ class InputEntryEvent(InputEntryBase):
                 "flags": ["no_exclusion"]
             }
 
-            # Grab the metadata for the event action, and generate children for all of its properties
-            metadata = copy.deepcopy(settings.action_metadata[self.input_widget.currentText()])
-            if metadata["requirements"]:
-                self.AddItems(metadata["requirements"])
+            # Grab the ACTION_DATA for the event action, and generate children for all of its parameters
+            action_data = copy.deepcopy(settings.GetActionData(self.input_widget.currentText()))
+            if action_data:
+                self.AddItems(action_data)
 
-    def AddItems(self, req_data=None, parent=None):
+    def AddItems(self, param_data=None, parent=None):
         if not parent:
             parent = self.owning_model_item
 
-        for name, data in req_data.items():
-            # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait')
+        for name, data in param_data.items():
+            # Some editors exclude certain parameters (IE. Point & Click doesn't make use of 'post_wait')
             if self.excluded_properties:
                 if name in self.excluded_properties:
                     continue

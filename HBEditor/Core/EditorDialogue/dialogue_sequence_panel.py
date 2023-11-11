@@ -18,6 +18,7 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core import settings
 
 
 class DialogueSequencePanel(QtWidgets.QWidget):
@@ -119,8 +120,15 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         for row in range(self.dialogue_table.rowCount(), 0, -1):
             self.dialogue_table.removeRow(row - 1)
 
-    def AddEntry(self, action_data: dict, specific_row: int = None, skip_select: bool = False):
-        """ Given a block of action data from the action database, create a new entry in the dialogue sequence """
+    def AddEntry(self, action_name: str, action_data: dict = None, specific_row: int = None, skip_select: bool = False):
+        """
+        Given an action name, create a new entry in the dialogue sequence populating with the ACTION_DATA for that
+        action. If 'action_data' is provided, populate the entry using it instead
+        """
+        if not action_data:
+            # Load a fresh copy of the ACTION_DATA
+            action_data = settings.GetActionData(action_name)
+
         # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
         new_entry_row = self.dialogue_table.rowCount()
         if specific_row is not None:
@@ -130,11 +138,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             self.dialogue_table.insertRow(new_entry_row)
 
         # Create a new dialogue entry object, and add it to the sequence widget
-        new_entry = DialogueEntry(
-            copy.deepcopy(action_data),
-            self.ed_core.UpdateActiveEntry,
-            self.RefreshCurrentRowSize
-        )
+        new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry, self.RefreshCurrentRowSize)
 
         # Assign the entry widget to the row
         self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
@@ -240,7 +244,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
 
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
-    def __init__(self, action_data, select_func, size_refresh_func):
+    def __init__(self, action_name, action_data, select_func, size_refresh_func):
         super().__init__()
 
         # Store a func object that is used when this entry is selected
@@ -251,7 +255,8 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         #@TODO: Replace with a Qt signal / slot
         self.size_refresh_func = size_refresh_func
 
-        # Store this entry's action data
+        # Store action details
+        self.action_name = action_name
         self.action_data = action_data
 
         # ****** DISPLAY WIDGETS ******
@@ -262,7 +267,7 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
 
-        self.name_widget.setText(ad.GetActionDisplayName(self.action_data))
+        self.name_widget.setText(self.action_name)
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
 
@@ -277,12 +282,16 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         """ Returns the action data stored in this object """
         return self.action_data
 
+    def GetName(self) -> dict:
+        """ Returns the action name stored in this object """
+        return self.action_name
+
     def UpdateSubtext(self):
         """ Updates the subtext displaying entry parameters """
-        self.subtext_widget.setText(self.CompileSubtextString(ad.GetActionRequirements(self.action_data)))
+        self.subtext_widget.setText(self.CompileSubtextString(self.action_data))
 
     def CompileSubtextString(self, req_data):
-        """ Given a list of requirements from the actions_metadata file, compile them into a user-friendly string """
+        """ Given an action_data dict, compile the previewable parameters into a user-friendly string """
         cur_string = ""
         for name, data in req_data.items():
             if "flags" in data:

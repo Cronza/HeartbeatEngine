@@ -223,7 +223,9 @@ class GroupsPanel(QtWidgets.QWidget):
 
 class GroupEntry(QtWidgets.QWidget):
     """
-    An entry for the Group Panel
+    An entry for the Group Panel.
+
+    'data' represents a list of actions and their data in the format of: {<action_name>: <action_param_data>}
 
     Attributes
         SIG_USER_TOGGLE: - Signal that reports (toggle_state, group_name)
@@ -233,7 +235,7 @@ class GroupEntry(QtWidgets.QWidget):
     def __init__(self, use_toggle: bool = False):
         super().__init__()
 
-        # Store any necessary data associated with this entry (From another panel or otherwise)
+        # Store any necessary ACTION_DATA associated with this entry (From another panel or otherwise)
         self.data = []
 
         # ****** DISPLAY WIDGETS ******
