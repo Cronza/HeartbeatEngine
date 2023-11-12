@@ -129,9 +129,9 @@ class Action:
     def Complete(self):
         self.complete = True
 
-    def UpdatedSimpAD(self, ACTION_DATA: dict, simplified_ad: dict = None):
+    def ValidateActionData(self, extended_ad: dict, simplified_ad: dict = None):
         """
-        Recursively compares the action's 'simplified_ad' against the provided 'ACTION_DATA', updating the former when
+        Recursively compares the action's 'simplified_ad' against the provided 'ext_ad', updating the former when
         it is missing data found in the latter
 
         This update performs the following adjustments:
@@ -139,17 +139,14 @@ class Action:
         - Replaces values with global values if a parameter is using a global setting
         """
 
-        if not simplified_ad:
-            simplified_ad = self.simplified_ad
-
-        for param_name, param_data in ACTION_DATA.items():
+        for param_name, param_data in extended_ad.items():
             if "children" in param_data:
-                if param_name not in simplified_ad:
-                    # Param not found in the simplified data. Skip recursive update for children
-                    pass
-
-                # Param found in simplified data. Recursively update the children as well
-                self.UpdatedSimpAD(param_data["children"], simplified_ad[param_name])
+                print("Param Name:", param_name)
+                print("Param Data:", param_data)
+                print("Simp Data:", simplified_ad)
+                if param_name in simplified_ad:
+                    # Param found in simplified data. Recursively update the children as well
+                    self.ValidateActionData(param_data["children"], simplified_ad[param_name])
 
             elif "template" in param_data:
                 # Parameters that use templates have a unique data structure in that each child is
@@ -170,11 +167,14 @@ class Action:
                 for element_name, element_data in simplified_ad[param_name].items():
                     # Skip a level as this is the "ArrayElement" container
 
-                    self.UpdatedSimpAD(template_data["children"], element_data)
+                    self.ValidateActionData(template_data["children"], element_data)
 
             elif param_name not in simplified_ad:
                 if "global" in param_data:
                     # Global active. Set 'value' to the corresponding global value
+                    #print("Applying global:", param_name)
+                    #print("Simplified Data:", simplified_ad)
+                    #print("Global Value:", settings.GetProjectSetting(param_data["global"][0], param_data["global"][1]))
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["global"][0], param_data["global"][1])
                 else:
                     # No global active. Use default value from the expanded data
@@ -230,7 +230,7 @@ class remove_renderable(Action):
     }
 
     def Start(self):
-        self.UpdateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         renderable = self.scene.active_renderables.renderables[self.simplified_ad['key']]
         children = []
@@ -348,7 +348,7 @@ class create_sprite(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         new_sprite = SpriteRenderable(
             self.scene,
             self.simplified_ad
@@ -423,7 +423,7 @@ class create_background(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         self.skippable = False
 
@@ -511,7 +511,7 @@ class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE U
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         new_renderable = Interactable(
@@ -645,7 +645,7 @@ class create_text(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         new_text_renderable = TextRenderable(
             self.scene,
@@ -830,7 +830,7 @@ class create_button(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         # System defined overrides
@@ -951,7 +951,7 @@ class create_text_button(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         new_renderable = Button(
@@ -1074,7 +1074,7 @@ class create_checkbox(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         new_renderable = Checkbox(
@@ -1094,7 +1094,7 @@ class create_checkbox(Action):
 #
 #    # @TODO: Update to new workflow
 #    def Start(self):
-#        self.UpdatedSimpAD(self.ACTION_DATA)
+#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 #        self.skippable = False
 #
 #        # Container-specific adjustments
@@ -1309,7 +1309,7 @@ class dialogue(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         new_speaker_text = TextRenderable(
             self.scene,
@@ -1325,6 +1325,7 @@ class dialogue(Action):
         self.scene.active_renderables.Add(new_dialogue_text)
 
         # Note: Speaker text does not support transitions currently
+        print("Dialogue transition", self.simplified_ad["dialogue"]["transition"])
         if self.simplified_ad["dialogue"]["transition"]["type"] != "None":
             self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["dialogue"]["transition"], new_dialogue_text)
             self.active_transition.Start()
@@ -1354,7 +1355,7 @@ class dialogue(Action):
 #    """
 #
 #    def Start(self):
-#        self.UpdatedSimpAD(self.ACTION_DATA)
+#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 #
 #        # Dialogue-specific adjustments
 #        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
@@ -1514,7 +1515,7 @@ class dialogue(Action):
 #    This action is only available in DialogueScenes, and requires a 'character' block be provided
 #    """
 #    def Start(self):
-#        self.UpdatedSimpAD(self.ACTION_DATA)
+#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 #
 #        # Character-specific adjustments
 #        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
@@ -1726,7 +1727,7 @@ class choice(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         # Create an object that acts as a parent for all the choice buttons. When this is deleted, the buttons
@@ -1771,7 +1772,7 @@ class choose_branch(Action):
     DISPLAY_NAME = "Choose Branch"
     ACTION_DATA = {} #@TODO: Review
     def Start(self):
-        #self.UpdatedSimpAD(self.ACTION_DATA)
+        #self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
@@ -1781,7 +1782,7 @@ class choose_branch(Action):
                 "remove_renderable"
             )
 
-        self.scene.SwitchDialogueBranch(self.ACTION_DATA['branch'])
+        self.scene.SwitchDialogueBranch(self.simplified_ad['branch'])
 
         self.scene.Draw()
         self.Complete()
@@ -1829,7 +1830,7 @@ class play_sfx(SoundAction):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         new_sound = Sound(self.simplified_ad)
 
@@ -1865,7 +1866,7 @@ class stop_sfx(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         if "key" in self.simplified_ad:
@@ -1910,7 +1911,7 @@ class play_music(SoundAction):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         new_music = Music(self.simplified_ad)
@@ -1947,7 +1948,7 @@ class stop_music(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         self.scene.active_music.Stop() #@TODO: Update
@@ -1975,7 +1976,7 @@ class set_mute(Action):
     }
 
     def Start(self):
-        #self.UpdatedSimpAD(self.ACTION_DATA)
+        #self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         # Update the project setting
@@ -2026,7 +2027,7 @@ class wait(Action):
     ACTION_DATA = {} #@TODO: Review
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.counter = 0
         self.target = self.simplified_ad["seconds"]
 
@@ -2053,7 +2054,7 @@ class quit_game(Action):
     ACTION_DATA = {}
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
         pygame.quit()
         exit()
@@ -2097,7 +2098,7 @@ class scene_fade_in(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         self.simplified_ad['key'] = 'Transition_SceneFade'
         self.simplified_ad['z_order'] = 9999999999999999999
@@ -2173,7 +2174,7 @@ class scene_fade_out(Action):
     }
 
     def Start(self):
-        self.UpdatedSimpAD(self.ACTION_DATA)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         self.simplified_ad['key'] = 'Transition_SceneFade'
         self.simplified_ad['z_order'] = 9999999999999999999

@@ -167,7 +167,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         selection = self.GetSelectedEntry()
 
         if selection:
-            self.AddEntry(selection.action_data)
+            self.AddEntry(selection.action_name, selection.action_data)
 
     def MoveEntryUp(self):
         """ If an entry is selected, move it up one row """
@@ -190,7 +190,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
                 # Add a new entry two rows above the initial row
                 new_row_num = selection_index - 1
-                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
+                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
 
                 # Transfer the data from the original entry to the new one, before refreshing the details
                 new_entry.action_data = taken_entry.action_data
@@ -217,7 +217,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
                 # Add a new entry two rows above the initial row
                 new_row_num = selection_index + 1
-                new_entry = self.AddEntry(taken_entry.action_data, new_row_num)
+                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
 
                 # Transfer the data from the original entry to the new one, before refreshing the details
                 new_entry.action_data = taken_entry.action_data

@@ -92,7 +92,8 @@ class EditorInterface(EditorBase):
             for item in self.editor_ui.scene_viewer.GetSceneItems():
                 if item.owner_id == new_group_name:
                     item.setEnabled(True)
-
+        elif cur_page == new_page:
+            pass
         else:
             # Prior page available. Disable its items, and enable the new page's items
             cur_group_name = cur_page.Get()[0]
@@ -163,6 +164,9 @@ class EditorInterface(EditorBase):
                     # Hide non-persistent page items by default, as pages themselves are inactive by default
                     if page_name.lower() != "persistent":
                         new_item.setVisible(False)
+
+        # Select the persistent layer
+        self.editor_ui.pages_panel.ChangeEntry(0)
 
     def ConvertInterfaceItemsToEngineFormat(self, scene_items: dict) -> dict:
         """ Build and return a dict of data from all active view items converted to engine format, organized by page """
