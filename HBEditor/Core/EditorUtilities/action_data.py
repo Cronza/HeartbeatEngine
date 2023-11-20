@@ -142,8 +142,6 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
 def GetActionName(action_data: dict) -> str:
     """
     Retrieve the action name used as the top level key for the provided action_data
-
-    This function is meant to be used by classes that cloned a piece of metadata from the actions_metadata.yaml file
     """
     return next(iter(action_data))
 
