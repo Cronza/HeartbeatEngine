@@ -52,6 +52,7 @@ class EditorProjectSettings(EditorBase):
                 f"# Type: {FileType.Project_Settings.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
+            self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
         except:
             Logger.getInstance().Log("Failed to Export!", 4)

@@ -551,6 +551,7 @@ class InputEntryEvent(InputEntryBase):
 
         # We need access to the return value of the created view item, so we must use a callback instead of a
         # signal / slot (Which don't allow return values)
+        #@TODO: The above statement is no longer valid, and signals should be adopted here
         self.add_func = add_func
         self.remove_func = remove_func
         self.signal_func = signal_func
@@ -623,7 +624,7 @@ class InputEntryEvent(InputEntryBase):
                     self.AddItems(child_name, {child_name: child_data}, new_entry)
 
         if not parent:
-            # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion
+            # Inform the owning U.I that we've added a child outside its purview. Only do this once all recursion
             # is done
             self.refresh_func(self.owning_model_item)
 

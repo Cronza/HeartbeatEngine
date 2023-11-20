@@ -26,8 +26,11 @@ class DialogueSequencePanel(QtWidgets.QWidget):
     The core U.I class for the dialogue sequence panel. This contains all logic for generating, moving and removing
     any and all child widgets pertaining to the panel.
 
-    This class is not meant for any destructive data changes, merely U.I actions
+    Attributes
+        SIG_USER_UPDATE: - Signal that fires whenever something was modified by the user in this panel
     """
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+
     def __init__(self, ed_core):
         super().__init__()
 
@@ -128,6 +131,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
+            self.SIG_USER_UPDATE.emit()
 
         # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
         new_entry_row = self.dialogue_table.rowCount()
@@ -157,10 +161,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         """ If an entry is selected, delete it from the table """
         selection = self.GetSelectedRow()
 
-        if selection is not None:
+        if selection != -1:
             self.dialogue_table.removeRow(self.GetSelectedRow())
-        else:
-            self.ed_core.UpdateActiveEntry()
+            self.SIG_USER_UPDATE.emit()
 
     def CopyEntry(self):
         """ If an entry is selected, clone it and add it to the sequence """
@@ -168,6 +171,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         if selection:
             self.AddEntry(selection.action_name, selection.action_data)
+            self.SIG_USER_UPDATE.emit()
 
     def MoveEntryUp(self):
         """ If an entry is selected, move it up one row """
@@ -196,6 +200,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
                 new_entry.action_data = taken_entry.action_data
                 self.ed_core.UpdateActiveEntry()
 
+            self.SIG_USER_UPDATE.emit()
+
     def MoveEntryDown(self):
         """ If an entry is selected, move it down one row """
         row_count = self.dialogue_table.rowCount()
@@ -222,6 +228,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
                 # Transfer the data from the original entry to the new one, before refreshing the details
                 new_entry.action_data = taken_entry.action_data
                 self.ed_core.UpdateActiveEntry()
+
+            self.SIG_USER_UPDATE.emit()
 
     def GetSelectedEntry(self):
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """

@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
@@ -29,10 +29,16 @@ class EditorDialogueUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.branches_panel = GroupsPanel(self.core.SwitchBranches, title="Branches")
+        self.branches_panel = GroupsPanel(title="Branches")
+        self.branches_panel.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.branches_panel.SIG_USER_GROUP_CHANGE.connect(self.core.SwitchBranches)
         self.dialogue_sequence = DialogueSequencePanel(self.core)
+        self.dialogue_sequence.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.details = DetailsPanel()
+        self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+
         self.scene_settings = SceneSettings()
+        self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.scene_settings.Populate()
 
         # The dialogue editor makes use of the "Choice" input widget, which requires a reference

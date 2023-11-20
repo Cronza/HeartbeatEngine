@@ -34,19 +34,19 @@ class EditorInterfaceUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.pages_panel = GroupsPanel(
-            change_func=self.core.EnablePageItems,
-            title="Pages",
-            enable_togglable_entries=True,
-            toggle_func=self.core.ShowPageItems
-        )
-        self.scene_viewer = SceneViewer(
-            core=self.core,
-            selection_change_func=self.core.UpdateActiveSceneItem,
-            add_func=self.core.RegisterItemToPage
+        self.pages_panel = GroupsPanel(title="Pages", enable_togglable_entries=True)
+        self.pages_panel.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.pages_panel.SIG_USER_GROUP_CHANGE.connect(self.core.EnablePageItems)
+        self.pages_panel.SIG_USER_GROUP_TOGGLE.connect(self.core.ShowPageItems)
 
-        )
+        self.scene_viewer = SceneViewer(self.core.file_type)
+        self.scene_viewer.SIG_USER_ADDED_ITEM.connect(self.core.RegisterItemToPage)
+        self.scene_viewer.SIG_USER_DELETED_ITEMS.connect(self.SIG_USER_UPDATE.emit)
+        self.scene_viewer.SIG_USER_MOVED_ITEMS.connect(self.OnItemMove)
+        self.scene_viewer.SIG_SELECTION_CHANGED.connect(self.core.UpdateActiveSceneItem)
+
         self.details = DetailsPanel()
+        self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.interface_settings = InterfaceSettings()
         self.interface_settings.Populate()
 
@@ -67,6 +67,10 @@ class EditorInterfaceUI(EditorBaseUI):
 
         # Adjust the main view so it's consuming as much space as possible
         self.main_resize_container.setStretchFactor(1, 10)
+
+    def OnItemMove(self, selected_items: list = None):
+        self.SIG_USER_UPDATE.emit()
+        self.core.UpdateActiveSceneItem(selected_items)
 
 
 class InterfaceSettings(SceneSettings):

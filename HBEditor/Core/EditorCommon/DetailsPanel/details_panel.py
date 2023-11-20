@@ -18,6 +18,14 @@ from HBEditor.Core.Primitives import input_entry_handler as ieh
 
 
 class DetailsPanel(QtWidgets.QWidget):
+    """
+    A TreeView for input widgets designed for displaying the 'ACTION_DATA' of actions
+
+    Attributes
+        SIG_USER_UPDATE: - Signal that fires whenever something was modified by the user in this panel
+    """
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+
     def __init__(self, excluded_properties: list = None):
         super().__init__()
 
@@ -209,6 +217,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.StoreData()
         self.Clear()
         self.active_entry = None
+        self.SIG_USER_UPDATE.emit()
 
     def Clear(self):
         self.details_tree.clear()
@@ -221,6 +230,8 @@ class DetailsPanel(QtWidgets.QWidget):
             input_widget.SetEditable(2)
         else:
             input_widget.SetEditable(0)
+
+        self.SIG_USER_UPDATE.emit()
 
     def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
         if self.active_entry:
@@ -241,3 +252,4 @@ class DetailsPanel(QtWidgets.QWidget):
                     stop = True
 
             self.active_entry.Refresh(parent_tree)
+            self.SIG_USER_UPDATE.emit()

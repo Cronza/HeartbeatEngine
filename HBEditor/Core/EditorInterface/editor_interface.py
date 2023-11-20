@@ -27,7 +27,6 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class EditorInterface(EditorBase):
     def __init__(self, file_path, interface_type: FileType = FileType.Interface):
         super().__init__(file_path)
-
         # Where as many scenes have unique editors, interface types share the same editor. As such, we need
         # to know which type this editor is working on to properly adjust functionality
         self.file_type = interface_type
@@ -40,27 +39,26 @@ class EditorInterface(EditorBase):
         )
         Logger.getInstance().Log("Editor initialized")
 
-    def UpdateActiveSceneItem(self, selected_items):
+    def UpdateActiveSceneItem(self, selected_items: list = None):
         """
         Makes the selected scene item the active one, refreshing the details panel. Hides the details information
-        if more than one item is selected
+        if more than one item is selected, or if 'None' is provided
         """
-
         # Only allow editing of details when a single item is selected
         if selected_items:
             if len(selected_items) == 1:
                 self.UpdateDetails(selected_items[0])
                 return
 
+        # If no items were provided or more than 1 were, clear the details
         self.UpdateDetails(None)
 
-    def UpdateDetails(self, selected_item):
+    def UpdateDetails(self, selected_item: RootItem = None):
         """
-        Refreshes the details panel with the details from the selected item. Clears all details if None is provided
+        Refreshes the details panel with the details from the selected item. Clears all details if None is provided.
         """
         if selected_item:
             self.editor_ui.details.Populate(selected_item)
-
         else:
             # No entries left to select. Wipe remaining details
             self.editor_ui.details.ClearActiveItem()
@@ -72,6 +70,7 @@ class EditorInterface(EditorBase):
         if not page:
             page = self.editor_ui.pages_panel.active_entry
         item.owner_id = page.Get()[0]
+        self.editor_ui.SIG_USER_UPDATE.emit()
 
     def ShowPageItems(self, make_visible: bool, page_name: str):
         """
@@ -129,6 +128,7 @@ class EditorInterface(EditorBase):
                 metadata=f"# Type: {self.file_type.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
+            self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
         except Exception as exc:
             Logger.getInstance().Log(f"Failed to Export: {exc}", 4)

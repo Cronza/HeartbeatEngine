@@ -11,7 +11,7 @@ class BaseItem:
         self.root_item = None
 
 
-class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
+class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
     """
     A basic GraphicsItem that acts as the root of a scene_item and its descendants. It serves a few purposes:
     - It is the 'active_entry' for the details panel
@@ -23,11 +23,10 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     happen. When selecting this object, all children are recursively selected as well to allow grouped movement
     """
 
-    def __init__(self, action_name: str, action_data: dict, select_func: callable):
+    def __init__(self, action_name: str, action_data: dict):
         super().__init__(None)
         self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
-        self.select_func = select_func
 
         self.setFlag(self.ItemIsMovable, True)
         self.setFlag(self.ItemIsSelectable, True)
@@ -188,32 +187,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             pen.setWidth(3)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
-
-    def mouseReleaseEvent(self, event) -> None:
-        for child in self.childItems():
-            # Always store a normalized position value between 0-1
-            #
-            # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value that is
-            # altered by any translation applied to the item (Needs additional review to confirm). This breaks
-            # features such as 'center_align'
-            parent_pos = child.pos()
-            item_pos = child.mapFromParent(parent_pos)
-            scene_pos = child.mapToScene(item_pos)
-            norm_range = [
-                scene_pos.x() / self.scene().width(),
-                scene_pos.y() / self.scene().height()
-            ]
-            child.action_data["position"]["value"] = norm_range
-
-        # Refresh in case position changed while dragging
-        self.select_func()
-
-        # Execute the original logic as it is what saves the position of objects internally
-        super().mouseReleaseEvent(event)
-
-    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
-        # Selecting the root will recursively select all of its children
-        self.setSelected(True)
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):

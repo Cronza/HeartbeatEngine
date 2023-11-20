@@ -34,7 +34,7 @@ class EditorPointAndClick(EditorBase):
         self.editor_ui = EditorPointAndClickUI(self)
         Logger.getInstance().Log("Editor initialized")
 
-    def UpdateActiveSceneItem(self, selected_items):
+    def UpdateActiveSceneItem(self, selected_items: list = None):
         """
         Makes the selected scene item the active one, refreshing the details panel. Hides the details information
         if more than one item is selected
@@ -84,6 +84,7 @@ class EditorPointAndClick(EditorBase):
                 metadata=f"# Type: {self.file_type.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
+            self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
         except Exception as exc:
             Logger.getInstance().Log(f"Failed to Export: {exc}", 4)

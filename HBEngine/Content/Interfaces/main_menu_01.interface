@@ -22,7 +22,6 @@ pages:
           text: ''
           text_size: 60
           center_align: True
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8
@@ -173,7 +172,6 @@ pages:
             - 0.2
           text: Load
           text_size: 60
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8
@@ -197,7 +195,6 @@ pages:
           text: About
           text_size: 60
           center_align: True
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8

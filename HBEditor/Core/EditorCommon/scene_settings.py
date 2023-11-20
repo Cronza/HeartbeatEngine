@@ -18,6 +18,8 @@ from HBEditor.Core.Primitives import input_entry_handler as ieh
 
 
 class SceneSettings(QtWidgets.QWidget):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -78,7 +80,8 @@ class SceneSettings(QtWidgets.QWidget):
                 view=self.settings_tree,
                 name=name,
                 data=data,
-                parent=None
+                parent=None,
+                signal_func=self.ConnectSignals
             )
 
     def GetData(self):
@@ -94,3 +97,12 @@ class SceneSettings(QtWidgets.QWidget):
             data_to_return[entry_name] = entry_data
 
         return data_to_return
+
+    def ConnectSignals(self, tree_item):
+        """ Connects the InputEntry signals to slots within this class """
+        input_widget = self.settings_tree.itemWidget(tree_item, 1)
+        input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
+
+    def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
+        self.SIG_USER_UPDATE.emit()
+

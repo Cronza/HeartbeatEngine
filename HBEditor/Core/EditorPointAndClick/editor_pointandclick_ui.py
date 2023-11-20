@@ -31,9 +31,16 @@ class EditorPointAndClickUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.scene_viewer = SceneViewer(self.core, self.core.UpdateActiveSceneItem)
+        self.scene_viewer = SceneViewer(self.core.file_type)
+        self.scene_viewer.SIG_USER_ADDED_ITEM.connect(self.SIG_USER_UPDATE.emit)
+        self.scene_viewer.SIG_USER_DELETED_ITEMS.connect(self.SIG_USER_UPDATE.emit)
+        self.scene_viewer.SIG_USER_MOVED_ITEMS.connect(self.OnItemMove)
+        self.scene_viewer.SIG_SELECTION_CHANGED.connect(self.core.UpdateActiveSceneItem)
+
         self.details = DetailsPanel(self.core.excluded_properties)
+
         self.scene_settings = SceneSettings()
+        self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.scene_settings.Populate()
 
         # Allow the user to resize each column
@@ -53,3 +60,7 @@ class EditorPointAndClickUI(EditorBaseUI):
         # Adjust the space allocation to favor the settings section
         self.main_resize_container.setStretchFactor(1, 0)
         self.main_resize_container.setStretchFactor(0, 1)
+
+    def OnItemMove(self, selected_items: list = None):
+        self.SIG_USER_UPDATE.emit()
+        self.core.UpdateActiveSceneItem(selected_items)
