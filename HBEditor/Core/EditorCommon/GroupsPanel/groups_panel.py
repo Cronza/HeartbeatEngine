@@ -19,22 +19,18 @@ from HBEditor.Core.Logger.logger import Logger
 
 
 class GroupsPanel(QtWidgets.QWidget):
-    def __init__(self,
-                 change_func: callable = None,
-                 title: str = "Groups",
-                 enable_togglable_entries: bool = False,
-                 toggle_func: callable = None):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+    SIG_USER_GROUP_TOGGLE = QtCore.pyqtSignal(bool, str)  # Emits when the user toggles an entry. Returns <toggle_state>, <group_name>
+    SIG_USER_GROUP_CHANGE = QtCore.pyqtSignal(object, object) # Emits when the user selects a different entry than the active one
+
+    def __init__(self, title: str = "Groups", enable_togglable_entries: bool = False):
         super().__init__()
 
         # Simplify the reference to the active group
         self.active_entry = None
 
-        # Callbacks
-        self.change_func = change_func
-
         # Configurable properties
         self.enable_togglable_entries = enable_togglable_entries
-        self.toggle_func = toggle_func
 
         ### U.I ###
 
@@ -94,7 +90,7 @@ class GroupsPanel(QtWidgets.QWidget):
         new_entry = GroupEntry(self.enable_togglable_entries)
         if self.enable_togglable_entries:
             new_entry.SetToggle(toggle)
-            new_entry.SIG_USER_TOGGLE.connect(self.toggle_func)
+            new_entry.SIG_USER_TOGGLE.connect(self.SIG_USER_GROUP_TOGGLE.emit)
 
         self.entry_list.setItemWidget(list_item, new_entry)
         new_entry.Set((name, description))
@@ -113,6 +109,7 @@ class GroupsPanel(QtWidgets.QWidget):
         # If the data has been validated, then create the new entry
         if name:
             self.CreateEntry(name, description)
+            self.SIG_USER_UPDATE.emit()
 
     def RemoveEntry(self):
         """ Deletes the selected entry if it is not the main entry """
@@ -121,6 +118,7 @@ class GroupsPanel(QtWidgets.QWidget):
 
             selected_row = self.entry_list.currentRow()
             self.entry_list.takeItem(selected_row)
+            self.SIG_USER_UPDATE.emit()
 
     def EditEntry(self):
         selection = self.entry_list.selectedItems()[0]
@@ -140,6 +138,7 @@ class GroupsPanel(QtWidgets.QWidget):
             if new_data[0]:
                 selected_entry.Set(new_data)
                 self.ResizeEntry(selection, selected_entry)
+                self.SIG_USER_UPDATE.emit()
 
     def ConfigurePrompt(self, name="New Name", description="New Description", source_entry=None) -> tuple:
         """ Prompts the user with a configuration window. Returns the new data if provided, or None if not """
@@ -198,18 +197,13 @@ class GroupsPanel(QtWidgets.QWidget):
         entry.setSizeHint(entry_data_obj.sizeHint())
 
     def ChangeEntry(self, new_entry_index: int = -1):
+        # Switch to the new item
         if new_entry_index > -1:
             self.entry_list.setCurrentRow(new_entry_index)
 
-        selection = self.entry_list.itemWidget(self.entry_list.currentItem())
-
-        if self.change_func:
-            self.change_func(
-                self.active_entry,
-                selection
-            )
-
         # Update the active entry to point to the newly selected entry
+        selection = self.entry_list.itemWidget(self.entry_list.currentItem())
+        self.SIG_USER_GROUP_CHANGE.emit(self.active_entry, selection)
         self.active_entry = selection
 
     def GetCount(self):
@@ -223,7 +217,9 @@ class GroupsPanel(QtWidgets.QWidget):
 
 class GroupEntry(QtWidgets.QWidget):
     """
-    An entry for the Group Panel
+    An entry for the Group Panel.
+
+    'data' represents a list of actions and their data in the format of: {<action_name>: <action_param_data>}
 
     Attributes
         SIG_USER_TOGGLE: - Signal that reports (toggle_state, group_name)
@@ -233,7 +229,7 @@ class GroupEntry(QtWidgets.QWidget):
     def __init__(self, use_toggle: bool = False):
         super().__init__()
 
-        # Store any necessary data associated with this entry (From another panel or otherwise)
+        # Store any necessary ACTION_DATA associated with this entry (From another panel or otherwise)
         self.data = []
 
         # ****** DISPLAY WIDGETS ******

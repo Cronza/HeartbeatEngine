@@ -13,7 +13,8 @@ class Sound(pygame.mixer.Sound):
         self.paused = False
         self.loop_count = 0
         if "loop" in self.sound_data:
-            self.loop_count = -1
+            if self.sound_data["loop"]:
+                self.loop_count = -1
 
         # For indentification in the audio stack, all sounds require a unique identifier
         if 'key' not in self.sound_data:
@@ -89,7 +90,8 @@ class Music:
         self.sound_data = sound_data
         self.paused = False
         if "loop" in self.sound_data:
-            self.loop_count = -1
+            if self.sound_data["loop"]:
+                self.loop_count = -1
 
         # Preset the volume (Use the base implementation to avoid the mute lock in 'SetVolume')
         pygame.mixer.music.set_volume(self.sound_data["volume"])

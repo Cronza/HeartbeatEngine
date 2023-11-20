@@ -3,6 +3,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 class SceneView(QtWidgets.QGraphicsView):
     """ A custom subclass of QGraphicsView with extended features """
+    SIG_USER_MOVED_ITEMS = QtCore.pyqtSignal(list)
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -17,6 +19,9 @@ class SceneView(QtWidgets.QGraphicsView):
         self.setRubberBandSelectionMode(QtCore.Qt.ContainsItemShape)
         self.setTransformationAnchor(self.AnchorUnderMouse)
         self.fitInView(parent.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
+        # Track the mouse position on LMB press to know whether selected items have been moved
+        self.mouse_pos_on_press = None
 
     def wheelEvent(self, event):
         """ Override the wheel event so we can add zoom functionality """
@@ -53,6 +58,38 @@ class SceneView(QtWidgets.QGraphicsView):
 
         super().keyReleaseEvent(event)
 
+    def mouseDoubleClickEvent(self, event: QtGui.QMouseEvent) -> None:
+        pass
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        super().mousePressEvent(event)
+        self.mouse_pos_on_press = event.pos()
+
+    def mouseReleaseEvent(self, event: QtGui.QMouseEvent) -> None:
+        super().mouseReleaseEvent(event)
+
+        selected_items = self.scene().selectedItems()
+        if selected_items:
+            # Only consider a move having happened if the cursor pos moved from when the mouse was first pressed
+            if self.mouse_pos_on_press != event.pos():
+                for item in selected_items:
+                    for child in item.childItems():
+                        # Always store a normalized position value between 0-1
+                        #
+                        # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value that
+                        # is altered by any translation applied to the item (Needs additional review to confirm). This
+                        # breaks features such as 'center_align'
+                        parent_pos = child.pos()
+                        item_pos = child.mapFromParent(parent_pos)
+                        scene_pos = child.mapToScene(item_pos)
+                        norm_range = [
+                            scene_pos.x() / self.scene().width(),
+                            scene_pos.y() / self.scene().height()
+                        ]
+                        child.action_data["position"]["value"] = norm_range
+
+                self.SIG_USER_MOVED_ITEMS.emit(selected_items)
+
 
 class Scene(QtWidgets.QGraphicsScene):
     """ A custom subclass of QGraphicsScene with extended features """
@@ -71,3 +108,6 @@ class Scene(QtWidgets.QGraphicsScene):
             QtGui.QBrush(QtCore.Qt.black)
         )
         background.setZValue(-9999999999)
+
+    def mouseDoubleClickEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        pass

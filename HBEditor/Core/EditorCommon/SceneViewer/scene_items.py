@@ -11,7 +11,7 @@ class BaseItem:
         self.root_item = None
 
 
-class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
+class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
     """
     A basic GraphicsItem that acts as the root of a scene_item and its descendants. It serves a few purposes:
     - It is the 'active_entry' for the details panel
@@ -23,10 +23,10 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
     happen. When selecting this object, all children are recursively selected as well to allow grouped movement
     """
 
-    def __init__(self, action_data: dict, select_func: callable):
+    def __init__(self, action_name: str, action_data: dict):
         super().__init__(None)
+        self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
-        self.select_func = select_func
 
         self.setFlag(self.ItemIsMovable, True)
         self.setFlag(self.ItemIsSelectable, True)
@@ -65,14 +65,14 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         return True
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
-                         pixmap: QtGui.QPixmap = None, text: str = "", search_term: str = "requirements"):
+                         pixmap: QtGui.QPixmap = None, text: str = ""):
         """
         Recursively generate child items in the tree for each item in the action_data. All items are created with
-        the full requirements data block
+        the full parameters data block
         """
         # Set values for the top-most item
         if not action_data and not parent:
-            action_data = self.action_data[ad.GetActionName(self.action_data)][search_term]
+            action_data = self.action_data
             parent = self
 
             # Some properties have special implications on usability within the editor (IE. position being uneditable
@@ -87,7 +87,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                     self.SetLocked(True)
                     self._movement_perm_locked = True
 
-        # In order to determine what child to spawn, we need to look through all the requirements at a given
+        # In order to determine what child to spawn, we need to look through all the parameters at a given
         # level, and see if certain names appear. If they do, we give them the full data block
         #
         # IE. {text: '', text_size: '', position: ''}. If 'text' is found, provide all 3 keys
@@ -96,8 +96,8 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
         # stomping issues
         new_item = None
 
-        for req_name, req_data in action_data.items():
-            if req_name == "sprite":
+        for param_name, param_data in action_data.items():
+            if param_name == "sprite":
                 new_item = SpriteItem(
                     action_data=action_data,  # Pass by ref
                     pixmap=pixmap
@@ -106,7 +106,7 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            elif req_name == "text":
+            elif param_name == "text":
                 new_item = TextItem(
                     action_data=action_data,  # Pass by ref
                     text=text
@@ -115,13 +115,12 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
                 new_item.root_item = self
                 new_item.Refresh()
 
-            if "children" in req_data:
+            if "children" in param_data:
                 self.GenerateChildren(
                     parent=new_item,
-                    action_data=req_data["children"],
+                    action_data=param_data["children"],
                     pixmap=pixmap,
-                    text=text,
-                    search_term="children"
+                    text=text
                 )
 
     def Refresh(self, change_tree: list = None):
@@ -188,32 +187,6 @@ class RootItem(QtWidgets.QGraphicsItem, SourceEntry):
             pen.setWidth(3)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
-
-    def mouseReleaseEvent(self, event) -> None:
-        for child in self.childItems():
-            # Always store a normalized position value between 0-1
-            #
-            # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value that is
-            # altered by any translation applied to the item (Needs additional review to confirm). This breaks
-            # features such as 'center_align'
-            parent_pos = child.pos()
-            item_pos = child.mapFromParent(parent_pos)
-            scene_pos = child.mapToScene(item_pos)
-            norm_range = [
-                scene_pos.x() / self.scene().width(),
-                scene_pos.y() / self.scene().height()
-            ]
-            child.action_data["position"]["value"] = norm_range
-
-        # Refresh in case position changed while dragging
-        self.select_func()
-
-        # Execute the original logic as it is what saves the position of objects internally
-        super().mouseReleaseEvent(event)
-
-    def mousePressEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
-        # Selecting the root will recursively select all of its children
-        self.setSelected(True)
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):

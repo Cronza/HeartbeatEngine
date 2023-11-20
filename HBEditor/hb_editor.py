@@ -25,7 +25,7 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.engine_launcher import EngineLauncher
-from HBEditor.Core.Dialogs.dialog_new_file import DialogNewScene
+from HBEditor.Core.Dialogs.dialog_new_scene import DialogNewScene
 from HBEditor.Core.EditorInterface.dialog_new_interface import DialogNewInterface
 from HBEditor.Core.Dialogs.dialog_file_system import DialogFileSystem
 from HBEditor.Core.Dialogs.dialog_list import DialogList
@@ -42,17 +42,14 @@ class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
 
-        self.main_window = QtWidgets.QMainWindow()
         self.e_ui = hbe.HBEditorUI(self)
-        self.e_ui.setupUi(self.main_window)
 
-        self.outliner = None  # Assignment happens once a project is loaded
+        # Track which editor is currently active
         self.active_editor = None
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
-        self.main_window.show()
-
+        self.e_ui.Show()
         sys.exit(self.app.exec_())
 
     def NewProject(self):
@@ -61,7 +58,7 @@ class HBEditor:
         chosen project
         """
         Logger.getInstance().Log("Requesting directory for the new project...'")
-        prompt = DialogFileSystem(self.main_window)
+        prompt = DialogFileSystem(self.e_ui.GetWindow())
         new_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Directory to Create a Project",
@@ -75,7 +72,7 @@ class HBEditor:
             # [0] = user_input: str, [1] = value_provided: bool
             Logger.getInstance().Log("Requesting a name for the new project...'")
             user_project_name = QtWidgets.QInputDialog.getText(
-                self.e_ui.central_widget,
+                self.e_ui.GetWindow(),
                 "New Project",
                 "Please Enter a Project Name:"
             )[0]
@@ -87,7 +84,7 @@ class HBEditor:
                 if os.path.exists(new_project_dir + "/" + user_project_name):
                     Logger.getInstance().Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
                     QtWidgets.QMessageBox.about(
-                        self.e_ui.central_widget,
+                        self.e_ui.GetWindow(),
                         "Project Already Exists!",
                         "The chosen directory already contains a project of the chosen name.\n"
                         "Please either delete this project, or choose another directory"
@@ -125,7 +122,7 @@ class HBEditor:
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
         Logger.getInstance().Log("Requesting path to project root...")
-        prompt = DialogFileSystem(self.main_window)
+        prompt = DialogFileSystem(self.e_ui.GetWindow())
         existing_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
             "Choose a Project Directory",
@@ -146,7 +143,7 @@ class HBEditor:
             else:
                 Logger.getInstance().Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
                 QtWidgets.QMessageBox.about(
-                    self.e_ui.central_widget,
+                    self.e_ui.GetWindow(),
                     "Not a Valid Project Directory!",
                     "The chosen directory is not a valid Heartbeat project.\n"
                     "Please either choose a different project, or create a new project."
@@ -164,7 +161,7 @@ class HBEditor:
         else:
             if not folder_name:
                 folder_name = QtWidgets.QInputDialog.getText(
-                    self.e_ui.central_widget,
+                    self.e_ui.GetWindow(),
                     "New Folder",
                     "Please Enter a Folder Name:"
                 )[0]
@@ -370,7 +367,7 @@ class HBEditor:
             full_path = f"{settings.user_project_dir}/{partial_file_path}"
 
             new_name = QtWidgets.QInputDialog.getText(
-                self.e_ui.central_widget,
+                self.e_ui.GetWindow(),
                 "Rename",
                 "Please Enter a New Name:"
             )[0]
@@ -510,7 +507,7 @@ class HBEditor:
                     else:
                         Logger.getInstance().Log("An invalid file was selected - Cancelling 'Open File' action", 4)
                         QtWidgets.QMessageBox.about(
-                            self.e_ui.central_widget,
+                            self.e_ui.GetWindow(),
                             "Not a Valid File!",
                             "The chosen file was not created by the HBEditor.\n"
                              "Please either choose a different file, or create a new one.\n\n"
@@ -533,7 +530,7 @@ class HBEditor:
             # If no import target is provided, then prompt the user to pick one
             if not import_target:
                 import_target = QtWidgets.QFileDialog.getOpenFileName(
-                    self.e_ui.central_widget,
+                    self.e_ui.GetWindow(),
                     "Choose a file to Import"
                 )[0]
 
@@ -585,7 +582,6 @@ class HBEditor:
             if problematic_files:
                 DialogList("Failed to Import", "The following files failed to import", problematic_files).exec()
 
-
         return problematic_files
 
 
@@ -597,7 +593,7 @@ class HBEditor:
             self.ShowNoStartingScenePrompt()
         else:
             p_manager = EngineLauncher()
-            p_manager.Play(self.e_ui.central_widget, settings.user_project_dir, settings.root)
+            p_manager.Play(self.e_ui.GetWindow(), settings.user_project_dir, settings.root)
 
     def Build(self):
         """ Launches the HBBuilder in order to generate an executable from the active project """
@@ -634,48 +630,36 @@ class HBEditor:
             if self.active_editor:
                 self.active_editor.Export()
 
-    def OpenEditor(self, target_file_path: str, editor_type: FileType, import_file: bool =False):
+    def OpenEditor(self, target_file_path: str, editor_type: FileType, import_file: bool = False):
         """ Creates an editor tab based on the provided file information """
-        if not settings.editor_data["EditorSettings"]["max_tabs"] <= self.e_ui.main_tab_editor.count():
-            editor_classes = {
-                FileType.Scene_Dialogue: EditorDialogue,
-                FileType.Scene_Point_And_Click: EditorPointAndClick,
-                FileType.Interface: EditorInterface,
-                FileType.Project_Settings: EditorProjectSettings
-             }
+        editor_classes = {
+            FileType.Scene_Dialogue: EditorDialogue,
+            FileType.Scene_Point_And_Click: EditorPointAndClick,
+            FileType.Interface: EditorInterface,
+            FileType.Project_Settings: EditorProjectSettings
+         }
 
-            # Let's check if we already have an editor open for this file
-            result = self.CheckIfFileOpen(target_file_path)
-            if result:
-                Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
-                self.e_ui.main_tab_editor.setCurrentWidget(result)
-            else:
-                # Initialize the Editor
-                self.active_editor = editor_classes[editor_type](target_file_path)
-
-                # Allow the caller to load the provided file instead of just marking it as the export target
-                if import_file:
-                    self.active_editor.Import()
-
-                self.e_ui.AddTab(
-                    self.active_editor.GetUI(),
-                    os.path.basename(target_file_path),
-                    self.e_ui.main_tab_editor
-                )
+        # Let's check if we already have an editor open for this file
+        result = self.CheckIfFileOpen(target_file_path)
+        if result:
+            Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
+            self.e_ui.main_tab_widget.setCurrentWidget(result)
+            self.active_editor = result
         else:
-            QtWidgets.QMessageBox.about(
-                self.e_ui.central_widget,
-                "Tab Limit Reached!",
-                "You have reached the maximum number of open tabs. Please close "
-                "a tab before attempting to open another"
-            )
+            # Initialize the Editor
+            self.active_editor = editor_classes[editor_type](target_file_path)
+            if import_file:
+                self.active_editor.Import()
+
+            # Create a tab to house the editor UI
+            self.e_ui.AddMainTab(self.active_editor.GetUI(), os.path.basename(target_file_path), True)
 
     def CloseEditor(self, target_file_path: str):
         """
         Closes the editor that is open for the provided file path
         """
-        for tab_index in range(0, self.e_ui.main_tab_editor.count()):
-            open_editor = self.e_ui.main_tab_editor.widget(tab_index)
+        for tab_index in range(0, self.e_ui.main_tab_widget.count()):
+            open_editor = self.e_ui.main_tab_widget.widget(tab_index)
 
             if open_editor.core.file_path == target_file_path:
                 self.e_ui.RemoveTab(tab_index)
@@ -688,21 +672,8 @@ class HBEditor:
         settings.LoadProjectSettings()
         settings.LoadHeartbeatFile()
 
-        # If this is the first time a user is loading a project after opening the editor, delete the 'Getting Started'
-        # display
-        if self.e_ui.getting_started_container:
-            target = self.e_ui.main_resize_container.widget(0)
-            target.deleteLater()
-            self.e_ui.getting_started_container = None
-
-            self.e_ui.CreateMainTabContainer()
-            self.e_ui.CreateOutliner()
-
-        # Clear any open editor tabs
-        self.e_ui.main_tab_editor.clear()
-
-        # Refresh U.I text using any active translations
-        self.e_ui.retranslateUi(self.main_window)
+        # Inform the U.I so it cleans up and prepares the U.I
+        self.e_ui.SetActiveProject()
 
     def OpenProjectSettings(self):
         """ Opens the 'Project Settings' editor """
@@ -735,10 +706,10 @@ class HBEditor:
         """
         Checks all open editor tabs for the provided file. Returns the editor if found. Otherwise, returns None
         """
-        for tab_index in range(0, self.e_ui.main_tab_editor.count()):
-            open_editor = self.e_ui.main_tab_editor.widget(tab_index)
+        for tab_index in range(0, self.e_ui.main_tab_widget.count()):
+            open_editor = self.e_ui.main_tab_widget.widget(tab_index)
             if open_editor.core.file_path == file_path:
-                return open_editor
+                return open_editor.core
 
         return None
 
@@ -853,7 +824,7 @@ class HBEditor:
     def ShowNoActiveProjectPrompt(self):
         Logger.getInstance().Log("There is no active project", 4)
         QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "No Active Project",
             "There is currently no project open.\n"
             "Please either open an existing project, or create a new one."
@@ -862,7 +833,7 @@ class HBEditor:
     def ShowFileAlreadyExistsPrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("A file / folder of that name already exists", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "File / Folder Already Exists",
             "The file / folder already exists."
         )
@@ -870,7 +841,7 @@ class HBEditor:
     def ShowNoStartingScenePrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("There is no starting scene set", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "No Starting Scene",
             "There is currently no starting scene.\n"
             "Please open the project settings and choose a starting scene."
@@ -879,7 +850,7 @@ class HBEditor:
     def ShowUnsupportedFileTypePrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file type is unsupported", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "Unsupported File Type",
             "The chosen file type is not supported.\n"
         )
@@ -887,7 +858,7 @@ class HBEditor:
     def ShowInvalidFileNamePrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
         if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "Invalid Name",
             "The chosen file name contains illegal characters, or reserved words. Please remove them before "
             "trying again."
@@ -896,7 +867,7 @@ class HBEditor:
     def ShowInternalImportErrorPrompt(self, batch_mode: bool = False):
         Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
         if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             "Unable to Import",
             "The import target resides within a project's 'Content' directory, which is prohibited. This is due to"
             " potential problems that may arise from targeting files that are already registered to the project.\n\n"
@@ -920,7 +891,7 @@ class HBEditor:
             message = f"Are you sure you want to {action.lower()} the following item:\n\n'{partial_file_path}'?"
 
         result = QtWidgets.QMessageBox.question(
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             f"Confirm {action.capitalize()}",
             message,
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
@@ -940,19 +911,18 @@ class HBEditor:
                       f"within this directory."
 
         result = QtWidgets.QMessageBox.question(
-            self.e_ui.central_widget,
+            self.e_ui.GetWindow(),
             f"Confirm {action.capitalize()}",
             message,
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
         )
         return result == QtWidgets.QMessageBox.Yes
 
+
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
-
 sys.excepthook = except_hook
-
 print(sys.excepthook)
+
 if __name__ == "__main__":
     editor = HBEditor()

@@ -12,27 +12,22 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
 from PyQt5 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.ActionMenu.action_menu_option import ActionMenuOption
-
-#@TODO: Should this class be split into a function class & a U.I class?
 
 
 class ActionMenu(QtWidgets.QMenu):
     """
     A generic menu of categories and actions that the active editor can use. 'button' func is used when any menu option
-    is clicked. 'available_actions' is a set of actions pulled from the action_metadata that will represent what's available
-    in the menu
+    is clicked.
     """
     def __init__(self, button_func, editor_type: FileType):
         super().__init__()
 
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
 
-        for category, data in settings.editor_action_metadata.items():
+        for category, data in settings.available_actions.items():
             # Create the category submenu
             cat_menu = QtWidgets.QMenu(self)
             cat_menu.setTitle(category)
@@ -42,14 +37,22 @@ class ActionMenu(QtWidgets.QMenu):
             for option_data in data['options']:
                 for applicable_editor in option_data["applicable_editors"]:
                     if FileType[applicable_editor] == editor_type:
-                        # The top level action name key gets removed when we try and access the data it contains. When
-                        # we go to pass the metadata copy to the option, re-add this key
-                        metadata_copy = copy.deepcopy(settings.action_metadata[option_data["name"]])
-                        option = ActionMenuOption(self, {option_data["name"]: metadata_copy}, button_func)
-                        option.setText(metadata_copy['display_name'])
+                        option = ActionMenuOption(self, option_data['name'], option_data['display_name'])
+                        option.SIG_USER_CLICKED.connect(button_func)
                         cat_menu.addAction(option)
                         break
 
             # Only use the menu if there were any actions that are allowed for this editor type
             if len(cat_menu.actions()) > 0:
                 self.addMenu(cat_menu)
+
+
+class ActionMenuOption(QtWidgets.QWidgetAction):
+    SIG_USER_CLICKED = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent, action_name: str, display_name: str):
+        super().__init__(parent)
+
+        self.action_name = action_name  # The real action name, separate from the user-facing display name
+        self.setText(display_name)
+        self.triggered.connect(lambda: self.SIG_USER_CLICKED.emit(self.action_name))

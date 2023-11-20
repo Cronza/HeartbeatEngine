@@ -12,11 +12,15 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 
 class EditorBaseUI(QtWidgets.QWidget):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()  # Emitted whenever any editor child widget is modified by the user
+    SIG_USER_SAVE = QtCore.pyqtSignal()  # Emitted whenever the user saves this editor
+
     def __init__(self, core_ref):
         super().__init__()
 
         self.core = core_ref
+        self.pending_changes = False

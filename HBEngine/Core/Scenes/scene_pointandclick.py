@@ -21,13 +21,14 @@ class PointAndClickScene(Scene):
 
     def LoadSceneData(self):
         # Load any applicable interfaces
-        if self.scene_data["settings"]["interface"]:
+        if self.scene_data["settings"]["interface"] and self.scene_data["settings"]["interface"] != "None":
             self.LoadInterface(self.scene_data["settings"]["interface"])
 
         # Render scene items
         if "scene_items" in self.scene_data:
             for item in self.scene_data["scene_items"]:
-                self.a_manager.PerformAction(item, item['action'])
+                action_name, action_data = next(iter(item.items()))
+                self.a_manager.PerformAction(action_data, action_name)
 
         else:
             raise ValueError("'scene_items' missing from the scene file")

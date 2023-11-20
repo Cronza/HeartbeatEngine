@@ -83,6 +83,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
         #TODO: Investigate how to improve the sizing for the first col. It should be a percentage of the available space
         self.settings_tree.header().setDefaultSectionSize(self.settings_tree.header().defaultSectionSize() * 2)
 
+        # Generate entries for each project setting and category
         self.PopulateCategories()
 
     def PopulateCategories(self):
@@ -137,5 +138,14 @@ class EditorProjectSettingsUI(EditorBaseUI):
                     owner=self,
                     view=self.settings_tree,
                     name=setting_name,
-                    data=data
+                    data=data,
+                    signal_func=self.ConnectSignals
                 )
+
+    def ConnectSignals(self, tree_item):
+        """ Connects the InputEntry signals to slots within this class """
+        input_widget = self.settings_tree.itemWidget(tree_item, 1)
+        input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
+
+    def UserUpdatedInputWidget(self, owning_tree_item: QtWidgets.QTreeWidgetItem):
+        self.SIG_USER_UPDATE.emit()

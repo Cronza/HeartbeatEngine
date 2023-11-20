@@ -21,6 +21,7 @@ from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 from HBEditor.Core.Primitives.input_entries import InputEntryAssetSelector
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core import settings
 
 
 class SceneViewer(QtWidgets.QWidget):
@@ -30,19 +31,22 @@ class SceneViewer(QtWidgets.QWidget):
 
     Param 'selection_change_func': Called when an selection has changed. Returns list of selected items
     Param 'add_func': Called when a new item is added. Returns the added item
+
+    Attributes
+        SIG_SELECTION_CHANGED: Signal that fires whenever the selected scene item changes, whether via the system or user
+        SIG_USER_ADDED_ITEM: Signal that fires whenever the user adds a new item to the view
+        SIG_USER_DELETED_ITEM: Signal that fires whenever the user adds a new item to the view
     """
-    def __init__(self,
-                 core,
-                 selection_change_func: callable = None,
-                 add_func: callable = None):
+    SIG_SELECTION_CHANGED = QtCore.pyqtSignal(list)
+    SIG_USER_ADDED_ITEM = QtCore.pyqtSignal(RootItem)
+    SIG_USER_DELETED_ITEMS = QtCore.pyqtSignal()
+    SIG_USER_MOVED_ITEMS = QtCore.pyqtSignal(list)
+    SIG_USER_LOCKED_ITEMS = QtCore.pyqtSignal(list)
+
+    def __init__(self, file_type: FileType):
         super().__init__()
 
-        #@TODO: Rename this to 'owner' to be more explicit
-        self.core = core
         self.viewer_size = (1280, 720)
-
-        self.selection_change_func = selection_change_func
-        self.add_func = add_func
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -85,7 +89,7 @@ class SceneViewer(QtWidgets.QWidget):
             QtGui.QIcon.Off
         )
         self.add_entry_button.setIcon(icon)
-        self.action_menu = ActionMenu(self.AddRenderable, self.core.file_type)
+        self.action_menu = ActionMenu(self.AddRenderable, file_type)
         self.add_entry_button.setMenu(self.action_menu)
         self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.action_toolbar.addWidget(self.add_entry_button)
@@ -113,21 +117,31 @@ class SceneViewer(QtWidgets.QWidget):
         self.lock_button.clicked.connect(self.LockRenderable)
         self.action_toolbar.addWidget(self.lock_button)
 
+        # Scene / View
         self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
-        self.scene.selectionChanged.connect(self.UpdateActiveSceneItem)
+        self.scene.selectionChanged.connect(self.UpdateSelectionChanged)
         self.view = SceneView(self.scene)
+        self.view.SIG_USER_MOVED_ITEMS.connect(self.SIG_USER_MOVED_ITEMS.emit)
         self.sub_layout.addWidget(self.view)
         self.main_layout.addLayout(self.sub_layout)
 
         self.view.show()
 
-    def AddRenderable(self, action_data, skip_selection: bool = False) -> RootItem:
-        """ Add an item to the scene view. Return the newly created item """
-        new_item = RootItem(
-            action_data=action_data,
-            select_func=self.UpdateActiveSceneItem
-        )
+    def AddRenderable(self, action_name: str, action_data: dict = None, skip_selection: bool = False) -> RootItem:
+        """
+        Add an item to the scene view. If 'action_data' is provided, populate the entry using it instead
 
+        Return the newly created item.
+        """
+
+        if not action_data:
+            # Load a fresh copy of the ACTION_DATA
+            action_data = settings.GetActionData(action_name)
+
+        new_item = RootItem(
+            action_name=action_name,
+            action_data=action_data
+        )
         self.scene.addItem(new_item)
 
         # Generate after adding to the scene so children have the scene transform context
@@ -142,9 +156,8 @@ class SceneViewer(QtWidgets.QWidget):
             self.scene.clearSelection()
             new_item.setSelected(True)
 
-        if self.add_func:
-            self.add_func(new_item)
-
+        # Inform listeners
+        self.SIG_USER_ADDED_ITEM.emit(new_item)
         return new_item
 
     def CopyRenderable(self):
@@ -153,7 +166,7 @@ class SceneViewer(QtWidgets.QWidget):
 
         if selected_items:
             for item in selected_items:
-                self.AddRenderable(copy.deepcopy(item.action_data))
+                self.AddRenderable(item.action_name, item.action_data)
 
     def LockRenderable(self):
         """ Toggles the locked state of the selected items, preventing their movement with the cursor """
@@ -181,21 +194,23 @@ class SceneViewer(QtWidgets.QWidget):
                 else:
                     self.lock_button.Toggle(False)
 
+            self.SIG_USER_LOCKED_ITEMS.emit(selected_items)
+
     def RemoveSelectedItems(self):
         """ Removes all currently selected items """
         selected_items = self.scene.selectedItems()
 
         if selected_items:
             for item in selected_items:
-                self.scene.removeItem(item)
-
-            self.core.UpdateActiveSceneItem(None)
+                self.scene.removeItem(item)  # Deleting selected items emits the 'selectionChanged' signal
+            self.SIG_USER_DELETED_ITEMS.emit()
 
     def GetSceneItems(self) -> List[RootItem]:
         """ Returns a list of all RootItems in the SceneView """
         return [item for item in self.scene.items() if isinstance(item, RootItem)]
 
-    def UpdateActiveSceneItem(self):
+    def UpdateSelectionChanged(self):
+        """ SLOT: Called when the selected item has changed """
         selected_items = self.scene.selectedItems()
         lock = False
         if selected_items:
@@ -205,10 +220,8 @@ class SceneViewer(QtWidgets.QWidget):
                     break
 
         self.lock_button.Toggle(lock)
-
-        # Inform the core so it can take additional actions
-        if self.selection_change_func:
-            self.selection_change_func(selected_items) #@TODO: Document how to know that this takes params
+        print("Selection changed")
+        self.SIG_SELECTION_CHANGED.emit(selected_items)
 
     def Clear(self):
         """ Removes all items from scene """

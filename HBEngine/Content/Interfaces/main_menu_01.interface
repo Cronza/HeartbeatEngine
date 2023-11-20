@@ -8,220 +8,217 @@ pages:
     description: ''
     items:
       # Background
-      - action: create_background
-        key: "!&INTERFACE_MAIN_MENU_Background&!"
-        sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
-        z_order: 100000
+      - create_background:
+          key: "!&INTERFACE_MAIN_MENU_Background&!"
+          sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
+          z_order: 100000
 
       # Title
-      - action: create_text
-        key: "!&INTERFACE_MAIN_MENU_Title&!"
-        position:
-          - 0.5
-          - 0.35
-        text: ''
-        text_size: 60
-        center_align: True
-        font: Content/Fonts/DAGGERSQUARE.ttf
-        z_order: 100001
-        wrap_bounds:
-          - 0.8
-          - 0.8
-        connect_project_setting:
-          category: Game
-          setting: title
+      - create_text:
+          key: "!&INTERFACE_MAIN_MENU_Title&!"
+          position:
+            - 0.5
+            - 0.35
+          text: ''
+          text_size: 60
+          center_align: True
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.8
+          connect_project_setting:
+            category: Game
+            setting: title
 
       # Play Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_Play_Button&!"
-        position:
-          - 0.5
-          - 0.5
-        center_align: true
-        z_order: 100002
-        text: Play
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: play_sfx
-              key: SFX
-              sound: ''
-              volume: 1.0
-              loop: false
-              post_wait: no_wait
-          event_1:
-            action:
-              action: scene_fade_out
-              color: black
-              speed: 200
-              post_wait: wait_until_complete
-          event_2:
-            action:
-              action: load_scene
-              scene_file: ''
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_Play_Button&!"
+          position:
+            - 0.5
+            - 0.5
+          center_align: true
+          z_order: 100002
+          text: Play
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: play_sfx
+                key: SFX
+                sound: HBEngine/Content/SFX/whistle.wav
+                volume: 1.0
+                loop: false
+                post_wait: no_wait
+            event_1:
+              action:
+                action: scene_fade_out
+                color: black
+                speed: 200
+                post_wait: wait_until_complete
+            event_2:
+              action:
+                action: load_scene
+                scene_file: ''
 
       # Options Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_Options_Button&!"
-        position:
-          - 0.5
-          - 0.6
-        center_align: true
-        z_order: 100002
-        text: Option
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: switch_page
-              owner: "!&INTERFACE_MAIN_MENU&!"
-              page: page_Options
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_Options_Button&!"
+          position:
+            - 0.5
+            - 0.6
+          center_align: true
+          z_order: 100002
+          text: Option
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: switch_page
+                owner: "!&INTERFACE_MAIN_MENU&!"
+                page: page_Options
 
       # Load Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_Load_Button&!"
-        position:
-          - 0.5
-          - 0.55
-        center_align: true
-        z_order: 100002
-        text: Load
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: switch_page
-              owner: "!&INTERFACE_MAIN_MENU&!"
-              page: page_Load
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_Load_Button&!"
+          position:
+            - 0.5
+            - 0.55
+          center_align: true
+          z_order: 100002
+          text: Load
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: switch_page
+                owner: "!&INTERFACE_MAIN_MENU&!"
+                page: page_Load
 
       # About Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_About_Button&!"
-        position:
-          - 0.5
-          - 0.65
-        center_align: true
-        z_order: 100002
-        text: About
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: switch_page
-              owner: "!&INTERFACE_MAIN_MENU&!"
-              page: page_About
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_About_Button&!"
+          position:
+            - 0.5
+            - 0.65
+          center_align: true
+          z_order: 100002
+          text: About
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: switch_page
+                owner: "!&INTERFACE_MAIN_MENU&!"
+                page: page_About
 
       # Quit Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_Quit_Button&!"
-        position:
-          - 0.5
-          - 0.7
-        center_align: true
-        z_order: 100002
-        text: Quit
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: quit_game
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_Quit_Button&!"
+          position:
+            - 0.5
+            - 0.7
+          center_align: true
+          z_order: 100002
+          text: Quit
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: quit_game
 
   page_Load:
     description: ''
     items:
       # Page Title
-      - action: create_text
-        key: "!&INTERFACE_MAIN_MENU_pageLoad_Title&!"
-        position:
-          - 0.5
-          - 0.2
-        text: Load
-        text_size: 60
-        font: Content/Fonts/DAGGERSQUARE.ttf
-        z_order: 100001
-        wrap_bounds:
-          - 0.8
-          - 0.4
+      - create_text:
+          key: "!&INTERFACE_MAIN_MENU_pageLoad_Title&!"
+          position:
+            - 0.5
+            - 0.2
+          text: Load
+          text_size: 60
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.4
 
   page_About:
     description: ''
     items:
       # Background
-      - action: create_background
-        key: "!&INTERFACE_MAIN_MENU_pageAbout_Background&!"
-        sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
-        z_order: 100000
+      - create_background:
+          key: "!&INTERFACE_MAIN_MENU_pageAbout_Background&!"
+          sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
+          z_order: 100000
 
       # Page Title
-      - action: create_text
-        key: "!&INTERFACE_MAIN_MENU_pageAbout_Title&!"
-        position:
-          - 0.5
-          - 0.2
-        text: About
-        text_size: 60
-        center_align: True
-        font: Content/Fonts/DAGGERSQUARE.ttf
-        z_order: 100001
-        wrap_bounds:
-          - 0.8
-          - 0.4
+      - create_text:
+          key: "!&INTERFACE_MAIN_MENU_pageAbout_Title&!"
+          position:
+            - 0.5
+            - 0.2
+          text: About
+          text_size: 60
+          center_align: True
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.4
 
       # Back Button
-      - action: create_text_button
-        key: "!&INTERFACE_MAIN_MENU_pageAbout_Back_Button&!"
-        position:
-          - 0.5
-          - 0.85
-        center_align: true
-        z_order: 100002
-        text: Back
-        text_size: 16
-        text_color_hover:
-          - 0
-          - 127
-          - 255
-        wrap_bounds:
-          - 0.2
-          - 0.2
-        events:
-          event_0:
-            action:
-              action: remove_page
-              owner: "!&INTERFACE_MAIN_MENU&!"
+      - create_text_button:
+          key: "!&INTERFACE_MAIN_MENU_pageAbout_Back_Button&!"
+          position:
+            - 0.5
+            - 0.85
+          center_align: true
+          z_order: 100002
+          text: Back
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: remove_page
+                owner: "!&INTERFACE_MAIN_MENU&!"

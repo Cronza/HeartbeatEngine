@@ -27,7 +27,6 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class EditorInterface(EditorBase):
     def __init__(self, file_path, interface_type: FileType = FileType.Interface):
         super().__init__(file_path)
-
         # Where as many scenes have unique editors, interface types share the same editor. As such, we need
         # to know which type this editor is working on to properly adjust functionality
         self.file_type = interface_type
@@ -40,27 +39,26 @@ class EditorInterface(EditorBase):
         )
         Logger.getInstance().Log("Editor initialized")
 
-    def UpdateActiveSceneItem(self, selected_items):
+    def UpdateActiveSceneItem(self, selected_items: list = None):
         """
         Makes the selected scene item the active one, refreshing the details panel. Hides the details information
-        if more than one item is selected
+        if more than one item is selected, or if 'None' is provided
         """
-
         # Only allow editing of details when a single item is selected
         if selected_items:
             if len(selected_items) == 1:
                 self.UpdateDetails(selected_items[0])
                 return
 
+        # If no items were provided or more than 1 were, clear the details
         self.UpdateDetails(None)
 
-    def UpdateDetails(self, selected_item):
+    def UpdateDetails(self, selected_item: RootItem = None):
         """
-        Refreshes the details panel with the details from the selected item. Clears all details if None is provided
+        Refreshes the details panel with the details from the selected item. Clears all details if None is provided.
         """
         if selected_item:
             self.editor_ui.details.Populate(selected_item)
-
         else:
             # No entries left to select. Wipe remaining details
             self.editor_ui.details.ClearActiveItem()
@@ -72,6 +70,7 @@ class EditorInterface(EditorBase):
         if not page:
             page = self.editor_ui.pages_panel.active_entry
         item.owner_id = page.Get()[0]
+        self.editor_ui.SIG_USER_UPDATE.emit()
 
     def ShowPageItems(self, make_visible: bool, page_name: str):
         """
@@ -92,7 +91,8 @@ class EditorInterface(EditorBase):
             for item in self.editor_ui.scene_viewer.GetSceneItems():
                 if item.owner_id == new_group_name:
                     item.setEnabled(True)
-
+        elif cur_page == new_page:
+            pass
         else:
             # Prior page available. Disable its items, and enable the new page's items
             cur_group_name = cur_page.Get()[0]
@@ -111,16 +111,13 @@ class EditorInterface(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        settings_data = {"settings": self.editor_ui.interface_settings.GetData()}
-        conv_settings_data = ad.ConvertActionRequirementsToEngineFormat(settings_data, search_term="settings")
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.interface_settings.GetData())
 
-        # Get an engine-formatted list of scene items organized by page / persistent
-        conv_scene_items = self.ConvertInterfaceItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
-
+        # Merge the collected data
         data_to_export = {
             "type": self.file_type.name,
-            "settings": conv_settings_data,
-            "pages": conv_scene_items
+            "settings": conv_scene_data,
+            "pages": self.ConvertInterfaceItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
         Logger.getInstance().Log("Writing data to file...")
@@ -131,6 +128,7 @@ class EditorInterface(EditorBase):
                 metadata=f"# Type: {self.file_type.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
+            self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
         except Exception as exc:
             Logger.getInstance().Log(f"Failed to Export: {exc}", 4)
@@ -154,7 +152,8 @@ class EditorInterface(EditorBase):
                 # Populate the page entry
                 conv_page_items = self.ConvertInterfaceItemsToEditorFormat(page_data["items"])
                 for item in conv_page_items:
-                    new_item = self.editor_ui.scene_viewer.AddRenderable(item, True)
+                    action_name, action_data = next(iter(item.items()))
+                    new_item = self.editor_ui.scene_viewer.AddRenderable(action_name, action_data, True)
 
                     # Apply any imported editor-specific properties
                     if "editor_properties" in item[ad.GetActionName(item)]:
@@ -165,6 +164,9 @@ class EditorInterface(EditorBase):
                     # Hide non-persistent page items by default, as pages themselves are inactive by default
                     if page_name.lower() != "persistent":
                         new_item.setVisible(False)
+
+        # Select the persistent layer
+        self.editor_ui.pages_panel.ChangeEntry(0)
 
     def ConvertInterfaceItemsToEngineFormat(self, scene_items: dict) -> dict:
         """ Build and return a dict of data from all active view items converted to engine format, organized by page """
@@ -177,26 +179,15 @@ class EditorInterface(EditorBase):
             conv_pages[page_name] = {"description": page_desc, "items": []}
 
         for scene_item in scene_items:
-            scene_item_data = scene_item.action_data
+            conv_ad = ad.ConvertParamDataToEngineFormat(scene_item.action_data)
 
-            # Get the action name
-            converted_action = {"action": ad.GetActionName(scene_item_data)}
-
-            # Preserve any notable editor-specific properties so that they're available when importing
+            # Preserve any notable editor-specific parameters so that they're available when importing
             # Note: This is subject to change when additional examples are available
             if scene_item.GetLocked():
-                converted_action["editor_properties"] = {"locked": scene_item.GetLocked()}
-
-            # Collect a converted dict of all requirements for this action (If any are present)
-            converted_requirements = ad.ConvertActionRequirementsToEngineFormat(
-                editor_req_data=scene_item_data[ad.GetActionName(scene_item_data)]
-            )
-
-            if converted_requirements:
-                converted_action.update(converted_requirements)
+                conv_ad["editor_properties"] = {"locked": scene_item.GetLocked()}
 
             # Add the newly converted action to the associated page
-            conv_pages[scene_item.owner_id]["items"].append(converted_action)
+            conv_pages[scene_item.owner_id]["items"].append({scene_item.action_name: conv_ad})
 
         return conv_pages
 
@@ -207,19 +198,21 @@ class EditorInterface(EditorBase):
         """
         conv_items = []
         for item in action_data:
-            # Using the name of the action, look it up in the actions_metadata and clone it
-            md_entry = copy.deepcopy(settings.action_metadata[item["action"]])
+            # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
+            # the matching ACTION_DATA and clone it
+            action_name, action_data = next(iter(item.items()))
+            base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
 
             # Pass the entry by ref, and let the convert func edit it directly
-            ad.ConvertActionRequirementsToEditorFormat(
-                metadata_entry=md_entry,
-                engine_entry=item
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=base_ad_clone,
+                action_data=action_data
             )
 
             # Import the editor-specific properties in order to preserve editing state for items
             if "editor_properties" in item:
-                md_entry["editor_properties"] = item["editor_properties"]
+                base_ad_clone["editor_properties"] = item["editor_properties"]
 
-            conv_items.append({item["action"]: md_entry})
+            conv_items.append({action_name: base_ad_clone})
 
         return conv_items
