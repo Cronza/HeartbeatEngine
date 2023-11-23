@@ -61,9 +61,18 @@ class OutlinerUI(QtWidgets.QWidget):
         self.main_layout.addWidget(self.asset_list)
 
     def CreateContextMenu(self, pos):
-        use_asset_menu = self.asset_list.itemAt(pos)
+        use_asset_menu = self.asset_list.itemAt(pos)  # Alter the menu if the user triggers it while hovering an asset
         asset_is_selected = len(self.asset_list.selectedItems()) > 0
+
         context_menu = OutlinerContextMenu(self, self.core, use_asset_menu, asset_is_selected)
+        context_menu.a_import.triggered.connect(self.core.ImportAsset)
+        context_menu.a_rename.triggered.connect(self.core.RenameAsset)
+        context_menu.a_delete.triggered.connect(self.core.DeleteAsset)
+        context_menu.a_duplicate.triggered.connect(self.core.DuplicateAsset)
+        context_menu.a_create_folder.triggered.connect(self.core.CreateFolder)
+        context_menu.a_new_scene.triggered.connect(self.core.CreateScene)
+        context_menu.a_new_interface.triggered.connect(self.core.CreateInterface)
+        context_menu.a_details.triggered.connect(self.ShowDetails)
 
         # Reveal the context menu, translating the local widget pos to a global pos
         context_menu.popup(self.asset_list.mapToGlobal(pos))
@@ -116,8 +125,8 @@ class OutlinerUI(QtWidgets.QWidget):
         else:
             self.core.OpenFile(item.text())
 
-    def AddAsset(self, name: str, asset_type: FileType, thumbnail_path: str = ""):
-        new_asset = OutlinerAsset(asset_type, name, thumbnail_path)
+    def AddAsset(self, asset_name: str, asset_type: FileType, thumbnail_path: str = ""):
+        new_asset = OutlinerAsset(asset_name, asset_type, thumbnail_path)
 
         self.asset_list.addItem(new_asset)
 
@@ -142,6 +151,17 @@ class OutlinerUI(QtWidgets.QWidget):
 
     def ClearAssets(self):
         self.asset_list.clear()
+
+    def ShowDetails(self):
+        selected_asset = self.asset_list.currentItem()
+        print(selected_asset)
+        info_dialog = DialogAssetInfo(
+            file_name=selected_asset.asset_name,
+            file_type=selected_asset.asset_type,
+            rel_file_path=self.core.cur_directory,
+            abs_file_path=f"{settings.user_project_dir}/{self.core.cur_directory}"
+        )
+        info_dialog.exec()
 
 
 class AssetList(QtWidgets.QListWidget):
@@ -192,10 +212,11 @@ class AssetList(QtWidgets.QListWidget):
 
 
 class OutlinerAsset(QtWidgets.QListWidgetItem):
-    def __init__(self, asset_type: FileType, name: str, thumbnail_path: str = ""):
+    def __init__(self, asset_name: str, asset_type: FileType, thumbnail_path: str = ""):
         super().__init__()
-        self.setText(name)
+        self.setText(asset_name)
 
+        self.asset_name = asset_name
         self.asset_type = asset_type
         try:
             if thumbnail_path:
@@ -235,45 +256,43 @@ class TileDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class OutlinerContextMenu(QtWidgets.QMenu):
+    SIG_IMPORT = QtCore.pyqtSignal()
+    SIG_RENAME = QtCore.pyqtSignal()
+    SIG_DELETE = QtCore.pyqtSignal()
+    SIG_DUPLICATE = QtCore.pyqtSignal()
+    SIG_CREATE_FOLDER = QtCore.pyqtSignal()
+    SIG_CREATE_SCENE = QtCore.pyqtSignal()
+    SIG_CREATE_INTERFACE = QtCore.pyqtSignal()
+    SIG_SHOW_DETAILS = QtCore.pyqtSignal()
+
     def __init__(self, parent, core, use_asset_menu: bool = False, active_selection: bool = False):
         super().__init__(parent)
         # Store a ref to the window core so we can access pertinent functions
         self.core = core
 
+        # Create each of the possible actions
+        self.a_import = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Import.png")), "Import", self)
+        self.a_rename = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Rename.png")), "Rename", self)
+        self.a_delete = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Close.png")), "Delete", self)
+        self.a_duplicate = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")), "Duplicate", self)
+        self.a_create_folder = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Folder.png")), "Create Folder", self)
+        self.a_new_scene = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")), "Create Scene", self)
+        self.a_new_interface = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Interface.png")), "Create Interface", self)
+        self.a_details = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Information.png")), "Details", self)
+
+        # Only show the contextually relevant options
         if not use_asset_menu:
-            a_import = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Import.png")), "Import", self)
-            a_import.triggered.connect(self.core.ImportAsset)
-            self.addAction(a_import)
-
+            self.addAction(self.a_import)
         if active_selection:
-            a_rename = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Rename.png")), "Rename", self)
-            a_rename.triggered.connect(self.core.RenameAsset)
-            self.addAction(a_rename)
-
-            a_delete = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Close.png")), "Delete", self)
-            a_delete.triggered.connect(self.core.DeleteAsset)
-            self.addAction(a_delete)
-
-            a_duplicate = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")), "Duplicate", self)
-            a_duplicate.triggered.connect(self.core.DuplicateAsset)
-            self.addAction(a_duplicate)
-
+            self.addAction(self.a_rename)
+            self.addAction(self.a_delete)
+            self.addAction(self.a_duplicate)
         if not use_asset_menu:
-            a_create_folder = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Folder.png")), "Create Folder", self)
-            a_create_folder.triggered.connect(self.core.CreateFolder)
-            self.addAction(a_create_folder)
-
-            a_new_scene = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")), "Create Scene", self)
-            a_new_scene.triggered.connect(self.core.CreateScene)
-            self.addAction(a_new_scene)
-
-            a_new_interface = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Interface.png")), "Create Interface", self)
-            a_new_interface.triggered.connect(self.core.CreateInterface)
-            self.addAction(a_new_interface)
-
+            self.addAction(self.a_create_folder)
+            self.addAction(self.a_new_scene)
+            self.addAction(self.a_new_interface)
         if active_selection:
-            a_details = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Information.png")), "Details", self)
-            self.addAction(a_details)
+            self.addAction(self.a_details)
 
 
 class QuickAccessButton(QtWidgets.QToolButton):
@@ -306,3 +325,73 @@ class QuickAccessButton(QtWidgets.QToolButton):
 
         self.setAttribute(QtCore.Qt.WA_UnderMouse, False)  # Fix for hover state freeze due to QDialogs
         event.acceptProposedAction()
+
+
+class DialogAssetInfo(QtWidgets.QDialog):
+    def __init__(self, file_name: str, rel_file_path: str, abs_file_path: str, file_type: FileType):
+        super().__init__()
+
+        # Hide the OS header to lock its position
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.resize(400, 300)
+        #print(self.size())
+        self.main_layout = QtWidgets.QVBoxLayout(self)
+
+        # Header
+        self.header = QtWidgets.QLabel("Asset Details")
+        self.header.setObjectName("h2")
+        self.main_layout.addWidget(self.header)
+
+        # Asset List
+        self.details_list = QtWidgets.QTableWidget(self)
+        self.details_list.verticalHeader().setObjectName("vertical")
+        self.details_list.setColumnCount(2)
+        self.details_list.setWordWrap(False)
+        self.details_list.setShowGrid(False)
+        self.details_list.horizontalHeader().hide()
+        self.details_list.verticalHeader().hide()
+        self.details_list.setContentsMargins(0,0,0,0)
+        self.details_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        self.details_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
+        self.details_list.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)  # Disable selection
+        self.details_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+
+        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
+        # focus border. Thus, we do it the slightly more tragic way
+        self.details_list.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.main_layout.addWidget(self.details_list)
+
+        # Info elements
+        self.details_list.insertRow(self.details_list.rowCount())
+        self.details_list.setItem(0, 0, QtWidgets.QTableWidgetItem("File Name:"))
+        file_name_label = QtWidgets.QLabel(file_name)
+        file_name_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.details_list.setCellWidget(0, 1, file_name_label)
+
+        self.details_list.insertRow(self.details_list.rowCount())
+        self.details_list.setItem(1, 0, QtWidgets.QTableWidgetItem("Project Path:"))
+        rel_file_path_label = QtWidgets.QLabel(rel_file_path)
+        rel_file_path_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.details_list.setCellWidget(1, 1, rel_file_path_label)
+
+        self.details_list.insertRow(self.details_list.rowCount())
+        self.details_list.setItem(2, 0, QtWidgets.QTableWidgetItem("File System Path:"))
+        abs_file_path_label = QtWidgets.QLabel(abs_file_path)
+        abs_file_path_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.details_list.setCellWidget(2, 1, abs_file_path_label)
+
+        self.details_list.insertRow(self.details_list.rowCount())
+        self.details_list.setItem(3, 0, QtWidgets.QTableWidgetItem("File Type:"))
+        file_type_label = QtWidgets.QLabel(file_type.name)
+        file_type_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self.details_list.setCellWidget(3, 1, file_type_label)
+
+        self.details_list.resizeRowsToContents()
+
+        # Confirmation Buttons
+        self.button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok)
+        self.button_box.accepted.connect(self.accept)
+        self.main_layout.addWidget(self.button_box)
+
+

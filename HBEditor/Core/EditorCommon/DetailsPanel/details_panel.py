@@ -217,7 +217,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.StoreData()
         self.Clear()
         self.active_entry = None
-        self.SIG_USER_UPDATE.emit()
 
     def Clear(self):
         self.details_tree.clear()

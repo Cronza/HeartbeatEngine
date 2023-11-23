@@ -643,7 +643,7 @@ class HBEditor:
         result = self.CheckIfFileOpen(target_file_path)
         if result:
             Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
-            self.e_ui.main_tab_widget.setCurrentWidget(result)
+            self.e_ui.main_tab_widget.setCurrentWidget(result.editor_ui)
             self.active_editor = result
         else:
             # Initialize the Editor
