@@ -111,10 +111,28 @@ def ConvertPartialToAbsolutePath(partial_path):
         return project_root + "/" + partial_path
 
 
+def LoadCharacter(partial_file_path: str):
+    """
+    Given a file path to a character file within the project, load its data and store it within 'loaded_characters'.
+    If the character has already been loaded, then skip loading. Return the loaded data, or the already loaded data
+    """
+    global loaded_characters
+
+    if partial_file_path not in loaded_characters:
+        file_path = ConvertPartialToAbsolutePath(partial_file_path)
+        character_data = Reader.ReadAll(file_path)
+        loaded_characters[partial_file_path] = character_data
+        return character_data
+    else:
+        return loaded_characters[partial_file_path]
+
+
 root_dir = os.getcwd().replace("\\", "/")
 project_root = ""
 project_settings = None
+
 active_scene = None  # Managed by 'hb_engine.py'
+loaded_characters = {}  # Cache loaded characters so we don't need to reload them multiple times
 
 # When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
 # to change based on the mute setting), we need a way of tracking who needs to be informed. This dict

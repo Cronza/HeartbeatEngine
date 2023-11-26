@@ -205,6 +205,7 @@ project_default_files = {
 # The master dict of file types supported by the engine / editor
 supported_file_types = {
     ".interface": FileType.Interface,
+    ".character": FileType.Character,
     ".png": FileType.Asset_Image,
     ".jpg": FileType.Asset_Image,
     ".yaml": FileType.Asset_Data,

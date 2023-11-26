@@ -51,6 +51,7 @@
         <file alias="Rename.png">Icons/Rename.png</file>
         <file alias="SceneItem_Sprite.png">Icons/SceneItem_Sprite.png</file>
         <file alias="Interface.png">Icons/Interface.png</file>
+        <file alias="Character.png">Icons/Character.png</file>
         <file alias="ChangesPending.png">Icons/ChangesPending.png</file>
     </qresource>
     <qresource prefix="Themes">

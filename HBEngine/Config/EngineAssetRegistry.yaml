@@ -5,6 +5,8 @@ Content:
     pause_menu_01.interface: Interface
     dialogue_01.interface: Interface
     main_menu_01.interface: Interface
+  Characters:
+    narrator.character: Character
   Fonts:
     Comfortaa:
       Comfortaa-Bold.ttf: Asset_Font

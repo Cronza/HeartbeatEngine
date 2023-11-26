@@ -19,13 +19,13 @@ class FileType(Enum):
     Folder = 1
     Project_Settings = 2
     Interface = 3
-    Scene_Dialogue = 4
-    Scene_Point_And_Click = 5
-    Asset_Data = 6
-    Asset_Image = 7
-    Asset_Font = 8
-    Asset_Sound = 9
-    #Character = 3
+    Character = 4
+    Scene_Dialogue = 5
+    Scene_Point_And_Click = 6
+    Asset_Data = 7
+    Asset_Image = 8
+    Asset_Font = 9
+    Asset_Sound = 10
 
 
 class FileTypeDescriptions:
@@ -45,6 +45,7 @@ class FileTypeIcons:
     icons = {
         FileType.Folder: ":/Icons/Folder.png",
         FileType.Interface: ":/Icons/Interface.png",
+        FileType.Character: ":/Icons/Character.png",
         FileType.Project_Settings: ":/Icons/File.png",
         FileType.Scene_Dialogue: ":/Icons/File.png",
         FileType.Scene_Point_And_Click: ":/Icons/File.png",

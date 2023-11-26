@@ -27,6 +27,11 @@ Renderables:
 Interactables:
   icon: ":/Icons/AM_Renderable.png"
   options:
+    - name: "create_interactable"
+      display_name: "Create Interactable"
+      applicable_editors:
+        - Scene_Point_And_Click
+        - Interface
     - name: "create_button"
       display_name: "Create Button"
       applicable_editors:
@@ -34,6 +39,21 @@ Interactables:
         - Interface
     - name: "create_text_button"
       display_name: "Create Button (Text Only)"
+      applicable_editors:
+        - Scene_Point_And_Click
+        - Interface
+
+Characters:
+  icon: ":/Icons/AM_Renderable.png"
+  options:
+    - name: "create_character"
+      display_name: "Create Character"
+      applicable_editors:
+        - Scene_Dialogue
+        - Scene_Point_And_Click
+        - Interface
+    - name: "create_character_interactable"
+      display_name: "Create Character (Interactable)"
       applicable_editors:
         - Scene_Point_And_Click
         - Interface

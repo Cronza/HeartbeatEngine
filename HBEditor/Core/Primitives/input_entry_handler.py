@@ -99,6 +99,8 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget = InputEntryAssetSelector(data, owner, {FileType.Scene_Dialogue, FileType.Scene_Point_And_Click})
     elif data_type == ParameterType.Asset_Interface:
         input_widget = InputEntryAssetSelector(data, owner, {FileType.Interface})
+    elif data_type == ParameterType.Asset_Character:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Character})
     elif data_type == ParameterType.Asset_Data:
         input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Data})
     elif data_type == ParameterType.Asset_Image:
