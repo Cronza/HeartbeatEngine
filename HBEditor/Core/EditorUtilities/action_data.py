@@ -16,11 +16,16 @@ import copy
 from HBEditor.Core import settings
 
 
-def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties: list = None):
+def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties: list = None, force_when_no_change: bool = False):
     """
     Given a dict of parameter data (typically for an action), convert its structure into one usable by the HBEngine,
-    then return it. If 'excluded_properties' is provided, any parameters in that list will not be converted, and will
-    not appear in the returned data. If any items are missing the 'flags' key, they will also not be returned
+    then return it.
+
+    - If 'excluded_properties' is provided, any parameters in that list will not be converted, and will
+    not appear in the returned data. If any items are missing the 'flags' key, they will also not be returned. If any
+    items have a 'value' that matches 'default', they will also not be returned.
+
+    - If 'force_when_no_change' is provided, items with 'value' that match 'default' are returned
     """
     conv_data = {}
 
@@ -43,7 +48,8 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
             # Exclude parameters that don't have any flags. These are, by default, not editable
             # Containers don't have the 'value' key
             if "flags" in param_data:
-                conv_data[param_name] = param_data["value"]
+                if force_when_no_change or param_data["value"] != param_data["default"]:
+                    conv_data[param_name] = param_data["value"]
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])

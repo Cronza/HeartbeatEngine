@@ -115,7 +115,7 @@ class EditorDialogue(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force=True)
 
         # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()

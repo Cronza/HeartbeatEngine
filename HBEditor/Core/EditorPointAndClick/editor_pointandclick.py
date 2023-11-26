@@ -67,7 +67,7 @@ class EditorPointAndClick(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force=True)
 
         # Merge the collected data
         data_to_export = {
