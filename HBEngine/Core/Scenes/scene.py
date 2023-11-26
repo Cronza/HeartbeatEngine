@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core import settings
+from HBEngine.Core import settings, scene_manager
 from HBEngine.Core.Objects.renderable_group import RenderableGroup
 from HBEngine.Core.Objects.interface import Interface
 from HBEngine.Core.Objects.interface_pause import InterfacePause
@@ -22,13 +22,12 @@ from Tools.HBYaml.hb_yaml import Reader
 
 
 class Scene:
-    def __init__(self, scene_data_file, window, scene_manager):
+    def __init__(self, scene_data_file, window):
 
         # Read in the active scene data
         self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
 
         self.window = window
-        self.scene_manager = scene_manager
         self.a_manager = ActionManager(self)
         self.active_renderables = RenderableGroup()
         self.active_interfaces = RenderableGroup()
@@ -41,13 +40,6 @@ class Scene:
 
         # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
-
-        # Load any cached data on the scene manager
-        if not self.scene_manager.resolution_multiplier:
-            self.resolution_multiplier = 1
-        else:
-            self.resolution_multiplier = self.scene_manager.resolution_multiplier
-
         self.LoadSceneData()
 
     def Update(self, events):
@@ -93,28 +85,28 @@ class Scene:
             if self.active_music:  # Clear music
                 self.active_music.Stop()
 
-            self.scene_manager.LoadScene(scene_file)
+            scene_manager.LoadScene(scene_file)
         else:
             raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
 
-    def Resize(self):
-        """ Determines a new sprite size based on the difference between the main resolution and the new resolution """
+    #def Resize(self):
+    #    """ Determines a new sprite size based on the difference between the main resolution and the new resolution """
 
-        # Generate the new screen size scale multiplier, then cache it in the scene manager in case scenes change
-        new_resolution = settings.resolution_options[settings.resolution]
-        self.resolution_multiplier = self.CalculateScreenSizeMultiplier(settings.main_resolution, new_resolution)
-        self.scene_manager.resolution_multiplier = self.resolution_multiplier
+    #    # Generate the new screen size scale multiplier, then cache it in the scene manager in case scenes change
+    #    new_resolution = settings.resolution_options[settings.resolution]
+    #    self.resolution_multiplier = self.CalculateScreenSizeMultiplier(settings.main_resolution, new_resolution)
+    #    settings.resolution_multiplier = self.resolution_multiplier
 
-        # Inform each renderable of the resolution change so they can update their respective elements
-        for renderable in self.active_renderables.Get():
-            renderable.RecalculateSize(self.resolution_multiplier)
-            # Resize any child renderables after resizing the parent
-            if renderable.children:
-                for child in renderable.children:
-                    child.RecalculateSize(self.resolution_multiplier)
+    #    # Inform each renderable of the resolution change so they can update their respective elements
+    #    for renderable in self.active_renderables.Get():
+    #        renderable.RecalculateSize(self.resolution_multiplier)
+    #        # Resize any child renderables after resizing the parent
+    #        if renderable.children:
+    #            for child in renderable.children:
+    #                child.RecalculateSize(self.resolution_multiplier)
 
-        # Redraw the scaled sprites
-        self.Draw()
+    #    # Redraw the scaled sprites
+    #    self.Draw()
 
     def LoadSceneData(self):
         """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """

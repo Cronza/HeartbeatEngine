@@ -195,11 +195,10 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_scene_prompt = DialogNewScene()
-            new_scene_prompt.exec()
-            selected_name = new_scene_prompt.GetName()
-            selected_type = new_scene_prompt.GetSelection()
-
-            if selected_name:
+            exit_code = new_scene_prompt.exec()
+            if exit_code:
+                selected_name = new_scene_prompt.GetName()
+                selected_type = new_scene_prompt.GetSelection()
                 if self.ValidateFileName(selected_name):
                     file_name = f"{selected_name}.yaml"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
@@ -230,11 +229,10 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_interface_prompt = DialogNewInterface()
-            new_interface_prompt.exec()
-            selected_name = new_interface_prompt.GetName()
-            selected_template_path = new_interface_prompt.GetSelection()
-
-            if selected_name:
+            exit_code = new_interface_prompt.exec()
+            if exit_code:
+                selected_name = new_interface_prompt.GetName()
+                selected_template_path = new_interface_prompt.GetSelection()
                 if self.ValidateFileName(selected_name):
                     file_name = f"{selected_name}.interface"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
@@ -643,7 +641,7 @@ class HBEditor:
         result = self.CheckIfFileOpen(target_file_path)
         if result:
             Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
-            self.e_ui.main_tab_widget.setCurrentWidget(result)
+            self.e_ui.main_tab_widget.setCurrentWidget(result.editor_ui)
             self.active_editor = result
         else:
             # Initialize the Editor

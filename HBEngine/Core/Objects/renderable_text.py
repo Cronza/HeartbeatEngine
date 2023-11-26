@@ -55,7 +55,7 @@ class TextRenderable(Renderable):
 
         # For new objects, resize initially in case we're already using a scaled resolution
         self.WrapText()
-        self.RecalculateSize(self.scene.resolution_multiplier)
+        self.RecalculateSize(settings.resolution_multiplier)
 
         # Setup Connections
         if "connect_project_setting" in self.renderable_data:
@@ -153,7 +153,7 @@ class TextRenderable(Renderable):
         if isinstance(new_value, str):
             self.text = new_value
             self.WrapText()
-            self.RecalculateSize(self.scene.resolution_multiplier)
+            self.RecalculateSize(settings.resolution_multiplier)
         else:
             raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'str'")
 

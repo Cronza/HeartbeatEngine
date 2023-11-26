@@ -119,10 +119,7 @@ class AssetBrowser(QtWidgets.QDialog):
         self.asset_list.clearSelection()
         search_criteria = self.search_input.text().lower()
         for row in range(0, self.asset_list.rowCount()):
-            if self.asset_list.isColumnHidden(0):
-                asset_name = self.asset_list.item(row, 0).text().lower()
-            else:
-                asset_name = self.asset_list.item(row, 1).text().lower()
+            asset_name = self.asset_list.item(row, 1).text().lower()
             if search_criteria not in asset_name:
                 self.asset_list.hideRow(row)
             else:
@@ -134,7 +131,6 @@ class AssetBrowser(QtWidgets.QDialog):
         # Always add a 'None' option as the first choice
         self.asset_list.insertRow(self.asset_list.rowCount())
         self.asset_list.setItem(self.asset_list.rowCount() - 1, 1, QtWidgets.QTableWidgetItem("None"))
-        #self.asset_list.setItem(self.asset_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(""))
 
         for asset_name, asset_type, asset_path in self.valid_assets:
             self.asset_list.insertRow(self.asset_list.rowCount())

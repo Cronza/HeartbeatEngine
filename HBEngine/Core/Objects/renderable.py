@@ -39,7 +39,7 @@ class Renderable(pygame.sprite.Sprite):
 
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
-        self.surface = self.surface = pygame.Surface((0, 0), pygame.SRCALPHA)  # The active surface
+        self.surface = pygame.Surface((0, 0), pygame.SRCALPHA)  # The active surface
         self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
 
         # YAML Parameters

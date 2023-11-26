@@ -15,28 +15,6 @@
 import os
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
-root_dir = os.getcwd().replace("\\", "/")
-
-project_root = ""
-project_settings = None
-
-active_scene = None  # Managed by scene_manager.py'
-
-# When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
-# to change based on the mute setting), we need a way of tracking who needs to be informed. This dict
-# represents that tracking, by using a structure like the following:
-#
-# {"<Category>": {"<setting>": {"<object_ref>": "<func>"}}}
-#
-# "Func" in this case is the function to invoke when the connected setting is changed
-project_setting_listeners = {}
-
-# --- Settings (Reflective of those found in the 'Game.yaml') ---
-# Window
-resolution = None
-resolution_options = None
-active_resolution = None
-
 
 def SetProjectRoot(new_root):
     global root_dir
@@ -50,7 +28,7 @@ def SetProjectRoot(new_root):
         project_root = root_dir
 
 
-def LoadProjectSettings(file_path: str = "Config/Game.yaml"):
+def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
     """ Reads in the provided project settings file path. Defaults to 'Config/Game.yaml' if no path is provided """
     global project_settings
     global resolution
@@ -58,7 +36,7 @@ def LoadProjectSettings(file_path: str = "Config/Game.yaml"):
     global active_resolution
     global project_setting_listeners
 
-    file_path = ConvertPartialToAbsolutePath(file_path)
+    file_path = ConvertPartialToAbsolutePath(partial_file_path)
     project_settings = Reader.ReadAll(file_path)
 
     # Initialize the listener dict with keys for each available settings
@@ -132,3 +110,23 @@ def ConvertPartialToAbsolutePath(partial_path):
     else:
         return project_root + "/" + partial_path
 
+
+root_dir = os.getcwd().replace("\\", "/")
+project_root = ""
+project_settings = None
+active_scene = None  # Managed by 'hb_engine.py'
+
+# When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
+# to change based on the mute setting), we need a way of tracking who needs to be informed. This dict
+# represents that tracking, by using a structure like the following:
+#
+# {"<Category>": {"<setting>": {"<object_ref>": "<func>"}}}
+#
+# "Func" in this case is the function to invoke when the connected setting is changed
+project_setting_listeners = {}
+
+# Window
+resolution = None
+resolution_options = None
+resolution_multiplier = 1
+active_resolution = None

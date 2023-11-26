@@ -14,14 +14,13 @@
 """
 import argparse
 import pygame
-from HBEngine.Core.Scenes.scene_manager import SceneManager
+from HBEngine.Core import scene_manager
 from HBEngine.Core import settings
 from pygame import mixer
 
 
 clock = None
 window = None
-scene_manager = None  # Declare the scene manager, but we'll initialize it during the game loop
 
 # DEBUG TRIGGERS
 show_fps = False
@@ -41,15 +40,18 @@ def Initialize(project_path):
 def Main():
     global clock
     global window
-    global scene_manager
     global show_fps
 
     pygame.init()
     mixer.init()
     clock = pygame.time.Clock()
     window = pygame.display.set_mode(settings.active_resolution)
+    scene_manager.window = window
 
-    scene_manager = SceneManager(window)
+    # Load the starting scene
+    if not settings.project_settings["Game"]["starting_scene"]:
+        raise ValueError("No starting scene was provided in the project settings")
+    scene_manager.LoadScene(settings.project_settings["Game"]["starting_scene"])
 
     # Start the game loop
     is_running = True
@@ -61,14 +63,6 @@ def Main():
             if event.type == pygame.QUIT:
                 is_running = False
             if event.type == pygame.KEYDOWN:
-                # Maximize
-                if event.key == pygame.K_1:
-                    UpdateResolution(1, pygame.FULLSCREEN)
-                    scene_manager.ResizeScene()
-                # Minimize
-                if event.key == pygame.K_2:
-                    UpdateResolution(0)
-                    scene_manager.ResizeScene()
                 # Exit
                 if event.key == pygame.K_ESCAPE:
                     if settings.active_scene:
