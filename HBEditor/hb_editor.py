@@ -195,11 +195,10 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_scene_prompt = DialogNewScene()
-            new_scene_prompt.exec()
-            selected_name = new_scene_prompt.GetName()
-            selected_type = new_scene_prompt.GetSelection()
-
-            if selected_name:
+            exit_code = new_scene_prompt.exec()
+            if exit_code:
+                selected_name = new_scene_prompt.GetName()
+                selected_type = new_scene_prompt.GetSelection()
                 if self.ValidateFileName(selected_name):
                     file_name = f"{selected_name}.yaml"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
@@ -230,11 +229,10 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             new_interface_prompt = DialogNewInterface()
-            new_interface_prompt.exec()
-            selected_name = new_interface_prompt.GetName()
-            selected_template_path = new_interface_prompt.GetSelection()
-
-            if selected_name:
+            exit_code = new_interface_prompt.exec()
+            if exit_code:
+                selected_name = new_interface_prompt.GetName()
+                selected_template_path = new_interface_prompt.GetSelection()
                 if self.ValidateFileName(selected_name):
                     file_name = f"{selected_name}.interface"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"

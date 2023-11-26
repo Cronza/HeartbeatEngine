@@ -591,7 +591,7 @@ class InputEntryEvent(InputEntryBase):
             }
 
             # Grab the ACTION_DATA for the event action, and generate children for all of its parameters
-            action_data = copy.deepcopy(settings.GetActionData(self.input_widget.currentText()))
+            action_data = settings.GetActionData(self.input_widget.currentText())
             if action_data:
                 self.AddItems(action_data)
 

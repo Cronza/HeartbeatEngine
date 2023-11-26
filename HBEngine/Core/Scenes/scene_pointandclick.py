@@ -13,11 +13,12 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEngine.Core.Scenes.scene import Scene
+from HBEngine.Core import settings
 
 
 class PointAndClickScene(Scene):
-    def __init__(self, scene_data_file, window, scene_manager):
-        super().__init__(scene_data_file, window, scene_manager)
+    def __init__(self, scene_data_file, window):
+        super().__init__(scene_data_file, window)
 
     def LoadSceneData(self):
         # Load any applicable interfaces

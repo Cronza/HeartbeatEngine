@@ -43,6 +43,6 @@ class SpriteRenderable(Renderable):
                 # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
                 # to defer this though if they need to do any additional work beforehand
                 if initial_rescale:
-                    self.RecalculateSize(self.scene.resolution_multiplier)
+                    self.RecalculateSize(settings.resolution_multiplier)
 
 

@@ -51,7 +51,7 @@ class Interactable(SpriteRenderable):
         self.scaled_original_surface = None
 
         # Defer the resize until we're able to define the interactive surfaces
-        self.RecalculateSize(self.scene.resolution_multiplier)
+        self.RecalculateSize(settings.resolution_multiplier)
 
     def update(self, *args):
         super().update()
