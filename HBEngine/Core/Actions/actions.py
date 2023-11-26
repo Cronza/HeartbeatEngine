@@ -440,7 +440,7 @@ class create_background(Action):
         return new_sprite
 
 
-class create_interactable(Action):  # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
+class create_interactable(Action):
     """ Creates an interactable renderable, and adds it to the renderable stack. Returns an 'Interactable' """
     DISPLAY_NAME = "Create Interactable"
     ACTION_DATA = {
