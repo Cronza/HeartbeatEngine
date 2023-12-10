@@ -27,10 +27,6 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class EditorInterface(EditorBase):
     def __init__(self, file_path, interface_type: FileType = FileType.Interface):
         super().__init__(file_path)
-        # Where as many scenes have unique editors, interface types share the same editor. As such, we need
-        # to know which type this editor is working on to properly adjust functionality
-        self.file_type = interface_type
-
         self.editor_ui = EditorInterfaceUI(self)
         self.editor_ui.pages_panel.CreateEntry(
             "Persistent",
@@ -115,7 +111,7 @@ class EditorInterface(EditorBase):
 
         # Merge the collected data
         data_to_export = {
-            "type": self.file_type.name,
+            "type": FileType.Interface.name,
             "settings": conv_scene_data,
             "pages": self.ConvertInterfaceItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
@@ -125,8 +121,7 @@ class EditorInterface(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {self.file_type.name}\n" +
-                f"# {settings.editor_data['EditorSettings']['version_string']}"
+                metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)

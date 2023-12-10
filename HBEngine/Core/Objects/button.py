@@ -22,8 +22,8 @@ class Button(Interactable):
     """
     The Button class extends the 'Interactable' class, and adds an additional child 'TextRenderable'
     """
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
-        super().__init__(scene, renderable_data, parent)
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
+        super().__init__(renderable_data, parent)
         # Buttons come in 2 variant forms: Regular and Text-Only:
         #   Regular: Sprite Renderable + Text Renderable
         #   Text-Only: Text Renderable
@@ -35,16 +35,13 @@ class Button(Interactable):
         # If "button_text" appears in the renderable_data, then we can assume this is a Regular button. Otherwise, we
         # can assume it is a Text-Only button
         if "button_text" in self.renderable_data:
-
             self.renderable_data["button_text"]["key"] = f"{self.renderable_data['key']}_Text"
             self.button_text_renderable = TextRenderable(
-                self.scene,
                 self.renderable_data["button_text"],
                 self
             )
         else:
             self.button_text_renderable = TextRenderable(
-                self.scene,
                 self.renderable_data,
                 self
             )

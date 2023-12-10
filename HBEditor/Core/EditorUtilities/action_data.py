@@ -48,8 +48,11 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
             # Exclude parameters that don't have any flags. These are, by default, not editable
             # Containers don't have the 'value' key
             if "flags" in param_data:
-                if force_when_no_change or param_data["value"] != param_data["default"]:
+                if force_when_no_change or 'default' not in param_data:
                     conv_data[param_name] = param_data["value"]
+                elif 'default' in param_data:
+                    if param_data["value"] != param_data["default"]:
+                        conv_data[param_name] = param_data["value"]
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])

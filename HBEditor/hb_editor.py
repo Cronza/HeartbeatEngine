@@ -25,12 +25,11 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.engine_launcher import EngineLauncher
-from HBEditor.Core.Dialogs.dialog_new_scene import DialogNewScene
 from HBEditor.Core.EditorInterface.dialog_new_interface import DialogNewInterface
 from HBEditor.Core.Dialogs.dialog_file_system import DialogFileSystem
 from HBEditor.Core.Dialogs.dialog_list import DialogList
 from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
-from HBEditor.Core.EditorPointAndClick.editor_pointandclick import EditorPointAndClick
+from HBEditor.Core.EditorScene.editor_scene import EditorScene
 from HBEditor.Core.EditorInterface.editor_interface import EditorInterface
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
 from HBEditor.Core.EditorUtilities import path
@@ -185,45 +184,47 @@ class HBEditor:
 
         return ""
 
-    def NewScene(self, parent_dir: str) -> tuple:
+    def NewFile(self, parent_dir: str, file_type: FileType) -> str:
         """
-        Given a partial path with the content folder as the root, prompt the user to create a new scene in that
-        location. If successful, register that file in the asset registry and return the name and type of the file.
-        Otherwise, return "", None
+        Given a partial path with the content folder as the root, prompt the user to create a new file in that
+        location. If successful, register that file in the asset registry and return the name. Otherwise, return ""
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            new_scene_prompt = DialogNewScene()
-            exit_code = new_scene_prompt.exec()
-            if exit_code:
-                selected_name = new_scene_prompt.GetName()
-                selected_type = new_scene_prompt.GetSelection()
+            selected_name = QtWidgets.QInputDialog.getText(
+                self.e_ui.GetWindow(),
+                f"New {file_type.name}",
+                "Please Enter a File Name:"
+            )[0]
+            if not selected_name:
+                Logger.getInstance().Log("File name was not provided - Cancelling 'New File' action", 3)
+            else:
                 if self.ValidateFileName(selected_name):
-                    file_name = f"{selected_name}.yaml"
+                    file_name = f"{selected_name}.{file_type.name.lower()}"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
                     if not os.path.exists(full_path):
                         with open(full_path, 'w'):
                             Logger.getInstance().Log(f"File created - {full_path}", 2)
 
-                        settings.RegisterAsset(parent_dir, file_name, selected_type)
+                        settings.RegisterAsset(parent_dir, file_name, file_type)
 
                         # Create the editor, then export to initially populate the new file
-                        self.OpenEditor(full_path, selected_type)
+                        self.OpenEditor(full_path, file_type)
                         self.active_editor.Export()
-                        return file_name, selected_type
+                        return file_name
                     else:
                         self.ShowFileAlreadyExistsPrompt()
                 else:
                     self.ShowInvalidFileNamePrompt()
 
-        return "", None
+        return ""
 
-    def NewInterface(self, parent_dir: str) -> tuple:
+    def NewInterface(self, parent_dir: str) -> str:
         """
         Given a partial path with the content folder as the root, prompt the user to create a new interface in that
-        location. If successful, register that file in the asset registry and return the name and type of the file.
-        Otherwise, return "", None
+        location. If successful, register that file in the asset registry and return the name of the file.
+        Otherwise, return ""
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
@@ -256,13 +257,13 @@ class HBEditor:
                             self.OpenEditor(full_path, FileType.Interface)
                             self.active_editor.Export()
 
-                        return file_name, FileType.Interface
+                        return file_name
                     else:
                         self.ShowFileAlreadyExistsPrompt()
                 else:
                     self.ShowInvalidFileNamePrompt()
 
-        return "", None
+        return ""
 
     def DeleteFileOrFolder(self, partial_file_path: str, is_folder: True) -> bool:
         """
@@ -478,40 +479,23 @@ class HBEditor:
         """
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
+            return False
         else:
             full_path = f"{settings.user_project_dir}/{partial_file_path}"
 
             # Validate whether the selected file is capable of being opened
             # Note: This is expected to change in a future release
-            if ".interface" in partial_file_path:
-                file_type = FileType.Interface
-                self.OpenEditor(full_path, file_type, True)
-                return True
-            if ".yaml" not in partial_file_path:
+            file_type = None
+            if ".interface" in partial_file_path: file_type = FileType.Interface
+            elif ".scene" in partial_file_path: file_type = FileType.Scene
+            elif ".dialogue" in partial_file_path: file_type = FileType.Dialogue
+            else:
                 Logger.getInstance().Log("File type does not have any interact functionality", 3)
                 return False
-            else:
-                # Read the first line to determine the type of file
-                with open(full_path) as f:
-                    # Check the metadata at the top of the file to see which file type this is
-                    line = f.readline()
-                    search = re.search("# Type: (.*)", line)
 
-                    # Was the expected metadata found?
-                    if search:
-                        file_type = FileType[search.group(1)]
-                        self.OpenEditor(full_path, file_type, True)
-                        return True
-                    else:
-                        Logger.getInstance().Log("An invalid file was selected - Cancelling 'Open File' action", 4)
-                        QtWidgets.QMessageBox.about(
-                            self.e_ui.GetWindow(),
-                            "Not a Valid File!",
-                            "The chosen file was not created by the HBEditor.\n"
-                             "Please either choose a different file, or create a new one.\n\n"
-                            "If you authored this file by hand, please add the correct metadata to the top of the file"
-                        )
-        return False
+            self.OpenEditor(full_path, file_type, True)
+            return True
+
 
     def Import(self, partial_dest_path: str, import_target: str = "", batch_mode: bool = False) -> bool:
         """
@@ -631,8 +615,8 @@ class HBEditor:
     def OpenEditor(self, target_file_path: str, editor_type: FileType, import_file: bool = False):
         """ Creates an editor tab based on the provided file information """
         editor_classes = {
-            FileType.Scene_Dialogue: EditorDialogue,
-            FileType.Scene_Point_And_Click: EditorPointAndClick,
+            FileType.Scene: EditorScene,
+            FileType.Dialogue: EditorDialogue,
             FileType.Interface: EditorInterface,
             FileType.Project_Settings: EditorProjectSettings
          }

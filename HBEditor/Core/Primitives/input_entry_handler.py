@@ -96,7 +96,9 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
 
         # Asset selectors
     elif data_type == ParameterType.Asset_Scene:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Scene_Dialogue, FileType.Scene_Point_And_Click})
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Scene})
+    elif data_type == ParameterType.Asset_Dialogue:
+        input_widget = InputEntryAssetSelector(data, owner, {FileType.Dialogue})
     elif data_type == ParameterType.Asset_Interface:
         input_widget = InputEntryAssetSelector(data, owner, {FileType.Interface})
     elif data_type == ParameterType.Asset_Data:

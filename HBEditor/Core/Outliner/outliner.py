@@ -57,14 +57,19 @@ class Outliner:
             self.ui.AddAsset(asset_name, FileType.Folder)
 
     def CreateScene(self):
-        asset_name, asset_type = self.hb_core.NewScene(self.cur_directory)
+        asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Scene)
         if asset_name:
-            self.ui.AddAsset(asset_name, asset_type)
+            self.ui.AddAsset(asset_name, FileType.Scene)
+
+    def CreateDialogue(self):
+        asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Dialogue)
+        if asset_name:
+            self.ui.AddAsset(asset_name, FileType.Dialogue)
 
     def CreateInterface(self):
-        asset_name, asset_type = self.hb_core.NewInterface(self.cur_directory)
+        asset_name = self.hb_core.NewInterface(self.cur_directory)
         if asset_name:
-            self.ui.AddAsset(asset_name, asset_type)
+            self.ui.AddAsset(asset_name, FileType.Interface)
 
     def OpenFile(self, asset_name: str):
         self.hb_core.OpenFile(f"{self.cur_directory}/{asset_name}")

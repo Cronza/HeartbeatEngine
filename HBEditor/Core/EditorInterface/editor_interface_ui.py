@@ -39,7 +39,7 @@ class EditorInterfaceUI(EditorBaseUI):
         self.pages_panel.SIG_USER_GROUP_CHANGE.connect(self.core.EnablePageItems)
         self.pages_panel.SIG_USER_GROUP_TOGGLE.connect(self.core.ShowPageItems)
 
-        self.scene_viewer = SceneViewer(self.core.file_type)
+        self.scene_viewer = SceneViewer(FileType.Interface)
         self.scene_viewer.SIG_USER_ADDED_ITEM.connect(self.core.RegisterItemToPage)
         self.scene_viewer.SIG_USER_DELETED_ITEMS.connect(self.SIG_USER_UPDATE.emit)
         self.scene_viewer.SIG_USER_MOVED_ITEMS.connect(self.OnItemMove)

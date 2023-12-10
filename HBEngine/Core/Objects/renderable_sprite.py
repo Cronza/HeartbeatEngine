@@ -25,9 +25,9 @@ class SpriteRenderable(Renderable):
         - Backgrounds
         - etc
     """
-    def __init__(self, scene, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None,
+    def __init__(self, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None,
                  use_placeholder: bool = True):
-        super().__init__(scene, renderable_data, parent)
+        super().__init__(renderable_data, parent)
 
         if "sprite" in self.renderable_data:
             if self.renderable_data['sprite'] != "None" and self.renderable_data['sprite'] != "":

@@ -15,6 +15,7 @@
 import pygame.mixer
 import copy
 from HBEngine.Core import settings
+from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
 from HBEngine.Core.Objects.interactable import Interactable
@@ -23,6 +24,7 @@ from HBEngine.Core.Objects.choice import Choice
 from HBEngine.Core.Objects.checkbox import Checkbox
 from HBEngine.Core.Objects.audio import Sound, Music
 from HBEngine.Core.Objects.renderable_container import Container
+from HBEngine.Core.Modules import dialogue as m_dialogue
 from Tools.HBYaml.hb_yaml import Reader
 
 """
@@ -105,17 +107,16 @@ look like the following:
 
 
 class Action:
-    def __init__(self, scene, simplified_ad: dict, a_manager, no_draw: bool = False):
-        self.scene = scene
+    def __init__(self, simplified_ad: dict, parent: Renderable = None, no_draw: bool = False):
+        self.parent: Renderable = parent  # Who should be the parent of new renderables created by this action. If blank, defaults to the scene
         self.simplified_ad = simplified_ad  # User-provided action data using the simplified structure
-        self.a_manager = a_manager
         self.active_transition = None
         self.speed = 500
         self.skippable = True
         self.complete = False
         self.completion_callback = None  # Called by the action manager before it deletes the action
 
-        self.no_draw = no_draw  # Whether to skip adding any resulting renderables to the draw stack
+        self.no_draw = no_draw  # Whether to skip drawing for new renderables. Useful when batch performing creation actions
 
     def Start(self):
         pass
@@ -129,6 +130,13 @@ class Action:
     def Complete(self):
         self.complete = True
 
+    def AddToScene(self, new_renderable):
+        """ Adds the provided renderable either to the scene's draw stack, or to 'self.parent' as a child """
+        if self.parent:
+            self.parent.children.append(new_renderable)
+        else:
+            settings.scene.active_renderables.Add(new_renderable)
+
     def ValidateActionData(self, extended_ad: dict, simplified_ad: dict = None):
         """
         Recursively compares the action's 'simplified_ad' against the provided 'ext_ad', updating the former when
@@ -141,9 +149,6 @@ class Action:
 
         for param_name, param_data in extended_ad.items():
             if "children" in param_data:
-                print("Param Name:", param_name)
-                print("Param Data:", param_data)
-                print("Simp Data:", simplified_ad)
                 if param_name in simplified_ad:
                     # Param found in simplified data. Recursively update the children as well
                     self.ValidateActionData(param_data["children"], simplified_ad[param_name])
@@ -172,9 +177,6 @@ class Action:
             elif param_name not in simplified_ad:
                 if "global" in param_data:
                     # Global active. Set 'value' to the corresponding global value
-                    #print("Applying global:", param_name)
-                    #print("Simplified Data:", simplified_ad)
-                    #print("Global Value:", settings.GetProjectSetting(param_data["global"][0], param_data["global"][1]))
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["global"][0], param_data["global"][1])
                 else:
                     # No global active. Use default value from the expanded data
@@ -183,8 +185,8 @@ class Action:
 
 class SoundAction(Action):
     # @TODO: Add Pause function
-    def __init__(self, scene, action_data, a_manager, no_draw: bool = False):
-        super().__init__(scene, action_data, a_manager)
+    def __init__(self, simplified_ad: dict, parent: Renderable = None, no_draw: bool = False):
+        super().__init__(simplified_ad)
         self.assigned_channel = None
 
 
@@ -219,20 +221,13 @@ class remove_renderable(Action):
                     "flags": ["editable", "preview"],
                 },
             },
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "no_wait",
-            "default": "no_wait",
-            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        renderable = self.scene.active_renderables.renderables[self.simplified_ad['key']]
+        renderable = settings.scene.active_renderables.renderables[self.simplified_ad['key']]
         children = []
 
         if isinstance(renderable, Container):
@@ -250,25 +245,26 @@ class remove_renderable(Action):
                 # Merge the surfaces, then delete the child (Grim, I know)
                 for child in children:
                     renderable.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
-                    self.scene.active_renderables.Remove(child.key)
+                    settings.scene.active_renderables.Remove(child.key)
 
                 renderable.visible = True
 
-            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], renderable)
+            from HBEngine.Core import action_manager
+            self.active_transition = action_manager.CreateTransition(self.simplified_ad["transition"], renderable)
             self.active_transition.Start()
         else:
             if children:
                 # Remove all children first
                 for child in children:
-                    self.scene.active_renderables.Remove(child.key)
+                    settings.scene.active_renderables.Remove(child.key)
 
-            self.scene.active_renderables.Remove(self.simplified_ad["key"])
-            self.scene.Draw()
+            settings.scene.active_renderables.Remove(self.simplified_ad["key"])
+            settings.scene.Draw()
             self.Complete()
 
     def Update(self, events):
         if self.active_transition.complete is True:
-            self.scene.active_renderables.Remove(self.simplified_ad["key"])
+            settings.scene.active_renderables.Remove(self.simplified_ad["key"])
             self.Complete()
         else:
             self.active_transition.Update()
@@ -321,7 +317,7 @@ class create_sprite(Action):
         },
         "transition": {
             "type": "Container",
-            "flags": ["preview"],
+            "flags": ["editable", "preview"],
             "children": {
                 "type": {
                     "type": "Dropdown",
@@ -337,36 +333,26 @@ class create_sprite(Action):
                     "flags": ["editable", "preview"],
                 },
             },
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "wait_for_input",
-            "default": "wait_for_input",
-            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-            "flags": ["editable", "preview"],
         }
     }
 
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-        new_sprite = SpriteRenderable(
-            self.scene,
-            self.simplified_ad
-        )
+        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
 
         if "flip" in self.simplified_ad:
             if self.simplified_ad["flip"]:
                 new_sprite.Flip()
 
+        self.AddToScene(new_sprite)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_sprite)
-
             # Any transitions are applied to the sprite post-load
             if "None" not in self.simplified_ad["transition"]["type"]:
-                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], new_sprite)
+                from HBEngine.Core import action_manager
+                self.active_transition = action_manager.CreateTransition(self.simplified_ad["transition"], new_sprite)
                 self.active_transition.Start()
             else:
-                self.scene.Draw()
+                settings.scene.Draw()
                 self.Complete()
         else:
             self.Complete()
@@ -412,14 +398,7 @@ class create_background(Action):
             "value": False,
             "default": False,
             "flags": ["editable"],
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "no_wait",
-            "default": "no_wait",
-            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-            "flags": ["editable", "preview"],
-        },
+        }
     }
 
     def Start(self):
@@ -427,16 +406,13 @@ class create_background(Action):
 
         self.skippable = False
 
-        new_sprite = SpriteRenderable(
-            self.scene,
-            self.simplified_ad,
-        )
+        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
 
+        self.AddToScene(new_sprite)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_sprite)
-            self.scene.Draw()
-        self.Complete()
+            settings.scene.Draw()
 
+        self.Complete()
         return new_sprite
 
 
@@ -501,6 +477,7 @@ class create_interactable(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
+                                "start_dialogue"
                             ],
                             "flags": ["editable"],
                         }
@@ -514,21 +491,18 @@ class create_interactable(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Interactable(
-            self.scene,
-            self.simplified_ad,
-        )
+        new_renderable = Interactable(renderable_data=self.simplified_ad)
 
         # If the user requested a flip action, do so
         if 'flip' in self.simplified_ad:
             if self.simplified_ad['flip']:
                 new_renderable.Flip()
 
+        self.AddToScene(new_renderable)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_renderable)
-            self.scene.Draw()
-        self.Complete()
+            settings.scene.Draw()
 
+        self.Complete()
         return new_renderable
 
 
@@ -617,13 +591,6 @@ class create_text(Action):
                 },
             },
         },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "wait_for_input",
-            "default": "wait_for_input",
-            "options": ["no_wait", "wait_for_input", "wait_until_complete"],
-            "flags": ["editable", "preview"],
-        },
         "connect_project_setting": {
             "type": "Container",
             "flags": ["editable", "preview"],
@@ -647,19 +614,16 @@ class create_text(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        new_text_renderable = TextRenderable(
-            self.scene,
-            self.simplified_ad
-        )
+        new_text_renderable = TextRenderable(renderable_data=self.simplified_ad)
 
+        self.AddToScene(new_text_renderable)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_text_renderable)
-
             if "None" not in self.simplified_ad["transition"]["type"]:
-                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["transition"], new_text_renderable)
+                from HBEngine.Core import action_manager
+                self.active_transition = action_manager.CreateTransition(self.simplified_ad["transition"], new_text_renderable)
                 self.active_transition.Start()
             else:
-                self.scene.Draw()
+                settings.scene.Draw()
                 self.Complete()
         else:
             self.Complete()
@@ -820,6 +784,7 @@ class create_button(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
+                                "start_dialogue"
                             ],
                             "flags": ["editable"],
                         }
@@ -836,16 +801,13 @@ class create_button(Action):
         # System defined overrides
         self.simplified_ad["button_text"]["z_order"] = self.simplified_ad["z_order"] + 1
 
-        new_renderable = Button(
-            self.scene,
-            self.simplified_ad
-        )
+        new_renderable = Button(renderable_data=self.simplified_ad)
 
+        self.AddToScene(new_renderable)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_renderable)
-            self.scene.Draw()
-        self.Complete()
+            settings.scene.Draw()
 
+        self.Complete()
         return new_renderable
 
 
@@ -954,16 +916,13 @@ class create_text_button(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Button(
-            self.scene,
-            self.simplified_ad
-        )
+        new_renderable = Button(renderable_data=self.simplified_ad)
 
+        self.AddToScene(new_renderable)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_renderable)
-            self.scene.Draw()
-        self.Complete()
+            settings.scene.Draw()
 
+        self.Complete()
         return new_renderable
 
 
@@ -1077,46 +1036,35 @@ class create_checkbox(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Checkbox(
-            self.scene,
-            self.simplified_ad
-        )
+        new_renderable = Checkbox(renderable_data=self.simplified_ad)
 
+        self.AddToScene(new_renderable)
         if not self.no_draw:
-            self.scene.active_renderables.Add(new_renderable)
-            self.scene.Draw()
+            settings.scene.Draw()
+
         self.Complete()
-
         return new_renderable
-
-#class create_container(Action): # AWAITING EDITOR IMPLEMENTATION - WILL BE UPDATED
-#    """ Creates a simple container renderable with the provided action data. Returns a 'Container' """
-#
-#    # @TODO: Update to new workflow
-#    def Start(self):
-#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-#        self.skippable = False
-#
-#        # Container-specific adjustments
-#        self.ACTION_DATA['position'] = (0, 0)
-#        self.ACTION_DATA['z_order'] = 0
-#        self.ACTION_DATA['center_align'] = False
-#
-#        # Containers aren't rendered, so use defaults
-#        new_renderable = Container(
-#            self.scene,
-#            self.ACTION_DATA,
-#        )
-#
-#        self.scene.active_renderables.Add(new_renderable)
-#
-#        self.scene.Draw()
-#        self.Complete()
-#
-#        return new_renderable
 
 
 # -------------- DIALOGUE ACTIONS --------------
+
+
+class start_dialogue(Action):
+    DISPLAY_NAME = "Start Dialogue"
+    ACTION_DATA = {
+        "dialogue_file": {
+            "type": "Asset_Dialogue",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"]
+        }
+    }
+    def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        from HBEngine import hb_engine
+        hb_engine.LoadModule(m_dialogue.Dialogue, self.simplified_ad['dialogue_file'])
+        self.Complete()
+        return None
 
 
 class dialogue(Action):
@@ -1210,7 +1158,7 @@ class dialogue(Action):
                     "default": [0.2, 0.2],
                     "global": ["Dialogue", "speaker_text_wrap_bounds"],
                     "flags": ["global_active"],
-                },
+                }
             },
         },
         "dialogue": {
@@ -1297,40 +1245,27 @@ class dialogue(Action):
                     "default": [0.8, 0.16],
                     "global": ["Dialogue", "dialogue_text_wrap_bounds"],
                     "flags": ["global_active"],
-                },
+                }
             },
-        },
-        "post_wait": {
-            "type": "String",
-            "value": "wait_for_input",
-            "default": "wait_for_input",
-            "flags": ["no_exclusion"],
         }
     }
 
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        new_speaker_text = TextRenderable(
-            self.scene,
-            self.simplified_ad["speaker"]
-        )
+        new_speaker_text = TextRenderable(self.simplified_ad["speaker"])
+        new_dialogue_text = TextRenderable(self.simplified_ad["dialogue"])
 
-        new_dialogue_text = TextRenderable(
-            self.scene,
-            self.simplified_ad["dialogue"]
-        )
-
-        self.scene.active_renderables.Add(new_speaker_text)
-        self.scene.active_renderables.Add(new_dialogue_text)
+        self.AddToScene(new_speaker_text)
+        self.AddToScene(new_dialogue_text)
 
         # Note: Speaker text does not support transitions currently
-        print("Dialogue transition", self.simplified_ad["dialogue"]["transition"])
         if self.simplified_ad["dialogue"]["transition"]["type"] != "None":
-            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad["dialogue"]["transition"], new_dialogue_text)
+            from HBEngine.Core import action_manager
+            self.active_transition = action_manager.CreateTransition(self.simplified_ad["dialogue"]["transition"], new_dialogue_text)
             self.active_transition.Start()
         else:
-            self.scene.Draw()
+            settings.scene.Draw()
             self.Complete()
 
         return None
@@ -1346,240 +1281,6 @@ class dialogue(Action):
         if self.active_transition:
             self.active_transition.Skip()
         self.Complete()
-
-
-#class character_dialogue(Action):
-#    """
-#    A specialized variant of the 'dialogue' class that uses values from a character file instead of manual inputs
-#    Returns None
-#    """
-#
-#    def Start(self):
-#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-#
-#        # Dialogue-specific adjustments
-#        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
-#            "The active scene is not of the 'DialogueScene' type. This action can not be performed"
-#        )
-#
-#        #@TODO: Can we consolidate to avoid duplicated if checks for global settings?
-#        # If the user provides a 'character' block, use details from the relevant character data file if it exists, as
-#        # well as any applicable global settings
-#        if 'character' in self.simplified_ad:
-#            character_data = self.scene.character_data[self.simplified_ad['character']]
-#
-#            # Dialogue-specific adjustments
-#            character_data['key'] = 'SpeakerText'
-#
-#            # OVERRIDES WITH NO PROJECT DEFAULTS
-#            assert 'name' in character_data, print(
-#                f"Character file '{self.simplified_ad['character']}' does not have a 'name' param")
-#            character_data['text'] = character_data['name']
-#
-#            assert 'color' in character_data, print(
-#                f"Character file '{self.simplified_ad['character']}' does not have a 'color' param")
-#            character_data['text_color'] = character_data['color']
-#
-#            # PROJECT DEFAULTS
-#            character_data['position'] = settings.project_settings['Dialogue'][
-#                'speaker_text_position']
-#
-#            character_data['z_order'] = settings.project_settings['Dialogue'][
-#                'speaker_z_order']
-#
-#            character_data['center_align'] = settings.project_settings['Dialogue'][
-#                'speaker_center_align']
-#
-#            character_data['font'] = settings.project_settings['Dialogue'][
-#                'speaker_font']
-#
-#            character_data['text_size'] = settings.project_settings['Dialogue'][
-#                'speaker_text_size']
-#
-#            new_character_text = TextRenderable(
-#                self.scene,
-#                character_data
-#            )
-#            # Speaker text does not support transitions currently
-#            self.scene.active_renderables.Add(new_character_text)
-#
-#        # If the user has specified a 'speaker' block, build the speaker renderable details using any provided
-#        # information, and / or any global settings
-#        elif 'speaker' in self.simplified_ad:
-#            # Dialogue-specific adjustments
-#            self.simplified_ad['speaker']['key'] = 'SpeakerText'
-#
-#            # PROJECT DEFAULTS OVERRIDE
-#            if 'position' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['position'] = settings.project_settings['Dialogue'][
-#                    'speaker_text_position']
-#
-#            if 'z_order' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['z_order'] = settings.project_settings['Dialogue'][
-#                    'speaker_z_order']
-#
-#            if 'center_align' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['center_align'] = settings.project_settings['Dialogue'][
-#                    'speaker_center_align']
-#
-#            if 'font' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['font'] = settings.project_settings['Dialogue'][
-#                    'speaker_font']
-#
-#            if 'text_size' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['text_size'] = settings.project_settings['Dialogue'][
-#                    'speaker_text_size']
-#
-#            if 'text_color' not in self.simplified_ad['speaker']:
-#                self.simplified_ad['speaker']['text_color'] = settings.project_settings['Dialogue'][
-#                    'speaker_text_color']
-#
-#            new_speaker_text = TextRenderable(
-#                self.scene,
-#                self.simplified_ad['speaker']
-#            )
-#            # Speaker text does not support transitions currently
-#            self.scene.active_renderables.Add(new_speaker_text)
-#
-#        # If the user has specified a 'dialogue' block, build the speaker renderable
-#        if 'dialogue' in self.simplified_ad:
-#            # Dialogue-specific adjustments
-#            self.simplified_ad['dialogue']['key'] = 'DialogueText'
-#
-#            # PROJECT DEFAULTS OVERRIDE
-#            if 'position' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['position'] = settings.project_settings['Dialogue'][
-#                    'dialogue_text_position']
-#
-#            if 'z_order' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['z_order'] = settings.project_settings['Dialogue'][
-#                    'dialogue_z_order']
-#
-#            if 'center_align' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['center_align'] = settings.project_settings['Dialogue'][
-#                    'dialogue_center_align']
-#
-#            if 'font' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['font'] = settings.project_settings['Dialogue'][
-#                    'dialogue_font']
-#
-#            if 'text_size' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['text_size'] = settings.project_settings['Dialogue'][
-#                    'dialogue_text_size']
-#
-#            if 'text_color' not in self.simplified_ad['dialogue']:
-#                self.simplified_ad['dialogue']['text_color'] = settings.project_settings['Dialogue'][
-#                    'dialogue_text_color']
-#
-#            new_dialogue_text = TextRenderable(
-#                self.scene,
-#                self.simplified_ad['dialogue']
-#            )
-#
-#            self.scene.active_renderables.Add(new_dialogue_text)
-#
-#            # By default, dialogue text fades in. However, allow the user to override this behaviour
-#            if 'transition' in self.simplified_ad['dialogue']:
-#                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['dialogue']['transition'],
-#                                                                         new_dialogue_text)
-#                self.active_transition.Start()
-#            else:
-#                self.simplified_ad['dialogue']['transition'] = {
-#                    'type': 'fade_in',
-#                    'speed': 1000
-#                }
-#                self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['dialogue']['transition'],
-#                                                                         new_dialogue_text)
-#                self.active_transition.Start()
-#
-#        return None
-#
-#    def Update(self, events):
-#        if self.active_transition.complete is True:
-#            print("Transition Complete")
-#            self.Complete()
-#        else:
-#            self.active_transition.Update()
-#
-#    def Skip(self):
-#        if self.active_transition:
-#            self.active_transition.Skip()
-#        self.Complete()
-
-
-#class create_character(Action):
-#    """
-#    Creates a specialized 'SpriteRenderable' based on character data settings, allowing the developer to move
-#    references to specific sprites to a character yaml file, leaving the dialogue sequence agnostic.
-#    Returns a 'SpriteRenderable'.
-#    This action is only available in DialogueScenes, and requires a 'character' block be provided
-#    """
-#    def Start(self):
-#        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-#
-#        # Character-specific adjustments
-#        assert type(self.scene) == Core.BaseClasses.scene_dialogue.DialogueScene, print(
-#            "The active scene is not of the 'DialogueScene' type. This action can not be performed")
-#        assert 'character' in self.simplified_ad, print(
-#            f"No 'character' block assigned to {self}. This makes for an impossible action!")
-#        assert 'name' in self.simplified_ad['character'], print(
-#            f"No 'name' value assigned to {self} character block. This makes for an impossible action!")
-#        assert 'mood' in self.simplified_ad['character'], print(
-#            f"No 'mood' value assigned to {self} character block. This makes for an impossible action!")
-#
-#        # Get the character data from the scene
-#        character_data = self.scene.character_data[self.simplified_ad['character']['name']]
-#
-#        assert 'moods' in character_data, print(
-#            f"Character file '{self.simplified_ad['character']['name']}' does not have a 'moods' block")
-#        self.simplified_ad['sprite'] = character_data['moods'][self.simplified_ad['character']['mood']]
-#
-#        # OVERRIDES WITH NO PROJECT DEFAULTS
-#        if 'position' not in self.simplified_ad:
-#            self.simplified_ad['position'] = (0, 0)
-#
-#        # PROJECT DEFAULTS OVERRIDE
-#        if 'z_order' not in self.simplified_ad:
-#            self.simplified_ad['z_order'] = settings.project_settings['Sprite'][
-#                'z_order']
-#
-#        if 'center_align' not in self.simplified_ad:
-#            self.simplified_ad['center_align'] = settings.project_settings['Sprite'][
-#                'center_align']
-#
-#        new_sprite = SpriteRenderable(
-#            self.scene,
-#            self.simplified_ad
-#        )
-#
-#        # If the user requested a flip action, do so
-#        if 'flip' in self.simplified_ad:
-#            if self.simplified_ad['flip']:
-#                new_sprite.Flip()
-#
-#        self.scene.active_renderables.Add(new_sprite)
-#
-#        # Any transitions are applied to the sprite post-load
-#        if 'transition' in self.simplified_ad:
-#            self.active_transition = self.a_manager.CreateTransition(self.simplified_ad['transition'], new_sprite)
-#            self.active_transition.Start()
-#        else:
-#            self.scene.Draw()
-#            self.Complete()
-#
-#        return new_sprite
-#
-#    def Update(self, events):
-#        if self.active_transition.complete:
-#            print("Transition Complete")
-#            self.Complete()
-#        else:
-#            self.active_transition.Update()
-#
-#    def Skip(self):
-#        if self.active_transition:
-#            self.active_transition.Skip()
-#        self.Complete()
 
 
 class choice(Action):
@@ -1736,10 +1437,7 @@ class choice(Action):
         self.simplified_ad["z_order"] = 0
         self.simplified_ad["center_align"] = False
         self.simplified_ad["key"] = "Choice"
-        new_renderable = Choice(
-            self.scene,
-            self.simplified_ad
-        )
+        new_renderable = Choice(renderable_data=self.simplified_ad)
 
         # Generate a button for each choice, adding them to the active renderables group for access to updates
         # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
@@ -1755,14 +1453,14 @@ class choice(Action):
             # The key is generated dynamically instead of being provided by the file
             choice_data["key"] = choice_name
 
-            new_child = Button(self.scene, choice_data)
-            self.scene.active_renderables.Add(new_child)
+            new_child = Button(choice_data)
+            settings.scene.active_renderables.Add(new_child)
             new_renderable.children.append(new_child)
 
         # Add the choice parent object to the render stack
-        self.scene.active_renderables.Add(new_renderable)
+        settings.scene.active_renderables.Add(new_renderable)
 
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
 
         return new_renderable
@@ -1776,15 +1474,16 @@ class choose_branch(Action):
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
-        if self.scene.active_renderables.Exists("Choice"):
-            self.a_manager.PerformAction(
+        if settings.scene.active_renderables.Exists("Choice"):
+            from HBEngine.Core import action_manager
+            action_manager.PerformAction(
                 {"key": "Choice", "transition": {"type": "None"}},
                 "remove_renderable"
             )
 
-        self.scene.SwitchDialogueBranch(self.simplified_ad['branch'])
+        settings.scene.SwitchDialogueBranch(self.simplified_ad['branch'])
 
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
 
         return None
@@ -1819,13 +1518,6 @@ class play_sfx(SoundAction):
             "value": False,
             "default": False,
             "flags": ["editable", "preview"],
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "wait_until_complete",
-            "default": "wait_until_complete",
-            "options": ["no_wait", "wait_until_complete"],
-            "flags": ["editable", "preview", "no_exclusion"],
         }
     }
 
@@ -1836,18 +1528,18 @@ class play_sfx(SoundAction):
 
         # Start the playback (internally stores the channel object)
         new_sound.Play()
-        self.scene.active_sounds[self.simplified_ad["key"]] = new_sound
+        settings.scene.active_sounds[self.simplified_ad["key"]] = new_sound
 
         return new_sound
 
     def Update(self, events):
-        if not self.scene.active_sounds[self.simplified_ad["key"]].GetBusy():
-            self.scene.active_sounds[self.simplified_ad["key"]].Stop()
-            self.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove from the scene sfx list
+        if not settings.scene.active_sounds[self.simplified_ad["key"]].GetBusy():
+            settings.scene.active_sounds[self.simplified_ad["key"]].Stop()
+            settings.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove from the scene sfx list
             self.Complete()  # Remove from the action manager
 
     def Skip(self):
-        self.scene.active_sounds.pop(self.simplified_ad["key"])
+        settings.scene.active_sounds.pop(self.simplified_ad["key"])
         self.Complete()
 
 
@@ -1870,9 +1562,9 @@ class stop_sfx(Action):
         self.skippable = False
 
         if "key" in self.simplified_ad:
-            self.scene.active_sounds[self.simplified_ad["key"]].stop()  # Stop the sound
-            del self.scene.active_sounds[self.simplified_ad["key"]]  # Delete the sound
-            self.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove key
+            settings.scene.active_sounds[self.simplified_ad["key"]].stop()  # Stop the sound
+            del settings.scene.active_sounds[self.simplified_ad["key"]]  # Delete the sound
+            settings.scene.active_sounds.pop(self.simplified_ad["key"])  # Remove key
 
             self.Complete()
         else:
@@ -1900,13 +1592,6 @@ class play_music(SoundAction):
             "value": False,
             "default": False,
             "flags": ["editable", "preview"],
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "no_wait",
-            "default": "no_wait",
-            "options": ["no_wait", "wait_until_complete"],
-            "flags": ["editable", "preview"],
         }
     }
 
@@ -1918,17 +1603,17 @@ class play_music(SoundAction):
 
         #new_music.end_event = #@TODO: This needs to delete the action upon completion or the action will exist forever
         # If the user hasn't removed the previous music, forcefully remove it here without any transition
-        if self.scene.active_music:
-            self.scene.active_music.Stop()  # This will invoke the end-event on the existing music action #@TODO: Review if this comment is accurate
-            del self.scene.active_music  # Delete the music
+        if settings.scene.active_music:
+            settings.scene.active_music.Stop()  # This will invoke the end-event on the existing music action #@TODO: Review if this comment is accurate
+            del settings.scene.active_music  # Delete the music
 
         new_music.Play()
-        self.scene.active_music = new_music
+        settings.scene.active_music = new_music
 
         self.Complete()
 
     def Update(self, events):
-        if not self.scene.active_music.GetBusy(): #@TODO: Review whether this triggers when audio is paused
+        if not settings.scene.active_music.GetBusy(): #@TODO: Review whether this triggers when audio is paused
             print("Music completed")
             self.Complete()
 
@@ -1951,9 +1636,9 @@ class stop_music(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        self.scene.active_music.Stop() #@TODO: Update
-        self.scene.active_music.complete = True
-        self.scene.active_music = None  # DEBUG: Remove once the end-event is implemented
+        settings.scene.active_music.Stop() #@TODO: Update
+        settings.scene.active_music.complete = True
+        settings.scene.active_music = None  # DEBUG: Remove once the end-event is implemented
         self.Complete()
         return None
 
@@ -1987,13 +1672,13 @@ class set_mute(Action):
 
         # Update all active audio objects
         if settings.GetProjectSetting("Audio", "mute"):
-            for sfx in self.scene.active_sounds.values():
+            for sfx in settings.scene.active_sounds.values():
                 sfx.Mute()
-            if self.scene.active_music: self.scene.active_music.Mute()
+            if settings.scene.active_music: settings.scene.active_music.Mute()
         else:
-            for sfx in self.scene.active_sounds.values():
+            for sfx in settings.scene.active_sounds.values():
                 sfx.Unmute()
-            if self.scene.active_music: self.scene.active_music.Unmute()
+            if settings.scene.active_music: settings.scene.active_music.Unmute()
 
         self.Complete()
 
@@ -2017,7 +1702,7 @@ class load_scene(Action):
     def Start(self):
         self.skippable = False
 
-        self.scene.SwitchScene(self.simplified_ad["scene_file"])
+        settings.scene.SwitchScene(self.simplified_ad["scene_file"])
         self.Complete()
 
 
@@ -2034,7 +1719,7 @@ class wait(Action):
         return None
 
     def Update(self, events):
-        self.counter += 1 * self.scene.delta_time
+        self.counter += 1 * settings.scene.delta_time
         print(self.counter)
 
         if self.counter >= self.target:
@@ -2087,13 +1772,6 @@ class scene_fade_in(Action):
             "value": 300,
             "default": 300,
             "flags": ["editable", "preview"],
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "wait_until_complete",
-            "default": "wait_until_complete",
-            "options": ["no_wait", "wait_until_complete"],
-            "flags": ["editable"],
         }
     }
 
@@ -2114,13 +1792,10 @@ class scene_fade_in(Action):
         if 'speed' in self.simplified_ad:
             self.speed = self.simplified_ad['speed']
 
-        new_sprite = SpriteRenderable(
-            self.scene,
-            self.simplified_ad
-        )
+        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
 
-        self.scene.active_renderables.Add(new_sprite)
-        self.scene.Draw()
+        self.AddToScene(new_sprite)
+        settings.scene.Draw()
 
         self.renderable = new_sprite
         self.progress = self.renderable.GetSurface().get_alpha()
@@ -2129,17 +1804,17 @@ class scene_fade_in(Action):
         return new_sprite
 
     def Update(self, events):
-        self.progress -= (self.speed * self.scene.delta_time)
+        self.progress -= (self.speed * settings.scene.delta_time)
         self.renderable.GetSurface().set_alpha(self.progress)
 
-        self.scene.Draw()
+        settings.scene.Draw()
 
         if self.progress <= self.goal:
             self.Complete()
 
     def Skip(self):
         self.renderable.GetSurface().set_alpha(self.goal)
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
 
 
@@ -2163,13 +1838,6 @@ class scene_fade_out(Action):
             "value": 300,
             "default": 300,
             "flags": ["editable", "preview"],
-        },
-        "post_wait": {
-            "type": "Dropdown",
-            "value": "wait_until_complete",
-            "default": "wait_until_complete",
-            "options": ["no_wait", "wait_until_complete"],
-            "flags": ["editable"],
         }
     }
 
@@ -2190,14 +1858,11 @@ class scene_fade_out(Action):
         if 'speed' in self.simplified_ad:
             self.speed = self.simplified_ad['speed']
 
-        new_sprite = SpriteRenderable(
-            self.scene,
-            self.simplified_ad
-        )
+        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
         new_sprite.GetSurface().set_alpha(0)
 
-        self.scene.active_renderables.Add(new_sprite)
-        self.scene.Draw()
+        self.AddToScene(new_sprite)
+        settings.scene.Draw()
 
         self.renderable = new_sprite
         self.progress = 0
@@ -2206,17 +1871,17 @@ class scene_fade_out(Action):
         return new_sprite
 
     def Update(self, events):
-        self.progress += (self.speed * self.scene.delta_time)
+        self.progress += (self.speed * settings.scene.delta_time)
         self.renderable.GetSurface().set_alpha(self.progress)
 
-        self.scene.Draw()
+        settings.scene.Draw()
 
         if self.progress >= self.goal:
             self.Complete()
 
     def Skip(self):
         self.renderable.GetSurface().set_alpha(self.goal)
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
 
 
@@ -2229,7 +1894,8 @@ class pause(Action):
     ACTION_DATA = {}
 
     def Start(self):
-        self.scene.Pause()
+        from HBEngine import hb_engine
+        hb_engine.Pause()
         self.Complete()
         return None
 
@@ -2240,7 +1906,8 @@ class unpause(Action):
     ACTION_DATA = {}
 
     def Start(self):
-        self.scene.Unpause()
+        from HBEngine import hb_engine
+        hb_engine.Unpause()
         self.Complete()
         return None
 
@@ -2264,11 +1931,10 @@ class switch_page(Action):
     }
 
     def Start(self):
-        if self.scene.active_interfaces.Exists(self.simplified_ad["owner"]):
-            owner = self.scene.active_interfaces.GetFromKey(self.simplified_ad["owner"])
-            owner.LoadPage(self.simplified_ad["page"])
+        if self.simplified_ad["owner"] in settings.scene.active_interfaces:
+            settings.scene.active_interfaces[self.simplified_ad["owner"]].LoadPage(self.simplified_ad["page"])
 
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
         return None
 
@@ -2286,10 +1952,9 @@ class remove_page(Action):
     }
 
     def Start(self):
-        if self.scene.active_interfaces.Exists(self.simplified_ad["owner"]):
-            owner = self.scene.active_interfaces.GetFromKey(self.simplified_ad["owner"])
-            owner.RemovePage()
+        if self.simplified_ad["owner"] in settings.scene.active_interfaces:
+            settings.scene.active_interfaces[self.simplified_ad["owner"]].RemovePage(self.simplified_ad["page"])
 
-        self.scene.Draw()
+        settings.scene.Draw()
         self.Complete()
         return None

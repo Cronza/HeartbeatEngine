@@ -111,10 +111,22 @@ def ConvertPartialToAbsolutePath(partial_path):
         return project_root + "/" + partial_path
 
 
+# --- Core engine references managed by 'hb_engine.py' ---
+modules = {}
+scene = None
+input_owner = None
+paused = False
+
+# --- Project settings ---
 root_dir = os.getcwd().replace("\\", "/")
 project_root = ""
 project_settings = None
-active_scene = None  # Managed by 'hb_engine.py'
+
+# Window
+resolution = None
+resolution_options = None
+resolution_multiplier = 1
+active_resolution = None
 
 # When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
 # to change based on the mute setting), we need a way of tracking who needs to be informed. This dict
@@ -125,8 +137,4 @@ active_scene = None  # Managed by 'hb_engine.py'
 # "Func" in this case is the function to invoke when the connected setting is changed
 project_setting_listeners = {}
 
-# Window
-resolution = None
-resolution_options = None
-resolution_multiplier = 1
-active_resolution = None
+

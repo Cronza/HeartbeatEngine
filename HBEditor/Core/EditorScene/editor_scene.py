@@ -18,20 +18,17 @@ from HBEditor.Core import settings
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import action_data as ad
-from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
+from HBEditor.Core.EditorScene.editor_scene_ui import EditorSceneUI
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
-class EditorPointAndClick(EditorBase):
+class EditorScene(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
-
-        self.file_type = FileType.Scene_Point_And_Click
-
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
         self.excluded_properties = ["transition", "post_wait"]
 
-        self.editor_ui = EditorPointAndClickUI(self)
+        self.editor_ui = EditorSceneUI(self)
         Logger.getInstance().Log("Editor initialized")
 
     def UpdateActiveSceneItem(self, selected_items: list = None):
@@ -61,17 +58,17 @@ class EditorPointAndClick(EditorBase):
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Point & Click data for: {self.file_path}")
+        Logger.getInstance().Log(f"Exporting Scene data for: {self.file_path}")
 
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force=True)
+        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force_when_no_change=True)
 
         # Merge the collected data
         data_to_export = {
-            "type": FileType.Scene_Point_And_Click.name,
+            "type": FileType.Scene.name,
             "settings": conv_scene_data,
             "scene_items": self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
@@ -81,8 +78,7 @@ class EditorPointAndClick(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {self.file_type.name}\n" +
-                f"# {settings.editor_data['EditorSettings']['version_string']}"
+                metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)

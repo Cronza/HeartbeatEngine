@@ -26,7 +26,7 @@ class Container(Renderable):
             f_objects = renderable_data['sprites']
 
             for f_object in f_objects:
-                self.children.append(self.scene.a_manager.PerformAction(f_object, 'create_sprite'))
+                self.children.append(self.scene.a_manager.PerformAction(f_object, 'create_sprite'), no_draw=True)
         else:
             print('Data file does not specify any sprites')
 
@@ -35,7 +35,7 @@ class Container(Renderable):
             f_interactables = renderable_data['interactables']
 
             for f_interactable in f_interactables:
-                self.children.append(self.scene.a_manager.PerformAction(f_interactable, 'create_interactable'))
+                self.children.append(self.scene.a_manager.PerformAction(f_interactable, 'create_interactable'), no_draw=True)
         else:
             print('Data file does not specify any interactables')
 
@@ -44,7 +44,7 @@ class Container(Renderable):
             f_buttons = renderable_data['buttons']
 
             for f_button in f_buttons:
-                self.children.append(self.scene.a_manager.PerformAction(f_button, 'create_button'))
+                self.children.append(self.scene.a_manager.PerformAction(f_button, 'create_button'), no_draw=True)
         else:
             print('Data file does not specify any buttons')
 
@@ -53,7 +53,7 @@ class Container(Renderable):
             f_texts = renderable_data['text']
 
             for f_text in f_texts:
-                self.children.append(self.scene.a_manager.PerformAction(f_text, 'create_text'))
+                self.children.append(self.scene.a_manager.PerformAction(f_text, 'create_text'), no_draw=True)
         else:
             print('Data file does not specify any text')
 
@@ -61,7 +61,6 @@ class Container(Renderable):
         """ Recursively collect all children to this container """
         f_children = []
         return self.GetChild(self, f_children)
-
 
     def GetChild(self, parent, f_children):
         """ Given a renderable, recursively collect itself, and any children it has, and return them as a list """

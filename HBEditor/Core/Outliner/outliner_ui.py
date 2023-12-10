@@ -71,6 +71,7 @@ class OutlinerUI(QtWidgets.QWidget):
         context_menu.a_duplicate.triggered.connect(self.core.DuplicateAsset)
         context_menu.a_create_folder.triggered.connect(self.core.CreateFolder)
         context_menu.a_new_scene.triggered.connect(self.core.CreateScene)
+        context_menu.a_new_dialogue.triggered.connect(self.core.CreateDialogue)
         context_menu.a_new_interface.triggered.connect(self.core.CreateInterface)
         context_menu.a_details.triggered.connect(self.ShowDetails)
 
@@ -127,7 +128,6 @@ class OutlinerUI(QtWidgets.QWidget):
 
     def AddAsset(self, asset_name: str, asset_type: FileType, thumbnail_path: str = ""):
         new_asset = OutlinerAsset(asset_name, asset_type, thumbnail_path)
-
         self.asset_list.addItem(new_asset)
 
         # Allow folders to be drop targets so assets can be rearranged in the editor
@@ -262,6 +262,7 @@ class OutlinerContextMenu(QtWidgets.QMenu):
     SIG_DUPLICATE = QtCore.pyqtSignal()
     SIG_CREATE_FOLDER = QtCore.pyqtSignal()
     SIG_CREATE_SCENE = QtCore.pyqtSignal()
+    SIG_CREATE_DIALOGUE = QtCore.pyqtSignal()
     SIG_CREATE_INTERFACE = QtCore.pyqtSignal()
     SIG_SHOW_DETAILS = QtCore.pyqtSignal()
 
@@ -277,6 +278,7 @@ class OutlinerContextMenu(QtWidgets.QMenu):
         self.a_duplicate = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")), "Duplicate", self)
         self.a_create_folder = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Folder.png")), "Create Folder", self)
         self.a_new_scene = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")), "Create Scene", self)
+        self.a_new_dialogue = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Dialogue.png")), "Create Dialogue", self)
         self.a_new_interface = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Interface.png")), "Create Interface", self)
         self.a_details = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Information.png")), "Details", self)
 
@@ -290,6 +292,7 @@ class OutlinerContextMenu(QtWidgets.QMenu):
         if not use_asset_menu:
             self.addAction(self.a_create_folder)
             self.addAction(self.a_new_scene)
+            self.addAction(self.a_new_dialogue)
             self.addAction(self.a_new_interface)
         if active_selection:
             self.addAction(self.a_details)
@@ -334,7 +337,7 @@ class DialogAssetInfo(QtWidgets.QDialog):
         # Hide the OS header to lock its position
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.resize(400, 300)
-        #print(self.size())
+
         self.main_layout = QtWidgets.QVBoxLayout(self)
 
         # Header

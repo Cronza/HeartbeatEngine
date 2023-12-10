@@ -74,6 +74,7 @@ class Sound(pygame.mixer.Sound):
         self.channel = self.play(self.loop_count)
 
     def Stop(self):
+        """ Stop SFX playback and clear the assigned channel """
         self.paused = False
         self.channel = None
         self.stop()
