@@ -114,6 +114,11 @@ class Scene:
         else:
             raise ValueError("'scene_items' missing from the scene file")
 
+        # Execute start actions
+        if 'start_actions' in self.scene_data['settings']:
+            for action_index, action_data in self.scene_data['settings']['start_actions'].items():
+                action_manager.PerformAction(action_data['action'], action_data['action']['action'])
+
         self.Draw()
 
     def LoadInterface(self, interface_file: str, interface_class: type = Interface) -> Interface:

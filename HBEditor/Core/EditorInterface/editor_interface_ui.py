@@ -12,14 +12,15 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import copy
 from PyQt5 import QtWidgets, QtCore, QtGui
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
-from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
 from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 
 class EditorInterfaceUI(EditorBaseUI):
@@ -47,8 +48,11 @@ class EditorInterfaceUI(EditorBaseUI):
 
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-        self.interface_settings = InterfaceSettings()
-        self.interface_settings.Populate()
+
+        self.interface_settings = DetailsPanel(use_globals_column=False)
+        self.interface_settings_src_obj = InterfaceSettings()
+        self.interface_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.interface_settings.Populate(self.interface_settings_src_obj)
 
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
@@ -73,40 +77,26 @@ class EditorInterfaceUI(EditorBaseUI):
         self.core.UpdateActiveSceneItem(selected_items)
 
 
-class InterfaceSettings(SceneSettings):
+class InterfaceSettings(QtCore.QObject, SourceEntry):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+    ACTION_DATA = {
+        "key": {
+            "type": "String",
+            "default": "!&INTERFACE&!",
+            "value": "!&INTERFACE&!",
+            "flags": ["editable"]
+        },
+        "description": {
+            "type": "Paragraph",
+            "default": "",
+            "value": "",
+            "flags": ["editable"]
+        }
+    }
+
     def __init__(self):
         super().__init__()
+        self.action_data = copy.deepcopy(self.ACTION_DATA)
 
-    def Populate(self, data: dict = None):
-        self.settings_tree.clear()
-
-        entries = {
-            "key": {
-                "type": "String",
-                "default": "!&INTERFACE&!",
-                "value": "!&INTERFACE&!",
-                "flags": ["editable"]
-            },
-
-            "description": {
-                "type": "Paragraph",
-                "default": "",
-                "value": "",
-                "flags": ["editable"]
-            }
-        }
-
-        if data:
-            if "key" in data:
-                entries["key"]["value"] = data["key"]
-            if "description" in data:
-                entries["description"]["value"] = data["description"]
-
-        for name, data in entries.items():
-            ieh.Add(
-                owner=self,
-                view=self.settings_tree,
-                name=name,
-                data=data,
-                parent=None
-            )
+    def Refresh(self, change_tree: list = None):
+        self.SIG_USER_UPDATE.emit()

@@ -489,6 +489,8 @@ class InputEntryArray(InputEntryBase):
                 # Array elements have generated names to avoid having to be stored as a list when caching or saving
                 name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
+                self.SIG_USER_UPDATE.emit(self.owning_model_item)
+
             if not parent:
                 parent = self.owning_model_item
 

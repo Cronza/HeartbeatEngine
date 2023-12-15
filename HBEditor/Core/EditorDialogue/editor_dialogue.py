@@ -111,8 +111,9 @@ class EditorDialogue(EditorBase):
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
-        # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force_when_no_change=True)
+        # Collect the dialogue settings
+        self.editor_ui.dialogue_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.dialogue_settings_src_obj.action_data, force_when_no_change=True)
 
         # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()
@@ -120,7 +121,7 @@ class EditorDialogue(EditorBase):
         # Merge the collected data
         data_to_export = {
             "type": FileType.Dialogue.name,
-            "settings": conv_scene_data,
+            "settings": conv_settings_data,
             "dialogue": self.ConvertDialogueToEngineFormat(data_to_export)
         }
 
@@ -145,8 +146,12 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
-            # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["settings"])
+            # Populate the dialogue settings
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.dialogue_settings_src_obj.action_data,
+                action_data=file_data["settings"]
+            )
+            self.editor_ui.dialogue_settings.Populate(self.editor_ui.dialogue_settings_src_obj)
 
             # Populate the branches and dialogue sequence
             converted_data = self.ConvertDialogueToEditorFormat(file_data["dialogue"])

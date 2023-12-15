@@ -26,7 +26,7 @@ class EditorScene(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
-        self.excluded_properties = ["transition", "post_wait"]
+        self.excluded_properties = ["transition"]
 
         self.editor_ui = EditorSceneUI(self)
         Logger.getInstance().Log("Editor initialized")
@@ -64,12 +64,13 @@ class EditorScene(EditorBase):
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData(), force_when_no_change=True)
+        self.editor_ui.scene_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings_src_obj.action_data, force_when_no_change=True)
 
         # Merge the collected data
         data_to_export = {
             "type": FileType.Scene.name,
-            "settings": conv_scene_data,
+            "settings": conv_settings_data,
             "scene_items": self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
@@ -96,7 +97,12 @@ class EditorScene(EditorBase):
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
 
             # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["settings"])
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.scene_settings_src_obj.action_data,
+                action_data=file_data["settings"],
+                excluded_properties=self.excluded_properties
+            )
+            self.editor_ui.scene_settings.Populate(self.editor_ui.scene_settings_src_obj)
 
             for item in conv_scene_items:
                 action_name, action_data = next(iter(item.items()))
@@ -133,7 +139,7 @@ class EditorScene(EditorBase):
             # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
             # the matching ACTION_DATA and clone it
             action_name, action_data = next(iter(item.items()))
-            base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
+            base_ad_clone = settings.GetActionData(action_name)
 
             # Pass the entry by ref, and let the convert func edit it directly
             ad.ConvertActionDataToEditorFormat(

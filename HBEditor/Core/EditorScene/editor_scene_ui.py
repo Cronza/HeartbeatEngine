@@ -12,12 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+import copy
+from PyQt5 import QtWidgets, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
-from HBEditor.Core.EditorCommon.scene_settings import SceneSettings
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.Primitives import input_entry_handler as ieh
+from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 
 class EditorSceneUI(EditorBaseUI):
@@ -39,10 +41,12 @@ class EditorSceneUI(EditorBaseUI):
         self.scene_viewer.SIG_SELECTION_CHANGED.connect(self.core.UpdateActiveSceneItem)
 
         self.details = DetailsPanel(self.core.excluded_properties)
+        self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.scene_settings = SceneSettings()
+        self.scene_settings = DetailsPanel(use_globals_column=False)
+        self.scene_settings_src_obj = SceneSettings()
         self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-        self.scene_settings.Populate()
+        self.scene_settings.Populate(self.scene_settings_src_obj)
 
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
@@ -65,3 +69,62 @@ class EditorSceneUI(EditorBaseUI):
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()
         self.core.UpdateActiveSceneItem(selected_items)
+
+
+class SceneSettings(QtCore.QObject, SourceEntry):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+    ACTION_DATA = {
+        "interface": {
+            "type": "Asset_Interface",
+            "default": "",
+            "value": "",
+            "flags": ["editable"]
+        },
+        "description": {
+            "type": "Paragraph",
+            "default": "",
+            "value": "",
+            "flags": ["editable"]
+        },
+        "allow_pausing": {
+            "type": "Bool",
+            "default": "True",
+            "value": "True",
+            "flags": ["editable"]
+        },
+        "start_actions": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "action": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "action": {
+                            "type": "Event",
+                            "value": "None",
+                            "default": "None",
+                            "options": [
+                                "None",
+                                "scene_fade_in",
+                                "play_sfx",
+                                "play_music",
+                                "set_mute",
+                                "start_dialogue"
+                            ],
+                            "flags": ["editable"]
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    def __init__(self):
+        super().__init__()
+        self.action_data = copy.deepcopy(self.ACTION_DATA)
+
+    def Refresh(self, change_tree: list = None):
+        self.SIG_USER_UPDATE.emit()
+
+

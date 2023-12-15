@@ -106,13 +106,14 @@ class EditorInterface(EditorBase):
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
-        # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.interface_settings.GetData())
+        # Collect the interface settings
+        self.editor_ui.interface_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.interface_settings_src_obj.action_data, force_when_no_change=True)
 
         # Merge the collected data
         data_to_export = {
             "type": FileType.Interface.name,
-            "settings": conv_scene_data,
+            "settings": conv_settings_data,
             "pages": self.ConvertInterfaceItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
@@ -137,7 +138,11 @@ class EditorInterface(EditorBase):
         # Skip importing if the file has no data to load
         if file_data:
             # Populate the interface settings
-            self.editor_ui.interface_settings.Populate(file_data["settings"])
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.interface_settings_src_obj.action_data,
+                action_data=file_data["settings"]
+            )
+            self.editor_ui.interface_settings.Populate(self.editor_ui.interface_settings_src_obj)
 
             for page_name, page_data in file_data["pages"].items():
                 # Create the page entry (The persistent page is created on editor init, so skip that)

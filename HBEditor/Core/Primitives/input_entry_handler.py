@@ -121,13 +121,14 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget.Set(data["value"])
 
     name_widget = QLabel(name)
-    global_checkbox = SimpleCheckbox()
-    global_checkbox.owner = owning_model_item
-    global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
 
     # The global checkbox isn't universally used, so only use it if relevant. If it's enabled, mark
     # the input widget as uneditable by the user
+    global_checkbox = None
     if "global" in data and "flags" in data:
+        global_checkbox = SimpleCheckbox()
+        global_checkbox.owner = owning_model_item
+        global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
         owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
         if "global_active" in data["flags"]:
             global_checkbox.Set(True)
