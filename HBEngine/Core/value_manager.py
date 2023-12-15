@@ -24,21 +24,6 @@ class ValueManager:
     def Request(self):
         pass
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def GetValue(self, action_name):
         """
         Returns the object associated with the provided action text

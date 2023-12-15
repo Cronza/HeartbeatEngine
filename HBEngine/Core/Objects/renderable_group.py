@@ -12,6 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+
+
 class RenderableGroup:
     def __init__(self):
         """
@@ -37,7 +39,6 @@ class RenderableGroup:
         Remove the given renderable key from the dict. Returns whether the key was successfully removed. Returns False
         if the key was not found
         """
-        print(key_to_remove)
         for key in key_to_remove:
             try:
                 del self.renderables[key]

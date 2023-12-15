@@ -19,8 +19,8 @@ class FileType(Enum):
     Folder = 1
     Project_Settings = 2
     Interface = 3
-    Scene_Dialogue = 4
-    Scene_Point_And_Click = 5
+    Dialogue = 4
+    Scene = 5
     Asset_Data = 6
     Asset_Image = 7
     Asset_Font = 8
@@ -28,26 +28,13 @@ class FileType(Enum):
     #Character = 3
 
 
-class FileTypeDescriptions:
-    descriptions = {
-        FileType.Scene_Dialogue: "A scene containing a sequence of dialogue between characters. "
-                                 "These files may contain additional branches",
-
-        FileType.Scene_Point_And_Click: "A scene with interactable objects. Perfect for designing "
-                                        "Point & Click scenes, or interactive maps"
-
-        #FileType.Character: "A file containing details on a character, such as a special font for "
-        #                    "their name, their unique color, or various sprites representing their moods"
-    }
-
-
 class FileTypeIcons:
     icons = {
         FileType.Folder: ":/Icons/Folder.png",
         FileType.Interface: ":/Icons/Interface.png",
         FileType.Project_Settings: ":/Icons/File.png",
-        FileType.Scene_Dialogue: ":/Icons/File.png",
-        FileType.Scene_Point_And_Click: ":/Icons/File.png",
+        FileType.Dialogue: ":/Icons/File.png",
+        FileType.Scene: ":/Icons/File.png",
         FileType.Asset_Data: ":/Icons/File.png",
         FileType.Asset_Image: ":/Icons/File_Image.png",
         FileType.Asset_Font: ":/Icons/File.png",

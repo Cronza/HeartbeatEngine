@@ -21,7 +21,6 @@ pages:
             - 0.2
           text: Paused
           text_size: 60
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8
@@ -153,7 +152,6 @@ pages:
             - 0.2
           text: Options
           text_size: 60
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8
@@ -201,7 +199,6 @@ pages:
             - 0.2
           text: Save
           text_size: 60
-          font: Content/Fonts/DAGGERSQUARE.ttf
           z_order: 100001
           wrap_bounds:
             - 0.8

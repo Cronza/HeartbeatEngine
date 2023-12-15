@@ -19,7 +19,6 @@ from HBEditor.Core.Logger.logger import Logger
 class EditorBase:
     def __init__(self, file_path):
         self.file_path = file_path
-        self.file_type = None
         self.editor_ui = None
 
         Logger.getInstance().Log("Initializing Editor...")

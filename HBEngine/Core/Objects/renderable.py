@@ -28,10 +28,8 @@ class Renderable(pygame.sprite.Sprite):
 
     This class is not meant to be used directly, but to be subclassed into more specialized objects
     """
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
         super().__init__()
-
-        self.scene = scene
         self.parent = parent
         self.children = []
 
@@ -61,7 +59,7 @@ class Renderable(pygame.sprite.Sprite):
             self.scaled_surface = None
             self.UpdateRect(self.RecalculateSurfacePosition(self.surface), self.surface.get_size())
         else:
-            self.scaled_surface = self.GetRescaledSurface(multiplier, self.surface)
+            self.scaled_surface = self.GetRescaledSurface(self.surface, multiplier)
             self.UpdateRect(self.RecalculateSurfacePosition(self.scaled_surface), self.scaled_surface.get_size())
 
     def RecalculateSurfacePosition(self, surface: pygame.Surface) -> tuple:

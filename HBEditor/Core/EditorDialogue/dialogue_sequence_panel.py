@@ -18,6 +18,7 @@ from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
 
 
@@ -37,7 +38,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.ed_core = ed_core
 
         # Create an action menu to be used later on for adding entries to the sequence
-        self.action_menu = ActionMenu(self.AddEntry, self.ed_core.file_type)
+        self.action_menu = ActionMenu(self.AddEntry, FileType.Dialogue)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -141,14 +142,22 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         else:
             self.dialogue_table.insertRow(new_entry_row)
 
-        # Create a new dialogue entry object, and add it to the sequence widget
+        # Create a new dialogue entry object, and add it to the sequence widget.
         new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry, self.RefreshCurrentRowSize)
+
+        # Add unique dialogue-only parameters that wouldn't be found in the 'ACTION_DATA'
+        if 'post_wait' not in new_entry.action_data:
+            new_entry.action_data['post_wait'] = {
+                "type": "Dropdown",
+                "value": 'wait_for_input',
+                "options": ["wait_for_input", "wait_until_complete", "no_wait"],
+                "flags": ["editable", "preview"]
+            }
 
         # Assign the entry widget to the row
         self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
 
-        # Since selecting the new row will cause the details panel to refresh, allow opting out in case
-        # batch creation is happening
+        # Selecting the new row will cause the details panel to refresh, so allow opting out in case of batch creation
         if not skip_select:
             self.dialogue_table.selectRow(new_entry_row)
 

@@ -18,20 +18,17 @@ from HBEditor.Core import settings
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import action_data as ad
-from HBEditor.Core.EditorPointAndClick.editor_pointandclick_ui import EditorPointAndClickUI
+from HBEditor.Core.EditorScene.editor_scene_ui import EditorSceneUI
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
-class EditorPointAndClick(EditorBase):
+class EditorScene(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
-
-        self.file_type = FileType.Scene_Point_And_Click
-
         # Like the actions themselves, there are some properties that are explicitly not used by this editor
-        self.excluded_properties = ["transition", "post_wait"]
+        self.excluded_properties = ["transition"]
 
-        self.editor_ui = EditorPointAndClickUI(self)
+        self.editor_ui = EditorSceneUI(self)
         Logger.getInstance().Log("Editor initialized")
 
     def UpdateActiveSceneItem(self, selected_items: list = None):
@@ -61,18 +58,19 @@ class EditorPointAndClick(EditorBase):
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Point & Click data for: {self.file_path}")
+        Logger.getInstance().Log(f"Exporting Scene data for: {self.file_path}")
 
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
         # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
+        self.editor_ui.scene_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings_src_obj.action_data, force_when_no_change=True)
 
         # Merge the collected data
         data_to_export = {
-            "type": FileType.Scene_Point_And_Click.name,
-            "settings": conv_scene_data,
+            "type": FileType.Scene.name,
+            "settings": conv_settings_data,
             "scene_items": self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
@@ -81,8 +79,7 @@ class EditorPointAndClick(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {self.file_type.name}\n" +
-                f"# {settings.editor_data['EditorSettings']['version_string']}"
+                metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
@@ -100,7 +97,12 @@ class EditorPointAndClick(EditorBase):
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
 
             # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["settings"])
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.scene_settings_src_obj.action_data,
+                action_data=file_data["settings"],
+                excluded_properties=self.excluded_properties
+            )
+            self.editor_ui.scene_settings.Populate(self.editor_ui.scene_settings_src_obj)
 
             for item in conv_scene_items:
                 action_name, action_data = next(iter(item.items()))
@@ -137,7 +139,7 @@ class EditorPointAndClick(EditorBase):
             # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
             # the matching ACTION_DATA and clone it
             action_name, action_data = next(iter(item.items()))
-            base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
+            base_ad_clone = settings.GetActionData(action_name)
 
             # Pass the entry by ref, and let the convert func edit it directly
             ad.ConvertActionDataToEditorFormat(

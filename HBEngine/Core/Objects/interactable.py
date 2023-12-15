@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core import settings
+from HBEngine.Core import settings, action_manager
 from HBEngine.Core.DataTypes.input_states import State
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -26,8 +26,8 @@ class Interactable(SpriteRenderable):
     - Normal, hover, and clicked input states
     - A 'click' action
     """
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
-        super().__init__(scene, renderable_data, False, parent)
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
+        super().__init__(renderable_data, False, parent)
 
         self.state = State.normal
 
@@ -55,9 +55,9 @@ class Interactable(SpriteRenderable):
 
     def update(self, *args):
         super().update()
-        # If being hovered...
-        if self.rect.collidepoint(pygame.mouse.get_pos()):
-            if not self.scene.stop_interactions:
+        if not settings.scene.stop_interactions:
+            # If being hovered...
+            if self.rect.collidepoint(pygame.mouse.get_pos()):
                 # If not already in the hover state...
                 if self.state is State.normal:
                     self.ChangeState(State.hover)
@@ -76,10 +76,10 @@ class Interactable(SpriteRenderable):
                         self.ChangeState(State.normal)
                         self.isClicking = False
 
-        # If no longer hovering...
-        elif self.state is not State.normal:
-            self.isClicking = False
-            self.ChangeState(State.normal)
+            # If no longer hovering...
+            elif self.state is not State.normal:
+                self.isClicking = False
+                self.ChangeState(State.normal)
 
     def RecalculateSize(self, multiplier):
         # Call the parent function to recalculate the base surface
@@ -105,33 +105,33 @@ class Interactable(SpriteRenderable):
                 self.interact_events.append(array_elem_data[next(iter(array_elem_data))])
 
             if self.interact_events:
-                self.scene.stop_interactions = True
+                settings.scene.stop_interactions = True
                 if "post_wait" in self.interact_events[0]:
                     if self.interact_events[0]["post_wait"] == "wait_until_complete":
-                        self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"], self.ContinueInteract)
+                        action_manager.PerformAction(action_data=self.interact_events[0], action_name=self.interact_events[0]["action"], completion_callback=self.ContinueInteract)
                     else:
                         # All other cases use 'no_wait'
-                        self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"])
+                        action_manager.PerformAction(action_data=self.interact_events[0], action_name=self.interact_events[0]["action"])
                         self.ContinueInteract()
                 else:
-                    self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"])
+                    action_manager.PerformAction(action_data=self.interact_events[0], action_name=self.interact_events[0]["action"])
                     self.ContinueInteract()
             else:
-                self.scene.Draw()
+                settings.scene.Draw()
         elif "event" in self.renderable_data:
             event_data = self.renderable_data["event"]
-            self.scene.a_manager.PerformAction(event_data, event_data["action"])
+            action_manager.PerformAction(action_data=event_data, action_name=event_data["action"])
         else:
-            self.scene.Draw()
+            settings.scene.Draw()
 
     def ContinueInteract(self):
         self.interact_events.pop(0)
 
         # If there are still more events, perform them
         if self.interact_events:
-            self.scene.a_manager.PerformAction(self.interact_events[0], self.interact_events[0]["action"], self.ContinueInteract)
+            action_manager.PerformAction(action_data=self.interact_events[0], action_name=self.interact_events[0]["action"], completion_callback=self.ContinueInteract)
         else:
-            self.scene.stop_interactions = False
+            settings.scene.stop_interactions = False
 
     def LoadStateSprites(self):
         """
@@ -185,7 +185,7 @@ class Interactable(SpriteRenderable):
         """ Updates the active interact state with the provided state, refreshing the active surface """
         self.SetActiveSurface(self.GetStateSurface(new_state))
         self.state = new_state
-        self.scene.Draw()
+        settings.scene.Draw()
 
     def Flip(self):
         # Completely override the parent, as interactables use a cached original surface instead of explicitly using

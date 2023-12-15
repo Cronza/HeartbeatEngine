@@ -25,9 +25,6 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class EditorDialogue(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
-
-        self.file_type = FileType.Scene_Dialogue
-
         self.editor_ui = EditorDialogueUI(self)
         self.editor_ui.branches_panel.CreateEntry(
             "Main",
@@ -114,16 +111,17 @@ class EditorDialogue(EditorBase):
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
-        # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.scene_settings.GetData())
+        # Collect the dialogue settings
+        self.editor_ui.dialogue_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.dialogue_settings_src_obj.action_data, force_when_no_change=True)
 
         # Collect everything for the "dialogue" key
         data_to_export = self.GetAllDialogueData()
 
         # Merge the collected data
         data_to_export = {
-            "type": self.file_type.name,
-            "settings": conv_scene_data,
+            "type": FileType.Dialogue.name,
+            "settings": conv_settings_data,
             "dialogue": self.ConvertDialogueToEngineFormat(data_to_export)
         }
 
@@ -133,8 +131,7 @@ class EditorDialogue(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {self.file_type.name}\n" +
-                f"# {settings.editor_data['EditorSettings']['version_string']}"
+                metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
@@ -149,8 +146,12 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
-            # Populate the scene settings
-            self.editor_ui.scene_settings.Populate(file_data["settings"])
+            # Populate the dialogue settings
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.dialogue_settings_src_obj.action_data,
+                action_data=file_data["settings"]
+            )
+            self.editor_ui.dialogue_settings.Populate(self.editor_ui.dialogue_settings_src_obj)
 
             # Populate the branches and dialogue sequence
             converted_data = self.ConvertDialogueToEditorFormat(file_data["dialogue"])
@@ -210,6 +211,14 @@ class EditorDialogue(EditorBase):
                     base_action_data=base_ad_clone,
                     action_data=action_data
                 )
+
+                # Add unique dialogue-only parameters that wouldn't be found in the 'ACTION_DATA'
+                base_ad_clone['post_wait'] = {
+                    "type": "Dropdown",
+                    "value": action_data['post_wait'],
+                    "options": ["wait_for_input", "wait_until_complete", "no_wait"],
+                    "flags": ["editable", "preview"]
+                }
 
                 converted_entries.append({action_name: base_ad_clone})
 

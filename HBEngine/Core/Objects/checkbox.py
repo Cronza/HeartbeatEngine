@@ -5,11 +5,10 @@ from HBEngine.Core import settings
 
 
 class Checkbox(Interactable):
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
-        super().__init__(scene, renderable_data, parent)
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
+        super().__init__(renderable_data, parent)
 
         self.check_icon_renderable = SpriteRenderable(
-            scene=self.scene,
             renderable_data={
                 "key": f"{self.renderable_data['key']}_Text",
                 "position": [0.5, 0.5],
@@ -36,7 +35,7 @@ class Checkbox(Interactable):
                 self.check_icon_renderable.visible = True
 
         super().Interact()
-        self.scene.Draw()  # Draw to apply the icon changes
+        settings.scene.Draw()  # Draw to apply the icon changes
 
     def ConnectionUpdate(self, new_value):
         if isinstance(new_value, bool):

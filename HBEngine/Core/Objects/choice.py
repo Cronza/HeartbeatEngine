@@ -16,8 +16,8 @@ from HBEngine.Core.Objects.renderable_container import Container
 
 
 class Choice(Container):
-    def __init__(self, scene, renderable_data):
-        super().__init__(scene, renderable_data)
+    def __init__(self, renderable_data):
+        super().__init__(renderable_data)
         self.visible = False
 
         # Pass in a button list, and generate buttons

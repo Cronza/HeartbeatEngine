@@ -27,10 +27,6 @@ from Tools.HBYaml.hb_yaml import Reader, Writer
 class EditorInterface(EditorBase):
     def __init__(self, file_path, interface_type: FileType = FileType.Interface):
         super().__init__(file_path)
-        # Where as many scenes have unique editors, interface types share the same editor. As such, we need
-        # to know which type this editor is working on to properly adjust functionality
-        self.file_type = interface_type
-
         self.editor_ui = EditorInterfaceUI(self)
         self.editor_ui.pages_panel.CreateEntry(
             "Persistent",
@@ -110,13 +106,14 @@ class EditorInterface(EditorBase):
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
 
-        # Collect the scene settings
-        conv_scene_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.interface_settings.GetData())
+        # Collect the interface settings
+        self.editor_ui.interface_settings.StoreData()
+        conv_settings_data = ad.ConvertParamDataToEngineFormat(self.editor_ui.interface_settings_src_obj.action_data, force_when_no_change=True)
 
         # Merge the collected data
         data_to_export = {
-            "type": self.file_type.name,
-            "settings": conv_scene_data,
+            "type": FileType.Interface.name,
+            "settings": conv_settings_data,
             "pages": self.ConvertInterfaceItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
@@ -125,8 +122,7 @@ class EditorInterface(EditorBase):
             Writer.WriteFile(
                 data=data_to_export,
                 file_path=self.file_path,
-                metadata=f"# Type: {self.file_type.name}\n" +
-                f"# {settings.editor_data['EditorSettings']['version_string']}"
+                metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
@@ -142,7 +138,11 @@ class EditorInterface(EditorBase):
         # Skip importing if the file has no data to load
         if file_data:
             # Populate the interface settings
-            self.editor_ui.interface_settings.Populate(file_data["settings"])
+            ad.ConvertActionDataToEditorFormat(
+                base_action_data=self.editor_ui.interface_settings_src_obj.action_data,
+                action_data=file_data["settings"]
+            )
+            self.editor_ui.interface_settings.Populate(self.editor_ui.interface_settings_src_obj)
 
             for page_name, page_data in file_data["pages"].items():
                 # Create the page entry (The persistent page is created on editor init, so skip that)

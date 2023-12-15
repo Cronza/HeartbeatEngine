@@ -27,13 +27,10 @@ def GetProjectContentDirectory():
     return f"{user_project_dir}/Content"
 
 
-def GetMetadataString(file_type: FileType = None):
+def GetMetadataString():
     """ Return the metadata string used to mark HBEditor-authored files """
     global editor_data
     metadata_str = f"# {editor_data['EditorSettings']['version_string']}"
-
-    if file_type:
-        metadata_str = f"# Type: {file_type.name}\n{metadata_str}"
 
     return metadata_str
 

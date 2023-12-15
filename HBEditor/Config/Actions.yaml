@@ -4,25 +4,25 @@ Renderables:
     - name: "create_sprite"
       display_name: "Create Sprite"
       applicable_editors:
-        - Scene_Dialogue
-        - Scene_Point_And_Click
+        - Dialogue
+        - Scene
         - Interface
     - name: "create_background"
       display_name: "Create Background"
       applicable_editors:
-        - Scene_Dialogue
-        - Scene_Point_And_Click
+        - Dialogue
+        - Scene
         - Interface
     - name: "create_text"
       display_name: "Create Text"
       applicable_editors:
-        - Scene_Dialogue
-        - Scene_Point_And_Click
+        - Dialogue
+        - Scene
         - Interface
     - name: "remove_renderable"
       display_name: "Remove Renderable"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
 
 Interactables:
   icon: ":/Icons/AM_Renderable.png"
@@ -30,30 +30,35 @@ Interactables:
     - name: "create_interactable"
       display_name: "Create Interactable"
       applicable_editors:
-        - Scene_Point_And_Click
+        - Scene
         - Interface
     - name: "create_button"
       display_name: "Create Button"
       applicable_editors:
-        - Scene_Point_And_Click
+        - Scene
         - Interface
     - name: "create_text_button"
       display_name: "Create Button (Text Only)"
       applicable_editors:
-        - Scene_Point_And_Click
+        - Scene
         - Interface
 
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"
   options:
+    - name: "start_dialogue"
+      display_name: "Start Dialogue"
+      applicable_editors:
+        - Scene
+        - Interface
     - name: "dialogue"
       display_name: "Dialogue"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "choice"
       display_name: "Choice"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
 
 Scene:
   icon: ":/Icons/AM_Scene.png"
@@ -61,15 +66,15 @@ Scene:
     - name: "load_scene"
       display_name: "Load Scene"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "scene_fade_in"
       display_name: "Fade In"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "scene_fade_out"
       display_name: "Fade Out"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
 
 Sound:
   icon: ":/Icons/AM_Dialogue.png"
@@ -77,20 +82,20 @@ Sound:
     - name: "play_sfx"
       display_name: "Play SFX"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "play_music"
       display_name: "Play Music"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "stop_sfx"
       display_name: "Stop SFX"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "stop_music"
       display_name: "Stop Music"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue
     - name: "set_mute"
       display_name: "Set Mute"
       applicable_editors:
-        - Scene_Dialogue
+        - Dialogue

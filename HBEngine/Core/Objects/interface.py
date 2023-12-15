@@ -13,28 +13,26 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame
-from HBEngine.Core import settings
+from HBEngine.Core import settings, action_manager
 from HBEngine.Core.Objects.renderable import Renderable
 from Tools.HBYaml.hb_yaml import Reader
 
 
 class Interface(Renderable):
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
         # Page renderables are independent of the persistent renderables, and can be created and removed at runtime. In
-        # order to faciliate quick removal, keep a list of keys for page renderables as they're created
+        # order to faciliate quick removal, keep a list of page renderables as they're created
         self.page_renderables = []
 
         self.visible = False
         if "key" not in renderable_data: renderable_data["key"] = id(self)
         if "z_order" not in renderable_data: renderable_data["z_order"] = 10000
-        super().__init__(scene, renderable_data, parent)
+        super().__init__(renderable_data, parent)
 
         if "Persistent" in renderable_data["pages"]:
             for item in renderable_data["pages"]["Persistent"]["items"]:
                 action_name, action_data = next(iter(item.items()))
-                self.children.append(
-                    self.scene.a_manager.PerformAction(action_data=action_data, action_name=action_name, no_draw=True)
-                )
+                action_manager.PerformAction(action_data=action_data, action_name=action_name, parent=self, no_draw=True)
         else:
             raise ValueError("'Persistent' missing from the interface file - No items to display!")
 
@@ -50,8 +48,8 @@ class Interface(Renderable):
 
                 # Create and record new page renderables
                 for page_action in self.renderable_data["pages"][page_name]["items"]:
-                    renderable = self.scene.a_manager.PerformAction(page_action, page_action["action"], no_draw=True)
-                    self.children.append(renderable)
+                    action_name, action_data = next(iter(page_action.items()))
+                    renderable = action_manager.PerformAction(action_data=action_data, action_name=action_name, parent=self, no_draw=True)
                     self.page_renderables.append(renderable)
                 return True
 
@@ -63,4 +61,3 @@ class Interface(Renderable):
         for renderable in self.page_renderables:
             self.children.remove(renderable)
         self.page_renderables.clear()
-

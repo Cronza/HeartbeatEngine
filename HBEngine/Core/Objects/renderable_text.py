@@ -27,8 +27,8 @@ class TextRenderable(Renderable):
         - Pop-up text
         - etc
     """
-    def __init__(self, scene, renderable_data: dict, parent: Renderable = None):
-        super().__init__(scene, renderable_data, parent)
+    def __init__(self, renderable_data: dict, parent: Renderable = None):
+        super().__init__(renderable_data, parent)
 
         font = settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
         self.text = self.renderable_data["text"]

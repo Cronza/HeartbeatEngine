@@ -27,8 +27,8 @@ class Writer:
     @staticmethod
     def WriteFile(data: dict, file_path: str, metadata: str = ""):
         """
-        Given a dict, write it as a .yaml file to the target location. If 'metadata' is provided, prepend that
-        to the beginning of the file (Useful for comments)
+        Given a dict, write it to the provided file path. If 'metadata' is provided, prepend that to the beginning
+        of the file (Useful for comments)
         """
         with open(file_path, 'w') as file:
             if metadata:
