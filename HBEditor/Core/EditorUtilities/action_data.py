@@ -78,7 +78,6 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                 if base_param_name in excluded_properties:
                     continue
 
-            #print("Base Param Data", base_param_data)
             if base_param_data["type"] == "Event":
                 # Event types have a unique data structure in that they have generated children based on another
                 # action's ACTION_DATA. Since this data comes from outside the scope of this action, we have to perform
@@ -100,7 +99,6 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                     }
                     # Merge in the target parameters
                     event_target_base_ad = copy.deepcopy(settings.GetActionData(action_data[base_param_name]["action"]))
-                    #print("Base AD for Event Action:", event_target_base_ad)
                     base_param_data["children"].update(event_target_base_ad)
 
                     # By default, 'value' will be the entire child dict (IE. {'action': ..., 'scene_file': ...})
@@ -117,7 +115,6 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                     template_copy_name = GetActionName(base_param_data["template"])
                     template_copy_data = template_copy[template_copy_name]
 
-                    #print("Template Data Clone:", template_copy_data)
                     ConvertActionDataToEditorFormat(
                         base_action_data=template_copy_data["children"],
                         action_data=inst_data

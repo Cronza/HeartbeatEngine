@@ -109,8 +109,13 @@ class HBEditorUI:
             self.outliner = Outliner(self.core)
             self.AddSubTab(self.outliner.GetUI(), "Outliner")
 
-        # Clear any open editor tabs
+        # Clear old data
         self.main_tab_widget.clear()
+        self.outliner.GetUI().ClearAssets()
+        Logger.getInstance().ClearLog()
+
+        # Reload the Outliner
+        self.outliner.Populate()
 
         # Refresh U.I text using any active translations
         self.retranslateUi(self.main_window)
