@@ -35,12 +35,24 @@ def GetMetadataString():
     return metadata_str
 
 
+def GetProjectSettingsPath() -> str:
+    """ Returns the absolute path to the active project's 'Game.yaml' file """
+    global user_project_dir
+    return user_project_dir + "/" + 'Config/Game.yaml'
+
+
+def GetValuesPath() -> str:
+    """ Returns the absolute path to the active project's 'Values.yaml' file """
+    global user_project_dir
+    return user_project_dir + "/" + 'Config/Values.yaml'
+
+
 def LoadProjectSettings():
     """ Reads the 'Game.yaml' file for the active project """
     global user_project_dir
     global user_project_data
     global project_default_files
-    user_project_data = Reader.ReadAll(user_project_dir + "/" + project_default_files['Config'])
+    user_project_data = Reader.ReadAll(GetProjectSettingsPath())
 
 
 def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
@@ -194,10 +206,11 @@ project_folder_structure = [
     "Config"
 ]
 
-# A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
-project_default_files = {
-    "Config": "Config/Game.yaml"
-}
+# A list of tuples for files that are provided in new projects. Format: (<target_folder>, <source_file>)
+project_default_files = [
+    ("Config", "Config/Game.yaml"),
+    ("Config", "Config/Values.yaml"),
+]
 
 # The master dict of file types supported by the engine / editor
 supported_file_types = {

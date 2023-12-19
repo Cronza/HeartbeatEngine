@@ -32,6 +32,7 @@ from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorScene.editor_scene import EditorScene
 from HBEditor.Core.EditorInterface.editor_interface import EditorInterface
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
+from HBEditor.Core.EditorValues.editor_values import EditorValues
 from HBEditor.Core.EditorUtilities import path
 from Tools.HBBuilder.hb_builder import HBBuilder
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -107,7 +108,7 @@ class HBEditor:
                     Writer.WriteFile({"Content": {}}, heartbeat_file, settings.GetMetadataString())
 
                     # Clone project default files
-                    for key, rel_path in settings.project_default_files.items():
+                    for key, rel_path in settings.project_default_files:
                         shutil.copy(
                             settings.engine_root + "/" + rel_path,
                             project_path + "/" + rel_path
@@ -618,7 +619,8 @@ class HBEditor:
             FileType.Scene: EditorScene,
             FileType.Dialogue: EditorDialogue,
             FileType.Interface: EditorInterface,
-            FileType.Project_Settings: EditorProjectSettings
+            FileType.Project_Settings: EditorProjectSettings,
+            FileType.Values: EditorValues
          }
 
         # Let's check if we already have an editor open for this file
@@ -664,11 +666,16 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            self.OpenEditor(
-                settings.user_project_dir + "/" + settings.project_default_files['Config'],
-                FileType.Project_Settings,
-                True
-            )
+            self.OpenEditor(settings.GetProjectSettingsPath(), FileType.Project_Settings, True)
+
+    def OpenValues(self):
+        """ Opens the 'Values' editor """
+        # Normally we would have loaded this editor like the others, but since we need to bind loading this to a menu
+        # button, we need it in the form of a function
+        if not settings.user_project_name:
+            self.ShowNoActiveProjectPrompt()
+        else:
+            self.OpenEditor(settings.GetValuesPath(), FileType.Values, True)
 
     def CheckForOpenFiles(self, root: str) -> list:
         """

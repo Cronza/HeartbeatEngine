@@ -192,12 +192,15 @@ class MainMenuBar(QtWidgets.QMenuBar):
         self.file_menu.addAction(self.a_new_project)
         self.file_menu.addAction(self.a_open_project)
 
-        # Settings Menu
-        self.settings_menu = QtWidgets.QMenu(self)
-        self.settings_menu.setWindowFlags(self.settings_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
+        # Edit Menu
+        self.edit_menu = QtWidgets.QMenu(self)
+        self.edit_menu.setWindowFlags(self.edit_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
         self.a_open_project_settings = QtWidgets.QAction(parent)
         self.a_open_project_settings.triggered.connect(engine_core.OpenProjectSettings)
-        self.settings_menu.addAction(self.a_open_project_settings)
+        self.a_open_values = QtWidgets.QAction(parent)
+        self.a_open_values.triggered.connect(engine_core.OpenValues)
+        self.edit_menu.addAction(self.a_open_project_settings)
+        self.edit_menu.addAction(self.a_open_values)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self)
@@ -218,7 +221,7 @@ class MainMenuBar(QtWidgets.QMenuBar):
 
         # Add each menu to the menu bar
         self.addAction(self.file_menu.menuAction())
-        self.addAction(self.settings_menu.menuAction())
+        self.addAction(self.edit_menu.menuAction())
         self.addAction(self.play_menu.menuAction())
         self.addAction(self.build_menu.menuAction())
 
@@ -243,10 +246,12 @@ class MainMenuBar(QtWidgets.QMenuBar):
         self.a_build.setShortcut(_translate("MainWindow", "Ctrl+Alt+B"))
         self.a_build_clean.setText(_translate("MainWindow", "Clean"))
 
-        # 'Settings Menu' Actions
-        self.settings_menu.setTitle(_translate("MainWindow", "Settings"))
-        self.a_open_project_settings.setText(_translate("MainWindow", "Open Project Settings"))
+        # 'Edit Menu' Actions
+        self.edit_menu.setTitle(_translate("MainWindow", "Edit"))
+        self.a_open_project_settings.setText(_translate("MainWindow", "Project Settings"))
         self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
+        self.a_open_values.setText(_translate("MainWindow", "Values"))
+        self.a_open_values.setShortcut(_translate("MainWindow", "Ctrl+Shift+V"))
 
 
 class MainTabWidget(QtWidgets.QTabWidget):

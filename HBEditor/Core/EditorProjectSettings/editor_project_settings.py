@@ -25,8 +25,6 @@ class EditorProjectSettings(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
-        self.file_type = FileType.Project_Settings
-
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
         self.project_settings_schema = Reader.ReadAll(
