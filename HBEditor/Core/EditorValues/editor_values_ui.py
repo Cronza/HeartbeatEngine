@@ -23,18 +23,14 @@ class EditorValuesUI(EditorBaseUI):
         super().__init__(core_ref)
 
         # Build the core editor layout object
-        self.main_layout = QtWidgets.QVBoxLayout(self)
+        self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # Title
-        self.values_title = QtWidgets.QLabel(self)
-        self.values_title.setText("Settings")
-        self.values_title.setObjectName("h1")
-        self.main_layout.addWidget(self.values_title)
-
         # Create the toolbar
         self.main_toolbar = QtWidgets.QToolBar()
+        self.main_toolbar.setOrientation(QtCore.Qt.Vertical)
+        self.main_toolbar.setObjectName("vertical")
         self.main_layout.addWidget(self.main_toolbar)
 
         # Add Button
@@ -53,6 +49,7 @@ class EditorValuesUI(EditorBaseUI):
 
         # Main Table
         self.values_table = QtWidgets.QTableWidget(self)
+        self.values_table.setObjectName('values-table')
         self.values_table.setColumnCount(2)
         self.values_table.verticalHeader().hide()
         self.values_table.setHorizontalHeaderLabels(['Name', 'Value'])
