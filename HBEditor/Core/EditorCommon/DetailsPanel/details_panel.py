@@ -58,6 +58,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         # --- Specialized Settings for the 'G' column ---
