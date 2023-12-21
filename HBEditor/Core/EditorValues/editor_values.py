@@ -32,4 +32,30 @@ class EditorValues(EditorBase):
         Logger.getInstance().Log("Editor initialized")
 
     def Export(self):
-        pass
+        Logger.getInstance().Log(f"Exporting Values")
+
+        # Write the data out
+        Logger.getInstance().Log("Writing data to file...")
+        try:
+            Writer.WriteFile(
+                self.editor_ui.GetData(),
+                self.file_path,
+                f"# {settings.editor_data['EditorSettings']['version_string']}"
+            )
+            self.editor_ui.SIG_USER_SAVE.emit()
+            Logger.getInstance().Log("File Exported!", 2)
+        except Exception as exc:
+            print(exc)
+            Logger.getInstance().Log("Failed to Export!", 4)
+
+    def Import(self):
+        super().Import()
+        Logger.getInstance().Log(f"Importing Values data for: {self.file_path}")
+
+        file_data = Reader.ReadAll(self.file_path)
+
+        # Skip importing if the file has no data to load
+        if file_data:
+            for val_name, val_data in file_data.items():
+                self.editor_ui.AddValue((val_name, val_data))
+

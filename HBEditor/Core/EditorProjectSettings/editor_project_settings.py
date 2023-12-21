@@ -47,7 +47,6 @@ class EditorProjectSettings(EditorBase):
             Writer.WriteFile(
                 self.project_settings,
                 self.file_path,
-                f"# Type: {FileType.Project_Settings.name}\n" +
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             self.editor_ui.SIG_USER_SAVE.emit()
