@@ -1684,6 +1684,38 @@ class set_mute(Action):
 
         return None
 
+
+# -------------- VALUE ACTIONS --------------
+
+
+class set_value(Action):
+    DISPLAY_NAME = "Set Value"
+    ACTION_DATA = {
+        "name": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "value": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        }
+    }
+
+    def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.skippable = False
+
+        # Set the project value
+        settings.SetValue(self.simplified_ad['name'], self.simplified_ad['value'])
+
+        self.Complete()
+        return None
+
+
 # -------------- UTILITY ACTIONS --------------
 
 
