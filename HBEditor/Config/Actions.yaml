@@ -99,3 +99,21 @@ Sound:
       display_name: "Set Mute"
       applicable_editors:
         - Dialogue
+Utils:
+  icon: ":/Icons/AM_Dialogue.png"
+  options:
+    - name: "set_value"
+      display_name: "Set Value"
+      applicable_editors:
+        - Scene
+        - Interface
+        - Dialogue
+    - name: "conditional"
+      display_name: "Conditional"
+      applicable_editors:
+        - Scene
+        - Interface
+    - name: "conditional_dialogue"
+      display_name: "Conditional"
+      applicable_editors:
+        - Dialogue

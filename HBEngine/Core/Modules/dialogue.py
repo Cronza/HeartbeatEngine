@@ -48,8 +48,9 @@ class Dialogue:
     def Shutdown(self):
         """" Shut down the module, cleaning up spawned renderables and objects"""
         settings.scene.active_renderables.Remove(self.root_renderable.key)
-        settings.scene.active_renderables.Remove(self.interface.key)
-        del settings.scene.active_interfaces[self.interface.key]
+        if self.interface:
+            settings.scene.active_renderables.Remove(self.interface.key)
+            del settings.scene.active_interfaces[self.interface.key]
         self.root_renderable = None
         self.interface = None
 

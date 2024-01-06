@@ -116,12 +116,12 @@ def SetValue(value_name: str, value_data: str):
         connect_func(value_name)
 
 
-def GetValue(value_name: str):
+def GetValue(value_name: str) -> str:
     """ Returns the user value that matches the provided name """
     global values
 
     try:
-        return values[value_name]
+        return str(values[value_name])
     except KeyError:
         raise ValueError(f"Project Value Not Found: '{value_name}'")
 

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
-import copy
+import copy, operator
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -133,6 +133,14 @@ class Action:
     def AddToScene(self, new_renderable):
         """ Adds the provided renderable either to the scene's draw stack, or to 'self.parent' as a child """
         if self.parent:
+            # If an object with the matching key already exists, delete it first
+            item_to_delete = None
+            for child in self.parent.children:
+                if child.key == new_renderable.key:
+                    item_to_delete = child
+                    break
+            if item_to_delete:
+                self.parent.children.remove(item_to_delete)
             self.parent.children.append(new_renderable)
         else:
             settings.scene.active_renderables.Add(new_renderable)
@@ -1446,7 +1454,7 @@ class choice(Action):
         for choice_name, choice_data in self.simplified_ad["choices"].items():
             # Define what the button does when clicked
             choice_data["event"] = {
-                "action": "choose_branch",
+                "action": "switch_branch",
                 "branch": choice_data["branch"]
             }
 
@@ -1466,11 +1474,19 @@ class choice(Action):
         return new_renderable
 
 
-class choose_branch(Action):
-    DISPLAY_NAME = "Choose Branch"
-    ACTION_DATA = {} #@TODO: Review
+class switch_branch(Action):
+    DISPLAY_NAME = "Switch Branch"
+    ACTION_DATA = {
+        "branch": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+    }
+
     def Start(self):
-        #self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
@@ -1481,7 +1497,8 @@ class choose_branch(Action):
                 "remove_renderable"
             )
 
-        settings.scene.SwitchDialogueBranch(self.simplified_ad['branch'])
+        # Request that the Dialogue module load the given branch
+        settings.modules[m_dialogue.Dialogue.MODULE_NAME].SwitchDialogueBranch(self.simplified_ad['branch'])
 
         settings.scene.Draw()
         self.Complete()
@@ -1714,6 +1731,194 @@ class set_value(Action):
 
         self.Complete()
         return None
+
+
+class conditional(Action):
+    DISPLAY_NAME = "Conditional"
+    ACTION_DATA = {
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "default": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable", "preview"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
+        },
+        "on_true": {
+            "type": "Event",
+            "value": "None",
+            "default": "None",
+            "options": [
+                "None",
+                "create_background",
+                "create_sprite",
+                "create_interactable",
+                "create_text",
+                "create_sprite",
+                "create_button",
+                "create_text_button",
+                "play_music",
+                "play_sfx"
+            ],
+            "flags": ["editable", "preview"]
+        },
+        "on_false": {
+            "type": "Event",
+            "value": "None",
+            "default": "None",
+            "options": [
+                "None",
+                "create_background",
+                "create_sprite",
+                "create_interactable",
+                "create_text",
+                "create_sprite",
+                "create_button",
+                "create_text_button"
+                "play_music"
+                "play_sfx"
+            ],
+            "flags": ["editable", "preview"]
+        }
+    }
+
+    def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.skippable = False
+
+        if self.simplified_ad['conditions']:
+            operators = {
+                'equal': operator.eq,
+                'not_equal': operator.ne,
+                'less': operator.lt,
+                'less-or-equal': operator.le,
+                'greater': operator.gt,
+                'greater-or-equal': operator.ge,
+            }
+
+            # Loop through each condition and confirm whether it resolves to True or False. Every condition *must*
+            # resolve to True in order for the overall condition to be considered met
+            condition_not_met = False
+            for con_name, con_data in self.simplified_ad['conditions'].items():
+                cur_value_data = settings.GetValue(con_data['value_name'])
+
+                # Equality operators support any data type, while numerical comparisons require that the value and goal
+                # be numerical (Float or Int). If performing a numerical comparison, perform type enforcement
+                if con_data['operator'] != 'equal' and con_data['operator'] != 'not_equal':
+
+                    if not con_data['goal'].isnumeric():
+                        raise ValueError(f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric value: '{con_data['value_name']}'")
+                    elif not cur_value_data.isnumeric():
+                        raise ValueError(f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric goal: '{con_data['goal']}")
+
+                    # Cast the value and goal to float so the comparison applies properly
+                    if not operators[con_data['operator']](float(cur_value_data), float(con_data['goal'])):
+                        condition_not_met = True
+                        break
+
+                if not operators[con_data['operator']](cur_value_data, con_data['goal']):
+                    condition_not_met = True
+                    break
+
+            if condition_not_met:
+                if self.simplified_ad['on_false']:
+                    from HBEngine.Core import action_manager
+                    action_manager.PerformAction(self.simplified_ad['on_false'], self.simplified_ad['on_false']['action'])
+            else:
+                if self.simplified_ad['on_true']:
+                    from HBEngine.Core import action_manager
+                    action_manager.PerformAction(self.simplified_ad['on_true'], self.simplified_ad['on_true']['action'])
+
+        else:
+            raise ValueError(f"'conditional' action Failed - No conditions specified")
+
+        self.Complete()
+        return None
+
+
+class conditional_dialogue(conditional):
+    """
+    A variant of the 'conditional' action meant for usage by the Dialogue module. This variant behaves identically
+    except for a reduced set of on_true / on_false actions
+    """
+    ACTION_DATA = {
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable", "no_exclusion"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "default": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable", "preview"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
+        },
+        "on_true": {
+            "type": "Event",
+            "value": "None",
+            "default": "None",
+            "options": [
+                "None",
+                "switch_branch",
+                "choice"
+            ],
+            "flags": ["editable", "preview"]
+        },
+        "on_false": {
+            "type": "Event",
+            "value": "None",
+            "default": "None",
+            "options": [
+                "None",
+                "switch_branch",
+                "choice"
+            ],
+            "flags": ["editable", "preview"]
+        }
+    }
 
 
 # -------------- UTILITY ACTIONS --------------
