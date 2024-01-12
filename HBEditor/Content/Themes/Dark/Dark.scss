@@ -24,16 +24,17 @@ $col_input_hover: #5C5C61;
 $col_input_pressed: #3F3F42;
 $col_input_inactive: #343436;
 
-/* Used for tabs, menu dropdowns (just the top-most parent), etc*/
-$col_hover: #54585C;
+/* Used for tabs, menu dropdowns, buttons, etc */
+$col_hover: #686d70;
 $col_active: #585D61;
 
-/* Used for tool buttons, push buttons, etc */
-$col_button_hover: #2D5373;
-$col_button_pressed: #213D54;
-
 /* Used for dialogue entries, branch entries, etc */
-$col_entry_active: #1E384D;
+//$col_entry_active: #1E384D;
+
+/* Used for view items */
+$col_view_item_hover: #25455f;
+$col_view_item_active: #1E384D;
+$col_view_item_alt: #252526; // This is a slightly darker version of $col_secondary
 
 /* *** Text *** */
 $size_text: 9pt;
@@ -94,11 +95,11 @@ QToolButton{
     border: $size_border solid $col_primary;
     padding: 2px;
     &:hover {
-        background-color: $col_button_hover;
+        background-color: $col_hover;
     }
 
     &:pressed {
-        background-color: $col_button_pressed;
+        background-color: $col_active;
     }
 
     &:menu-indicator {
@@ -117,11 +118,11 @@ QToolButton{
         border: $size_border solid $col_primary;
 
         &:hover {
-            background-color: $col_button_hover;
+            background-color: $col_hover;
         }
 
         &:pressed {
-            background-color: $col_button_pressed;
+            background-color: $col_active;
         }
 
         &:disabled{
@@ -165,7 +166,7 @@ QTabBar{
         min-height: 20px;
         padding: 2px 4px 2px 4px;
         &:hover {
-            background-color: $col_button_hover;
+            background-color: $col_hover;
         }
         &:selected {
             background-color: $col_active;
@@ -182,12 +183,35 @@ QTabBar{
         }
     }
 }
+QAbstractScrollArea{
+    &selected:item{
+        border: 0px solid transparent;
+    }
+}
 QAbstractItemView {
     background-color: $col_secondary;
+    alternate-background-color: $col_view_item_alt;
     border: $size_border solid $col_secondary;
+    outline: none;
+
     &:item{
+        border: 0px solid transparent;
+        outline: none;
         color: $col_text;
-        selection-color: $col_active;
+        selection-background-color: $col_view_item_active;
+        selection-color: $col_text;
+
+        &:hover{
+            background-color: $col_view_item_hover;
+        }
+        &:selected{
+            background-color: $col_view_item_active;
+
+            &:hover{
+                border: $size_border solid $col_view_item_hover;
+            }
+        }
+
     }
 }
 QHeaderView{
@@ -216,33 +240,16 @@ QHeaderView{
         }
     }
 }
-QListView{
-    &#groups-panel{
-        &:item{
-            border: 0px solid transparent;
-            background-color: $col_secondary;
-            outline: none;
-            color: $col_text;
-            selection-background-color: $col_entry_active;
-            selection-color: $col_text;
-
-            &:selected{
-                background-color: $col_entry_active;
-            }
-        }
-    }
-}
 QTableView{
     border: 0px solid transparent;
-    background-color: $col_secondary;
-    outline: none;
-    color: $col_text;
-    selection-background-color: $col_entry_active;
+    border-top: $size_border solid $col_secondary;
 
-    &:item{
-        &:selected{
-            selection-color: $col_text;
-        }
+    color: $col_text;
+    background-color: $col_secondary;
+
+    &#values-table{ /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
+        border-left: $size_border solid $col_secondary;
+        border-top: 0px solid transparent;
     }
 }
 QTreeView{
@@ -258,6 +265,12 @@ QTreeView{
     &:item {
         padding: 3px;
         background-color: $col_secondary;
+        &:hover{
+            background-color: transparent;
+        }
+        &:selected{
+            background-color: transparent;
+        }
     }
     &:branch {
         &:open {
@@ -290,11 +303,6 @@ QGraphicsView{
     }
 }
 
-QAbstractScrollArea{
-    &selected:item{
-        border: 0px solid transparent;
-    }
-}
 QScrollBar{
     border: 0px solid transparent;
      &:vertical {
@@ -345,7 +353,7 @@ QMenu{
     &:item {
         box-shadow: 0px 0px;
         &:selected {
-            background-color: $col_button_hover;
+            background-color: $col_hover;
         }
     }
 }
@@ -425,7 +433,7 @@ QComboBox {
         border: &size_border solid $col_primary;
         background-color: $col_tertiary;
         color: $col_text;
-        selection-background-color: $col_button_hover;
+        selection-background-color: $col_hover;
     }
 }
 
@@ -445,7 +453,7 @@ QLineEdit{
     background-color: $col_input;
     color: $col_text;
     border: $size_border solid $col_primary;
-    selection-background-color: $col_button_hover;
+    selection-background-color: $col_hover;
 }
 QLineEdit[readOnly="true"]{
     background-color: $col_input_inactive;
@@ -470,7 +478,7 @@ QCheckBox{
             }
         }
         &:unchecked:hover {
-            background-color: $col_button_hover;
+            background-color: $col_hover;
         }
         &:checked {
             image: url(:/Icons/Checkmark.png);
@@ -480,7 +488,7 @@ QCheckBox{
             }
         }
         &:checked:hover {
-            background-color: $col_button_hover
+            background-color: $col_hover
         }
 
     }
@@ -499,11 +507,11 @@ QPushButton{
     border: $size_border solid $col_secondary;
 
     &:hover {
-        background-color: $col_button_hover;
+        background-color: $col_hover;
     }
 
     &:pressed {
-        background-color: $col_button_pressed;
+        background-color: $col_active;
     }
 
     &:disabled{
@@ -534,5 +542,5 @@ QWidget[model-entry="text-error"]{
 
 
 QWidget[toggleable-action="toggled"]{
-    background-color: $col_button_hover;
+    background-color: $col_hover;
 }

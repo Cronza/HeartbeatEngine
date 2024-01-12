@@ -618,7 +618,7 @@ class InputEntryEvent(InputEntryBase):
                         if not child_data["editable"]:
                             continue
 
-                    self.AddItems(child_name, {child_name: child_data}, new_entry)
+                    self.AddItems({child_name: child_data}, new_entry)
 
         if not parent:
             # Inform the owning U.I that we've added a child outside its purview. Only do this once all recursion

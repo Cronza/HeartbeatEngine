@@ -121,16 +121,35 @@ class Scene:
 
         self.Draw()
 
-    def LoadInterface(self, interface_file: str, interface_class: type = Interface) -> Interface:
-        interface = interface_class(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)))
-        self.active_renderables.Add(interface)
-        self.active_interfaces[interface.key] = interface
+    def LoadInterface(self, interface_file: str, interface_class: type = Interface, parent: 'Renderable' = None) -> Interface:
+        if interface_file:
+            interface = interface_class(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)))
 
-        return interface
+            # Add to the scene or to a parent if applicable
+            if parent:
+                parent.children.append(interface)
+            else:
+                self.active_renderables.Add(interface)
+            self.active_interfaces[interface.key] = interface
 
-    def UnloadInterface(self, key_to_remove: str) -> bool:
+            return interface
+
+        return None
+
+    def UnloadInterface(self, key_to_remove: str, parent: 'Renderable') -> bool:
         try:
-            self.active_renderables.Remove(key_to_remove)
+            # Remove from the scene or parent if applicable
+            if parent:
+                child_to_delete = None
+                for child in parent.children:
+                    if child.key == key_to_remove:
+                        child_to_delete = child
+                        break
+
+                if child_to_delete:
+                    parent.children.remove(child_to_delete)
+            else:
+                self.active_renderables.Remove(key_to_remove)
             del self.active_interfaces[key_to_remove]
             return True
         except KeyError as exc:

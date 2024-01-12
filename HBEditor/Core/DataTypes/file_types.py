@@ -18,13 +18,14 @@ from enum import Enum
 class FileType(Enum):
     Folder = 1
     Project_Settings = 2
-    Interface = 3
-    Dialogue = 4
-    Scene = 5
-    Asset_Data = 6
-    Asset_Image = 7
-    Asset_Font = 8
-    Asset_Sound = 9
+    Values = 3
+    Interface = 4
+    Dialogue = 5
+    Scene = 6
+    Asset_Data = 7
+    Asset_Image = 8
+    Asset_Font = 9
+    Asset_Sound = 10
     #Character = 3
 
 

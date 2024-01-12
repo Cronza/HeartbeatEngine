@@ -14,9 +14,9 @@
  */
 /* *** Colors *** */
 /* Used for input fields, for editable fields */
-/* Used for tabs, menu dropdowns (just the top-most parent), etc*/
-/* Used for tool buttons, push buttons, etc */
+/* Used for tabs, menu dropdowns, buttons, etc */
 /* Used for dialogue entries, branch entries, etc */
+/* Used for view items */
 /* *** Text *** */
 /* Misc */
 QMainWindow {
@@ -51,9 +51,9 @@ QToolButton {
   border: 1px solid #3F4245;
   padding: 2px; }
   QToolButton:hover {
-    background-color: #2D5373; }
+    background-color: #686d70; }
   QToolButton:pressed {
-    background-color: #213D54; }
+    background-color: #585D61; }
   QToolButton:menu-indicator {
     image: none; }
   QToolButton:right-arrow {
@@ -65,9 +65,9 @@ QToolButton {
     padding: 1px;
     border: 1px solid #3F4245; }
     QToolButton#non-toolbar:hover {
-      background-color: #2D5373; }
+      background-color: #686d70; }
     QToolButton#non-toolbar:pressed {
-      background-color: #213D54; }
+      background-color: #585D61; }
     QToolButton#non-toolbar:disabled {
       background-color: #343436; }
   QToolButton#choice-add {
@@ -105,7 +105,7 @@ QTabBar:tab {
   padding: 2px 4px 2px 4px;
   border-left: 0px solid transparent; }
   QTabBar:tab:hover {
-    background-color: #2D5373; }
+    background-color: #686d70; }
   QTabBar:tab:selected {
     background-color: #585D61; }
 
@@ -115,12 +115,26 @@ QTabBar:close-button {
   QTabBar:close-button:hover {
     image: url(":/Icons/Close_Hover.png"); }
 
+QAbstractScrollAreaselected:item {
+  border: 0px solid transparent; }
+
 QAbstractItemView {
   background-color: #2A2A2B;
-  border: 1px solid #2A2A2B; }
+  alternate-background-color: #252526;
+  border: 1px solid #2A2A2B;
+  outline: none; }
   QAbstractItemView:item {
+    border: 0px solid transparent;
+    outline: none;
     color: rgba(255, 255, 255, 80%);
-    selection-color: #585D61; }
+    selection-background-color: #1E384D;
+    selection-color: rgba(255, 255, 255, 80%); }
+    QAbstractItemView:item:hover {
+      background-color: #25455f; }
+    QAbstractItemView:item:selected {
+      background-color: #1E384D; }
+      QAbstractItemView:item:selected:hover {
+        border: 1px solid #25455f; }
 
 QHeaderView {
   border: 0px solid transparent; }
@@ -140,24 +154,15 @@ QHeaderView {
     QHeaderView#outliner:section {
       border-top: 0px solid transparent; }
 
-QListView#groups-panel:item {
-  border: 0px solid transparent;
-  background-color: #2A2A2B;
-  outline: none;
-  color: rgba(255, 255, 255, 80%);
-  selection-background-color: #1E384D;
-  selection-color: rgba(255, 255, 255, 80%); }
-  QListView#groups-panel:item:selected {
-    background-color: #1E384D; }
-
 QTableView {
   border: 0px solid transparent;
-  background-color: #2A2A2B;
-  outline: none;
+  border-top: 1px solid #2A2A2B;
   color: rgba(255, 255, 255, 80%);
-  selection-background-color: #1E384D; }
-  QTableView:item:selected {
-    selection-color: rgba(255, 255, 255, 80%); }
+  background-color: #2A2A2B; }
+  QTableView#values-table {
+    /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
+    border-left: 1px solid #2A2A2B;
+    border-top: 0px solid transparent; }
 
 QTreeView {
   border: 0px solid transparent;
@@ -171,6 +176,10 @@ QTreeView {
   QTreeView:item {
     padding: 3px;
     background-color: #2A2A2B; }
+    QTreeView:item:hover {
+      background-color: transparent; }
+    QTreeView:item:selected {
+      background-color: transparent; }
   QTreeView:branch:open {
     border-image: none; }
     QTreeView:branch:open:has-children {
@@ -189,9 +198,6 @@ QGraphicsView {
   QGraphicsView#scene-viewer {
     border-bottom: 0px solid transparent;
     border-right: 0px solid transparent; }
-
-QAbstractScrollAreaselected:item {
-  border: 0px solid transparent; }
 
 QScrollBar {
   border: 0px solid transparent; }
@@ -222,7 +228,7 @@ QMenuBar {
     color: rgba(255, 255, 255, 80%);
     padding: 4px 8px 4px 8px; }
     QMenuBar:item:selected {
-      background-color: #54585C; }
+      background-color: #686d70; }
     QMenuBar:item:pressed {
       background-color: #585D61; }
 
@@ -233,7 +239,7 @@ QMenu {
   QMenu:item {
     box-shadow: 0px 0px; }
     QMenu:item:selected {
-      background-color: #2D5373; }
+      background-color: #686d70; }
 
 QLabel {
   color: rgba(255, 255, 255, 80%);
@@ -297,7 +303,7 @@ QComboBox {
     border: QComboBox QAbstractItemView size_border solid #3F4245;
     background-color: #46494D;
     color: rgba(255, 255, 255, 80%);
-    selection-background-color: #2D5373; }
+    selection-background-color: #686d70; }
 
 QComboBox::down-arrow {
   image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png); }
@@ -315,7 +321,7 @@ QLineEdit {
   background-color: #4E4E52;
   color: rgba(255, 255, 255, 80%);
   border: 1px solid #3F4245;
-  selection-background-color: #2D5373; }
+  selection-background-color: #686d70; }
 
 QLineEdit[readOnly="true"] {
   background-color: #343436;
@@ -335,14 +341,14 @@ QCheckBox:indicator {
     border: 1px solid #3F4245;
     background-color: #343436; }
   QCheckBox:indicator:unchecked:hover {
-    background-color: #2D5373; }
+    background-color: #686d70; }
   QCheckBox:indicator:checked {
     image: url(:/Icons/Checkmark.png); }
     QCheckBox:indicator:checked:disabled {
       image: url(:/Icons/Checkmark_Disabled.png);
       background-color: #343436; }
   QCheckBox:indicator:checked:hover {
-    background-color: #2D5373; }
+    background-color: #686d70; }
 
 QDialog {
   background-color: #3F4245;
@@ -357,9 +363,9 @@ QPushButton {
   padding-right: 12px;
   border: 1px solid #2A2A2B; }
   QPushButton:hover {
-    background-color: #2D5373; }
+    background-color: #686d70; }
   QPushButton:pressed {
-    background-color: #213D54; }
+    background-color: #585D61; }
   QPushButton:disabled {
     background-color: #343436; }
   QPushButton#file:disabled {
@@ -382,4 +388,4 @@ QWidget[model-entry="text-error"] {
   color: rgba(204, 51, 0, 100%); }
 
 QWidget[toggleable-action="toggled"] {
-  background-color: #2D5373; }
+  background-color: #686d70; }

@@ -60,14 +60,11 @@ def SaveProjectSettings(file_path: str = "Config/Game.yaml"):
 
 
 def SetProjectSetting(category: str, setting: str, value: any):
+    """ Sets the corresponding project settings, then save it to disk"""
     global project_settings
     global project_setting_listeners
 
-    # Sets the target project setting, apply the relevant functional change (IE. Editing 'mute' will mute all audio)
-    if category == "Audio":
-        if setting == "mute":
-            if isinstance(value, bool):
-                project_settings[category][setting] = value
+    project_settings[category][setting] = value
 
     # Inform any applicable listeners
     for listener_name, connect_func in project_setting_listeners[category][setting].items():
@@ -77,10 +74,56 @@ def SetProjectSetting(category: str, setting: str, value: any):
     SaveProjectSettings()
 
 
-def GetProjectSetting(category, key):
-    """ Returns the value from the global setting defined in 'Game.yaml' that matches the provided category and key """
+def GetProjectSetting(category: str, key: str):
+    """ Returns the project setting value that matches the provided category and key """
     global project_settings
-    return project_settings[category][key]
+
+    try:
+        return project_settings[category][key]
+    except KeyError:
+        raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
+
+
+def LoadValues(partial_file_path: str = "Config/Values.yaml"):
+    """ Reads in the project values file path. Defaults to 'Config/Values.yaml' if no path is provided """
+    global values
+
+    file_path = ConvertPartialToAbsolutePath(partial_file_path)
+    values = Reader.ReadAll(file_path)
+
+
+def SaveValues(file_path: str = "Config/Values.yaml"):
+    """ Saves the project values to the provided file path. Defaults to 'Config/Values.yaml' if no path is provided """
+    global project_settings
+
+    file_path = ConvertPartialToAbsolutePath(file_path)
+    Writer.WriteFile(project_settings, file_path)
+
+
+def SetValue(value_name: str, value_data: str):
+    """
+    Set the corresponding project value
+
+    Note: This change will not persist between runs of the game unless the user saves the game
+    """
+    global values
+    global value_listeners
+
+    values[value_name] = value_data
+
+    # Inform any applicable listeners
+    for listener_name, connect_func in value_listeners[value_name].items():
+        connect_func(value_name)
+
+
+def GetValue(value_name: str) -> str:
+    """ Returns the user value that matches the provided name """
+    global values
+
+    try:
+        return str(values[value_name])
+    except KeyError:
+        raise ValueError(f"Project Value Not Found: '{value_name}'")
 
 
 def ConvertPartialToAbsolutePath(partial_path):
@@ -117,10 +160,11 @@ scene = None
 input_owner = None
 paused = False
 
-# --- Project settings ---
+
 root_dir = os.getcwd().replace("\\", "/")
 project_root = ""
-project_settings = None
+project_settings = {}
+values = {}
 
 # Window
 resolution = None
@@ -129,12 +173,9 @@ resolution_multiplier = 1
 active_resolution = None
 
 # When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
-# to change based on the mute setting), we need a way of tracking who needs to be informed. This dict
-# represents that tracking, by using a structure like the following:
-#
-# {"<Category>": {"<setting>": {"<object_ref>": "<func>"}}}
-#
-# "Func" in this case is the function to invoke when the connected setting is changed
-project_setting_listeners = {}
+# to change based on the mute setting), we need a way of tracking who needs to be informed. These dicts
+# represents that tracking
+project_setting_listeners = {}  # Structure: {"<category>": {"<setting>": {"<object_ref>": "<connect_func>"}}}
+value_listeners = {}  # Structure: {"<value_name">: {"<object_ref>": "<connect_func>"}}
 
 

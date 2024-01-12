@@ -26,7 +26,7 @@ class DetailsPanel(QtWidgets.QWidget):
     """
     SIG_USER_UPDATE = QtCore.pyqtSignal()
 
-    def __init__(self, excluded_properties: list = None, use_globals_column: bool = True):
+    def __init__(self, excluded_properties: list = None):
         super().__init__()
 
         self.active_entry = None
@@ -58,20 +58,18 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
+        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         # --- Specialized Settings for the 'G' column ---
-        if use_globals_column:
-            # 1. Allow columns to be significantly smaller than normal
-            self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
+        # 1. Allow columns to be significantly smaller than normal
+        self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
-            # 2. Force the last column to be barely larger than a standard checkbox
-            self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
+        # 2. Force the last column to be barely larger than a standard checkbox
+        self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
 
-            # 3. Align the column header text to match the alignment of the checkbox
-            self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
-        else:
-            self.details_tree.setColumnHidden(2, True)
+        # 3. Align the column header text to match the alignment of the checkbox
+        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)

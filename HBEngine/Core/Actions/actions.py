@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
-import copy
+import copy, operator
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -107,6 +107,10 @@ look like the following:
 
 
 class Action:
+    #CREATES_SPRITE = False
+    #CREATES_TEXT = False
+    #CREATES_
+
     def __init__(self, simplified_ad: dict, parent: Renderable = None, no_draw: bool = False):
         self.parent: Renderable = parent  # Who should be the parent of new renderables created by this action. If blank, defaults to the scene
         self.simplified_ad = simplified_ad  # User-provided action data using the simplified structure
@@ -133,6 +137,14 @@ class Action:
     def AddToScene(self, new_renderable):
         """ Adds the provided renderable either to the scene's draw stack, or to 'self.parent' as a child """
         if self.parent:
+            # If an object with the matching key already exists, delete it first
+            item_to_delete = None
+            for child in self.parent.children:
+                if child.key == new_renderable.key:
+                    item_to_delete = child
+                    break
+            if item_to_delete:
+                self.parent.children.remove(item_to_delete)
             self.parent.children.append(new_renderable)
         else:
             settings.scene.active_renderables.Add(new_renderable)
@@ -220,6 +232,34 @@ class remove_renderable(Action):
                     "default": 500,
                     "flags": ["editable", "preview"],
                 },
+            },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
             },
         }
     }
@@ -333,6 +373,34 @@ class create_sprite(Action):
                     "flags": ["editable", "preview"],
                 },
             },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -398,6 +466,34 @@ class create_background(Action):
             "value": False,
             "default": False,
             "flags": ["editable"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -482,6 +578,34 @@ class create_interactable(Action):
                             "flags": ["editable"],
                         }
                     },
+                }
+            },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
                 }
             },
         }
@@ -608,7 +732,36 @@ class create_text(Action):
                     "flags": ["editable", "preview"],
                 },
             },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
+
     }
 
     def Start(self):
@@ -791,6 +944,34 @@ class create_button(Action):
                     },
                 }
             },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -909,6 +1090,34 @@ class create_text_button(Action):
                     },
                 }
             }
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -1029,6 +1238,34 @@ class create_checkbox(Action):
                     },
                 }
             },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -1057,8 +1294,37 @@ class start_dialogue(Action):
             "value": "",
             "default": "",
             "flags": ["editable", "preview"]
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
+
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         from HBEngine import hb_engine
@@ -1247,6 +1513,35 @@ class dialogue(Action):
                     "flags": ["global_active"],
                 }
             },
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "default": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -1424,6 +1719,34 @@ class choice(Action):
                     }
                 }
             }
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -1446,7 +1769,7 @@ class choice(Action):
         for choice_name, choice_data in self.simplified_ad["choices"].items():
             # Define what the button does when clicked
             choice_data["event"] = {
-                "action": "choose_branch",
+                "action": "switch_branch",
                 "branch": choice_data["branch"]
             }
 
@@ -1466,11 +1789,47 @@ class choice(Action):
         return new_renderable
 
 
-class choose_branch(Action):
-    DISPLAY_NAME = "Choose Branch"
-    ACTION_DATA = {} #@TODO: Review
+class switch_branch(Action):
+    DISPLAY_NAME = "Switch Branch"
+    ACTION_DATA = {
+        "branch": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
+        }
+    }
+
     def Start(self):
-        #self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         # If a choice button lead to this, delete that whole choice container, otherwise it would persist
         # into the new branch
@@ -1481,7 +1840,8 @@ class choose_branch(Action):
                 "remove_renderable"
             )
 
-        settings.scene.SwitchDialogueBranch(self.simplified_ad['branch'])
+        # Request that the Dialogue module load the given branch
+        settings.modules[m_dialogue.Dialogue.MODULE_NAME].SwitchDialogueBranch(self.simplified_ad['branch'])
 
         settings.scene.Draw()
         self.Complete()
@@ -1518,6 +1878,34 @@ class play_sfx(SoundAction):
             "value": False,
             "default": False,
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -1554,6 +1942,34 @@ class stop_sfx(Action):
             "value": "SFX",
             "default": "SFX",
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1592,6 +2008,34 @@ class play_music(SoundAction):
             "value": False,
             "default": False,
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1629,6 +2073,34 @@ class stop_music(Action):
             "value": "",
             "default": "",
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1657,11 +2129,39 @@ class set_mute(Action):
             "value": True,
             "default": True,
             "flags": ["editable"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
     def Start(self):
-        #self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
         # Update the project setting
@@ -1684,6 +2184,66 @@ class set_mute(Action):
 
         return None
 
+
+# -------------- VALUE ACTIONS --------------
+
+
+class set_value(Action):
+    DISPLAY_NAME = "Set Value"
+    ACTION_DATA = {
+        "name": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "value": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.skippable = False
+
+        # Set the project value
+        settings.SetValue(self.simplified_ad['name'], self.simplified_ad['value'])
+
+        self.Complete()
+        return None
+
+
 # -------------- UTILITY ACTIONS --------------
 
 
@@ -1696,6 +2256,34 @@ class load_scene(Action):
             "default": "",
             "value": "",
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1709,7 +2297,42 @@ class load_scene(Action):
 class wait(Action):
     """ Waits for a set amount of time before completing """
     DISPLAY_NAME = "Wait"
-    ACTION_DATA = {} #@TODO: Review
+    ACTION_DATA = {
+        "seconds": {
+            "type": "Int",
+            "value": 300,
+            "default": 300,
+            "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
@@ -1772,6 +2395,34 @@ class scene_fade_in(Action):
             "value": 300,
             "default": 300,
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1838,6 +2489,34 @@ class scene_fade_out(Action):
             "value": 300,
             "default": 300,
             "flags": ["editable", "preview"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1887,6 +2566,49 @@ class scene_fade_out(Action):
 
 # -------------- INTERFACE ACTIONS --------------
 
+class load_interface(Action):
+    """ Loads the provided interface. Returns 'Interface' """
+    DISPLAY_NAME = "Load Interface"
+    ACTION_DATA = {
+        "interface_file": {
+            "type": "Asset_Interface",
+            "value": "None",
+            "default": "None",
+            "flags": ["editable", "preview"],
+        }
+    }
+
+    def Start(self):
+        new_interface = settings.scene.LoadInterface(
+            interface_file=self.simplified_ad["interface_file"],
+            parent=self.parent
+        )
+        settings.scene.Draw()
+        self.Complete()
+        return new_interface
+
+
+class unload_interface(Action):
+    """ Unloads the provided interface. Returns None """
+    DISPLAY_NAME = "Unload Interface"
+    ACTION_DATA = {
+        "key": {
+            "type": "String",
+            "value": "",
+            "default": "",
+            "flags": ["editable", "preview"]
+        }
+    }
+
+    def Start(self):
+        new_interface = settings.scene.UnloadInterface(
+            key_to_remove=self.simplified_ad["key"],
+            parent=self.parent
+        )
+        settings.scene.Draw()
+        self.Complete()
+        return new_interface
+
 
 class pause(Action):
     """ Requests that the active scene pause the game and show the pause interface. Returns 'None' """
@@ -1927,6 +2649,34 @@ class switch_page(Action):
             "value": "",
             "default": "",
             "flags": ["editable"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1948,6 +2698,34 @@ class remove_page(Action):
             "value": "",
             "default": "",
             "flags": ["editable"],
+        },
+        "conditions": {
+            "type": "Array",
+            "flags": ["editable"],
+            "template": {
+                "condition": {
+                    "type": "Array_Element",
+                    "flags": ["editable"],
+                    "children": {
+                        "value_name": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        },
+                        "operator": {
+                            "type": "Dropdown",
+                            "value": "equal",
+                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
+                            "flags": ["editable"],
+                        },
+                        "goal": {
+                            "type": "String",
+                            "value": "",
+                            "flags": ["editable"],
+                        }
+                    }
+                }
+            }
         }
     }
 
