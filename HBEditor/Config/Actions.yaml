@@ -46,11 +46,6 @@ Interactables:
 Dialogue:
   icon: ":/Icons/AM_Dialogue.png"
   options:
-    - name: "start_dialogue"
-      display_name: "Start Dialogue"
-      applicable_editors:
-        - Scene
-        - Interface
     - name: "dialogue"
       display_name: "Dialogue"
       applicable_editors:
@@ -99,14 +94,23 @@ Sound:
       display_name: "Set Mute"
       applicable_editors:
         - Dialogue
+Interface:
+  icon: ":/Icons/Interface.png"
+  options:
+    - name: "load_interface"
+      display_name: "Load Interface"
+      applicable_editors:
+        - Dialogue
+    - name: "unload_interface"
+      display_name: "Unload Interface"
+      applicable_editors:
+        - Dialogue
 Utils:
   icon: ":/Icons/AM_Dialogue.png"
   options:
     - name: "set_value"
       display_name: "Set Value"
       applicable_editors:
-        - Scene
-        - Interface
         - Dialogue
     - name: "conditional"
       display_name: "Conditional"

@@ -49,7 +49,7 @@ class EditorInterfaceUI(EditorBaseUI):
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.interface_settings = DetailsPanel(use_globals_column=False)
+        self.interface_settings = DetailsPanel()
         self.interface_settings_src_obj = InterfaceSettings()
         self.interface_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.interface_settings.Populate(self.interface_settings_src_obj)

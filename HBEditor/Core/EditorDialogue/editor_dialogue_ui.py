@@ -39,7 +39,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.dialogue_settings = DetailsPanel(use_globals_column=False)
+        self.dialogue_settings = DetailsPanel()
         self.dialogue_settings_src_obj = DialogueSettings()
         self.dialogue_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.dialogue_settings.Populate(self.dialogue_settings_src_obj)

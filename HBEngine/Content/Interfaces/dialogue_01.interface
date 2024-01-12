@@ -23,6 +23,7 @@ pages:
             - 0.8
           center_align: true
           z_order: 10000
+          conditions: { }
 
       # Main Menu Button
       - create_text_button:
@@ -50,6 +51,8 @@ pages:
               action:
                 action: load_scene
                 scene_file: ''
+                conditions: { }
+          conditions: { }
 
       # Quick Save Button
       - create_text_button:
@@ -73,6 +76,7 @@ pages:
             - 0.2
             - 0.2
           events: { }
+          conditions: { }
 
       # Quick Load Button
       - create_text_button:
@@ -96,3 +100,4 @@ pages:
             - 0.2
             - 0.2
           events: { }
+          conditions: { }

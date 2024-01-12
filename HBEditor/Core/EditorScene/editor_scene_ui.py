@@ -43,7 +43,7 @@ class EditorSceneUI(EditorBaseUI):
         self.details = DetailsPanel(self.core.excluded_properties)
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.scene_settings = DetailsPanel(use_globals_column=False)
+        self.scene_settings = DetailsPanel()
         self.scene_settings_src_obj = SceneSettings()
         self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.scene_settings.Populate(self.scene_settings_src_obj)
@@ -106,11 +106,18 @@ class SceneSettings(QtCore.QObject, SourceEntry):
                             "default": "None",
                             "options": [
                                 "None",
-                                "scene_fade_in",
+                                "create_background",
+                                "create_sprite",
+                                "create_interactable",
+                                "create_text",
+                                "create_sprite",
+                                "create_button",
+                                "create_text_button",
                                 "play_sfx",
                                 "play_music",
-                                "set_mute",
                                 "start_dialogue"
+                                "scene_fade_in",
+                                "set_mute"
                             ],
                             "flags": ["editable"]
                         }

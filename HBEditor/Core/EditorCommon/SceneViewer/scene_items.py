@@ -116,12 +116,13 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                 new_item.Refresh()
 
             if "children" in param_data:
-                self.GenerateChildren(
-                    parent=new_item,
-                    action_data=param_data["children"],
-                    pixmap=pixmap,
-                    text=text
-                )
+                if param_data['children']:
+                    self.GenerateChildren(
+                        parent=new_item,
+                        action_data=param_data["children"],
+                        pixmap=pixmap,
+                        text=text
+                    )
 
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve

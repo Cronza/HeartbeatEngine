@@ -12,6 +12,7 @@ pages:
           key: "!&INTERFACE_MAIN_MENU_Background&!"
           sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
           z_order: 100000
+          conditions: { }
 
       # Title
       - create_text:
@@ -29,6 +30,7 @@ pages:
           connect_project_setting:
             category: Game
             setting: title
+          conditions: { }
 
       # Play Button
       - create_text_button:
@@ -56,16 +58,20 @@ pages:
                 volume: 1.0
                 loop: false
                 post_wait: no_wait
+                conditions: { }
             event_1:
               action:
                 action: scene_fade_out
                 color: black
                 speed: 200
                 post_wait: wait_until_complete
+                conditions: { }
             event_2:
               action:
                 action: load_scene
                 scene_file: ''
+                conditions: { }
+          conditions: { }
 
       # Options Button
       - create_text_button:
@@ -90,6 +96,8 @@ pages:
                 action: switch_page
                 owner: "!&INTERFACE_MAIN_MENU&!"
                 page: page_Options
+                conditions: { }
+          conditions: { }
 
       # Load Button
       - create_text_button:
@@ -114,6 +122,8 @@ pages:
                 action: switch_page
                 owner: "!&INTERFACE_MAIN_MENU&!"
                 page: page_Load
+                conditions: { }
+          conditions: { }
 
       # About Button
       - create_text_button:
@@ -138,6 +148,8 @@ pages:
                 action: switch_page
                 owner: "!&INTERFACE_MAIN_MENU&!"
                 page: page_About
+                conditions: { }
+          conditions: { }
 
       # Quit Button
       - create_text_button:
@@ -160,6 +172,7 @@ pages:
             event_0:
               action:
                 action: quit_game
+          conditions: { }
 
   page_Load:
     description: ''
@@ -176,6 +189,7 @@ pages:
           wrap_bounds:
             - 0.8
             - 0.4
+          conditions: { }
 
   page_About:
     description: ''
@@ -185,6 +199,7 @@ pages:
           key: "!&INTERFACE_MAIN_MENU_pageAbout_Background&!"
           sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
           z_order: 100000
+          conditions: { }
 
       # Page Title
       - create_text:
@@ -199,6 +214,7 @@ pages:
           wrap_bounds:
             - 0.8
             - 0.4
+          conditions: { }
 
       # Back Button
       - create_text_button:
@@ -222,3 +238,5 @@ pages:
               action:
                 action: remove_page
                 owner: "!&INTERFACE_MAIN_MENU&!"
+                conditions: { }
+          conditions: { }

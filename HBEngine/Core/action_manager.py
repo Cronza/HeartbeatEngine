@@ -12,9 +12,10 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import inspect
+import inspect, operator
 from typing import Type
 from HBEngine.Core.Actions import actions, transitions
+from HBEngine.Core import settings
 
 
 active_actions = {}
@@ -57,6 +58,16 @@ def PerformAction(action_data: dict, action_name: str, parent: object = None, co
     Given an action_data YAML block and an action name, create and run the associated action. Return anything
     that the action opts to return
     """
+    # Check conditions prior to loading the action
+    if "conditions" in action_data:
+        if action_data["conditions"]:
+            print(action_data["conditions"])
+            if not CheckCondition(action_data["conditions"]):
+                # Condition not met - Do not execute this action
+                return None
+
+
+
     # Fetch the action function corresponding to the next action index
     action = GetAction(action_name)
     new_action = action(
@@ -95,7 +106,7 @@ def GetAction(action_name: str) -> callable:
     return None
 
 
-def GetTransition(transition_data) -> callable:
+def GetTransition(transition_data: dict) -> callable:
     """
     Returns the object associated with the provided transition text
     """
@@ -122,10 +133,51 @@ def GetTransition(transition_data) -> callable:
         raise ValueError("No transition type specified - Unable to process transition")
 
 
-def CreateTransition(transition_data, renderable):
+def CreateTransition(transition_data: dict, renderable):
     transition = GetTransition(transition_data)
 
     if 'speed' in transition_data:
         return transition(renderable, transition_data['speed'])
     else:
         return transition(renderable)
+
+
+def CheckCondition(conditional_data: dict) -> bool:
+    """ Given a dict of conditions, check each one. If all conditions are met, return True. Otherwise return False """
+    operators = {
+        'equal': operator.eq,
+        'not_equal': operator.ne,
+        'less': operator.lt,
+        'less-or-equal': operator.le,
+        'greater': operator.gt,
+        'greater-or-equal': operator.ge,
+    }
+
+    # Loop through each condition and confirm whether it resolves to True or False. Every condition *must*
+    # resolve to True in order for the overall condition to be considered met
+    condition_met = True
+    for con_name, con_data in conditional_data.items():
+        cur_value_data = settings.GetValue(con_data['value_name'])
+
+        # Equality operators support any data type, while numerical comparisons require that the value and goal
+        # be numerical (Float or Int). If performing a numerical comparison, perform type enforcement
+        if con_data['operator'] != 'equal' and con_data['operator'] != 'not_equal':
+
+            if not con_data['goal'].isnumeric():
+                raise ValueError(
+                    f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric value: '{con_data['value_name']}'")
+            elif not cur_value_data.isnumeric():
+                raise ValueError(
+                    f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric goal: '{con_data['goal']}")
+
+            # Cast the value and goal to float so the comparison applies properly
+            if not operators[con_data['operator']](float(cur_value_data), float(con_data['goal'])):
+                condition_met = False
+                break
+
+        if not operators[con_data['operator']](cur_value_data, con_data['goal']):
+            condition_met = False
+            break
+
+    return condition_met
+
