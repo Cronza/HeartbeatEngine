@@ -107,7 +107,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 if "editable" not in data["flags"]:
                     continue
 
-                # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait'). Don't
+                # Some editors exclude certain requirements (IE. Scenes don't make use of 'post_wait'). Don't
                 # generate entries for any excluded property. Make an exception if the 'no_exclusion' flag is used
                 elif excluded_properties:
                     if name in excluded_properties:

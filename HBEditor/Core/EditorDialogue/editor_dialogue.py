@@ -68,11 +68,10 @@ class EditorDialogue(EditorBase):
         # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.data.clear()
 
-        dialogue_table = self.editor_ui.dialogue_sequence.dialogue_table
-        num_of_entries = dialogue_table.rowCount()
-        for entry_index in range(num_of_entries):
-            dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
-            cur_branch.data.append({dialogue_entry.GetName(): dialogue_entry.Get()})
+        sequence_list = self.editor_ui.dialogue_sequence.sequence_list
+        for entry_index in range(sequence_list.count()):
+            sequence_entry = sequence_list.itemWidget(sequence_list.item(entry_index))
+            cur_branch.data.append({sequence_entry.GetName(): sequence_entry.Get()})
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in the loaded file, including all branches, and returns them as a dict """
@@ -217,7 +216,7 @@ class EditorDialogue(EditorBase):
                     "type": "Dropdown",
                     "value": action_data['post_wait'],
                     "options": ["wait_for_input", "wait_until_complete", "no_wait"],
-                    "flags": ["editable", "preview"]
+                    "flags": ["editable"]
                 }
 
                 converted_entries.append({action_name: base_ad_clone})

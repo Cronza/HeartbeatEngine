@@ -79,52 +79,32 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             self.CopyEntry
         )
 
-        # Move Entry Up Button
-        self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Up.png")),
-            "Move Entry Up",
-            self.MoveEntryUp
-        )
-
-        # Move Entry Down Button
-        self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Down.png")),
-            "Move Entry Up",
-            self.MoveEntryDown
-        )
-
-        # Build the Action Sequence
-        self.dialogue_table = QtWidgets.QTableWidget(self)
-        self.dialogue_table.verticalHeader().setObjectName("vertical")
-        self.dialogue_table.setColumnCount(1)
-        self.dialogue_table.setShowGrid(False)
-        self.dialogue_table.horizontalHeader().hide()
-        self.dialogue_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.dialogue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
-        self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
-        self.dialogue_table.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
-        self.dialogue_table.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
+        # Build the Sequence
+        self.sequence_list = QtWidgets.QListWidget(self)
+        self.sequence_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
+        self.sequence_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
+        self.sequence_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
+        self.sequence_list.setResizeMode(QtWidgets.QListWidget.Adjust)
+        self.sequence_list.setDragEnabled(True)
+        self.sequence_list.setDragDropMode(QtWidgets.QTableWidget.InternalMove)
+        self.sequence_list.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.sequence_list.setAcceptDrops(True)
+        self.sequence_list.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
 
         # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly more tragic way
-        self.dialogue_table.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.sequence_list.setFocusPolicy(QtCore.Qt.NoFocus)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
         self.main_layout.addWidget(self.main_toolbar)
-        self.main_layout.addWidget(self.dialogue_table)
-
-    def RefreshCurrentRowSize(self):
-        """ Resize the currently selected row based on the size of it's contents """
-        self.dialogue_table.resizeRowToContents(self.dialogue_table.currentIndex().row())
+        self.main_layout.addWidget(self.sequence_list)
         
     def Clear(self):
-        """ Deletes all data in the dialogue table """
-        for row in range(self.dialogue_table.rowCount(), 0, -1):
-            self.dialogue_table.removeRow(row - 1)
+        """ Deletes all data in the sequence """
+        self.sequence_list.clear()
 
-    def AddEntry(self, action_name: str, action_data: dict = None, specific_row: int = None, skip_select: bool = False):
+    def AddEntry(self, action_name: str, action_data: dict = None, index: int = None, skip_select: bool = False) -> 'DialogueEntry':
         """
         Given an action name, create a new entry in the dialogue sequence populating with the ACTION_DATA for that
         action. If 'action_data' is provided, populate the entry using it instead
@@ -134,44 +114,32 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             action_data = settings.GetActionData(action_name)
             self.SIG_USER_UPDATE.emit()
 
-        # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
-        new_entry_row = self.dialogue_table.rowCount()
-        if specific_row is not None:
-            new_entry_row = specific_row
-            self.dialogue_table.insertRow(new_entry_row)
+        new_item = QtWidgets.QListWidgetItem()
+        if index:
+            self.sequence_list.insertItem(index, new_item)
         else:
-            self.dialogue_table.insertRow(new_entry_row)
+            self.sequence_list.addItem(new_item)
 
-        # Create a new dialogue entry object, and add it to the sequence widget.
-        new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry, self.RefreshCurrentRowSize)
-
+        new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry)
         # Add unique dialogue-only parameters that wouldn't be found in the 'ACTION_DATA'
         if 'post_wait' not in new_entry.action_data:
             new_entry.action_data['post_wait'] = {
                 "type": "Dropdown",
                 "value": 'wait_for_input',
                 "options": ["wait_for_input", "wait_until_complete", "no_wait"],
-                "flags": ["editable", "preview"]
+                "flags": ["editable"]
             }
-
-        # Assign the entry widget to the row
-        self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
-
-        # Selecting the new row will cause the details panel to refresh, so allow opting out in case of batch creation
-        if not skip_select:
-            self.dialogue_table.selectRow(new_entry_row)
-
-        # Resize the row to fit any contents it has
-        self.dialogue_table.resizeRowToContents(new_entry_row)
+        new_item.setSizeHint(new_entry.sizeHint())
+        self.sequence_list.setItemWidget(new_item, new_entry)
 
         return new_entry
 
     def RemoveEntry(self):
         """ If an entry is selected, delete it from the table """
-        selection = self.GetSelectedRow()
+        selected_indexes = self.sequence_list.selectedIndexes()
 
-        if selection != -1:
-            self.dialogue_table.removeRow(self.GetSelectedRow())
+        if selected_indexes:
+            self.sequence_list.takeItem(selected_indexes[0].row())
             self.SIG_USER_UPDATE.emit()
 
     def CopyEntry(self):
@@ -179,98 +147,28 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         selection = self.GetSelectedEntry()
 
         if selection:
-            self.AddEntry(selection.action_name, selection.action_data)
-            self.SIG_USER_UPDATE.emit()
-
-    def MoveEntryUp(self):
-        """ If an entry is selected, move it up one row """
-        row_count = self.dialogue_table.rowCount()
-        if row_count:
-            selection_index = self.GetSelectedRow()
-
-            # Only allow moving up if we're not already at the top of the sequence
-            if selection_index < 0:
-                Logger.getInstance().Log("No entry selected", 3)
-            elif selection_index == 0:
-                Logger.getInstance().Log("Can't move entry up as we're at the top of the sequence", 3)
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.dialogue_table.cellWidget(selection_index, 0)
-
-                # Delete the origin row
-                self.dialogue_table.removeRow(selection_index)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection_index - 1
-                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.action_data = taken_entry.action_data
-                self.ed_core.UpdateActiveEntry()
-
-            self.SIG_USER_UPDATE.emit()
-
-    def MoveEntryDown(self):
-        """ If an entry is selected, move it down one row """
-        row_count = self.dialogue_table.rowCount()
-        if self.dialogue_table.rowCount():
-            selection_index = self.GetSelectedRow()
-
-            # Only allow moving down if we're not already at the bottom of the sequence
-            if selection_index < 0:
-                Logger.getInstance().Log("No entry selected", 3)
-            elif selection_index + 1 >= self.dialogue_table.rowCount():
-                Logger.getInstance().Log("Can't move entry down as we're at the bottom of the sequence", 3)
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.dialogue_table.cellWidget(selection_index, 0)
-
-                # Delete the origin row
-                self.dialogue_table.removeRow(selection_index)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection_index + 1
-                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.action_data = taken_entry.action_data
-                self.ed_core.UpdateActiveEntry()
-
+            # Get the selected index so we can place the clone next to it
+            selected_index = self.sequence_list.selectedIndexes()[0].row()
+            self.AddEntry(selection.action_name, selection.action_data, selected_index)
             self.SIG_USER_UPDATE.emit()
 
     def GetSelectedEntry(self):
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """
-        selected_entry = self.dialogue_table.selectedIndexes()
+        selected_items = self.sequence_list.selectedItems()
 
-        if selected_entry:
-            selected_row = selected_entry[0].row()
-            return self.dialogue_table.cellWidget(selected_row, 0)
+        if selected_items:
+            # Only single selection is allowed, so only first index will be valid
+            return self.sequence_list.itemWidget(selected_items[0])
         else:
             return None
 
-    def GetSelectedRow(self) -> int:
-        """ Returns the currently selected row. If there isn't one, returns -1 """
-        selected_row = self.dialogue_table.selectedIndexes()
-
-        if selected_row:
-            return selected_row[0].row()
-        else:
-            return -1
-
 
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
-    def __init__(self, action_name, action_data, select_func, size_refresh_func):
+    def __init__(self, action_name, action_data, select_func):
         super().__init__()
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
-
-        # Store a func object that is used when the row containing this object should be resized based on the
-        # subtext data in this object
-        #@TODO: Replace with a Qt signal / slot
-        self.size_refresh_func = size_refresh_func
 
         # Store action details
         self.action_name = action_name
@@ -326,6 +224,5 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         return cur_string.strip(', ')
 
     def Refresh(self, change_tree: list = None):
-        self.size_refresh_func()
         self.UpdateSubtext()
 
