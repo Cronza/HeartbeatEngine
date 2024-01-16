@@ -14,7 +14,7 @@
 """
 import subprocess
 import os
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox
 from HBEditor.Core.Logger.logger import Logger
 
 

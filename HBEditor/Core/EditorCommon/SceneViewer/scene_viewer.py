@@ -14,7 +14,7 @@
 """
 import copy
 from typing import List
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.SceneViewer.scene_view import SceneView, Scene
 from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
@@ -76,7 +76,7 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Toolbar
         self.action_toolbar = QtWidgets.QToolBar()
-        self.action_toolbar.setOrientation(QtCore.Qt.Vertical)
+        self.action_toolbar.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.action_toolbar.setObjectName("horizontal")
         self.sub_layout.addWidget(self.action_toolbar)
 
@@ -84,26 +84,26 @@ class SceneViewer(QtWidgets.QWidget):
         self.add_entry_button = QtWidgets.QToolButton(self.action_toolbar)
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Plus.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+            QtGui.QPixmap("EditorContent:Icons/Plus.png"),
+            QtGui.QIcon.Mode.Normal,
+            QtGui.QIcon.State.Off
         )
         self.add_entry_button.setIcon(icon)
         self.action_menu = ActionMenu(self.AddRenderable, file_type)
         self.add_entry_button.setMenu(self.action_menu)
-        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.ToolButtonPopupMode.InstantPopup)
         self.action_toolbar.addWidget(self.add_entry_button)
 
         # Toolbar - Remove Button
         self.action_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Entry",
             self.RemoveSelectedItems
         )
 
         # Toolbar - Copy Button
         self.action_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Copy.png")),
             "Copy Entry",
             self.CopyRenderable
         )
@@ -112,7 +112,7 @@ class SceneViewer(QtWidgets.QWidget):
         # Toolbar - Lock button
         self.lock_button = ToggleableAction(
             "Lock Entry",
-            QtGui.QIcon(":/Icons/Lock.png")
+            QtGui.QIcon("EditorContent:Icons/Lock.png")
         )
         self.lock_button.clicked.connect(self.LockRenderable)
         self.action_toolbar.addWidget(self.lock_button)
@@ -220,7 +220,6 @@ class SceneViewer(QtWidgets.QWidget):
                     break
 
         self.lock_button.Toggle(lock)
-        print("Selection changed")
         self.SIG_SELECTION_CHANGED.emit(selected_items)
 
     def Clear(self):

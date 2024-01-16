@@ -156,10 +156,11 @@ def ConvertPartialToAbsolutePath(partial_path):
 
 # --- Core engine references managed by 'hb_engine.py' ---
 modules = {}
+clock = None
+window = None
 scene = None
 input_owner = None
 paused = False
-
 
 root_dir = os.getcwd().replace("\\", "/")
 project_root = ""

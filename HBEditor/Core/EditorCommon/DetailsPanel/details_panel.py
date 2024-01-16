@@ -53,13 +53,13 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
-        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
-        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
-        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
-        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
+        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
@@ -69,7 +69,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
 
         # 3. Align the column header text to match the alignment of the checkbox
-        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
+        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)

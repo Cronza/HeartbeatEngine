@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.Outliner.outliner import Outliner
@@ -30,13 +30,14 @@ class HBEditorUI:
         self.setupUi(self.main_window)
 
     def setupUi(self, MainWindow):
-        self.LoadFonts(settings.editor_data['EditorSettings']["fonts"])
-        self.LoadTheme(settings.editor_data['EditorSettings']["theme"])
+        self.LoadFonts(settings.editor_data['EditorSettings']["active_fonts"])
+        self.LoadTheme(settings.editor_data['EditorSettings']["active_theme"])
 
         # Configure the Window
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 720)
-        MainWindow.setWindowIcon(QtGui.QIcon(":/Icons/Engine_Logo.png"))
+
+        MainWindow.setWindowIcon(QtGui.QIcon("EditorContent:Icons/Engine_Logo.png"))
 
         # Build the core widget / layout
         self.central_widget = QtWidgets.QWidget(MainWindow)
@@ -52,7 +53,7 @@ class HBEditorUI:
         # Build the main resize splitter, allowing the user to resize each row
         self.main_resize_container = QtWidgets.QSplitter(self.central_widget)
         self.main_resize_container.setContentsMargins(0, 0, 0, 0)
-        self.main_resize_container.setOrientation(Qt.Vertical)
+        self.main_resize_container.setOrientation(Qt.Orientation.Vertical)
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
 
         # Build the Getting Started Screen
@@ -159,20 +160,19 @@ class HBEditorUI:
             self.core.active_editor = None
         Logger.getInstance().Log("Editor closed")
 
-    def LoadTheme(self, theme_path) -> None:
-        """ Given the resource path to a theme .css file, load it and apply it to the editor application """
+    def LoadTheme(self, theme_path: str) -> None:
+        """ Given the 'EditorContent' path to a theme .css file, load it and apply it to the editor application """
         theme_file = QtCore.QFile(theme_path)
-        if theme_file.open(QtCore.QFile.ReadOnly):
+        if theme_file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             self.core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
         else:
             Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
-            print(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}")
 
-    def LoadFonts(self, fonts):
-        """ Given a list of resource paths to font files, load them so they're available throughout the editor """
-        for font in fonts:
-            if QtGui.QFontDatabase.addApplicationFont(font) < 0:
-                Logger.getInstance().Log(f"Failed to load font '{font}'", 4)
+    def LoadFonts(self, font_paths: list):
+        """ Given a list of 'EditorContent' font paths, load them so that they're available throughout the editor """
+        for path in font_paths:
+            if QtGui.QFontDatabase.addApplicationFont(QtCore.QDir(path).path()) < 0:
+                Logger.getInstance().Log(f"Failed to load font '{path}'", 4)
 
     def GetWindow(self) -> QtWidgets.QMainWindow:
         return self.main_window
@@ -185,12 +185,12 @@ class MainMenuBar(QtWidgets.QMenuBar):
 
         # File Menu
         self.file_menu = QtWidgets.QMenu(self)
-        self.file_menu.setWindowFlags(self.file_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
-        self.a_save_file = QtWidgets.QAction(parent)
+        self.file_menu.setWindowFlags(self.file_menu.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+        self.a_save_file = QtGui.QAction(parent)
         self.a_save_file.triggered.connect(engine_core.Save)
-        self.a_new_project = QtWidgets.QAction(parent)
+        self.a_new_project = QtGui.QAction(parent)
         self.a_new_project.triggered.connect(engine_core.NewProject)
-        self.a_open_project = QtWidgets.QAction(parent)
+        self.a_open_project = QtGui.QAction(parent)
         self.a_open_project.triggered.connect(engine_core.OpenProject)
         self.file_menu.addAction(self.a_save_file)
         # self.file_menu.addAction(self.a_save_file_as)
@@ -199,27 +199,27 @@ class MainMenuBar(QtWidgets.QMenuBar):
 
         # Edit Menu
         self.edit_menu = QtWidgets.QMenu(self)
-        self.edit_menu.setWindowFlags(self.edit_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
-        self.a_open_project_settings = QtWidgets.QAction(parent)
+        self.edit_menu.setWindowFlags(self.edit_menu.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+        self.a_open_project_settings = QtGui.QAction(parent)
         self.a_open_project_settings.triggered.connect(engine_core.OpenProjectSettings)
-        self.a_open_values = QtWidgets.QAction(parent)
+        self.a_open_values = QtGui.QAction(parent)
         self.a_open_values.triggered.connect(engine_core.OpenValues)
         self.edit_menu.addAction(self.a_open_project_settings)
         self.edit_menu.addAction(self.a_open_values)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self)
-        self.play_menu.setWindowFlags(self.play_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
-        self.a_play_game = QtWidgets.QAction(parent)
+        self.play_menu.setWindowFlags(self.play_menu.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+        self.a_play_game = QtGui.QAction(parent)
         self.a_play_game.triggered.connect(engine_core.Play)
         self.play_menu.addAction(self.a_play_game)
 
         # Build Menu
         self.build_menu = QtWidgets.QMenu(self)
-        self.build_menu.setWindowFlags(self.build_menu.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
-        self.a_build = QtWidgets.QAction(parent)
+        self.build_menu.setWindowFlags(self.build_menu.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
+        self.a_build = QtGui.QAction(parent)
         self.a_build.triggered.connect(engine_core.Build)
-        self.a_build_clean = QtWidgets.QAction(parent)
+        self.a_build_clean = QtGui.QAction(parent)
         self.a_build_clean.triggered.connect(engine_core.Clean)
         self.build_menu.addAction(self.a_build)
         self.build_menu.addAction(self.a_build_clean)
@@ -267,14 +267,14 @@ class MainTabWidget(QtWidgets.QTabWidget):
     def __init__(self):
         super().__init__()
         self.setVisible(False)
-        self.setElideMode(0)
+        self.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
         self.setTabsClosable(True)
         self.tabCloseRequested.connect(self.OnTabClose)
         self.currentChanged.connect(self.SIG_TAB_CHANGE.emit)
 
     def MarkDirty(self):
         """ Marks the active tab as dirty, showing an icon representing the tab has changes made to it's widget """
-        self.setTabIcon(self.currentIndex(), QtGui.QIcon(QtGui.QPixmap(":/Icons/ChangesPending.png")))
+        self.setTabIcon(self.currentIndex(), QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/ChangesPending.png")))
         self.currentWidget().pending_changes = True
 
     def MarkClean(self):
@@ -292,10 +292,10 @@ class MainTabWidget(QtWidgets.QTabWidget):
                 self,
                 f"You have Pending Changes",
                 "There are pending changes in this tab. Would you like to Save before closing?",
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
             )
 
-            if result == QtWidgets.QMessageBox.Yes:
+            if result == QtWidgets.QMessageBox.StandardButton.Yes:
                 tab_widget.core.Export()
 
         self.SIG_TAB_CLOSE.emit(tab_index)
@@ -319,6 +319,6 @@ class GettingStartedScreen(QtWidgets.QWidget):
             "2) Go to 'File' -> 'Open Project' to Open an existing Heartbeat project"
         )
 
-        self.getting_started_layout.setAlignment(Qt.AlignCenter)
+        self.getting_started_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.getting_started_layout.addWidget(getting_started_title)
         self.getting_started_layout.addWidget(getting_started_message)

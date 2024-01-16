@@ -12,8 +12,8 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.DataTypes.file_types import FileType
+from PyQt6 import QtWidgets, QtGui, QtCore
+from HBEditor.Core import settings
 
 
 class DialogNewFileFromTemplate(QtWidgets.QDialog):
@@ -34,10 +34,10 @@ class DialogNewFileFromTemplate(QtWidgets.QDialog):
         # Description / thumbnail
         self.thumbnail = QtWidgets.QLabel()
         self.thumbnail.setScaledContents(True)
-        self.details_layout.addWidget(self.thumbnail, 1, QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
+        self.details_layout.addWidget(self.thumbnail, 1, QtCore.Qt.AlignmentFlag.AlignTop | QtCore.Qt.AlignmentFlag.AlignCenter)
         self.description = QtWidgets.QLabel()
         self.description.setWordWrap(True)
-        self.details_layout.addWidget(self.description, 1, QtCore.Qt.AlignTop)
+        self.details_layout.addWidget(self.description, 1, QtCore.Qt.AlignmentFlag.AlignTop)
 
         # Name selection
         self.name_layout = QtWidgets.QHBoxLayout(self)
@@ -48,7 +48,7 @@ class DialogNewFileFromTemplate(QtWidgets.QDialog):
 
         # Buttons
         self.buttons_layout = QtWidgets.QHBoxLayout(self)
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
         self.buttons_layout.addWidget(self.button_box)
 
         # Compile the full layout
@@ -70,7 +70,7 @@ class DialogNewFileFromTemplate(QtWidgets.QDialog):
             self.description.setText(cur_item.GetDescription())
             self.thumbnail.setPixmap(
                 QtGui.QPixmap(cur_item.GetPreviewImage()).scaled(
-                    round(self.width() / 2), self.thumbnail.height(), QtCore.Qt.KeepAspectRatio
+                    round(self.width() / 2), self.thumbnail.height(), QtCore.Qt.AspectRatioMode.KeepAspectRatio
                 )
             )
 

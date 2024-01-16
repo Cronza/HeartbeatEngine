@@ -14,7 +14,7 @@
 """
 from enum import Enum
 from functools import partial
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.DataTypes.file_types import FileType, FileTypeIcons
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
@@ -34,14 +34,14 @@ class OutlinerUI(QtWidgets.QWidget):
         # Toolbar
         self.toolbar = QtWidgets.QToolBar(self)
         self.toolbar.setContentsMargins(0, 0, 0, 0)
-        self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toolbar.setObjectName("vertical")
 
         # Toolbar - Import Button
         self.import_button = QtWidgets.QToolButton(self)
-        self.import_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self.import_button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.import_button.setText(" Import")
-        self.import_button.setIcon(QtGui.QIcon(QtGui.QPixmap(":/Icons/Import.png")))
+        self.import_button.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Import")))
         self.import_button.clicked.connect(self.core.ImportAsset)
         self.toolbar.addWidget(self.import_button)
         self.toolbar.addSeparator()
@@ -132,10 +132,10 @@ class OutlinerUI(QtWidgets.QWidget):
 
         # Allow folders to be drop targets so assets can be rearranged in the editor
         if asset_type == FileType.Folder:
-            new_asset.setFlags(new_asset.flags() | QtCore.Qt.ItemIsDropEnabled)
+            new_asset.setFlags(new_asset.flags() | QtCore.Qt.ItemFlag.ItemIsDropEnabled)
 
     def RemoveAsset(self, name: str):
-        asset = self.asset_list.findItems(name, QtCore.Qt.MatchExactly)[0]
+        asset = self.asset_list.findItems(name, QtCore.Qt.MatchFlag.MatchExactly)[0]
         self.asset_list.takeItem(self.asset_list.row(asset))
         #@TODO: Add sort update here...
 
@@ -170,14 +170,14 @@ class AssetList(QtWidgets.QListWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.setResizeMode(QtWidgets.QListView.Adjust)
-        self.setViewMode(QtWidgets.QListView.IconMode)
+        self.setResizeMode(QtWidgets.QListView.ResizeMode.Adjust)
+        self.setViewMode(QtWidgets.QListView.ViewMode.IconMode)
         self.setIconSize(QtCore.QSize(
             settings.editor_data["Outliner"]["icon_size"][0],
             settings.editor_data["Outliner"]["icon_size"][1]
         ))
-        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.DragDrop)
+        self.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.setWordWrap(True)
 
         # We need very specific control over the rendering for 'IconMode' in order to improve the 'tile' look. This
@@ -225,7 +225,7 @@ class OutlinerAsset(QtWidgets.QListWidgetItem):
                 self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
         except:
             Logger.getInstance().Log(f"Unable to load icon for file type '{self.asset_type}' - Using generic default")
-            self.setIcon(QtGui.QIcon(QtGui.QPixmap(":/Icons/File.png")))
+            self.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/File")))
 
     def GetType(self):
         return self.asset_type
@@ -246,7 +246,7 @@ class TileDelegate(QtWidgets.QStyledItemDelegate):
 
         # Paint using the style data stored in 'option'
         style = option.widget.style() if option.widget else QtGui.QApplication.style()
-        style.drawControl(QtWidgets.QStyle.CE_ItemViewItem, option, painter, option.widget)
+        style.drawControl(QtWidgets.QStyle.ControlElement.CE_ItemViewItem, option, painter, option.widget)
 
     def sizeHint(self, option, index):
         if not index.isValid():
@@ -272,15 +272,15 @@ class OutlinerContextMenu(QtWidgets.QMenu):
         self.core = core
 
         # Create each of the possible actions
-        self.a_import = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Import.png")), "Import", self)
-        self.a_rename = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Rename.png")), "Rename", self)
-        self.a_delete = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Close.png")), "Delete", self)
-        self.a_duplicate = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")), "Duplicate", self)
-        self.a_create_folder = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Folder.png")), "Create Folder", self)
-        self.a_new_scene = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Scene.png")), "Create Scene", self)
-        self.a_new_dialogue = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/AM_Dialogue.png")), "Create Dialogue", self)
-        self.a_new_interface = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Interface.png")), "Create Interface", self)
-        self.a_details = QtWidgets.QAction(QtGui.QIcon(QtGui.QPixmap(":/Icons/Information.png")), "Details", self)
+        self.a_import = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Import.png")), "Import", self)
+        self.a_rename = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Rename.png")), "Rename", self)
+        self.a_delete = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Close.png")), "Delete", self)
+        self.a_duplicate = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Copy.png")), "Duplicate", self)
+        self.a_create_folder = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Folder.png")), "Create Folder", self)
+        self.a_new_scene = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Scene.png")), "Create Scene", self)
+        self.a_new_dialogue = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Dialogue.png")), "Create Dialogue", self)
+        self.a_new_interface = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Interface.png")), "Create Interface", self)
+        self.a_details = QtGui.QAction(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Information.png")), "Details", self)
 
         # Only show the contextually relevant options
         if not use_asset_menu:
@@ -326,7 +326,7 @@ class QuickAccessButton(QtWidgets.QToolButton):
         else:
             self.SIG_DROP.emit([self.path], False)
 
-        self.setAttribute(QtCore.Qt.WA_UnderMouse, False)  # Fix for hover state freeze due to QDialogs
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_UnderMouse, False)  # Fix for hover state freeze due to QDialogs
         event.acceptProposedAction()
 
 
@@ -335,7 +335,7 @@ class DialogAssetInfo(QtWidgets.QDialog):
         super().__init__()
 
         # Hide the OS header to lock its position
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
         self.resize(400, 300)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
@@ -354,46 +354,46 @@ class DialogAssetInfo(QtWidgets.QDialog):
         self.details_list.horizontalHeader().hide()
         self.details_list.verticalHeader().hide()
         self.details_list.setContentsMargins(0,0,0,0)
-        self.details_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        self.details_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
-        self.details_list.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)  # Disable selection
-        self.details_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+        self.details_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.details_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.details_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)  # Disable selection
+        self.details_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
         # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly more tragic way
-        self.details_list.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.details_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.main_layout.addWidget(self.details_list)
 
         # Info elements
         self.details_list.insertRow(self.details_list.rowCount())
         self.details_list.setItem(0, 0, QtWidgets.QTableWidgetItem("File Name:"))
         file_name_label = QtWidgets.QLabel(file_name)
-        file_name_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        file_name_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.details_list.setCellWidget(0, 1, file_name_label)
 
         self.details_list.insertRow(self.details_list.rowCount())
         self.details_list.setItem(1, 0, QtWidgets.QTableWidgetItem("Project Path:"))
         rel_file_path_label = QtWidgets.QLabel(rel_file_path)
-        rel_file_path_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        rel_file_path_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.details_list.setCellWidget(1, 1, rel_file_path_label)
 
         self.details_list.insertRow(self.details_list.rowCount())
         self.details_list.setItem(2, 0, QtWidgets.QTableWidgetItem("File System Path:"))
         abs_file_path_label = QtWidgets.QLabel(abs_file_path)
-        abs_file_path_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        abs_file_path_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.details_list.setCellWidget(2, 1, abs_file_path_label)
 
         self.details_list.insertRow(self.details_list.rowCount())
         self.details_list.setItem(3, 0, QtWidgets.QTableWidgetItem("File Type:"))
         file_type_label = QtWidgets.QLabel(file_type.name)
-        file_type_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        file_type_label.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         self.details_list.setCellWidget(3, 1, file_type_label)
 
         self.details_list.resizeRowsToContents()
 
         # Confirmation Buttons
         self.button_box = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok)
+            QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.button_box.accepted.connect(self.accept)
         self.main_layout.addWidget(self.button_box)
 

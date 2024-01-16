@@ -14,7 +14,7 @@
 """
 import re
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities import action_data as adh
@@ -102,15 +102,15 @@ class InputEntryColor(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
         self.input_widget = QtWidgets.QFrame()
-        self.input_widget.setFrameStyle(QtWidgets.QFrame.Panel)
+        self.input_widget.setFrameStyle(QtWidgets.QFrame.Shape.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
 
         # @TODO: Replace style sheet assignment with a QPalette to retain button state styles
         self.color_select_button = QtWidgets.QToolButton()
         self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel.png"), QtGui.QIcon.Normal)
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Disabled)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Color_Wheel.png"), QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Mode.Disabled)
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 
@@ -202,8 +202,8 @@ class InputEntryAssetSelector(InputEntryBase):
         self.file_select_button = QtWidgets.QToolButton()
         self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder.png"), QtGui.QIcon.Normal)
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder_Disabled.png"), QtGui.QIcon.Disabled)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Folder.png"), QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Folder_Disabled.png"), QtGui.QIcon.Mode.Disabled)
         self.file_select_button.setIcon(icon)
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addWidget(self.file_select_button)
@@ -392,7 +392,7 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt = QtWidgets.QLineEdit()
 
         # Limit entered values to int only
-        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.StandardNotation)
+        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.Notation.StandardNotation)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
         self.input_widget.setText("0")
@@ -472,7 +472,7 @@ class InputEntryArray(InputEntryBase):
         if "children" not in self.data:
             self.data["children"] = {}
 
-        self.main_layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
         self.add_item_button = QtWidgets.QToolButton()
         self.add_item_button.setObjectName("choice-add")

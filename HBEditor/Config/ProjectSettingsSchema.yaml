@@ -69,9 +69,5 @@ Audio:
   volume_sfx: "Int"
 
 Pause Menu:
-  data_file: "Asset_Interface"
-
-Scene Transitions:
-  speed: "Int"
-  z_order: "Int"
+  interface: "Asset_Interface"
 

@@ -15,7 +15,7 @@
 import os
 import inspect
 import copy
-from PyQt5 import QtGui
+from PyQt6 import QtGui
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEngine.Core.Actions import actions
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -238,10 +238,8 @@ user_project_dir = None
 user_project_data = None  # The contents of the project's 'Game.yaml' file
 
 asset_registry = {}  # Loaded when project is loaded
-engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")
-
-# Contains data relating to how the editor functions
-editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")
+engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")  # Engine files which are accessible via the asset registration system
+editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")  # Editor function and style settings
 
 # Contains categorized engine actions and definitions for which editors can use which actions
 available_actions = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")

@@ -1,5 +1,5 @@
 Renderables:
-  icon: ":/Icons/AM_Renderable.png"
+  icon: "EditorContent:Icons/Renderable.png"
   options:
     - name: "create_sprite"
       display_name: "Create Sprite"
@@ -25,7 +25,7 @@ Renderables:
         - Dialogue
 
 Interactables:
-  icon: ":/Icons/AM_Renderable.png"
+  icon: "EditorContent:Icons/Renderable.png"
   options:
     - name: "create_interactable"
       display_name: "Create Interactable"
@@ -44,7 +44,7 @@ Interactables:
         - Interface
 
 Dialogue:
-  icon: ":/Icons/AM_Dialogue.png"
+  icon: "EditorContent:Icons/Dialogue.png"
   options:
     - name: "dialogue"
       display_name: "Dialogue"
@@ -56,7 +56,7 @@ Dialogue:
         - Dialogue
 
 Scene:
-  icon: ":/Icons/AM_Scene.png"
+  icon: "EditorContent:Icons/Scene.png"
   options:
     - name: "load_scene"
       display_name: "Load Scene"
@@ -72,7 +72,7 @@ Scene:
         - Dialogue
 
 Sound:
-  icon: ":/Icons/AM_Dialogue.png"
+  icon: "EditorContent:Icons/Dialogue.png"
   options:
     - name: "play_sfx"
       display_name: "Play SFX"
@@ -95,7 +95,7 @@ Sound:
       applicable_editors:
         - Dialogue
 Interface:
-  icon: ":/Icons/Interface.png"
+  icon: "EditorContent:Icons/Interface.png"
   options:
     - name: "load_interface"
       display_name: "Load Interface"
@@ -106,7 +106,7 @@ Interface:
       applicable_editors:
         - Dialogue
 Utils:
-  icon: ":/Icons/AM_Dialogue.png"
+  icon: "EditorContent:Icons/Dialogue.png"
   options:
     - name: "set_value"
       display_name: "Set Value"

@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
@@ -53,7 +53,7 @@ class EditorSceneUI(EditorBaseUI):
 
         # Add a sub tab widget for details, settings, etc
         self.sub_tab_widget = QtWidgets.QTabWidget(self)
-        self.sub_tab_widget.setElideMode(0)
+        self.sub_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
         self.sub_tab_widget.addTab(self.details, "Details")
         self.sub_tab_widget.addTab(self.scene_settings, "Scene Settings")
 
@@ -115,7 +115,7 @@ class SceneSettings(QtCore.QObject, SourceEntry):
                                 "create_text_button",
                                 "play_sfx",
                                 "play_music",
-                                "start_dialogue"
+                                "start_dialogue",
                                 "scene_fade_in",
                                 "set_mute"
                             ],

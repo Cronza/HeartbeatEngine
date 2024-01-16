@@ -25,7 +25,7 @@ class Interface(Renderable):
         self.page_renderables = []
 
         self.visible = False
-        if "key" not in renderable_data: renderable_data["key"] = id(self)
+        if "key" not in renderable_data: renderable_data["key"] = id(self) #@TODO: Dialogue files don't have a key
         if "z_order" not in renderable_data: renderable_data["z_order"] = 10000
         super().__init__(renderable_data, parent)
 

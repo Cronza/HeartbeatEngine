@@ -87,4 +87,4 @@ Audio:
   volume_music: 100
   volume_sfx: 100
 Pause Menu:
-  data_file: ''
+  interface: ''

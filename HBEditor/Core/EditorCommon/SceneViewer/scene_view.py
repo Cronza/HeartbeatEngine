@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 
 
 class SceneView(QtWidgets.QGraphicsView):
@@ -15,10 +15,10 @@ class SceneView(QtWidgets.QGraphicsView):
         self.zoom = 1  # Tracks the amount we've zoomed in
         self.zoom_speed = 0.1
 
-        self.setDragMode(self.RubberBandDrag)
-        self.setRubberBandSelectionMode(QtCore.Qt.ContainsItemShape)
-        self.setTransformationAnchor(self.AnchorUnderMouse)
-        self.fitInView(parent.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        self.setDragMode(self.DragMode.RubberBandDrag)
+        self.setRubberBandSelectionMode(QtCore.Qt.ItemSelectionMode.ContainsItemShape)
+        self.setTransformationAnchor(self.ViewportAnchor.AnchorUnderMouse)
+        self.fitInView(parent.sceneRect(), QtCore.Qt.AspectRatioMode.KeepAspectRatio)
 
         # Track the mouse position on LMB press to know whether selected items have been moved
         self.mouse_pos_on_press = None
@@ -44,16 +44,16 @@ class SceneView(QtWidgets.QGraphicsView):
 
     def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         # Enable viewport panning while spacebar is down
-        if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
-            self.setDragMode(self.ScrollHandDrag)
+        if event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
+            self.setDragMode(self.DragMode.ScrollHandDrag)
             self.setInteractive(False)
 
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         # Disable viewport panning once the spacebar is released
-        if event.key() == QtCore.Qt.Key_Space and not event.isAutoRepeat():
-            self.setDragMode(self.RubberBandDrag)
+        if event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
+            self.setDragMode(self.DragMode.RubberBandDrag)
             self.setInteractive(True)
 
         super().keyReleaseEvent(event)
@@ -101,11 +101,11 @@ class Scene(QtWidgets.QGraphicsScene):
 
     def AddDefaultBackground(self):
         """ Create a default background (since the scene is, by default, transparent) """
-        self.setBackgroundBrush(QtCore.Qt.darkGray)
+        self.setBackgroundBrush(QtCore.Qt.GlobalColor.darkGray)
         background = self.addRect(
             QtCore.QRectF(0, 0, self.scene_size.width(), self.scene_size.height()),
             QtGui.QPen(),
-            QtGui.QBrush(QtCore.Qt.black)
+            QtGui.QBrush(QtCore.Qt.GlobalColor.black)
         )
         background.setZValue(-9999999999)
 

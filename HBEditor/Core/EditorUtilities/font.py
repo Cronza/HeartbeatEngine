@@ -15,7 +15,7 @@
 import os
 from io import BytesIO
 from PIL import ImageFont
-from PyQt5 import QtGui, QtCore
+from PyQt6 import QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 
 
@@ -24,11 +24,11 @@ def LoadCustomFont(file_path):
     Loads and creates a font using the provided file path (either absolute, or a Qt resource path),
     applying any style used by that font
     """
-    if file_path.startswith(":/") or os.path.exists(file_path) and not os.path.isdir(file_path):
+    if os.path.exists(file_path) and not os.path.isdir(file_path):
         QtGui.QFontDatabase.addApplicationFont(file_path)
 
         font_file = QtCore.QFile(file_path)
-        if font_file.open(QtCore.QFile.ReadOnly):
+        if font_file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             # 1:
             # 'QFontDatabase.addApplicationFont' doesn't return anything that would give us information on
             #  what type of style the loaded font used (Bold, Italic, etc). All we get is an (int) ID
@@ -91,7 +91,3 @@ def ApplyStyle(style_string: str, font: QtGui.QFont) -> None:
     # 'in' check, instead of '=='
     font.setBold("Bold" in style_string)
     font.setItalic("Italic" in style_string)
-
-
-def ReadAsBytes(font_qfile):
-    return BytesIO(font_qfile.readAll())()

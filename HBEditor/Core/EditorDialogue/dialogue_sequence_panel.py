@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
@@ -56,44 +56,44 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Plus.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+            QtGui.QPixmap("EditorContent:Icons/Plus.png"),
+            QtGui.QIcon.Mode.Normal,
+            QtGui.QIcon.State.Off
         )
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setMenu(self.action_menu)
-        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.ToolButtonPopupMode.InstantPopup)
         self.main_toolbar.addWidget(self.add_entry_button)
 
         # Remove Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Entry",
             self.RemoveEntry
         )
 
         # Copy Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Copy.png")),
             "Copy Entry",
             self.CopyEntry
         )
 
         # Build the Sequence
         self.sequence_list = QtWidgets.QListWidget(self)
-        self.sequence_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
-        self.sequence_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.sequence_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
-        self.sequence_list.setResizeMode(QtWidgets.QListWidget.Adjust)
+        self.sequence_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.sequence_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
+        self.sequence_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.sequence_list.setResizeMode(QtWidgets.QListWidget.ResizeMode.Adjust)
         self.sequence_list.setDragEnabled(True)
-        self.sequence_list.setDragDropMode(QtWidgets.QTableWidget.InternalMove)
-        self.sequence_list.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.sequence_list.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
+        self.sequence_list.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
         self.sequence_list.setAcceptDrops(True)
         self.sequence_list.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
 
         # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly more tragic way
-        self.sequence_list.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.sequence_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)

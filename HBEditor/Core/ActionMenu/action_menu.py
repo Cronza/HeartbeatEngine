@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
 
@@ -25,7 +25,7 @@ class ActionMenu(QtWidgets.QMenu):
     def __init__(self, button_func, editor_type: FileType):
         super().__init__()
 
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.NoDropShadowWindowHint)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
 
         for category, data in settings.available_actions.items():
             # Create the category submenu

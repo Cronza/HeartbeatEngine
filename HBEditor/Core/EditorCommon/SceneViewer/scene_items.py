@@ -1,5 +1,5 @@
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.EditorUtilities import font
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
@@ -28,9 +28,9 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
 
-        self.setFlag(self.ItemIsMovable, True)
-        self.setFlag(self.ItemIsSelectable, True)
-        self.setFlag(self.ItemSendsGeometryChanges)
+        self.setFlag(self.GraphicsItemFlag.ItemIsMovable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges)
 
         self.setAcceptDrops(True)
 
@@ -58,9 +58,9 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
 
         self._movement_locked = state
         if state:
-            self.setFlags(self.flags() & ~self.ItemIsMovable)
+            self.setFlags(self.flags() & ~self.GraphicsItemFlag.ItemIsMovable)
         else:
-            self.setFlags(self.flags() | self.ItemIsMovable)
+            self.setFlags(self.flags() | self.GraphicsItemFlag.ItemIsMovable)
 
         return True
 
@@ -198,8 +198,8 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         self.is_centered = False
         self.is_flipped = False
 
-        self.setFlag(self.ItemIsSelectable, False)
-        self.setFlag(self.ItemSendsGeometryChanges, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
 
     def Refresh(self, changed_entry_name: str = ""):
@@ -255,7 +255,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         if img_path:
             self.setPixmap(QtGui.QPixmap(img_path))
         else:
-            self.setPixmap(QtGui.QPixmap(":/Icons/SceneItem_Sprite.png"))
+            self.setPixmap(QtGui.QPixmap("EditorContent:Icons/SceneItem_Sprite.png"))
 
     def UpdateZOrder(self):
         self.setZValue(float(self.action_data["z_order"]["value"]))
@@ -294,8 +294,8 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.action_data = action_data
 
         self.is_centered = False
-        self.setFlag(self.ItemIsSelectable, False)
-        self.setFlag(self.ItemSendsGeometryChanges, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
         self.document().setDocumentMargin(0)
 

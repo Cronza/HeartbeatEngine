@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import os
 import argparse
 import pygame
 from HBEngine.Core import settings
@@ -19,14 +20,6 @@ from HBEngine.Core.scene import Scene
 from HBEngine.Core.Objects.interface_pause import InterfacePause
 
 from pygame import mixer
-
-
-clock = None
-window = None
-
-
-# DEBUG TRIGGERS
-show_fps = False
 
 
 def Initialize(project_path: str):
@@ -42,21 +35,20 @@ def Initialize(project_path: str):
 
 
 def Main():
-    global clock
-    global window
-    global show_fps
-    #global modules
+    # Debug toggles
+    show_fps = False
 
     pygame.init()
     mixer.init()
-    clock = pygame.time.Clock()
-    window = pygame.display.set_mode(settings.active_resolution)
+    settings.clock = pygame.time.Clock()
+    settings.window = pygame.display.set_mode(settings.active_resolution)
     pause_interface = None  # Instatiated and set during runtime
 
     # Load the starting scene
-    if not settings.project_settings["Game"]["starting_scene"]:
+    if settings.project_settings["Game"]["starting_scene"]:
+        LoadScene(settings.project_settings["Game"]["starting_scene"])
+    else:
         raise ValueError("No starting scene was provided in the project settings")
-    LoadScene(settings.project_settings["Game"]["starting_scene"])
 
     # Start the game loop
     is_running = True
@@ -71,11 +63,12 @@ def Main():
                 # Exit
                 if event.key == pygame.K_ESCAPE:
                     if settings.scene:
-                        if settings.paused:
-                            Unpause()
-                            pause_interface = None
-                        else:
-                            pause_interface = Pause()
+                        if settings.scene.allow_pausing:
+                            if settings.paused:
+                                Unpause()
+                                pause_interface = None
+                            else:
+                                pause_interface = Pause()
 
                 if event.type == pygame.QUIT:
                     is_running = False
@@ -98,21 +91,26 @@ def Main():
 
         # Debug Logging
         if show_fps:
-            print(clock.get_fps())
+            print(settings.clock.get_fps())
 
         # Refresh any changes
         pygame.display.update()
 
         # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
         # on actions
-        settings.scene.delta_time = clock.tick(60) / 1000
+        settings.scene.delta_time = settings.clock.tick(60) / 1000
 
 
 def Pause() -> InterfacePause:
-    interface = settings.scene.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
+    pause_interface = settings.GetProjectSetting('Pause Menu', 'interface')
+    if pause_interface and pause_interface != 'None':
+        interface = settings.scene.LoadInterface(pause_interface, InterfacePause)
+    else:
+        print("No pause interface set - Falling back to default")
+        interface = settings.scene.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
+
     settings.scene.Draw()
     settings.paused = True
-
     return interface
 
 
@@ -124,7 +122,10 @@ def Unpause():
 
 def LoadScene(partial_file_path: str):
     """ Deletes the active scene if applicable, and creates a new one using the provided scene file """
-    global window
+    # Validate the scene path
+    scene_path = settings.ConvertPartialToAbsolutePath(partial_file_path)
+    if not os.path.exists(scene_path):
+        raise ValueError(f"Scene '{scene_path}' does not exist")
 
     # Shutdown any modules that shouldn't persist between scenes
     active_modules = list(settings.modules.items())
@@ -134,11 +135,7 @@ def LoadScene(partial_file_path: str):
 
     # Clear any existing scene, and create a new scene with the provided info
     settings.scene = None
-    settings.scene = Scene(
-        scene_data_file=partial_file_path,
-        window=window,
-        load_scene_func=LoadScene
-    )
+    settings.scene = Scene(scene_data_file=scene_path)
     settings.scene.LoadSceneData()
 
 

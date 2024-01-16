@@ -57,7 +57,7 @@ QToolButton {
   QToolButton:menu-indicator {
     image: none; }
   QToolButton:right-arrow {
-    image: url(":/Icons/Arrow_Right.png");
+    image: url("EditorContent:Icons/Arrow_Right.png");
     padding: 3px; }
   QToolButton#non-toolbar {
     /* ToolButtons that are used outside of a toolbar */
@@ -74,18 +74,18 @@ QToolButton {
     /* Choice buttons don't use the typical button background */
     background-color: #2A2A2B;
     border: 0px solid transparent;
-    image: url(":/Icons/Small_Plus.png");
+    image: url("EditorContent:Icons/Small_Plus.png");
     padding: 0px; }
     QToolButton#choice-add:hover {
-      image: url(":/Icons/Small_Plus_Hover.png"); }
+      image: url("EditorContent:Icons/Small_Plus_Hover.png"); }
   QToolButton#choice-remove {
     /* Choice buttons don't use the typical button background */
     background-color: #2A2A2B;
     border: 0px solid transparent;
-    image: url(":/Icons/Small_Minus.png");
+    image: url("EditorContent:Icons/Small_Minus.png");
     padding: 0px; }
     QToolButton#choice-remove:hover {
-      image: url(":/Icons/Small_Minus_Hover.png"); }
+      image: url("EditorContent:Icons/Small_Minus_Hover.png"); }
 
 QTabWidget {
   icon-size: 24px; }
@@ -110,10 +110,10 @@ QTabBar:tab {
     background-color: #585D61; }
 
 QTabBar:close-button {
-  image: url(":/Icons/Close.png");
+  image: url("EditorContent:Icons/Close.png");
   padding: 2px; }
   QTabBar:close-button:hover {
-    image: url(":/Icons/Close_Hover.png"); }
+    image: url("EditorContent:Icons/Close_Hover.png"); }
 
 QAbstractScrollAreaselected:item {
   border: 0px solid transparent; }
@@ -183,15 +183,15 @@ QTreeView {
   QTreeView:branch:open {
     border-image: none; }
     QTreeView:branch:open:has-children {
-      image: url(":/Icons/Arrow_Down.png"); }
+      image: url("EditorContent:Icons/Arrow_Down.png"); }
       QTreeView:branch:open:has-children:hover {
-        image: url(":/Icons/Arrow_Down_Hover.png"); }
+        image: url("EditorContent:Icons/Arrow_Down_Hover.png"); }
   QTreeView:branch:closed {
     border-image: none; }
     QTreeView:branch:closed:has-children {
-      image: url(":/Icons/Arrow_Right.png"); }
+      image: url("EditorContent:Icons/Arrow_Right.png"); }
       QTreeView:branch:closed:has-children:hover {
-        image: url(":/Icons/Arrow_Right_Hover.png"); }
+        image: url("EditorContent:Icons/Arrow_Right_Hover.png"); }
 
 QGraphicsView {
   border: 1px solid #2A2A2B; }
@@ -343,9 +343,9 @@ QCheckBox:indicator {
   QCheckBox:indicator:unchecked:hover {
     background-color: #686d70; }
   QCheckBox:indicator:checked {
-    image: url(:/Icons/Checkmark.png); }
+    image: url("EditorContent:Icons/Checkmark.png"); }
     QCheckBox:indicator:checked:disabled {
-      image: url(:/Icons/Checkmark_Disabled.png);
+      image: url("EditorContent:Icons/Checkmark_Disabled.png");
       background-color: #343436; }
   QCheckBox:indicator:checked:hover {
     background-color: #686d70; }
@@ -369,7 +369,7 @@ QPushButton {
   QPushButton:disabled {
     background-color: #343436; }
   QPushButton#file:disabled {
-    image: url(:/Icons/Folder.png); }
+    image: url("EditorContent:Icons/Folder.png"); }
 
 /* QProperties - Custom overrides referenced in code */
 QWidget[model-entry] {

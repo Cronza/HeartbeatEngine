@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLabel
+from PyQt6.QtWidgets import QWidget, QTreeWidgetItem, QLabel
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.DataTypes.file_types import FileType

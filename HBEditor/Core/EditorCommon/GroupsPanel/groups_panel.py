@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.Logger.logger import Logger
@@ -48,14 +48,14 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Add Group Button
         self.toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Plus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
             "Add Entry",
             self.AddEntry
         )
 
         # Remove Entry Button
         self.toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Entry",
             self.RemoveEntry
         )
@@ -73,7 +73,7 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # 'outline: none;' doesn't work for list widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly worse way
-        self.entry_list.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.entry_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         # ********** Add All Major Pieces to details layout **********
         self.main_layout.addWidget(self.title)
@@ -235,7 +235,7 @@ class GroupEntry(QtWidgets.QWidget):
         # ****** DISPLAY WIDGETS ******
         # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use
         # the minimum where possible
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Minimum)
 
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -261,7 +261,7 @@ class GroupEntry(QtWidgets.QWidget):
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
         self.subtext_widget.setText('Test Description')
-        self.subtext_widget.setAlignment(QtCore.Qt.AlignTop)
+        self.subtext_widget.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)
         self.info_layout.addWidget(self.subtext_widget)
 
