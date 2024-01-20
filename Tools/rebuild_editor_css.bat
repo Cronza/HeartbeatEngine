@@ -1,0 +1,1 @@
+..\venv\Scripts\python.exe -m qtsass ..\HBEditor\Content\Themes\Dark\Dark.scss -o ..\HBEditor\Content\Themes\Dark\Dark.css

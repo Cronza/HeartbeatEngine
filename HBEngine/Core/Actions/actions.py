@@ -237,6 +237,7 @@ class remove_renderable(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -377,6 +378,7 @@ class create_sprite(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -470,6 +472,7 @@ class create_background(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -556,6 +559,7 @@ class create_interactable(Action):
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
+            "children": {},
             "template": {
                 "event": {
                     "type": "Array_Element",
@@ -584,6 +588,7 @@ class create_interactable(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -736,6 +741,7 @@ class create_text(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -920,6 +926,7 @@ class create_button(Action):
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
+            "children": {},
             "template": {
                 "event": {
                     "type": "Array_Element",
@@ -948,6 +955,7 @@ class create_button(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1067,6 +1075,7 @@ class create_text_button(Action):
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
+            "children": {},
             "template": {
                 "event": {
                     "type": "Array_Element",
@@ -1094,6 +1103,7 @@ class create_text_button(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1215,6 +1225,7 @@ class create_checkbox(Action):
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
+            "children": {},
             "template": {
                 "event": {
                     "type": "Array_Element",
@@ -1242,6 +1253,7 @@ class create_checkbox(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1298,6 +1310,7 @@ class start_dialogue(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1517,6 +1530,7 @@ class dialogue(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1584,6 +1598,7 @@ class choice(Action):
         "choices": {
             "type": "Array",
             "flags": ["editable", "preview"],
+            "children": {},
             "template": {
                 "choice": {
                     "type": "Array_Element",
@@ -1723,6 +1738,7 @@ class choice(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1801,6 +1817,7 @@ class switch_branch(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1882,6 +1899,7 @@ class play_sfx(SoundAction):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -1946,6 +1964,7 @@ class stop_sfx(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2012,6 +2031,7 @@ class play_music(SoundAction):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2077,6 +2097,7 @@ class stop_music(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2133,6 +2154,7 @@ class set_mute(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2206,6 +2228,7 @@ class set_value(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2260,6 +2283,7 @@ class load_scene(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2307,6 +2331,7 @@ class wait(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2399,6 +2424,7 @@ class scene_fade_in(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2493,6 +2519,7 @@ class scene_fade_out(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2653,6 +2680,7 @@ class switch_page(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",
@@ -2702,6 +2730,7 @@ class remove_page(Action):
         "conditions": {
             "type": "Array",
             "flags": ["editable"],
+            "children": {},
             "template": {
                 "condition": {
                     "type": "Array_Element",

@@ -10,7 +10,7 @@
  *   GNU General Public License for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
+ *   along with the Heartbeat Engine. If not, see <httpsEditorContent:/www.gnu.org/licenses/>.
  */
 /* *** Colors *** */
 /* Used for input fields, for editable fields */
@@ -25,6 +25,8 @@ QMainWindow {
 QWidget {
   font-family: "Cabin";
   font-size: 9pt; }
+  QWidget#drag-source {
+    background-color: #2A2A2B; }
 
 QToolBar {
   icon-size: 18px;
@@ -343,9 +345,9 @@ QCheckBox:indicator {
   QCheckBox:indicator:unchecked:hover {
     background-color: #686d70; }
   QCheckBox:indicator:checked {
-    image: url("EditorContent:Icons/Checkmark.png"); }
+    image: url(EditorContent:Icons/Checkmark.png); }
     QCheckBox:indicator:checked:disabled {
-      image: url("EditorContent:Icons/Checkmark_Disabled.png");
+      image: url(EditorContent:Icons/Checkmark_Disabled.png);
       background-color: #343436; }
   QCheckBox:indicator:checked:hover {
     background-color: #686d70; }
@@ -369,7 +371,7 @@ QPushButton {
   QPushButton:disabled {
     background-color: #343436; }
   QPushButton#file:disabled {
-    image: url("EditorContent:Icons/Folder.png"); }
+    image: url(EditorContent:Icons/Folder.png); }
 
 /* QProperties - Custom overrides referenced in code */
 QWidget[model-entry] {

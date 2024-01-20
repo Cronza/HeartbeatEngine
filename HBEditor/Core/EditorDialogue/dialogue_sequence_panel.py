@@ -80,7 +80,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         )
 
         # Build the Sequence
-        self.sequence_list = QtWidgets.QListWidget(self)
+        self.sequence_list = DialogueSequence(self)
         self.sequence_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
         self.sequence_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
         self.sequence_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
@@ -88,6 +88,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.sequence_list.setDragEnabled(True)
         self.sequence_list.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
         self.sequence_list.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
+        self.sequence_list.setDropIndicatorShown(False)
         self.sequence_list.setAcceptDrops(True)
         self.sequence_list.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
 
@@ -163,9 +164,27 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             return None
 
 
+class DialogueSequence(QtWidgets.QListWidget):
+    """ A custom QListWidget with unique drag rendering """
+
+    def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
+        if supportedActions.MoveAction:
+            new_drag = QtGui.QDrag(self)
+            entry_widget = self.itemWidget(self.item(self.selectedIndexes()[0].row()))
+            drag_image = QtGui.QPixmap(entry_widget.size())
+            entry_widget.render(drag_image)  # Render the entry widget to a Pixmap
+            new_drag.setPixmap(drag_image)
+            new_drag.setMimeData(self.mimeData(self.selectedItems()))
+            new_drag.exec(supportedActions)
+        else:
+            super().startDrag(supportedActions)
+
+
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
     def __init__(self, action_name, action_data, select_func):
         super().__init__()
+        # Allow CSS to stylize the drag visualization for this widget
+        self.setObjectName("drag-source")
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
