@@ -95,7 +95,7 @@ class OutlinerUI(QtWidgets.QWidget):
         if len(split_path) > 1:
             for dir_index in range(1, len(split_path)):
                 arrow_separator = QtWidgets.QToolButton(self.toolbar)
-                arrow_separator.setArrowType(QtCore.Qt.RightArrow)
+                arrow_separator.setArrowType(QtCore.Qt.ArrowType.RightArrow)
                 arrow_separator.setEnabled(False)
                 self.toolbar.addWidget(arrow_separator)
 

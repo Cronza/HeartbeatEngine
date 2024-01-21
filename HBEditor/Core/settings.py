@@ -67,6 +67,7 @@ def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
 
     cur_depth[asset_name] = asset_type.name
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -78,9 +79,10 @@ def RegisterAssetFolder(path_to_create: str):
     for folder in split_path:
         if folder not in cur_depth:
             cur_depth[folder] = {}
+        else:
+            cur_depth = cur_depth[folder]
 
-        cur_depth = cur_depth[folder]
-
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -98,6 +100,7 @@ def DeregisterAsset(source_file_path: str, asset_name: str):
     if asset_name in cur_depth:
         del cur_depth[asset_name]
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -115,6 +118,7 @@ def DuplicateAssetRegistration(source_file_path: str, asset_name: str, new_name:
     if asset_name in cur_depth:
         cur_depth[new_name] = cur_depth[asset_name]
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -131,6 +135,7 @@ def RenameAssetRegistration(source_file_path: str, asset_name: str, new_name: st
         del cur_depth[asset_name]
         cur_depth[new_name] = source
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -159,6 +164,7 @@ def MoveAssetRegistration(source_file_path: str, asset_name: str, target_path: s
             cur_depth = cur_depth[folder]
         cur_depth[asset_name] = source_data
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -172,6 +178,43 @@ def GetAssetRegistryFolder(project_path: str) -> dict:
         cur_depth = cur_depth[folder]
 
     return cur_depth
+
+
+def SortRegistry(registry_data: dict):
+    """
+    Given Asset Registry data, sort and modify the data in place. This only applies to the top level of the data.
+    This does not recurse if given multiple depths
+    """
+    # Split up assets into Folders and Assets so we can apply sorting rules correctly
+    folders = {}
+    asset_groups = {}
+    for asset_name, asset_type in registry_data.items():
+        if isinstance(asset_type, dict):
+            folders[asset_name] = asset_type
+        else:
+            if asset_type not in asset_groups:
+                asset_groups[asset_type] = {}
+
+            # Group assets by their type, but keep the asset key,val pair intact
+            asset_groups[asset_type][asset_name] = asset_type
+
+    # Sort folders by alphabetical order
+    sorted_folders = sorted(folders.items(), key=lambda x: x[0])
+
+    # Sort the asset groups by alphabetical order
+    asset_groups = dict(sorted(asset_groups.items(), key=lambda x: x[0]))
+
+    # For each asset group, sort the assets themselves by alphabetical order
+    sorted_assets = {}
+    for group_name, assets in asset_groups.items():
+        sorted_assets.update(dict(sorted(assets.items(), key=lambda x: x[0])))
+
+    # Rebuild the registry using the newly sorted items
+    sorted_registry = {}
+    sorted_registry.update(sorted_folders)
+    sorted_registry.update(sorted_assets)
+    registry_data.clear()
+    registry_data.update(sorted_registry)
 
 
 def LoadHeartbeatFile():
