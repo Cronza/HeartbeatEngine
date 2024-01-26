@@ -137,7 +137,6 @@ class OutlinerUI(QtWidgets.QWidget):
     def RemoveAsset(self, name: str):
         asset = self.asset_list.findItems(name, QtCore.Qt.MatchFlag.MatchExactly)[0]
         self.asset_list.takeItem(self.asset_list.row(asset))
-        #@TODO: Add sort update here...
 
     def MoveToDirectory(self, path_to_dir: str):
         self.ClearAssets()
@@ -154,7 +153,6 @@ class OutlinerUI(QtWidgets.QWidget):
 
     def ShowDetails(self):
         selected_asset = self.asset_list.currentItem()
-        print(selected_asset)
         info_dialog = DialogAssetInfo(
             file_name=selected_asset.asset_name,
             file_type=selected_asset.asset_type,
