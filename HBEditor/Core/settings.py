@@ -185,36 +185,23 @@ def SortRegistry(registry_data: dict):
     Given Asset Registry data, sort and modify the data in place. This only applies to the top level of the data.
     This does not recurse if given multiple depths
     """
-    # Split up assets into Folders and Assets so we can apply sorting rules correctly
     folders = {}
-    asset_groups = {}
-    for asset_name, asset_type in registry_data.items():
-        if isinstance(asset_type, dict):
-            folders[asset_name] = asset_type
+    assets = {}
+
+    # Split up assets into Folders and Assets so we can apply sorting rules correctly
+    for key, value in registry_data.items():
+        if isinstance(value, dict):
+            folders[key] = value
         else:
-            if asset_type not in asset_groups:
-                asset_groups[asset_type] = {}
+            assets[key] = value
 
-            # Group assets by their type, but keep the asset key,val pair intact
-            asset_groups[asset_type][asset_name] = asset_type
+    # Sort assets by value first and then by key
+    sorted_assets = {key: value for key, value in sorted(assets.items(), key=lambda item: (str(item[1]), item[0]))}
 
-    # Sort folders by alphabetical order
-    sorted_folders = sorted(folders.items(), key=lambda x: x[0])
-
-    # Sort the asset groups by alphabetical order
-    asset_groups = dict(sorted(asset_groups.items(), key=lambda x: x[0]))
-
-    # For each asset group, sort the assets themselves by alphabetical order
-    sorted_assets = {}
-    for group_name, assets in asset_groups.items():
-        sorted_assets.update(dict(sorted(assets.items(), key=lambda x: x[0])))
-
-    # Rebuild the registry using the newly sorted items
-    sorted_registry = {}
-    sorted_registry.update(sorted_folders)
-    sorted_registry.update(sorted_assets)
+    # Combine folders and assets before updating the passed-in registry dict
     registry_data.clear()
-    registry_data.update(sorted_registry)
+    registry_data.update({**folders, **sorted_assets})
+
 
 
 def LoadHeartbeatFile():
