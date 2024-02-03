@@ -41,6 +41,10 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         # ID. This is commonly the name of the group
         self.owner_id = ""
 
+    def Get(self) -> dict:
+        """ Returns the action_data (including the action name) stored in this item """
+        return {self.action_name: self.action_data}
+
     def GetLocked(self):
         if self._movement_perm_locked:
             return self._movement_perm_locked

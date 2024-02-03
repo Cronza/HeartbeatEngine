@@ -13,11 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
+
+import yaml
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.EditorUtilities import utils
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
 
@@ -81,20 +84,8 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
         # Build the Sequence
         self.sequence_list = DialogueSequence(self)
-        self.sequence_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
-        self.sequence_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
-        self.sequence_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
-        self.sequence_list.setResizeMode(QtWidgets.QListWidget.ResizeMode.Adjust)
-        self.sequence_list.setDragEnabled(True)
-        self.sequence_list.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
-        self.sequence_list.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
-        self.sequence_list.setDropIndicatorShown(False)
-        self.sequence_list.setAcceptDrops(True)
+        self.sequence_list.SIG_USER_PASTE.connect(self.AddEntry)
         self.sequence_list.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
-
-        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
-        # focus border. Thus, we do it the slightly more tragic way
-        self.sequence_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
@@ -113,10 +104,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
-            self.SIG_USER_UPDATE.emit()
 
         new_item = QtWidgets.QListWidgetItem()
-        if index:
+        if index is not None:
             self.sequence_list.insertItem(index, new_item)
         else:
             self.sequence_list.addItem(new_item)
@@ -133,6 +123,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         new_item.setSizeHint(new_entry.sizeHint())
         self.sequence_list.setItemWidget(new_item, new_entry)
 
+        self.SIG_USER_UPDATE.emit()
         return new_entry
 
     def RemoveEntry(self):
@@ -165,9 +156,23 @@ class DialogueSequencePanel(QtWidgets.QWidget):
 
 
 class DialogueSequence(QtWidgets.QListWidget):
-    """ A custom QListWidget with unique drag rendering """
+    SIG_USER_PASTE = QtCore.pyqtSignal(str, object, int)  # action_name, action_data, index
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.setResizeMode(QtWidgets.QListWidget.ResizeMode.Adjust)
+        self.setDragEnabled(True)
+        self.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
+        self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
+        self.setDropIndicatorShown(False)
+        self.setAcceptDrops(True)
 
     def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
+        # Override the drag function to alter the drag image
         if supportedActions.MoveAction:
             new_drag = QtGui.QDrag(self)
             entry_widget = self.itemWidget(self.item(self.selectedIndexes()[0].row()))
@@ -178,6 +183,26 @@ class DialogueSequence(QtWidgets.QListWidget):
             new_drag.exec(supportedActions)
         else:
             super().startDrag(supportedActions)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        if event == QtGui.QKeySequence.StandardKey.Copy:
+            if self.selectedItems():
+                # Grab the data stored in the entry
+                selected_item: DialogueEntry = self.itemWidget(self.item(self.currentRow()))
+
+                # Modify the data to include an identifier to the source. This will help ensure copy + pasting only
+                # works for the right context
+                data = {'source': 'DialogueSequence', 'data': {selected_item.GetName(): selected_item.Get()}}
+                QtGui.QGuiApplication.clipboard().setText(str(data))
+
+        elif event == QtGui.QKeySequence.StandardKey.Paste:
+            # Validate the data
+            data = utils.ValidateClipboard("DialogueSequence", dict)
+            if data:
+                name, data = next(iter(data.items()))
+                self.SIG_USER_PASTE.emit(name, data, self.currentRow())
+        else:
+            super().keyPressEvent(event)
 
 
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
@@ -200,8 +225,8 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
 
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
-
         self.name_widget.setText(self.action_name)
+
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
 

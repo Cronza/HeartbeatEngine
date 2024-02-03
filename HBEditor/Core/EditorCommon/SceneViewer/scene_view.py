@@ -1,14 +1,20 @@
 from PyQt6 import QtWidgets, QtCore, QtGui
+from HBEditor.Core.EditorUtilities import utils
 
 
 class SceneView(QtWidgets.QGraphicsView):
     """ A custom subclass of QGraphicsView with extended features """
     SIG_USER_MOVED_ITEMS = QtCore.pyqtSignal(list)
+    SIG_USER_PASTE = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent):
+    def __init__(self, parent, context: str):
         super().__init__(parent)
 
         self.setObjectName("scene-viewer")
+
+        # Track the owning context of this view. This is used to ensure data being copied from this view can only be
+        # pasted in places with matching context
+        self.context = context
 
         self.zoom_min = 0.4  # Zoom Out
         self.zoom_max = 4  # Zoom In
@@ -48,7 +54,29 @@ class SceneView(QtWidgets.QGraphicsView):
             self.setDragMode(self.DragMode.ScrollHandDrag)
             self.setInteractive(False)
 
-        super().keyPressEvent(event)
+        elif event == QtGui.QKeySequence.StandardKey.Copy:
+            selected_items = self.scene().selectedItems()
+            if selected_items:
+                # Grab the data stored in all selected entries
+                selected_items = self.scene().selectedItems()
+
+                # Coalesce data from all selected items
+                entries = []
+                for item in selected_items:
+                    entries.append(item.Get())
+
+                # Modify the data to include an identifier to the source. This will help ensure copy + pasting only
+                # works for the right context
+                data = {'source': self.context, 'data': entries}
+                QtGui.QGuiApplication.clipboard().setText(str(data))
+
+        elif event == QtGui.QKeySequence.StandardKey.Paste:
+            # Validate the data
+            data = utils.ValidateClipboard(self.context, list)
+            if data:
+                self.SIG_USER_PASTE.emit(data)
+        else:
+            super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QtGui.QKeyEvent) -> None:
         # Disable viewport panning once the spacebar is released

@@ -120,8 +120,9 @@ class SceneViewer(QtWidgets.QWidget):
         # Scene / View
         self.scene = Scene(QtCore.QRectF(0, 0, self.viewer_size[0], self.viewer_size[1]))
         self.scene.selectionChanged.connect(self.UpdateSelectionChanged)
-        self.view = SceneView(self.scene)
+        self.view = SceneView(self.scene, f"{file_type.name}View")
         self.view.SIG_USER_MOVED_ITEMS.connect(self.SIG_USER_MOVED_ITEMS.emit)
+        self.view.SIG_USER_PASTE.connect(self.PasteRenderables)
         self.sub_layout.addWidget(self.view)
         self.main_layout.addLayout(self.sub_layout)
 
@@ -228,3 +229,11 @@ class SceneViewer(QtWidgets.QWidget):
 
         # Clear will destroy the default background of the scene. We need to ensure it's recreated
         self.scene.AddDefaultBackground()
+
+    def PasteRenderables(self, clipboard_data: list):
+        """ SLOT: Generate items using the given clipboard data """
+        for item in clipboard_data:
+            action_name, action_data = next(iter(item.items()))
+            self.AddRenderable(action_name, action_data, True)
+
+

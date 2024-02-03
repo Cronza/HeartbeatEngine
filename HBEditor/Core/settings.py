@@ -15,7 +15,6 @@
 import os
 import inspect
 import copy
-from PyQt6 import QtGui
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEngine.Core.Actions import actions
 from Tools.HBYaml.hb_yaml import Reader, Writer
