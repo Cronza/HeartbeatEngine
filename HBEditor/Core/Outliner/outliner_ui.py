@@ -139,17 +139,17 @@ class OutlinerUI(QtWidgets.QWidget):
         self.asset_list.takeItem(self.asset_list.row(asset))
 
     def MoveToDirectory(self, path_to_dir: str):
-        self.ClearAssets()
         self.core.cur_directory = path_to_dir
-
-        for action in self.toolbar.actions()[2:]:  # Start from after the Import button and Separator
-            self.toolbar.removeAction(action)
-
-        self.CreateQuickAccessButtons()
         self.core.Populate()
 
     def ClearAssets(self):
+        """ Removes all asset tiles from the outliner """
         self.asset_list.clear()
+
+    def ClearQAB(self):
+        """ Removes all QAB buttons """
+        for action in self.toolbar.actions()[2:]:  # Start from after the Import button and Separator
+            self.toolbar.removeAction(action)
 
     def ShowDetails(self):
         selected_asset = self.asset_list.currentItem()

@@ -35,6 +35,9 @@ class Outliner:
     def Populate(self):
         """ Create an asset widget for each registered asset in the current directory """
         self.ui.ClearAssets()
+        self.ui.ClearQAB()
+        self.ui.CreateQuickAccessButtons()
+
         cur_dir = settings.GetAssetRegistryFolder(self.cur_directory)
         for asset in cur_dir:
             # File assets are registered with their respective type enum. Folders hold nested dicts
