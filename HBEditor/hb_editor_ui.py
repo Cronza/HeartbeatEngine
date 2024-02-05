@@ -112,10 +112,10 @@ class HBEditorUI:
 
         # Clear old data
         self.main_tab_widget.clear()
-        self.outliner.GetUI().ClearAssets()
+        self.outliner.cur_directory = "Content"
         Logger.getInstance().ClearLog()
 
-        # Reload the Outliner
+        # Reload the Outliner (This clears old data)
         self.outliner.Populate()
 
         # Refresh U.I text using any active translations
