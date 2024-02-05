@@ -138,7 +138,9 @@ class InputEntryColor(InputEntryBase):
         self.input_widget.style().polish(self.input_widget)
 
     def OpenColorPrompt(self):
-        color_choice = QtWidgets.QColorDialog.getColor()
+        color_choice = QtWidgets.QColorDialog().getColor(
+            QtGui.QColor(self.data['value'][0], self.data['value'][1], self.data['value'][2])
+        )
 
         # 'rgb()' or 'getRgb()' return a QColor with alpha. We only want the RGB values (This feels wrong and I hate it)
         rgb = color_choice.red(), color_choice.green(), color_choice.blue()
