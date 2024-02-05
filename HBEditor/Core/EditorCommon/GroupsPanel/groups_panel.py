@@ -67,12 +67,6 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Create entry List
         self.entry_list = GroupList(self)
-        self.entry_list.setObjectName("groups-panel")
-        self.entry_list.setDragEnabled(True)
-        self.entry_list.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
-        self.entry_list.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
-        self.entry_list.setDropIndicatorShown(False)
-        self.entry_list.setAcceptDrops(True)
         self.entry_list.itemDoubleClicked.connect(self.EditEntry)
         self.entry_list.itemSelectionChanged.connect(self.ChangeEntry)
 
@@ -227,6 +221,14 @@ class GroupsPanel(QtWidgets.QWidget):
 
 class GroupList(QtWidgets.QListWidget):
     """ A custom QListWidget with unique controls for 'Locked' first items and drag rendering """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("groups-panel")
+        self.setDragEnabled(True)
+        self.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
+        self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
+        self.setDropIndicatorShown(False)
+        self.setAcceptDrops(True)
 
     def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
         if supportedActions.MoveAction:
