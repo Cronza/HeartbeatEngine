@@ -577,7 +577,9 @@ class create_interactable(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
-                                "start_dialogue"
+                                "set_value",
+                                "start_dialogue",
+                                "remove_renderable"
                             ],
                             "flags": ["editable"],
                         }
@@ -944,7 +946,9 @@ class create_button(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
-                                "start_dialogue"
+                                "set_value",
+                                "start_dialogue",
+                                "remove_renderable"
                             ],
                             "flags": ["editable"],
                         }
@@ -1093,6 +1097,9 @@ class create_text_button(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
+                                "set_value",
+                                "start_dialogue",
+                                "remove_renderable"
                             ],
                             "flags": ["editable"],
                         }
@@ -1237,12 +1244,9 @@ class create_checkbox(Action):
                             "default": "None",
                             "options": [
                                 "None",
-                                "load_scene",
-                                "quit_game",
-                                "scene_fade_out",
-                                "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
+                                "set_value"
                             ],
                             "flags": ["editable"],
                         }
