@@ -12,10 +12,11 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.Primitives.input_entries import InputEntryText
 from HBEditor.Core.Primitives import input_entry_handler as ieh
+from HBEditor.Core import settings
 
 
 class EditorValuesUI(EditorBaseUI):
@@ -29,20 +30,20 @@ class EditorValuesUI(EditorBaseUI):
 
         # Create the toolbar
         self.main_toolbar = QtWidgets.QToolBar()
-        self.main_toolbar.setOrientation(QtCore.Qt.Vertical)
+        self.main_toolbar.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.main_toolbar.setObjectName("vertical")
         self.main_layout.addWidget(self.main_toolbar)
 
         # Add Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Plus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
             "Add Value",
             self.AddValue
         )
 
         # Remove Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Value",
             self.RemoveValue
         )
@@ -53,15 +54,15 @@ class EditorValuesUI(EditorBaseUI):
         self.values_table.setColumnCount(2)
         self.values_table.verticalHeader().hide()
         self.values_table.setHorizontalHeaderLabels(['Name', 'Value'])
-        self.values_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
-        self.values_table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.values_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.values_table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.values_table.setAlternatingRowColors(True)
-        self.values_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.values_table.setFocusPolicy(QtCore.Qt.NoFocus)  # Disable the selection outline
+        self.values_table.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.values_table.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)  # Disable the selection outline
         self.values_table.setSortingEnabled(True)
         # TODO: Investigate how to improve the sizing for the first col. It should be a percentage of the available space
         self.values_table.horizontalHeader().setDefaultSectionSize(self.values_table.horizontalHeader().defaultSectionSize() * 3)
-        self.values_table.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked | QtWidgets.QAbstractItemView.SelectedClicked)
+        self.values_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked | QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
         values_delegate = ValuesItemDelegate(self)
         self.values_table.setItemDelegate(values_delegate)
         self.values_table.itemChanged.connect(lambda: self.SIG_USER_UPDATE.emit())

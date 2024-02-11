@@ -32,20 +32,12 @@ class EditorDialogue(EditorBase):
         )
         Logger.getInstance().Log("Editor initialized")
 
-    def UpdateActiveEntry(self):
-        """ Makes the selected entry the active one, refreshing the details panel """
-        selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
-
-        # Refresh the details panel to reflect the newly chosen row
-        self.UpdateDetails(selection)
-
     def UpdateDetails(self, selected_item):
         """
         Refreshes the details panel with the details from the selected item. Clears all details if None is provided
         """
         if selected_item:
             self.editor_ui.details.Populate(selected_item)
-
         else:
             # No entries left to select. Wipe remaining details
             self.editor_ui.details.ClearActiveItem()
@@ -68,11 +60,10 @@ class EditorDialogue(EditorBase):
         # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.data.clear()
 
-        dialogue_table = self.editor_ui.dialogue_sequence.dialogue_table
-        num_of_entries = dialogue_table.rowCount()
-        for entry_index in range(num_of_entries):
-            dialogue_entry = dialogue_table.cellWidget(entry_index, 0)
-            cur_branch.data.append({dialogue_entry.GetName(): dialogue_entry.Get()})
+        sequence_list = self.editor_ui.dialogue_sequence.sequence_list
+        for entry_index in range(sequence_list.count()):
+            sequence_entry = sequence_list.itemWidget(sequence_list.item(entry_index))
+            cur_branch.data.append({sequence_entry.GetName(): sequence_entry.Get()})
 
     def GetAllDialogueData(self) -> dict:
         """ Collects all dialogue data in the loaded file, including all branches, and returns them as a dict """
@@ -81,9 +72,6 @@ class EditorDialogue(EditorBase):
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the container
             branch = self.editor_ui.branches_panel.GetEntryItemWidget(index)
-
-            # Before we save, let's be extra sure the current information in the details panel is cached properly
-            self.editor_ui.details.StoreData()
 
             # If a branch is currently active, then it's likely to of not updated its cached branch data (Only
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
@@ -217,7 +205,7 @@ class EditorDialogue(EditorBase):
                     "type": "Dropdown",
                     "value": action_data['post_wait'],
                     "options": ["wait_for_input", "wait_until_complete", "no_wait"],
-                    "flags": ["editable", "preview"]
+                    "flags": ["editable"]
                 }
 
                 converted_entries.append({action_name: base_ad_clone})

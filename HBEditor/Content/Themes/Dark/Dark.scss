@@ -10,7 +10,7 @@
  *   GNU General Public License for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
+ *   along with the Heartbeat Engine. If not, see <httpsEditorContent:/www.gnu.org/licenses/>.
  */
 
 /* *** Colors *** */
@@ -61,6 +61,10 @@ QMainWindow{
 QWidget{
     font-family: "Cabin";
     font-size: $size_text;
+
+    &#drag-source{  // A widget used for drag representation
+        background-color: $col_secondary;
+    }
 }
 
 QToolBar{
@@ -107,7 +111,7 @@ QToolButton{
     }
 
     &:right-arrow {
-        image: url(":/Icons/Arrow_Right.png");
+        image: url("EditorContent:Icons/Arrow_Right.png");
         padding: 3px;
 
     }
@@ -132,19 +136,19 @@ QToolButton{
     &#choice-add{ /* Choice buttons don't use the typical button background */
         background-color: $col_secondary;
         border: 0px solid transparent;
-        image: url(":/Icons/Small_Plus.png");
+        image: url("EditorContent:Icons/Small_Plus.png");
         padding: 0px;
         &:hover {
-            image: url(":/Icons/Small_Plus_Hover.png");
+            image: url("EditorContent:Icons/Small_Plus_Hover.png");
         }
     }
     &#choice-remove{ /* Choice buttons don't use the typical button background */
         background-color: $col_secondary;
         border: 0px solid transparent;
-        image: url(":/Icons/Small_Minus.png");
+        image: url("EditorContent:Icons/Small_Minus.png");
         padding: 0px;
         &:hover {
-            image: url(":/Icons/Small_Minus_Hover.png");
+            image: url("EditorContent:Icons/Small_Minus_Hover.png");
         }
     }
 }
@@ -176,10 +180,10 @@ QTabBar{
 
     }
     &:close-button {
-        image: url(":/Icons/Close.png");
+        image: url("EditorContent:Icons/Close.png");
         padding: 2px;
         &:hover {
-            image: url(":/Icons/Close_Hover.png");
+            image: url("EditorContent:Icons/Close_Hover.png");
         }
     }
 }
@@ -193,7 +197,6 @@ QAbstractItemView {
     alternate-background-color: $col_view_item_alt;
     border: $size_border solid $col_secondary;
     outline: none;
-
     &:item{
         border: 0px solid transparent;
         outline: none;
@@ -211,7 +214,6 @@ QAbstractItemView {
                 border: $size_border solid $col_view_item_hover;
             }
         }
-
     }
 }
 QHeaderView{
@@ -276,20 +278,20 @@ QTreeView{
         &:open {
             border-image: none;
             &:has-children {
-                image: url(":/Icons/Arrow_Down.png");
+                image: url("EditorContent:Icons/Arrow_Down.png");
 
                 &:hover{
-                    image: url(":/Icons/Arrow_Down_Hover.png");
+                    image: url("EditorContent:Icons/Arrow_Down_Hover.png");
                 }
             }
         }
         &:closed {
             border-image: none;
             &:has-children {
-                image: url(":/Icons/Arrow_Right.png");
+                image: url("EditorContent:Icons/Arrow_Right.png");
 
                 &:hover{
-                    image: url(":/Icons/Arrow_Right_Hover.png");
+                    image: url("EditorContent:Icons/Arrow_Right_Hover.png");
                 }
             }
         }
@@ -302,7 +304,6 @@ QGraphicsView{
         border-right: 0px solid transparent;
     }
 }
-
 QScrollBar{
     border: 0px solid transparent;
      &:vertical {
@@ -481,9 +482,9 @@ QCheckBox{
             background-color: $col_hover;
         }
         &:checked {
-            image: url(:/Icons/Checkmark.png);
+            image: url(EditorContent:Icons/Checkmark.png);
             &:disabled{
-                image: url(:/Icons/Checkmark_Disabled.png);
+                image: url(EditorContent:Icons/Checkmark_Disabled.png);
                 background-color: $col_input_inactive;
             }
         }
@@ -519,7 +520,7 @@ QPushButton{
     }
     &#file{
         &:disabled{
-            image: url(:/Icons/Folder.png);
+            image: url(EditorContent:Icons/Folder.png);
         }
     }
 }

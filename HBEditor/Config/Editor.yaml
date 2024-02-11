@@ -2,23 +2,15 @@ EditorSettings:
   version: 0.1
   version_string: Created with Heartbeat Editor v0.1
   max_tabs: 3
-  theme: ":/Themes/Dark.css"
-  fonts:
-    - ":/Fonts/Comfortaa-Regular.ttf"
-    - ":/Fonts/Comfortaa-Light.ttf"
-    - ":/Fonts/Comfortaa-Bold.ttf"
-    - ":/Fonts/Cabin-Regular.ttf"
-    - ":/Fonts/Cabin-Medium.ttf"
-    - ":/Fonts/Cabin-Medium-Italic.ttf"
-    - ":/Fonts/Cabin-Bold.ttf"
-    - ":/Fonts/Cabin-Bold-Italic.ttf"
-    - ":/Fonts/Cabin-SemiBold.ttf"
-    - ":/Fonts/Cabin-SemiBold-Italic.ttf"
-    - ":/Fonts/Dustismo-Regular.ttf"
-    - ":/Fonts/Dustismo-Italic.ttf"
-    - ":/Fonts/Dustismo-Bold.ttf"
-    - ":/Fonts/Dustismo-Bold-Italic.ttf"
-
+  active_theme: "EditorContent:Themes/Dark/Dark.css"
+  active_fonts:
+    - "EditorContent:Fonts/Cabin/Cabin-Regular.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-Medium.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-MediumItalic.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-Bold.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-BoldItalic.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-SemiBold.ttf"
+    - "EditorContent:Fonts/Cabin/Cabin-SemiBoldItalic.ttf"
 Outliner:
   icon_size:
     - 40

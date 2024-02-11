@@ -9,7 +9,7 @@
 
 # What is the 'Heartbeat Engine'?
 
-The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework, with a fully-fledged editor built in PyQt5. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
+The Heartbeat Engine is a Visual Novel / Dating Simulator game engine written in Python using the PyGame framework, with a fully-fledged editor built in PyQt6. It is meant as a lightweight, user-friendly engine that allows developers to focus more on making games, and less on worrying about coding them.
 
 # Getting Started
 Currently, the Heartbeat Engine is in core development, so there may be issues during the setup process. There are no official releases of the engine or editor yet, so you will need to be able to perform the following to get started.

@@ -12,7 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 
 
@@ -36,15 +36,15 @@ class LoggerUI(QtWidgets.QWidget):
 
         # Clear Log Button
         self.logger_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Trash.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Trash.png")),
             "Clear Log",
             self.l_core.ClearLog
         )
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
-        self.log_list.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
-        self.log_list.setEditTriggers(QtWidgets.QAbstractItemView.SelectedClicked)
+        self.log_list.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.log_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
         self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
@@ -54,7 +54,7 @@ class LoggerUI(QtWidgets.QWidget):
     def AddEntry(self, text, style):
         new_entry = QtWidgets.QListWidgetItem()
         entry_text = QtWidgets.QLabel(text)  # Use a QLabel so we can apply css styling per-entry
-        entry_text.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        entry_text.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
         entry_text.setProperty("model-entry", style)  # Apply the match css rule in the active .qss file
 
         self.log_list.addItem(new_entry)

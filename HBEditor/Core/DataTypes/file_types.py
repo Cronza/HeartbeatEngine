@@ -31,13 +31,13 @@ class FileType(Enum):
 
 class FileTypeIcons:
     icons = {
-        FileType.Folder: ":/Icons/Folder.png",
-        FileType.Interface: ":/Icons/Interface.png",
-        FileType.Project_Settings: ":/Icons/File.png",
-        FileType.Dialogue: ":/Icons/File.png",
-        FileType.Scene: ":/Icons/File.png",
-        FileType.Asset_Data: ":/Icons/File.png",
-        FileType.Asset_Image: ":/Icons/File_Image.png",
-        FileType.Asset_Font: ":/Icons/File.png",
-        FileType.Asset_Sound: ":/Icons/File.png"
+        FileType.Folder: "EditorContent:Icons/Folder.png",
+        FileType.Interface: "EditorContent:Icons/Interface.png",
+        FileType.Project_Settings: "EditorContent:Icons/File.png",
+        FileType.Dialogue: "EditorContent:Icons/File.png",
+        FileType.Scene: "EditorContent:Icons/File.png",
+        FileType.Asset_Data: "EditorContent:Icons/File.png",
+        FileType.Asset_Image: "EditorContent:Icons/File_Image.png",
+        FileType.Asset_Font: "EditorContent:Icons/File.png",
+        FileType.Asset_Sound: "EditorContent:Icons/File.png"
     }

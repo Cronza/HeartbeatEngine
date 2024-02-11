@@ -13,11 +13,14 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+
+import yaml
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.EditorUtilities import utils
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
 
@@ -56,75 +59,44 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         self.add_entry_button = QtWidgets.QToolButton(self.main_toolbar)
         icon = QtGui.QIcon()
         icon.addPixmap(
-            QtGui.QPixmap(":/Icons/Plus.png"),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+            QtGui.QPixmap("EditorContent:Icons/Plus.png"),
+            QtGui.QIcon.Mode.Normal,
+            QtGui.QIcon.State.Off
         )
         self.add_entry_button.setIcon(icon)
         self.add_entry_button.setMenu(self.action_menu)
-        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.add_entry_button.setPopupMode(QtWidgets.QToolButton.ToolButtonPopupMode.InstantPopup)
         self.main_toolbar.addWidget(self.add_entry_button)
 
         # Remove Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Minus.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Entry",
             self.RemoveEntry
         )
 
         # Copy Entry Button
         self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Copy.png")),
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Copy.png")),
             "Copy Entry",
             self.CopyEntry
         )
 
-        # Move Entry Up Button
-        self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Up.png")),
-            "Move Entry Up",
-            self.MoveEntryUp
-        )
-
-        # Move Entry Down Button
-        self.main_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap(":/Icons/Down.png")),
-            "Move Entry Up",
-            self.MoveEntryDown
-        )
-
-        # Build the Action Sequence
-        self.dialogue_table = QtWidgets.QTableWidget(self)
-        self.dialogue_table.verticalHeader().setObjectName("vertical")
-        self.dialogue_table.setColumnCount(1)
-        self.dialogue_table.setShowGrid(False)
-        self.dialogue_table.horizontalHeader().hide()
-        self.dialogue_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.dialogue_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
-        self.dialogue_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.dialogue_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
-        self.dialogue_table.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
-        self.dialogue_table.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
-
-        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
-        # focus border. Thus, we do it the slightly more tragic way
-        self.dialogue_table.setFocusPolicy(QtCore.Qt.NoFocus)
+        # Build the Sequence
+        self.sequence_list = DialogueSequence(self)
+        self.sequence_list.SIG_USER_PASTE.connect(self.AddEntry)
+        self.sequence_list.itemSelectionChanged.connect(self.UpdateActiveEntry)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
         self.main_layout.addWidget(self.main_toolbar)
-        self.main_layout.addWidget(self.dialogue_table)
-
-    def RefreshCurrentRowSize(self):
-        """ Resize the currently selected row based on the size of it's contents """
-        self.dialogue_table.resizeRowToContents(self.dialogue_table.currentIndex().row())
+        self.main_layout.addWidget(self.sequence_list)
         
     def Clear(self):
-        """ Deletes all data in the dialogue table """
-        for row in range(self.dialogue_table.rowCount(), 0, -1):
-            self.dialogue_table.removeRow(row - 1)
+        """ Deletes all data in the sequence """
+        self.sequence_list.clear()
 
-    def AddEntry(self, action_name: str, action_data: dict = None, specific_row: int = None, skip_select: bool = False):
+    def AddEntry(self, action_name: str, action_data: dict = None, index: int = None, skip_select: bool = False) -> 'DialogueEntry':
         """
         Given an action name, create a new entry in the dialogue sequence populating with the ACTION_DATA for that
         action. If 'action_data' is provided, populate the entry using it instead
@@ -132,46 +104,34 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
-            self.SIG_USER_UPDATE.emit()
 
-        # Create a new, empty row. Allow optional row position specification, but default to the end of the sequence
-        new_entry_row = self.dialogue_table.rowCount()
-        if specific_row is not None:
-            new_entry_row = specific_row
-            self.dialogue_table.insertRow(new_entry_row)
+        new_item = QtWidgets.QListWidgetItem()
+        if index is not None:
+            self.sequence_list.insertItem(index, new_item)
         else:
-            self.dialogue_table.insertRow(new_entry_row)
+            self.sequence_list.addItem(new_item)
 
-        # Create a new dialogue entry object, and add it to the sequence widget.
-        new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry, self.RefreshCurrentRowSize)
-
+        new_entry = DialogueEntry(action_name, action_data, self.UpdateActiveEntry)
         # Add unique dialogue-only parameters that wouldn't be found in the 'ACTION_DATA'
         if 'post_wait' not in new_entry.action_data:
             new_entry.action_data['post_wait'] = {
                 "type": "Dropdown",
                 "value": 'wait_for_input',
                 "options": ["wait_for_input", "wait_until_complete", "no_wait"],
-                "flags": ["editable", "preview"]
+                "flags": ["editable"]
             }
+        new_item.setSizeHint(new_entry.sizeHint())
+        self.sequence_list.setItemWidget(new_item, new_entry)
 
-        # Assign the entry widget to the row
-        self.dialogue_table.setCellWidget(new_entry_row, 0, new_entry)
-
-        # Selecting the new row will cause the details panel to refresh, so allow opting out in case of batch creation
-        if not skip_select:
-            self.dialogue_table.selectRow(new_entry_row)
-
-        # Resize the row to fit any contents it has
-        self.dialogue_table.resizeRowToContents(new_entry_row)
-
+        self.SIG_USER_UPDATE.emit()
         return new_entry
 
     def RemoveEntry(self):
         """ If an entry is selected, delete it from the table """
-        selection = self.GetSelectedRow()
+        selected_indexes = self.sequence_list.selectedIndexes()
 
-        if selection != -1:
-            self.dialogue_table.removeRow(self.GetSelectedRow())
+        if selected_indexes:
+            self.sequence_list.takeItem(selected_indexes[0].row())
             self.SIG_USER_UPDATE.emit()
 
     def CopyEntry(self):
@@ -179,121 +139,117 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         selection = self.GetSelectedEntry()
 
         if selection:
-            self.AddEntry(selection.action_name, selection.action_data)
-            self.SIG_USER_UPDATE.emit()
-
-    def MoveEntryUp(self):
-        """ If an entry is selected, move it up one row """
-        row_count = self.dialogue_table.rowCount()
-        if row_count:
-            selection_index = self.GetSelectedRow()
-
-            # Only allow moving up if we're not already at the top of the sequence
-            if selection_index < 0:
-                Logger.getInstance().Log("No entry selected", 3)
-            elif selection_index == 0:
-                Logger.getInstance().Log("Can't move entry up as we're at the top of the sequence", 3)
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.dialogue_table.cellWidget(selection_index, 0)
-
-                # Delete the origin row
-                self.dialogue_table.removeRow(selection_index)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection_index - 1
-                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.action_data = taken_entry.action_data
-                self.ed_core.UpdateActiveEntry()
-
-            self.SIG_USER_UPDATE.emit()
-
-    def MoveEntryDown(self):
-        """ If an entry is selected, move it down one row """
-        row_count = self.dialogue_table.rowCount()
-        if self.dialogue_table.rowCount():
-            selection_index = self.GetSelectedRow()
-
-            # Only allow moving down if we're not already at the bottom of the sequence
-            if selection_index < 0:
-                Logger.getInstance().Log("No entry selected", 3)
-            elif selection_index + 1 >= self.dialogue_table.rowCount():
-                Logger.getInstance().Log("Can't move entry down as we're at the bottom of the sequence", 3)
-            else:
-                # 'cellWidget' returns a pointer which becomes invalid once we override it's row. Given this, instead
-                # of gently moving the row, we recreate it by transferring it's data to a newly created entry
-                taken_entry = self.dialogue_table.cellWidget(selection_index, 0)
-
-                # Delete the origin row
-                self.dialogue_table.removeRow(selection_index)
-
-                # Add a new entry two rows above the initial row
-                new_row_num = selection_index + 1
-                new_entry = self.AddEntry(taken_entry.action_name, taken_entry.action_data, new_row_num)
-
-                # Transfer the data from the original entry to the new one, before refreshing the details
-                new_entry.action_data = taken_entry.action_data
-                self.ed_core.UpdateActiveEntry()
-
+            # Get the selected index so we can place the clone next to it
+            selected_index = self.sequence_list.selectedIndexes()[0].row()
+            self.AddEntry(selection.action_name, selection.action_data, selected_index)
             self.SIG_USER_UPDATE.emit()
 
     def GetSelectedEntry(self):
         """ Returns the currently selected dialogue entry. If there isn't one, returns None """
-        selected_entry = self.dialogue_table.selectedIndexes()
+        selected_items = self.sequence_list.selectedItems()
 
-        if selected_entry:
-            selected_row = selected_entry[0].row()
-            return self.dialogue_table.cellWidget(selected_row, 0)
+        if selected_items:
+            # Only single selection is allowed, so only first index will be valid
+            return self.sequence_list.itemWidget(selected_items[0])
         else:
             return None
 
-    def GetSelectedRow(self) -> int:
-        """ Returns the currently selected row. If there isn't one, returns -1 """
-        selected_row = self.dialogue_table.selectedIndexes()
+    def UpdateActiveEntry(self):
+        """ Makes the selected entry the active one, refreshing the details panel """
+        selection = self.GetSelectedEntry()
 
-        if selected_row:
-            return selected_row[0].row()
+        # Refresh the details panel to reflect the newly chosen row
+        self.ed_core.UpdateDetails(selection)
+
+
+class DialogueSequence(QtWidgets.QListWidget):
+    SIG_USER_PASTE = QtCore.pyqtSignal(str, object, int)  # action_name, action_data, index
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
+        self.setResizeMode(QtWidgets.QListWidget.ResizeMode.Adjust)
+        self.setDragEnabled(True)
+        self.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
+        self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
+        self.setDropIndicatorShown(False)
+        self.setAcceptDrops(True)
+
+    def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
+        # Override the drag function to alter the drag image
+        if supportedActions.MoveAction:
+            new_drag = QtGui.QDrag(self)
+            entry_widget = self.itemWidget(self.item(self.selectedIndexes()[0].row()))
+            drag_image = QtGui.QPixmap(entry_widget.size())
+            entry_widget.render(drag_image)  # Render the entry widget to a Pixmap
+            new_drag.setPixmap(drag_image)
+            new_drag.setMimeData(self.mimeData(self.selectedItems()))
+            new_drag.exec(supportedActions)
         else:
-            return -1
+            super().startDrag(supportedActions)
+
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
+        if event == QtGui.QKeySequence.StandardKey.Copy:
+            if self.selectedItems():
+                # Grab the data stored in the entry
+                selected_item: DialogueEntry = self.itemWidget(self.item(self.currentRow()))
+
+                # Modify the data to include an identifier to the source. This will help ensure copy + pasting only
+                # works for the right context
+                data = {'source': 'DialogueSequence', 'data': {selected_item.GetName(): selected_item.Get()}}
+                QtGui.QGuiApplication.clipboard().setText(str(data))
+
+        elif event == QtGui.QKeySequence.StandardKey.Paste:
+            # Validate the data
+            data = utils.ValidateClipboard("DialogueSequence", dict)
+            if data:
+                name, data = next(iter(data.items()))
+                self.SIG_USER_PASTE.emit(name, data, self.currentRow())
+        else:
+            super().keyPressEvent(event)
 
 
 class DialogueEntry(QtWidgets.QWidget, SourceEntry):
-    def __init__(self, action_name, action_data, select_func, size_refresh_func):
+    def __init__(self, action_name, action_data, select_func):
         super().__init__()
+        # Allow CSS to stylize the drag visualization for this widget
+        self.setObjectName("drag-source")
 
         # Store a func object that is used when this entry is selected
         self.select_func = select_func
-
-        # Store a func object that is used when the row containing this object should be resized based on the
-        # subtext data in this object
-        #@TODO: Replace with a Qt signal / slot
-        self.size_refresh_func = size_refresh_func
 
         # Store action details
         self.action_name = action_name
         self.action_data = action_data
 
         # ****** DISPLAY WIDGETS ******
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 4, 0, 4)
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.main_layout.setContentsMargins(4, 4, 4, 4)
         self.main_layout.setSpacing(0)
+
+        self.info_layout = QtWidgets.QVBoxLayout(self)
+        self.info_layout.setSpacing(0)
+        self.main_layout.addLayout(self.info_layout)
 
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
-
         self.name_widget.setText(self.action_name)
+        self.info_layout.addWidget(self.name_widget)
+
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
+        self.info_layout.addWidget(self.subtext_widget)
 
-        # Refresh the subtext
-        self.UpdateSubtext()
+        self.icon_layout = QtWidgets.QHBoxLayout(self)
+        self.icon_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.icon_layout.setSpacing(0)
+        self.icon_condition = None  # Populated during Refresh
+        self.main_layout.addLayout(self.icon_layout)
 
-        # Add everything to the layout
-        self.main_layout.addWidget(self.name_widget)
-        self.main_layout.addWidget(self.subtext_widget)
+        self.Refresh()
 
     def Get(self) -> dict:
         """ Returns the action data stored in this object """
@@ -326,6 +282,28 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         return cur_string.strip(', ')
 
     def Refresh(self, change_tree: list = None):
-        self.size_refresh_func()
         self.UpdateSubtext()
 
+        # Update icons if applicable
+        if "conditions" in self.action_data:
+            # Clear the conditional icon if applicable
+            if self.icon_condition:
+                self.icon_layout.removeWidget(self.icon_condition)
+                self.icon_condition = None
+
+            if self.action_data["conditions"]['children']:
+                self.icon_condition = QtWidgets.QLabel(self)
+
+                # Due to a lack of constraints enforced by the layout, the pixmap scales beyond the bounds of the
+                # layout. To try and remedy this, we need to rescale the image manually. Unfortunately, even doing
+                # this leads to an abnormally large icon, so we need to reduce it further with arbitrary math
+                self.icon_condition.setPixmap(
+                    QtGui.QPixmap("EditorContent:Icons/Condition.png").scaled(
+                        round(self.icon_condition.width()/3)*2,
+                        round(self.icon_condition.height()/3)*2,
+                        QtCore.Qt.AspectRatioMode.KeepAspectRatio
+                    )
+                )
+                self.icon_condition.setToolTip("This shits conditional")
+
+                self.icon_layout.addWidget(self.icon_condition)

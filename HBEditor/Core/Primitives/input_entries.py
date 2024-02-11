@@ -14,7 +14,7 @@
 """
 import re
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.EditorUtilities import action_data as adh
@@ -102,15 +102,15 @@ class InputEntryColor(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
         self.input_widget = QtWidgets.QFrame()
-        self.input_widget.setFrameStyle(QtWidgets.QFrame.Panel)
+        self.input_widget.setFrameStyle(QtWidgets.QFrame.Shape.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
 
         # @TODO: Replace style sheet assignment with a QPalette to retain button state styles
         self.color_select_button = QtWidgets.QToolButton()
         self.color_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel.png"), QtGui.QIcon.Normal)
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Disabled)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Color_Wheel.png"), QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Color_Wheel_Disabled.png"), QtGui.QIcon.Mode.Disabled)
         self.color_select_button.setIcon(icon)
         self.color_select_button.clicked.connect(self.OpenColorPrompt)
 
@@ -138,7 +138,9 @@ class InputEntryColor(InputEntryBase):
         self.input_widget.style().polish(self.input_widget)
 
     def OpenColorPrompt(self):
-        color_choice = QtWidgets.QColorDialog.getColor()
+        color_choice = QtWidgets.QColorDialog().getColor(
+            QtGui.QColor(self.data['value'][0], self.data['value'][1], self.data['value'][2])
+        )
 
         # 'rgb()' or 'getRgb()' return a QColor with alpha. We only want the RGB values (This feels wrong and I hate it)
         rgb = color_choice.red(), color_choice.green(), color_choice.blue()
@@ -202,8 +204,8 @@ class InputEntryAssetSelector(InputEntryBase):
         self.file_select_button = QtWidgets.QToolButton()
         self.file_select_button.setObjectName("non-toolbar")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder.png"), QtGui.QIcon.Normal)
-        icon.addPixmap(QtGui.QPixmap(":/Icons/Folder_Disabled.png"), QtGui.QIcon.Disabled)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Folder.png"), QtGui.QIcon.Mode.Normal)
+        icon.addPixmap(QtGui.QPixmap("EditorContent:Icons/Folder_Disabled.png"), QtGui.QIcon.Mode.Disabled)
         self.file_select_button.setIcon(icon)
         self.main_layout.addWidget(self.input_widget)
         self.main_layout.addWidget(self.file_select_button)
@@ -392,7 +394,7 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt = QtWidgets.QLineEdit()
 
         # Limit entered values to int only
-        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.StandardNotation)
+        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.Notation.StandardNotation)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
         self.input_widget.setText("0")
@@ -453,8 +455,7 @@ class InputEntryArray(InputEntryBase):
     the ACTION_DATA
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
-                 add_func: callable, signal_func: callable, refresh_func: callable,
-                 excluded_properties: dict = None):
+                 add_func: callable, signal_func: callable, excluded_properties: dict = None):
         super().__init__(data)
 
         self.excluded_properties = excluded_properties
@@ -462,40 +463,35 @@ class InputEntryArray(InputEntryBase):
 
         self.child_limit = 6
 
-        # We need access to the return value of the created view item, so we must use a callback instead of a
-        # signal / slot (Which don't allow return values)
+        # Callbacks to pass along to new children
         self.add_func = add_func
         self.signal_func = signal_func
-        self.refresh_func = refresh_func
 
         # In order for the data to be recursively parsed, we need the 'children' key
         if "children" not in self.data:
             self.data["children"] = {}
 
-        self.main_layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
         self.add_item_button = QtWidgets.QToolButton()
         self.add_item_button.setObjectName("choice-add")
-        self.add_item_button.clicked.connect(lambda: self.AddItems())
+        self.add_item_button.clicked.connect(self.AddItems)
         self.main_layout.addWidget(self.add_item_button)
 
-    def AddItems(self, name="", data=None, parent=None):
+    def AddItems(self, name="", data=None, parent=None, init_iter: bool = True):
         if self.owning_model_item.childCount() >= self.child_limit and not data:  # Don't run when recursing
             Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
+            if not parent:
+                parent = self.owning_model_item
+
             if not data:
                 data = copy.deepcopy(self.data["template"])
 
                 # Array elements have generated names to avoid having to be stored as a list when caching or saving
                 name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
-                self.SIG_USER_UPDATE.emit(self.owning_model_item)
-
-            if not parent:
-                parent = self.owning_model_item
-
             data_no_key = data[adh.GetActionName(data)]
-
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
@@ -503,8 +499,7 @@ class InputEntryArray(InputEntryBase):
                 data=data_no_key,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
-                signal_func=self.signal_func,
-                refresh_func=self.refresh_func
+                signal_func=self.signal_func
             )
             if "children" in data_no_key:
                 for child_name, child_data in data_no_key["children"].items():
@@ -512,12 +507,11 @@ class InputEntryArray(InputEntryBase):
                         if not child_data["editable"]:
                             continue
 
-                    self.AddItems(child_name, {child_name: child_data}, new_entry)
+                    self.AddItems(child_name, {child_name: child_data}, new_entry, False)
 
-        if not parent:
-            # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion
-            # is done
-            self.refresh_func(self.owning_model_item)
+        if init_iter:
+            # Inform the owning U.I that we've added a child outside its purview
+            self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
 
 class InputEntryArrayElement(InputEntryBase):
@@ -544,20 +538,17 @@ class InputEntryEvent(InputEntryBase):
     is selected, all properties related to that action are generated as children to this entry
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
-                 add_func: callable, remove_func: callable, signal_func: callable, refresh_func: callable,
+                 add_func: callable, remove_func: callable, signal_func: callable,
                  excluded_properties: dict = None):
         super().__init__(data)
 
         self.excluded_properties = []
         self.owning_view = owning_view
 
-        # We need access to the return value of the created view item, so we must use a callback instead of a
-        # signal / slot (Which don't allow return values)
-        #@TODO: The above statement is no longer valid, and signals should be adopted here
+        # Callbacks to pass along to new children
         self.add_func = add_func
         self.remove_func = remove_func
         self.signal_func = signal_func
-        self.refresh_func = refresh_func
 
         self.input_widget = QtWidgets.QComboBox()
 
@@ -609,8 +600,7 @@ class InputEntryEvent(InputEntryBase):
                 data=data,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
-                signal_func=self.signal_func,
-                refresh_func=self.refresh_func
+                signal_func=self.signal_func
             )
             if "children" in data:
                 for child_name, child_data in data["children"].items():
@@ -623,7 +613,7 @@ class InputEntryEvent(InputEntryBase):
         if not parent:
             # Inform the owning U.I that we've added a child outside its purview. Only do this once all recursion
             # is done
-            self.refresh_func(self.owning_model_item)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
     def Get(self):
         self.data["value"] = self.input_widget.currentText()

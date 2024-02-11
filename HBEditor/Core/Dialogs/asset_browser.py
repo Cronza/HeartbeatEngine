@@ -1,5 +1,5 @@
 import copy, os
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
 from HBEditor.Core.EditorUtilities import image as ih
@@ -13,7 +13,7 @@ class AssetBrowser(QtWidgets.QDialog):
         self.type_filter = type_filter
 
         # Hide the OS header to lock its position
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
         self.resize(640, 480)
         self.main_layout = QtWidgets.QVBoxLayout(self)
 
@@ -34,21 +34,21 @@ class AssetBrowser(QtWidgets.QDialog):
         self.asset_list.verticalHeader().setObjectName("vertical")
         self.asset_list.setColumnCount(4)
         self.asset_list.setShowGrid(False)
-        self.asset_list.setTextElideMode(QtCore.Qt.ElideRight)
+        self.asset_list.setTextElideMode(QtCore.Qt.TextElideMode.ElideRight)
         self.asset_list.setWordWrap(False)
         self.asset_list.horizontalHeader().hide()
         self.asset_list.verticalHeader().hide()
         self.asset_list.hideColumn(0)  # Hide the thumbnail column by default
-        self.asset_list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
-        self.asset_list.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-        self.asset_list.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-        self.asset_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.asset_list.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+        self.asset_list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.asset_list.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.asset_list.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.asset_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.asset_list.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
-        self.asset_list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Disable editing
-        self.asset_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)  # Disable multi-selection
-        self.asset_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)  # Disables cell selection
-        self.asset_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignCenter)
+        self.asset_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.asset_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
+        self.asset_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.asset_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.asset_list.setIconSize(QtCore.QSize(
             settings.editor_data["Outliner"]["icon_size"][0],
             settings.editor_data["Outliner"]["icon_size"][1]
@@ -56,11 +56,11 @@ class AssetBrowser(QtWidgets.QDialog):
 
         # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly more tragic way
-        self.asset_list.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.asset_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.main_layout.addWidget(self.asset_list)
 
         # Confirmation Buttons
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         self.main_layout.addWidget(self.button_box)

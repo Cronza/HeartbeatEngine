@@ -1,15 +1,8 @@
 # Created by Cronza
 type: Interface
-key: "!&INTERFACE_DIALOGUE&!"
 settings:
-  z_order: 10000
-  show_transition:
-    type: fade_in
-    speed: 1000
-  hide_transition:
-    type: fade_out
-  speed: 1000
-
+  description: ''
+  key: "!&INTERFACE_DIALOGUE&!"
 pages:
   Persistent:
     description: ''

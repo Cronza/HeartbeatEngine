@@ -53,13 +53,13 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
         self.details_tree.setAutoScroll(False)
-        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
-        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed)
-        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
-        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
+        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # --- Specialized Settings for the 'G' column ---
         # 1. Allow columns to be significantly smaller than normal
@@ -69,7 +69,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
 
         # 3. Align the column header text to match the alignment of the checkbox
-        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignCenter)
+        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)
@@ -107,7 +107,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 if "editable" not in data["flags"]:
                     continue
 
-                # Some editors exclude certain requirements (IE. Point & Click doesn't make use of 'post_wait'). Don't
+                # Some editors exclude certain requirements (IE. Scenes don't make use of 'post_wait'). Don't
                 # generate entries for any excluded property. Make an exception if the 'no_exclusion' flag is used
                 elif excluded_properties:
                     if name in excluded_properties:
@@ -123,8 +123,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 data=data,
                 parent=parent,
                 excluded_properties=excluded_properties,
-                signal_func=self.ConnectSignals,
-                refresh_func=self.UserUpdatedInputWidget
+                signal_func=self.ConnectSignals
             )
 
             if "children" in data:
@@ -144,7 +143,7 @@ class DetailsPanel(QtWidgets.QWidget):
         if global_checkbox:
             global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
-    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None, initial_iter: bool = True) -> dict:
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None) -> dict:
         """
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
@@ -186,7 +185,6 @@ class DetailsPanel(QtWidgets.QWidget):
                     # displayed entries
 
                     entry_data["children"] = {}
-
                     for child_index in range(0, entry.childCount()):
                         # Get the underlying element dict without the top-most key (It's usually replaced by a generated
                         # one)
@@ -201,13 +199,13 @@ class DetailsPanel(QtWidgets.QWidget):
                         entry_data["children"][child_entry_name] = template_copy[ad.GetActionName(template_copy)]
 
                     # Update the children as usual now that the stagnant data has been removed
-                    entry_data["children"].update(self.StoreData(entry, False))
+                    entry_data["children"].update(self.StoreData(entry))
 
                 elif entry.childCount() > 0:
 
                     # We do an update here as not all items within the action_data were displayed (uneditable details
                     # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
-                    entry_data["children"].update(self.StoreData(entry, False))
+                    entry_data["children"].update(self.StoreData(entry))
 
                 data_to_store[entry_name] = entry_data
 

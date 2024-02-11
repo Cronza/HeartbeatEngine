@@ -35,6 +35,9 @@ class Outliner:
     def Populate(self):
         """ Create an asset widget for each registered asset in the current directory """
         self.ui.ClearAssets()
+        self.ui.ClearQAB()
+        self.ui.CreateQuickAccessButtons()
+
         cur_dir = settings.GetAssetRegistryFolder(self.cur_directory)
         for asset in cur_dir:
             # File assets are registered with their respective type enum. Folders hold nested dicts
@@ -54,22 +57,23 @@ class Outliner:
     def CreateFolder(self):
         asset_name = self.hb_core.NewFolder(self.cur_directory)
         if asset_name:
-            self.ui.AddAsset(asset_name, FileType.Folder)
+            self.Populate()
 
     def CreateScene(self):
         asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Scene)
         if asset_name:
-            self.ui.AddAsset(asset_name, FileType.Scene)
+            self.Populate()
+
 
     def CreateDialogue(self):
         asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Dialogue)
         if asset_name:
-            self.ui.AddAsset(asset_name, FileType.Dialogue)
+            self.Populate()
 
     def CreateInterface(self):
         asset_name = self.hb_core.NewInterface(self.cur_directory)
         if asset_name:
-            self.ui.AddAsset(asset_name, FileType.Interface)
+            self.Populate()
 
     def OpenFile(self, asset_name: str):
         self.hb_core.OpenFile(f"{self.cur_directory}/{asset_name}")

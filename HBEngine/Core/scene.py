@@ -21,12 +21,10 @@ from Tools.HBYaml.hb_yaml import Reader
 
 
 class Scene:
-    def __init__(self, scene_data_file: str, window: pygame.Surface, load_scene_func: callable):
+    def __init__(self, scene_data_file: str):
 
         # Read in the active scene data
-        self.scene_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(scene_data_file))
-
-        self.window = window
+        self.scene_data = Reader.ReadAll(scene_data_file)
 
         # All renderable elements, including module and interface items. Only top-most parents objects will be present
         # here, as children are recursively drawn
@@ -41,11 +39,7 @@ class Scene:
 
         self.input_owner = None  # Reserves input for strictly one object and its children
         self.stop_interactions = False  # Flag for whether user control should be disabled for interactables
-        self.allow_pausing = self.scene_data["settings"][
-            "allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
-
-        # Callbacks
-        self.load_scene_func = load_scene_func
+        self.allow_pausing = self.scene_data["settings"]["allow_pausing"]  # Allow disabling pause functionality (Valid for menu scenes or special sequences)
 
         # Keep track of delta time so time-based actions can be more accurate across systems
         self.delta_time = 0
@@ -71,7 +65,7 @@ class Scene:
             # Draw any renderables using the screen space multiplier to fit the new resolution
             for item in renderables:
                 if item.visible:
-                    self.window.blit(item.GetSurface(), (item.rect.x, item.rect.y))
+                    settings.window.blit(item.GetSurface(), (item.rect.x, item.rect.y))
 
                 #@TODO: Review if this causes redundant drawing
                 # Draw any child renderables after drawing the parent
@@ -79,7 +73,7 @@ class Scene:
                     children = sorted(item.children, key=lambda child_item: child_item.z_order)
                     for child in children:
                         if child.visible:
-                            self.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+                            settings.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
 
                             # Recurse if this child has children
                             if child.children:
@@ -87,18 +81,17 @@ class Scene:
 
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change """
-        if scene_file:
-            action_manager.Clear()  # Clear actions
+        action_manager.Clear()  # Clear actions
 
-            self.active_renderables.Clear()  # Clear graphics
-            for sound in self.active_sounds.values():  # Clear SFX
-                sound.Stop()
-            if self.active_music:  # Clear music
-                self.active_music.Stop()
+        self.active_renderables.Clear()  # Clear graphics
+        for sound in self.active_sounds.values():  # Clear SFX
+            sound.Stop()
+        if self.active_music:  # Clear music
+            self.active_music.Stop()
 
-            self.load_scene_func(scene_file)
-        else:
-            raise ValueError("Load Scene Failed - No scene file provided, or a scene type was not provided")
+        from HBEngine import hb_engine
+        hb_engine.LoadScene(scene_file)
+
 
     def LoadSceneData(self):
         """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """
@@ -136,7 +129,7 @@ class Scene:
 
         return None
 
-    def UnloadInterface(self, key_to_remove: str, parent: 'Renderable') -> bool:
+    def UnloadInterface(self, key_to_remove: str, parent: 'Renderable' = None) -> bool:
         try:
             # Remove from the scene or parent if applicable
             if parent:

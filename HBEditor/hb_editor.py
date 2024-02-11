@@ -17,10 +17,9 @@ import sys
 import shutil
 import re
 from pathlib import Path
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets, QtCore
 
 from HBEditor import hb_editor_ui as hbe
-from HBEditor.Content import content
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
@@ -42,15 +41,17 @@ class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
 
-        self.e_ui = hbe.HBEditorUI(self)
+        # Add a search path so references to editor assets are simplified. This is particularly important for theme
+        # files where paths can't be resolved programatically
+        QtCore.QDir.addSearchPath("EditorContent", (os.path.join(settings.editor_root, "Content")))
 
-        # Track which editor is currently active
-        self.active_editor = None
+        self.e_ui = hbe.HBEditorUI(self)
+        self.active_editor = None  # Track which editor is currently active
 
         # Show the interface. This suspends execution until the interface is closed, meaning the proceeding exit command
         # will be ran only then
         self.e_ui.Show()
-        sys.exit(self.app.exec_())
+        sys.exit(self.app.exec())
 
     def NewProject(self):
         """
@@ -883,9 +884,9 @@ class HBEditor:
             self.e_ui.GetWindow(),
             f"Confirm {action.capitalize()}",
             message,
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
-        return result == QtWidgets.QMessageBox.Yes
+        return result == QtWidgets.QMessageBox.StandardButton.Yes
 
     def ShowConfirmFolderModificationPrompt(self, files_open: bool, action: str, participle: str,
                                             partial_folder_path: str) -> bool:
@@ -903,9 +904,9 @@ class HBEditor:
             self.e_ui.GetWindow(),
             f"Confirm {action.capitalize()}",
             message,
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
-        return result == QtWidgets.QMessageBox.Yes
+        return result == QtWidgets.QMessageBox.StandardButton.Yes
 
 
 def except_hook(cls, exception, traceback):

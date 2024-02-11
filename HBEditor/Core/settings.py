@@ -15,7 +15,6 @@
 import os
 import inspect
 import copy
-from PyQt5 import QtGui
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEngine.Core.Actions import actions
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -67,6 +66,7 @@ def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
 
     cur_depth[asset_name] = asset_type.name
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -78,9 +78,10 @@ def RegisterAssetFolder(path_to_create: str):
     for folder in split_path:
         if folder not in cur_depth:
             cur_depth[folder] = {}
+        else:
+            cur_depth = cur_depth[folder]
 
-        cur_depth = cur_depth[folder]
-
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -98,6 +99,7 @@ def DeregisterAsset(source_file_path: str, asset_name: str):
     if asset_name in cur_depth:
         del cur_depth[asset_name]
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -115,6 +117,7 @@ def DuplicateAssetRegistration(source_file_path: str, asset_name: str, new_name:
     if asset_name in cur_depth:
         cur_depth[new_name] = cur_depth[asset_name]
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -131,6 +134,7 @@ def RenameAssetRegistration(source_file_path: str, asset_name: str, new_name: st
         del cur_depth[asset_name]
         cur_depth[new_name] = source
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -159,6 +163,7 @@ def MoveAssetRegistration(source_file_path: str, asset_name: str, target_path: s
             cur_depth = cur_depth[folder]
         cur_depth[asset_name] = source_data
 
+    SortRegistry(cur_depth)
     SaveHeartbeatFile(asset_registry)
 
 
@@ -172,6 +177,30 @@ def GetAssetRegistryFolder(project_path: str) -> dict:
         cur_depth = cur_depth[folder]
 
     return cur_depth
+
+
+def SortRegistry(registry_data: dict):
+    """
+    Given Asset Registry data, sort and modify the data in place. This only applies to the top level of the data.
+    This does not recurse if given multiple depths
+    """
+    folders = {}
+    assets = {}
+
+    # Split up assets into Folders and Assets so we can apply sorting rules correctly
+    for key, value in registry_data.items():
+        if isinstance(value, dict):
+            folders[key] = value
+        else:
+            assets[key] = value
+
+    # Sort assets by value first and then by key
+    sorted_assets = {key: value for key, value in sorted(assets.items(), key=lambda item: (str(item[1]), item[0]))}
+
+    # Combine folders and assets before updating the passed-in registry dict
+    registry_data.clear()
+    registry_data.update({**folders, **sorted_assets})
+
 
 
 def LoadHeartbeatFile():
@@ -238,10 +267,8 @@ user_project_dir = None
 user_project_data = None  # The contents of the project's 'Game.yaml' file
 
 asset_registry = {}  # Loaded when project is loaded
-engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")
-
-# Contains data relating to how the editor functions
-editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")
+engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")  # Engine files which are accessible via the asset registration system
+editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")  # Editor function and style settings
 
 # Contains categorized engine actions and definitions for which editors can use which actions
 available_actions = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")

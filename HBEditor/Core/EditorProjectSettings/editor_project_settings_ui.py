@@ -66,9 +66,9 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.settings_tree.setHeaderLabels(['Name', 'Input'])
         self.settings_tree.setAutoScroll(False)
         self.settings_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.settings_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.settings_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.settings_tree.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.settings_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.settings_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.settings_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.settings_layout.addWidget(self.settings_title)
         self.settings_layout.addWidget(self.settings_tree)
 

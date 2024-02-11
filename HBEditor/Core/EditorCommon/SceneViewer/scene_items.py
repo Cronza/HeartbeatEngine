@@ -1,5 +1,5 @@
 import copy
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.EditorUtilities import font
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad
@@ -28,9 +28,9 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
 
-        self.setFlag(self.ItemIsMovable, True)
-        self.setFlag(self.ItemIsSelectable, True)
-        self.setFlag(self.ItemSendsGeometryChanges)
+        self.setFlag(self.GraphicsItemFlag.ItemIsMovable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges)
 
         self.setAcceptDrops(True)
 
@@ -40,6 +40,19 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         # If the implementing editor desires organizing by group, track the group who owns this widget by using a unique
         # ID. This is commonly the name of the group
         self.owner_id = ""
+
+        self.allow_icon_drawing = True  # Toggles whether icons can appear for this item
+        self.condition_active = False
+        self.icon_condition = QtGui.QPixmap("EditorContent:Icons/Condition.png")
+        self.icon_condition = self.icon_condition.scaled(
+            round(self.icon_condition.width() / 2),
+            round(self.icon_condition.height() / 2),
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio
+        )
+
+    def Get(self) -> dict:
+        """ Returns the action_data (including the action name) stored in this item """
+        return {self.action_name: self.action_data}
 
     def GetLocked(self):
         if self._movement_perm_locked:
@@ -58,14 +71,14 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
 
         self._movement_locked = state
         if state:
-            self.setFlags(self.flags() & ~self.ItemIsMovable)
+            self.setFlags(self.flags() & ~self.GraphicsItemFlag.ItemIsMovable)
         else:
-            self.setFlags(self.flags() | self.ItemIsMovable)
+            self.setFlags(self.flags() | self.GraphicsItemFlag.ItemIsMovable)
 
         return True
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
-                         pixmap: QtGui.QPixmap = None, text: str = ""):
+                         pixmap: QtGui.QPixmap = None, text: str = "", init_iter: bool = True):
         """
         Recursively generate child items in the tree for each item in the action_data. All items are created with
         the full parameters data block
@@ -104,7 +117,6 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                 )
                 new_item.setParentItem(parent)
                 new_item.root_item = self
-                new_item.Refresh()
 
             elif param_name == "text":
                 new_item = TextItem(
@@ -113,7 +125,6 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                 )
                 new_item.setParentItem(parent)
                 new_item.root_item = self
-                new_item.Refresh()
 
             if "children" in param_data:
                 if param_data['children']:
@@ -121,8 +132,12 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                         parent=new_item,
                         action_data=param_data["children"],
                         pixmap=pixmap,
-                        text=text
+                        text=text,
+                        init_iter=False
                     )
+
+        if init_iter:
+            self.Refresh()
 
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
@@ -130,11 +145,19 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         if change_tree:
             self.RefreshRecursivePartial(self, change_tree)
         else:
-            self.RefreshRecursive(self)
+            self.RefreshRecursiveAll(self)
 
         # The root item uses the top-most child's z-order, so they both need to be updated
-        if change_tree[0] == "z_order":
-            self.UpdateZValue()
+        if change_tree:
+            if change_tree[0] == "z_order":
+                self.UpdateZValue()
+
+        # Update condition state if applicable
+        if "conditions" in self.action_data:
+            if self.action_data["conditions"]['children']:
+                self.condition_active = True
+            else:
+                self.condition_active = False
 
     def RefreshRecursiveAll(self, cur_target: QtWidgets.QGraphicsItem) -> bool:
         """ Perform a full Refresh for all children """
@@ -189,6 +212,28 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
 
+        if self.allow_icon_drawing:
+            if self.condition_active:
+                painter.drawPixmap(
+                    QtCore.QPointF(
+                        self.boundingRect().x() + (self.boundingRect().width()),
+                        self.boundingRect().y() - (self.icon_condition.height())
+                    ),
+                    self.icon_condition
+                )
+
+    def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mousePressEvent(event)
+        if self.allow_icon_drawing:
+            self.allow_icon_drawing = False
+            self.scene().update(self.scene().sceneRect())
+
+    def mouseReleaseEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mouseReleaseEvent(event)
+        if not self.allow_icon_drawing:
+            self.allow_icon_drawing = True
+            self.scene().update(self.scene().sceneRect())
+
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
     def __init__(self, action_data: dict, pixmap: QtGui.QPixmap = None):
@@ -198,8 +243,8 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         self.is_centered = False
         self.is_flipped = False
 
-        self.setFlag(self.ItemIsSelectable, False)
-        self.setFlag(self.ItemSendsGeometryChanges, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
 
     def Refresh(self, changed_entry_name: str = ""):
@@ -255,7 +300,7 @@ class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
         if img_path:
             self.setPixmap(QtGui.QPixmap(img_path))
         else:
-            self.setPixmap(QtGui.QPixmap(":/Icons/SceneItem_Sprite.png"))
+            self.setPixmap(QtGui.QPixmap("EditorContent:Icons/SceneItem_Sprite.png"))
 
     def UpdateZOrder(self):
         self.setZValue(float(self.action_data["z_order"]["value"]))
@@ -294,8 +339,8 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
         self.action_data = action_data
 
         self.is_centered = False
-        self.setFlag(self.ItemIsSelectable, False)
-        self.setFlag(self.ItemSendsGeometryChanges, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
         self.setAcceptDrops(True)
         self.document().setDocumentMargin(0)
 

@@ -8,34 +8,34 @@ REGISTERED_TEMPLATES = [
         "display_name": "Main Menu 01",
         "description": "A simple main menu U.I with centered icons, and a project title card which is connected to the 'title' project setting.",
         "template_path": "HBEngine/Content/Interfaces/main_menu_01.interface",
-        "preview_image": ":/Images/Template_Interface_Main_Menu.jpg"
+        "preview_image": "EditorContent:Images/Thumbnails/Template_Interface_Main_Menu.jpg"
     },
     # Pause Menu
     {
         "display_name": "Pause Menu 01",
         "description": "A simple pause menu that splits the screen into two sections:\n\n- The left side is persistent and contains the main buttons\n- The right side is populated as you click certain buttons, such as 'Options' and 'Save'",
         "template_path": "HBEngine/Content/Interfaces/pause_menu_01.interface",
-        "preview_image": ":/Images/Template_Interface_Pause_Menu.jpg"
+        "preview_image": "EditorContent:Images/Thumbnails/Template_Interface_Pause_Menu.jpg"
     },
     # Dialogue
     {
         "display_name": "Dialogue 01",
         "description": "A simple dialogue interface resembling ones used often in Western Visual Novels. Contains a Save, Load and Menu button along with a Speaker and Dialogue text frame",
         "template_path": "HBEngine/Content/Interfaces/dialogue_01.interface",
-        "preview_image": ":/Images/Template_Interface_Dialogue.jpg"
+        "preview_image": "EditorContent:Images/Thumbnails/Template_Interface_Dialogue.jpg"
     }
 ]
 
 
 class DialogNewInterface(DialogNewFileFromTemplate):
     def __init__(self):
-        super().__init__(":/Icons/Interface.png")
+        super().__init__("EditorContent:Icons/Interface.png")
 
         FileOption(
             "None",
             "Create a blank interface. Perfect if you want to start from scratch.",
             "",
-            ":/Images/Template_Blank.jpg",
+            "EditorContent:Images/Thumbnails/Template_Blank.jpg",
             self.options_list
         )
 

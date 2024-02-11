@@ -15,7 +15,7 @@
 import os
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core import settings
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 
 class DialogFileSystem(QFileDialog):
