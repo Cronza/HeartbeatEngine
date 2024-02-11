@@ -104,9 +104,9 @@ class SceneView(QtWidgets.QGraphicsView):
                     for child in item.childItems():
                         # Always store a normalized position value between 0-1
                         #
-                        # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value that
-                        # is altered by any translation applied to the item (Needs additional review to confirm). This
-                        # breaks features such as 'center_align'
+                        # Normally we'd use 'scenePos' to skip all these conversions, but that seems to return a value
+                        # that is altered by any translation applied to the item (Needs additional review to confirm).
+                        # This breaks features such as 'center_align'
                         parent_pos = child.pos()
                         item_pos = child.mapFromParent(parent_pos)
                         scene_pos = child.mapToScene(item_pos)
@@ -139,3 +139,4 @@ class Scene(QtWidgets.QGraphicsScene):
 
     def mouseDoubleClickEvent(self, event: 'QGraphicsSceneMouseEvent') -> None:
         pass
+

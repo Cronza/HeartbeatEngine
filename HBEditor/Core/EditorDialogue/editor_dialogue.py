@@ -32,20 +32,12 @@ class EditorDialogue(EditorBase):
         )
         Logger.getInstance().Log("Editor initialized")
 
-    def UpdateActiveEntry(self):
-        """ Makes the selected entry the active one, refreshing the details panel """
-        selection = self.editor_ui.dialogue_sequence.GetSelectedEntry()
-
-        # Refresh the details panel to reflect the newly chosen row
-        self.UpdateDetails(selection)
-
     def UpdateDetails(self, selected_item):
         """
         Refreshes the details panel with the details from the selected item. Clears all details if None is provided
         """
         if selected_item:
             self.editor_ui.details.Populate(selected_item)
-
         else:
             # No entries left to select. Wipe remaining details
             self.editor_ui.details.ClearActiveItem()
@@ -80,9 +72,6 @@ class EditorDialogue(EditorBase):
         for index in range(0, branch_count):
             # Get the actual branch entry widget instead of the container
             branch = self.editor_ui.branches_panel.GetEntryItemWidget(index)
-
-            # Before we save, let's be extra sure the current information in the details panel is cached properly
-            self.editor_ui.details.StoreData()
 
             # If a branch is currently active, then it's likely to of not updated its cached branch data (Only
             # happens when the active branch is switched). To account for this, make sure the active branch is checked

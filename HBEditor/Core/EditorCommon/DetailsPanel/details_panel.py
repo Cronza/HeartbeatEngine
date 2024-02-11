@@ -123,8 +123,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 data=data,
                 parent=parent,
                 excluded_properties=excluded_properties,
-                signal_func=self.ConnectSignals,
-                refresh_func=self.UserUpdatedInputWidget
+                signal_func=self.ConnectSignals
             )
 
             if "children" in data:
@@ -144,7 +143,7 @@ class DetailsPanel(QtWidgets.QWidget):
         if global_checkbox:
             global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
-    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None, initial_iter: bool = True) -> dict:
+    def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None) -> dict:
         """
         Retrieves the values from all items in the details tree, and updates the active entry using the
         collected data
@@ -186,7 +185,6 @@ class DetailsPanel(QtWidgets.QWidget):
                     # displayed entries
 
                     entry_data["children"] = {}
-
                     for child_index in range(0, entry.childCount()):
                         # Get the underlying element dict without the top-most key (It's usually replaced by a generated
                         # one)
@@ -201,13 +199,13 @@ class DetailsPanel(QtWidgets.QWidget):
                         entry_data["children"][child_entry_name] = template_copy[ad.GetActionName(template_copy)]
 
                     # Update the children as usual now that the stagnant data has been removed
-                    entry_data["children"].update(self.StoreData(entry, False))
+                    entry_data["children"].update(self.StoreData(entry))
 
                 elif entry.childCount() > 0:
 
                     # We do an update here as not all items within the action_data were displayed (uneditable details
                     # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
-                    entry_data["children"].update(self.StoreData(entry, False))
+                    entry_data["children"].update(self.StoreData(entry))
 
                 data_to_store[entry_name] = entry_data
 

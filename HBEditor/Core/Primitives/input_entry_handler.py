@@ -30,9 +30,6 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
     If 'signal_func' is provided, then:
     - Invoke it when we insert the QTreeWidgetItem into the tree (So the caller can connect the appropriate signals)
     - Pass by ref to any entries that have the ability to create child entries (So they can be connected properly)
-
-    If "refresh_func" is provided, provide it to any entries that may perform actions later on that require
-    the caller to know about it. When they call it, they'll provide their owning widget item
     """
 
     entry = QTreeWidgetItem()
@@ -42,7 +39,7 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
         view.addTopLevelItem(entry)
 
     name_widget, input_widget, global_checkbox = Create(
-        owner, name, data, entry, view, signal_func, refresh_func, excluded_properties
+        owner, name, data, entry, view, signal_func, excluded_properties
     )
     view.setItemWidget(entry, 0, name_widget)
     view.setItemWidget(entry, 1, input_widget)
@@ -55,7 +52,7 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
 
 def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidgetItem,
            owning_view: QtWidgets.QAbstractItemView, signal_func: callable = None,
-           refresh_func: callable = None, excluded_properties: dict = None) -> object:
+           excluded_properties: dict = None) -> object:
     """
     Creates and returns each element of an InputEntry:
     - QLabel (Name)
@@ -88,9 +85,9 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
         input_widget = InputEntryArrayElement(data, owning_view)
         input_widget.SIG_USER_DELETE.connect(Remove)
     elif data_type == ParameterType.Array:
-        input_widget = InputEntryArray(data, owning_view, Add, signal_func, refresh_func, excluded_properties)
+        input_widget = InputEntryArray(data, owning_view, Add, signal_func, excluded_properties)
     elif data_type == ParameterType.Event:
-        input_widget = InputEntryEvent(data, owning_view, Add, Remove, signal_func, refresh_func, excluded_properties)
+        input_widget = InputEntryEvent(data, owning_view, Add, Remove, signal_func, excluded_properties)
     elif data_type == ParameterType.CUST_Resolution:
         input_widget = InputEntryResolution(data)
 
@@ -135,9 +132,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
             input_widget.SetEditable(2)
         else:
             global_checkbox.Set(False)
-
         global_checkbox.Connect()
-        global_checkbox.SIG_USER_UPDATE.connect(refresh_func)
 
     return name_widget, input_widget, global_checkbox
 
@@ -160,3 +155,6 @@ def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QAbstractItemView = Non
                 name_split = name_widget.text().split("_")
                 name_split.pop(-1)
                 name_widget.setText("_".join(name_split) + f"_{child_index}")
+
+            # Signal that changes were made to the array
+            parent_input_widget.SIG_USER_UPDATE.emit(parent)

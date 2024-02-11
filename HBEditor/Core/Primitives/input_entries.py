@@ -455,8 +455,7 @@ class InputEntryArray(InputEntryBase):
     the ACTION_DATA
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
-                 add_func: callable, signal_func: callable, refresh_func: callable,
-                 excluded_properties: dict = None):
+                 add_func: callable, signal_func: callable, excluded_properties: dict = None):
         super().__init__(data)
 
         self.excluded_properties = excluded_properties
@@ -464,11 +463,9 @@ class InputEntryArray(InputEntryBase):
 
         self.child_limit = 6
 
-        # We need access to the return value of the created view item, so we must use a callback instead of a
-        # signal / slot (Which don't allow return values)
+        # Callbacks to pass along to new children
         self.add_func = add_func
         self.signal_func = signal_func
-        self.refresh_func = refresh_func
 
         # In order for the data to be recursively parsed, we need the 'children' key
         if "children" not in self.data:
@@ -478,26 +475,23 @@ class InputEntryArray(InputEntryBase):
 
         self.add_item_button = QtWidgets.QToolButton()
         self.add_item_button.setObjectName("choice-add")
-        self.add_item_button.clicked.connect(lambda: self.AddItems())
+        self.add_item_button.clicked.connect(self.AddItems)
         self.main_layout.addWidget(self.add_item_button)
 
-    def AddItems(self, name="", data=None, parent=None):
+    def AddItems(self, name="", data=None, parent=None, init_iter: bool = True):
         if self.owning_model_item.childCount() >= self.child_limit and not data:  # Don't run when recursing
             Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
         else:
+            if not parent:
+                parent = self.owning_model_item
+
             if not data:
                 data = copy.deepcopy(self.data["template"])
 
                 # Array elements have generated names to avoid having to be stored as a list when caching or saving
                 name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
-                self.SIG_USER_UPDATE.emit(self.owning_model_item)
-
-            if not parent:
-                parent = self.owning_model_item
-
             data_no_key = data[adh.GetActionName(data)]
-
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
@@ -505,8 +499,7 @@ class InputEntryArray(InputEntryBase):
                 data=data_no_key,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
-                signal_func=self.signal_func,
-                refresh_func=self.refresh_func
+                signal_func=self.signal_func
             )
             if "children" in data_no_key:
                 for child_name, child_data in data_no_key["children"].items():
@@ -514,12 +507,11 @@ class InputEntryArray(InputEntryBase):
                         if not child_data["editable"]:
                             continue
 
-                    self.AddItems(child_name, {child_name: child_data}, new_entry)
+                    self.AddItems(child_name, {child_name: child_data}, new_entry, False)
 
-        if not parent:
-            # Inform the owning U.I that we've added a child outside it's purview. Only do this once all recursion
-            # is done
-            self.refresh_func(self.owning_model_item)
+        if init_iter:
+            # Inform the owning U.I that we've added a child outside its purview
+            self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
 
 class InputEntryArrayElement(InputEntryBase):
@@ -546,20 +538,17 @@ class InputEntryEvent(InputEntryBase):
     is selected, all properties related to that action are generated as children to this entry
     """
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
-                 add_func: callable, remove_func: callable, signal_func: callable, refresh_func: callable,
+                 add_func: callable, remove_func: callable, signal_func: callable,
                  excluded_properties: dict = None):
         super().__init__(data)
 
         self.excluded_properties = []
         self.owning_view = owning_view
 
-        # We need access to the return value of the created view item, so we must use a callback instead of a
-        # signal / slot (Which don't allow return values)
-        #@TODO: The above statement is no longer valid, and signals should be adopted here
+        # Callbacks to pass along to new children
         self.add_func = add_func
         self.remove_func = remove_func
         self.signal_func = signal_func
-        self.refresh_func = refresh_func
 
         self.input_widget = QtWidgets.QComboBox()
 
@@ -611,8 +600,7 @@ class InputEntryEvent(InputEntryBase):
                 data=data,
                 parent=parent,
                 excluded_properties=self.excluded_properties,
-                signal_func=self.signal_func,
-                refresh_func=self.refresh_func
+                signal_func=self.signal_func
             )
             if "children" in data:
                 for child_name, child_data in data["children"].items():
@@ -625,7 +613,7 @@ class InputEntryEvent(InputEntryBase):
         if not parent:
             # Inform the owning U.I that we've added a child outside its purview. Only do this once all recursion
             # is done
-            self.refresh_func(self.owning_model_item)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
     def Get(self):
         self.data["value"] = self.input_widget.currentText()

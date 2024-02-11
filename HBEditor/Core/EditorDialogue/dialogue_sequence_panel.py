@@ -85,7 +85,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         # Build the Sequence
         self.sequence_list = DialogueSequence(self)
         self.sequence_list.SIG_USER_PASTE.connect(self.AddEntry)
-        self.sequence_list.itemSelectionChanged.connect(self.ed_core.UpdateActiveEntry)
+        self.sequence_list.itemSelectionChanged.connect(self.UpdateActiveEntry)
 
         # ********** Add All Major Pieces to main view layout **********
         self.main_layout.addWidget(self.title)
@@ -111,7 +111,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         else:
             self.sequence_list.addItem(new_item)
 
-        new_entry = DialogueEntry(action_name, action_data, self.ed_core.UpdateActiveEntry)
+        new_entry = DialogueEntry(action_name, action_data, self.UpdateActiveEntry)
         # Add unique dialogue-only parameters that wouldn't be found in the 'ACTION_DATA'
         if 'post_wait' not in new_entry.action_data:
             new_entry.action_data['post_wait'] = {
@@ -153,6 +153,13 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             return self.sequence_list.itemWidget(selected_items[0])
         else:
             return None
+
+    def UpdateActiveEntry(self):
+        """ Makes the selected entry the active one, refreshing the details panel """
+        selection = self.GetSelectedEntry()
+
+        # Refresh the details panel to reflect the newly chosen row
+        self.ed_core.UpdateDetails(selection)
 
 
 class DialogueSequence(QtWidgets.QListWidget):
@@ -219,23 +226,30 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
         self.action_data = action_data
 
         # ****** DISPLAY WIDGETS ******
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 4, 0, 4)
+        self.main_layout = QtWidgets.QHBoxLayout(self)
+        self.main_layout.setContentsMargins(4, 4, 4, 4)
         self.main_layout.setSpacing(0)
+
+        self.info_layout = QtWidgets.QVBoxLayout(self)
+        self.info_layout.setSpacing(0)
+        self.main_layout.addLayout(self.info_layout)
 
         self.name_widget = QtWidgets.QLabel()
         self.name_widget.setObjectName("h2")
         self.name_widget.setText(self.action_name)
+        self.info_layout.addWidget(self.name_widget)
 
         self.subtext_widget = QtWidgets.QLabel()
         self.subtext_widget.setObjectName("text-soft-italic")
+        self.info_layout.addWidget(self.subtext_widget)
 
-        # Refresh the subtext
-        self.UpdateSubtext()
+        self.icon_layout = QtWidgets.QHBoxLayout(self)
+        self.icon_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
+        self.icon_layout.setSpacing(0)
+        self.icon_condition = None  # Populated during Refresh
+        self.main_layout.addLayout(self.icon_layout)
 
-        # Add everything to the layout
-        self.main_layout.addWidget(self.name_widget)
-        self.main_layout.addWidget(self.subtext_widget)
+        self.Refresh()
 
     def Get(self) -> dict:
         """ Returns the action data stored in this object """
@@ -270,3 +284,26 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
     def Refresh(self, change_tree: list = None):
         self.UpdateSubtext()
 
+        # Update icons if applicable
+        if "conditions" in self.action_data:
+            # Clear the conditional icon if applicable
+            if self.icon_condition:
+                self.icon_layout.removeWidget(self.icon_condition)
+                self.icon_condition = None
+
+            if self.action_data["conditions"]['children']:
+                self.icon_condition = QtWidgets.QLabel(self)
+
+                # Due to a lack of constraints enforced by the layout, the pixmap scales beyond the bounds of the
+                # layout. To try and remedy this, we need to rescale the image manually. Unfortunately, even doing
+                # this leads to an abnormally large icon, so we need to reduce it further with arbitrary math
+                self.icon_condition.setPixmap(
+                    QtGui.QPixmap("EditorContent:Icons/Condition.png").scaled(
+                        round(self.icon_condition.width()/3)*2,
+                        round(self.icon_condition.height()/3)*2,
+                        QtCore.Qt.AspectRatioMode.KeepAspectRatio
+                    )
+                )
+                self.icon_condition.setToolTip("This shits conditional")
+
+                self.icon_layout.addWidget(self.icon_condition)

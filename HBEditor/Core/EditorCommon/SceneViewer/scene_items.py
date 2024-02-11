@@ -41,6 +41,15 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         # ID. This is commonly the name of the group
         self.owner_id = ""
 
+        self.allow_icon_drawing = True  # Toggles whether icons can appear for this item
+        self.condition_active = False
+        self.icon_condition = QtGui.QPixmap("EditorContent:Icons/Condition.png")
+        self.icon_condition = self.icon_condition.scaled(
+            round(self.icon_condition.width() / 2),
+            round(self.icon_condition.height() / 2),
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio
+        )
+
     def Get(self) -> dict:
         """ Returns the action_data (including the action name) stored in this item """
         return {self.action_name: self.action_data}
@@ -69,7 +78,7 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         return True
 
     def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
-                         pixmap: QtGui.QPixmap = None, text: str = ""):
+                         pixmap: QtGui.QPixmap = None, text: str = "", init_iter: bool = True):
         """
         Recursively generate child items in the tree for each item in the action_data. All items are created with
         the full parameters data block
@@ -108,7 +117,6 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                 )
                 new_item.setParentItem(parent)
                 new_item.root_item = self
-                new_item.Refresh()
 
             elif param_name == "text":
                 new_item = TextItem(
@@ -117,7 +125,6 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                 )
                 new_item.setParentItem(parent)
                 new_item.root_item = self
-                new_item.Refresh()
 
             if "children" in param_data:
                 if param_data['children']:
@@ -125,8 +132,12 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
                         parent=new_item,
                         action_data=param_data["children"],
                         pixmap=pixmap,
-                        text=text
+                        text=text,
+                        init_iter=False
                     )
+
+        if init_iter:
+            self.Refresh()
 
     def Refresh(self, change_tree: list = None):
         # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
@@ -134,11 +145,19 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         if change_tree:
             self.RefreshRecursivePartial(self, change_tree)
         else:
-            self.RefreshRecursive(self)
+            self.RefreshRecursiveAll(self)
 
         # The root item uses the top-most child's z-order, so they both need to be updated
-        if change_tree[0] == "z_order":
-            self.UpdateZValue()
+        if change_tree:
+            if change_tree[0] == "z_order":
+                self.UpdateZValue()
+
+        # Update condition state if applicable
+        if "conditions" in self.action_data:
+            if self.action_data["conditions"]['children']:
+                self.condition_active = True
+            else:
+                self.condition_active = False
 
     def RefreshRecursiveAll(self, cur_target: QtWidgets.QGraphicsItem) -> bool:
         """ Perform a full Refresh for all children """
@@ -192,6 +211,28 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
             pen.setWidth(3)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
+
+        if self.allow_icon_drawing:
+            if self.condition_active:
+                painter.drawPixmap(
+                    QtCore.QPointF(
+                        self.boundingRect().x() + (self.boundingRect().width()),
+                        self.boundingRect().y() - (self.icon_condition.height())
+                    ),
+                    self.icon_condition
+                )
+
+    def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mousePressEvent(event)
+        if self.allow_icon_drawing:
+            self.allow_icon_drawing = False
+            self.scene().update(self.scene().sceneRect())
+
+    def mouseReleaseEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mouseReleaseEvent(event)
+        if not self.allow_icon_drawing:
+            self.allow_icon_drawing = True
+            self.scene().update(self.scene().sceneRect())
 
 
 class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
