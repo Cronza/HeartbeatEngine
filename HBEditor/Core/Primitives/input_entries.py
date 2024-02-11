@@ -69,6 +69,9 @@ class InputEntryBase(QtWidgets.QWidget):
     def SetEditable(self, state: int):
         pass
 
+    def SetDefaultValue(self):
+        pass
+
 
 class InputEntryBool(InputEntryBase):
     def __init__(self, data):
@@ -97,10 +100,14 @@ class InputEntryBool(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = False
+
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+
         self.input_widget = QtWidgets.QFrame()
         self.input_widget.setFrameStyle(QtWidgets.QFrame.Shape.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
@@ -137,6 +144,9 @@ class InputEntryColor(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = [255, 255, 255]
+
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog().getColor(
             QtGui.QColor(self.data['value'][0], self.data['value'][1], self.data['value'][2])
@@ -160,7 +170,7 @@ class InputEntryDropdown(InputEntryBase):
         self.input_widget = QtWidgets.QComboBox()
         self.options = data["options"]
 
-        # Pre-load the list of dropdown options
+        # Preload the list of dropdown options
         for option in self.options:
             self.input_widget.addItem(str(option))
 
@@ -186,6 +196,10 @@ class InputEntryDropdown(InputEntryBase):
             self.input_widget.setEnabled(False)
 
         self.input_widget.style().polish(self.input_widget)
+
+    def SetDefaultValue(self):
+        self.data['value'] = self.options[0]
+        self.Set(self.data['value'])
 
 
 class InputEntryAssetSelector(InputEntryBase):
@@ -232,6 +246,10 @@ class InputEntryAssetSelector(InputEntryBase):
             self.file_select_button.setDisabled(True)
 
         self.input_widget.style().polish(self.input_widget)
+
+    def SetDefaultValue(self):
+        self.data['value'] = 'None'
+        self.Set(self.data['value'])
 
     def OpenAssetPrompt(self):
         """
@@ -283,6 +301,9 @@ class InputEntryFloat(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = 0.0
+        self.Set(self.data['value'])
 
 class InputEntryInt(InputEntryBase):
     def __init__(self, data):
@@ -324,6 +345,10 @@ class InputEntryInt(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = 0
+        self.Set(self.data['value'])
+
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self,data):
@@ -354,6 +379,10 @@ class InputEntryParagraph(InputEntryBase):
         elif state == 2:
             self.input_widget.setReadOnly(True)
 
+    def SetDefaultValue(self):
+        self.data['value'] = ''
+        self.Set(self.data['value'])
+
 
 class InputEntryText(InputEntryBase):
     def __init__(self, data):
@@ -381,6 +410,10 @@ class InputEntryText(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = ''
+        self.Set(self.data['value'])
+
 
 class InputEntryTuple(InputEntryBase):
     def __init__(self, data):
@@ -394,7 +427,7 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt = QtWidgets.QLineEdit()
 
         # Limit entered values to int only
-        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.Notation.StandardNotation)
+        validator = QtGui.QDoubleValidator(notation=QtGui.QDoubleValidator.Notation.StandardNotation)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
         self.input_widget.setText("0")
@@ -447,6 +480,10 @@ class InputEntryTuple(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
         self.input_widget_alt.style().polish(self.input_widget_alt)
+
+    def SetDefaultValue(self):
+        self.data['value'] = (0,0)
+        self.Set(self.data['value'])
 
 
 class InputEntryArray(InputEntryBase):

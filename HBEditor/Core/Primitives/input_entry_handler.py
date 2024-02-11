@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import QWidget, QTreeWidgetItem, QLabel
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorCommon.connect_button import ConnectButton
 from HBEditor.Core.Primitives.input_entries import *
 
 
@@ -38,7 +39,7 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
     else:
         view.addTopLevelItem(entry)
 
-    name_widget, input_widget, global_checkbox = Create(
+    name_widget, input_widget, connect_button = Create(
         owner, name, data, entry, view, signal_func, excluded_properties
     )
     view.setItemWidget(entry, 0, name_widget)
@@ -50,14 +51,14 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
     return entry
 
 
-def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidgetItem,
+def Create(owner: QWidget, name: str, data: dict, owning_model_item,
            owning_view: QtWidgets.QAbstractItemView, signal_func: callable = None,
-           excluded_properties: dict = None) -> object:
+           excluded_properties: dict = None) -> tuple:
     """
     Creates and returns each element of an InputEntry:
     - QLabel (Name)
     - InputEntry
-    - Global Checkbox (SimpleCheckbox)
+    - ConnectButton (Value / Project Setting Connection Button)
     """
     # @TODO: Replace with a switch when the Python version is upgraded to allow it (3.10)
     data_type = ParameterType[data["type"]]
@@ -110,34 +111,42 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item: QTreeWidget
     input_widget.owning_model_item = owning_model_item
     input_widget.Connect()
 
-    # Update the entry with the value key if applicable. Otherwise, use the default value
+    # Update the entry with the value key if applicable. Otherwise, use the default value. If no default is available,
+    # let the entry load its own default
     if "value" in data:
         input_widget.Set(data["value"])
     elif "default" in data:
         data["value"] = data["default"]
         input_widget.Set(data["value"])
+    else:
+        input_widget.SetDefaultValue()
 
     name_widget = QLabel(name)
 
     # The global checkbox isn't universally used, so only use it if relevant. If it's enabled, mark
     # the input widget as uneditable by the user
-    global_checkbox = None
+    connect_button = None
     if "global" in data and "flags" in data:
-        global_checkbox = SimpleCheckbox()
-        global_checkbox.owner = owning_model_item
-        global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
-        owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
-        if "global_active" in data["flags"]:
-            global_checkbox.Set(True)
-            input_widget.SetEditable(2)
-        else:
-            global_checkbox.Set(False)
-        global_checkbox.Connect()
-
-    return name_widget, input_widget, global_checkbox
+        connect_button = ConnectButton()
+        owning_view.setItemWidget(owning_model_item, 2, connect_button)
 
 
-def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QAbstractItemView = None):
+    #    global_checkbox = SimpleCheckbox()
+    #    global_checkbox.owner = owning_model_item
+    #    global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
+    #    owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
+    #    if "global_active" in data["flags"]:
+    #        global_checkbox.Set(True)
+    #        input_widget.SetEditable(2)
+    #    else:
+    #        global_checkbox.Set(False)
+    #    global_checkbox.Connect()
+
+    return name_widget, input_widget, connect_button
+
+
+def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QTreeView = None):
+    """ Removes the provided item and all of its children from the provided QTreeView"""
     parent = item.parent()
     if parent:
         parent.removeChild(item)

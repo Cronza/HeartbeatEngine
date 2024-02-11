@@ -51,7 +51,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setObjectName("no-top")
         self.details_tree.setColumnCount(3)
-        self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
+        self.details_tree.setHeaderLabels(['Name', 'Input', 'C'])
         self.details_tree.setAutoScroll(False)
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
@@ -61,7 +61,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        # --- Specialized Settings for the 'G' column ---
+        # --- Specialized Settings for the 'C' column ---
         # 1. Allow columns to be significantly smaller than normal
         self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
@@ -139,9 +139,9 @@ class DetailsPanel(QtWidgets.QWidget):
         input_widget = self.details_tree.itemWidget(tree_item, 1)
         input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
 
-        global_checkbox = self.details_tree.itemWidget(tree_item, 2)
-        if global_checkbox:
-            global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
+        #global_checkbox = self.details_tree.itemWidget(tree_item, 2)
+        #if global_checkbox:
+        #    global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
 
     def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None) -> dict:
         """
