@@ -73,7 +73,7 @@ class EditorValuesUI(EditorBaseUI):
         self.values_table.setObjectName('values-table')
         self.values_table.setColumnCount(3)
         self.values_table.verticalHeader().hide()
-        self.values_table.setHorizontalHeaderLabels(['Type', 'Name', 'Value'])
+        self.values_table.setHorizontalHeaderLabels(['Name', 'Type', 'Value'])
         self.values_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.values_table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.values_table.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -84,7 +84,7 @@ class EditorValuesUI(EditorBaseUI):
 
         # TODO: Investigate how to improve sizing calculations. It should be a percentage of the available space
         self.values_table.horizontalHeader().setDefaultSectionSize(self.values_table.horizontalHeader().defaultSectionSize() * 3)
-        self.values_table.setColumnWidth(0, round(self.values_table.horizontalHeader().defaultSectionSize() / 2))
+        self.values_table.setColumnWidth(1, round(self.values_table.horizontalHeader().defaultSectionSize() / 2))
 
         self.values_table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked | QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
         values_delegate = ValuesItemDelegate(self)
@@ -101,7 +101,6 @@ class EditorValuesUI(EditorBaseUI):
         self.values_table.setItem(self.values_table.rowCount() - 1, 2, QtWidgets.QTableWidgetItem())
 
         # Add the type dropdown
-        #type_input = InputEntryDropdown({"options": [param_type.name for param_type in self.possible_input_types]})
         type_input = ieh.Create(
             owner=self,
             name="",
@@ -110,8 +109,8 @@ class EditorValuesUI(EditorBaseUI):
             owning_view=self.values_table
         )[1]
         type_input.SIG_USER_UPDATE.connect(self.SwitchInputType)
-        self.values_table.setCellWidget(self.values_table.rowCount() - 1, 0, type_input)
-        self.SwitchInputType(self.values_table.item(self.values_table.rowCount() - 1, 0))
+        self.values_table.setCellWidget(self.values_table.rowCount() - 1, 1, type_input)
+        self.SwitchInputType(self.values_table.item(self.values_table.rowCount() - 1, 1))
 
         # Load data if provided
         if data:
@@ -129,7 +128,7 @@ class EditorValuesUI(EditorBaseUI):
         input_entry = ieh.Create(
             owner=self,
             name="",
-            data={"type": self.values_table.cellWidget(row, 0).Get()['value']},
+            data={"type": self.values_table.cellWidget(row, 1).Get()['value']},
             owning_model_item=self.values_table.item(row, 2),
             owning_view=self.values_table
         )[1]
