@@ -214,6 +214,11 @@ QAbstractItemView {
                 border: $size_border solid $col_view_item_hover;
             }
         }
+
+    }
+    &#values-table{ /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
+        border-left: $size_border solid $col_secondary;
+        border-top: 0px solid transparent;
     }
 }
 QHeaderView{
@@ -248,10 +253,14 @@ QTableView{
 
     color: $col_text;
     background-color: $col_secondary;
-
-    &#values-table{ /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
-        border-left: $size_border solid $col_secondary;
+}
+QTableView QTableCornerButton{
+    &:section{
+        border: $size_border solid $col_secondary;
         border-top: 0px solid transparent;
+        border-left: 0px solid transparent;
+        background-color: $col_primary;
+        padding: 0px;
     }
 }
 QTreeView{
@@ -540,8 +549,12 @@ QWidget[model-entry="text-warning"]{
 QWidget[model-entry="text-error"]{
     color: rgba(204, 51, 0, 1.0);
 }
-
-
 QWidget[toggleable-action="toggled"]{
     background-color: $col_hover;
 }
+
+QWidget[model-entry="text-error"]{
+    color: rgba(204, 51, 0, 1.0);
+}
+
+

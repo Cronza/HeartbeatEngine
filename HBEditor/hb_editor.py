@@ -633,11 +633,12 @@ class HBEditor:
         else:
             # Initialize the Editor
             self.active_editor = editor_classes[editor_type](target_file_path)
-            if import_file:
-                self.active_editor.Import()
 
             # Create a tab to house the editor UI
             self.e_ui.AddMainTab(self.active_editor.GetUI(), os.path.basename(target_file_path), True)
+
+            if import_file:
+                self.active_editor.Import()
 
     def CloseEditor(self, target_file_path: str):
         """

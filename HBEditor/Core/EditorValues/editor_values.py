@@ -12,10 +12,14 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from PyQt6 import QtWidgets
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorValues.editor_values_ui import EditorValuesUI
+from HBEditor.Core.EditorValues.editor_values_ui import ValueNameUndefined
+from HBEditor.Core.EditorValues.editor_values_ui import ValueAlreadyExists
+
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import path
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -34,11 +38,30 @@ class EditorValues(EditorBase):
     def Export(self):
         Logger.getInstance().Log(f"Exporting Values")
 
+        # Collect the table data
+        data_to_export = {}
+        try:
+            data_to_export = self.editor_ui.GetData()
+        except ValueNameUndefined:
+            QtWidgets.QMessageBox.about(
+                self.editor_ui,
+                "Unable to Save",
+                "Values are required to have a name. Please specify a name for all values and try again."
+            )
+            return
+        except ValueAlreadyExists:
+            QtWidgets.QMessageBox.about(
+                self.editor_ui,
+                "Unable to Save",
+                "Value names are unique and can not be duplicated. Please ensure all values have a unique name and try again."
+            )
+            return
+
         # Write the data out
         Logger.getInstance().Log("Writing data to file...")
         try:
             Writer.WriteFile(
-                self.editor_ui.GetData(),
+                data_to_export,
                 self.file_path,
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
@@ -57,5 +80,4 @@ class EditorValues(EditorBase):
         # Skip importing if the file has no data to load
         if file_data:
             for val_name, val_data in file_data.items():
-                self.editor_ui.AddValue((val_name, val_data))
-
+                self.editor_ui.AddValue(val_name, val_data['type'], val_data['value'])
