@@ -94,6 +94,8 @@ class EditorScene(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
+            # Disable signals to prevent marking the editor as dirty while we're populating it
+            self.editor_ui.blockSignals(True)
             conv_scene_items = self.ConvertSceneItemsToEditorFormat(file_data["scene_items"])
 
             # Populate the scene settings
@@ -113,6 +115,8 @@ class EditorScene(EditorBase):
                     editor_properties = action_data["editor_properties"]
                     if "locked" in editor_properties:
                         new_item.SetLocked(editor_properties["locked"])
+
+            self.editor_ui.blockSignals(False)
 
     def ConvertSceneItemsToEngineFormat(self, scene_items: list):
         """ Build and return a list of the data from all active scene items converted to engine format """

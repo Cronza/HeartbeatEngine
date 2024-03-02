@@ -134,6 +134,9 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
+            # Disable signals to prevent marking the editor as dirty while we're populating it
+            self.editor_ui.blockSignals(True)
+
             # Populate the dialogue settings
             ad.ConvertActionDataToEditorFormat(
                 base_action_data=self.editor_ui.dialogue_settings_src_obj.action_data,
@@ -154,6 +157,8 @@ class EditorDialogue(EditorBase):
 
             # Select the main branch by default
             self.editor_ui.branches_panel.ChangeEntry(0)
+
+            self.editor_ui.blockSignals(False)
 
     def ConvertDialogueToEngineFormat(self, action_data: dict):
         """

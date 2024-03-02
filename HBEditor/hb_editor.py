@@ -498,7 +498,6 @@ class HBEditor:
             self.OpenEditor(full_path, file_type, True)
             return True
 
-
     def Import(self, partial_dest_path: str, import_target: str = "", batch_mode: bool = False) -> bool:
         """
         Given a partial path with the content folder as the root, prompt the user to choose a file to import. Then,

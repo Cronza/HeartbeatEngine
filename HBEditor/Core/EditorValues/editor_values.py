@@ -79,5 +79,10 @@ class EditorValues(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
+            # Disable signals to prevent marking the editor as dirty while we're populating it
+            self.editor_ui.blockSignals(True)
+
             for val_name, val_data in file_data.items():
                 self.editor_ui.AddValue(val_name, val_data['type'], val_data['value'])
+
+            self.editor_ui.blockSignals(False)
