@@ -54,6 +54,13 @@ def LoadProjectSettings():
     user_project_data = Reader.ReadAll(GetProjectSettingsPath())
 
 
+def LoadValues():
+    """ Reads the 'Values.yaml' file for the active project """
+    global user_project_dir
+    global user_project_values
+    user_project_values = Reader.ReadAll(GetValuesPath())
+
+
 def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
     """
     Registers the provided file. 'parent_path' must be a partial path with the content directory as the root
@@ -265,6 +272,7 @@ supported_file_types_cat = {
 user_project_name = None
 user_project_dir = None
 user_project_data = None  # The contents of the project's 'Game.yaml' file
+user_project_values = None  # The contents of the project's 'Values.yaml' file
 
 asset_registry = {}  # Loaded when project is loaded
 engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")  # Engine files which are accessible via the asset registration system

@@ -71,6 +71,9 @@ class EditorValues(EditorBase):
             print(exc)
             Logger.getInstance().Log("Failed to Export!", 4)
 
+            # Reload the project values
+            settings.LoadValues()
+
     def Import(self):
         super().Import()
         Logger.getInstance().Log(f"Importing Values data for: {self.file_path}")

@@ -428,6 +428,7 @@ QComboBox {
         outline: none;
     }
     &:drop-down {
+        image: url(EditorContent:Icons/Arrow_Down.png);
         subcontrol-position: top right;
         width: 15px;
         border-left-width: 1px;

@@ -655,6 +655,7 @@ class HBEditor:
         settings.user_project_name = project_name
         settings.user_project_dir = project_dir.replace("\\", "/")
         settings.LoadProjectSettings()
+        settings.LoadValues()
         settings.LoadHeartbeatFile()
 
         # Inform the U.I so it cleans up and prepares the U.I

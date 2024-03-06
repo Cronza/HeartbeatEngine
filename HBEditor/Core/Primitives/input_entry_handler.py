@@ -127,7 +127,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
     # the input widget as uneditable by the user
     connect_button = None
     if "global" in data and "flags" in data:
-        connect_button = ConnectButton()
+        connect_button = ConnectButton(data_type)
         owning_view.setItemWidget(owning_model_item, 2, connect_button)
 
 
