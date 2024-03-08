@@ -216,7 +216,7 @@ QAbstractItemView {
         }
 
     }
-    &#values-table{ /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
+    &#variables-table{ /* The variables table doesn't have the typical surrounding U.I elements, which requires border changes */
         border-left: $size_border solid $col_secondary;
         border-top: 0px solid transparent;
     }

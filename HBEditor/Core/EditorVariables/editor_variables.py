@@ -16,44 +16,44 @@ from PyQt6 import QtWidgets
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.base_editor import EditorBase
-from HBEditor.Core.EditorValues.editor_values_ui import EditorValuesUI
-from HBEditor.Core.EditorValues.editor_values_ui import ValueNameUndefined
-from HBEditor.Core.EditorValues.editor_values_ui import ValueAlreadyExists
+from HBEditor.Core.EditorVariables.editor_variables_ui import EditorVariablesUI
+from HBEditor.Core.EditorVariables.editor_variables_ui import VariableNameUndefined
+from HBEditor.Core.EditorVariables.editor_variables_ui import VariableAlreadyExists
 
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import path
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
-class EditorValues(EditorBase):
+class EditorVariables(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
         # Read this data in first as the U.I will need it to initialize properly
-        self.values_data = Reader.ReadAll(self.file_path)
+        self.variables_data = Reader.ReadAll(self.file_path)
 
-        self.editor_ui = EditorValuesUI(self)
+        self.editor_ui = EditorVariablesUI(self)
         Logger.getInstance().Log("Editor initialized")
 
     def Export(self):
-        Logger.getInstance().Log(f"Exporting Values")
+        Logger.getInstance().Log(f"Exporting Variables")
 
         # Collect the table data
         data_to_export = {}
         try:
             data_to_export = self.editor_ui.GetData()
-        except ValueNameUndefined:
+        except VariableNameUndefined:
             QtWidgets.QMessageBox.about(
                 self.editor_ui,
                 "Unable to Save",
-                "Values are required to have a name. Please specify a name for all values and try again."
+                "Variables are required to have a name. Please specify a name for all variables and try again."
             )
             return
-        except ValueAlreadyExists:
+        except VariableAlreadyExists:
             QtWidgets.QMessageBox.about(
                 self.editor_ui,
                 "Unable to Save",
-                "Value names are unique and can not be duplicated. Please ensure all values have a unique name and try again."
+                "Variable names are unique and can not be duplicated. Please ensure all variables have a unique name and try again."
             )
             return
 
@@ -71,12 +71,12 @@ class EditorValues(EditorBase):
             print(exc)
             Logger.getInstance().Log("Failed to Export!", 4)
 
-            # Reload the project values
-            settings.LoadValues()
+            # Reload the project variables
+            settings.LoadVariables()
 
     def Import(self):
         super().Import()
-        Logger.getInstance().Log(f"Importing Values data for: {self.file_path}")
+        Logger.getInstance().Log(f"Importing Variables data for: {self.file_path}")
 
         file_data = Reader.ReadAll(self.file_path)
 

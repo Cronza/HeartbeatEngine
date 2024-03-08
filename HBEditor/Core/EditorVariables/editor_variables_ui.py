@@ -20,15 +20,15 @@ from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core import settings
 
 
-class ValueNameUndefined(Exception):
+class VariableNameUndefined(Exception):
     pass
 
 
-class ValueAlreadyExists(Exception):
+class VariableAlreadyExists(Exception):
     pass
 
 
-class EditorValuesUI(EditorBaseUI):
+class EditorVariablesUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
 
@@ -44,51 +44,51 @@ class EditorValuesUI(EditorBaseUI):
         self.main_layout.addWidget(self.main_toolbar)
 
         # Main Table
-        self.values_table = ValuesTable(self)
-        self.values_table.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-        self.main_layout.addWidget(self.values_table)
+        self.variables_table = VariablesTable(self)
+        self.variables_table.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.main_layout.addWidget(self.variables_table)
 
         # Instead of having wrapper functions for modifying the table, I moved those inside the table itself.
         # As such, the buttons can be configured to point to the table functions directly
         # Toolbar - Add Button
         self.main_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
-            "Add Value",
-            self.values_table.AddValue
+            "Add Variable",
+            self.variables_table.AddValue
         )
 
         # Toolbar - Remove Button
         self.main_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
             "Remove Value",
-            self.values_table.RemoveValue
+            self.variables_table.RemoveValue
         )
 
     def AddValue(self, name: str = '', type_data: str = '', input_data: any = None):
-        self.values_table.AddValue(name, type_data, input_data)
+        self.variables_table.AddValue(name, type_data, input_data)
 
     def RemoveValue(self):
-        self.values_table.RemoveValue()
+        self.variables_table.RemoveValue()
 
     def GetData(self) -> dict:
-        """ Returns a dict of {'value_name': {'type: <value_type>, 'value': 'value_data'}} """
-        values = {}
-        for row_index in range(0, self.values_table.rowCount()):
-            val_name = self.values_table.cellWidget(row_index, self.values_table.name_column).Get()['value']
-            val_type = self.values_table.cellWidget(row_index, self.values_table.type_column).Get()['value']
-            val_input = self.values_table.cellWidget(row_index, self.values_table.input_column).Get()['value']
+        """ Returns a dict of {'var_name': {'type: <var_type>, 'value': 'var_data'}} """
+        variables = {}
+        for row_index in range(0, self.variables_table.rowCount()):
+            var_name = self.variables_table.cellWidget(row_index, self.variables_table.name_column).Get()['value']
+            var_type = self.variables_table.cellWidget(row_index, self.variables_table.type_column).Get()['value']
+            var_input = self.variables_table.cellWidget(row_index, self.variables_table.input_column).Get()['value']
 
-            if not val_name:
-                raise ValueNameUndefined()
-            elif val_name in values:
-                raise ValueAlreadyExists()
+            if not var_name:
+                raise VariableNameUndefined()
+            elif var_name in variables:
+                raise VariableAlreadyExists()
             else:
-                values[val_name] = {'type': val_type, 'value': val_input}
+                variables[var_name] = {'type': var_type, 'value': var_input}
 
-        return values
+        return variables
 
 
-class ValuesTable(QtWidgets.QTableWidget):
+class VariablesTable(QtWidgets.QTableWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
 
     # Limit what data types are allowed as some (such as Array or Event) are complex and would require
@@ -281,7 +281,7 @@ class ValuesTable(QtWidgets.QTableWidget):
 
 class ValuesItemDelegate(QtWidgets.QStyledItemDelegate):
     """ A custom item delegate that enforces unique 'Name' column values """
-    def __init__(self, table_parent: ValuesTable):
+    def __init__(self, table_parent: VariablesTable):
         super().__init__()
 
         self.table_parent = table_parent

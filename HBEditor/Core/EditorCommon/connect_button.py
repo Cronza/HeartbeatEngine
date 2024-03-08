@@ -64,14 +64,14 @@ class DialogConnection(QtWidgets.QDialog):
 
         return "None"
 
-    def GetValuesOfType(self, target_type: ParameterType):
-        """ Returns a list of names for all values that match the provided type """
-        applicable_values = ['None']
-        for val_name, val_data in settings.user_project_values.items():
+    def GetVariablesOfType(self, target_type: ParameterType):
+        """ Returns a list of names for all variables that match the provided type """
+        applicable_variables = ['None']
+        for val_name, val_data in settings.user_project_variables.items():
             if ParameterType[val_data['type']] == target_type:
-                applicable_values.append(val_name)
+                applicable_variables.append(val_name)
 
-        return applicable_values
+        return applicable_variables
 
     def GetSearchedVariables(self):
         """ Use the search_input text to hide all items that don't have it as a substring. Reveal those that do """
@@ -89,41 +89,8 @@ class DialogConnection(QtWidgets.QDialog):
         add them to 'variable_list' """
         self.variable_list.clear()
 
-        applicable_vars = self.GetValuesOfType(self.supported_type)
+        applicable_vars = self.GetVariablesOfType(self.supported_type)
         for item in applicable_vars:
             new_item = QtWidgets.QListWidgetItem()
             new_item.setText(item)
             self.variable_list.addItem(new_item)
-
-
-class DialogConnection2(QtWidgets.QDialog):
-    def __init__(self, supported_type: ParameterType):
-        super().__init__()
-
-        # Hide the OS header to lock its position
-        self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
-        self.main_layout = QtWidgets.QVBoxLayout(self)
-
-        # header
-        self.header = QtWidgets.QLabel("Choose a Value to connect this input to")
-        self.main_layout.addWidget(self.header)
-
-        # Value dropdown
-        self.value_options = InputEntryDropdown(data={"type": "Dropdown", "options": self.GetValuesOfType(supported_type)})
-        self.value_options.SetDefaultValue()
-        self.main_layout.addWidget(self.value_options)
-
-        # Confirmation Buttons
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
-        self.main_layout.addWidget(self.button_box)
-
-    def GetValuesOfType(self, target_type: ParameterType):
-        """ Returns a list of names for all values that match the provided type """
-        applicable_values = ['None']
-        for val_name, val_data in settings.user_project_values.items():
-            if ParameterType[val_data['type']] == target_type:
-                applicable_values.append(val_name)
-
-        return applicable_values
