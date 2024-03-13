@@ -30,7 +30,7 @@ def Initialize(project_path: str):
 
     settings.SetProjectRoot(project_path)
     settings.LoadProjectSettings()
-    settings.LoadValues()
+    settings.LoadVariables()
     pygame.display.set_caption(settings.project_settings['Game']['title'])
 
 
