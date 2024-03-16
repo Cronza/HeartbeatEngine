@@ -123,7 +123,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.hovered_row = -1 # TEST
         self.is_dragging = False
 
-        self.setObjectName('values-table')
+        self.setObjectName('variables-table')
         self.setColumnCount(4)
         self.verticalHeader().hide()
 

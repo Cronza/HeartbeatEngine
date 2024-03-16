@@ -309,7 +309,7 @@ class GroupEntry(QtWidgets.QWidget):
             self.toggle_layout = QtWidgets.QHBoxLayout(self)
             self.toggle_layout.addStretch(10)
             self.toggle_button = SimpleCheckbox()
-            self.toggle_button.setToolTip("Whether to use the global value specified in the project file for this entry")
+            self.toggle_button.setToolTip("Toggle this group on and off")
             self.toggle_button.Connect()
             self.toggle_button.SIG_USER_UPDATE.connect(lambda toggle: self.SIG_USER_TOGGLE.emit(self.toggle_button.Get(), self.Get()[0]))
             self.toggle_layout.addWidget(self.toggle_button)

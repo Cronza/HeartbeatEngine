@@ -2,9 +2,53 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from HBEditor.Core import settings
 from HBEditor.Core.Primitives.input_entries import InputEntryDropdown
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
+from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
+
+class ConnectButton(SimpleCheckbox):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
+    
+    def __init__(self, supported_type: ParameterType):
+        super().__init__()
+        self.checkbox.setObjectName("connect-button")
+        self.supported_type = supported_type  # Allow filtering the list of possible connection targets
+        self.Connect()
+
+    def ShowConnectionDialog(self) -> str:
+        connect_dialog = DialogConnection(self.supported_type)
+        return connect_dialog.GetVariable()
+        #if result == '':
+        #    return ''
+        #else:
+
+    def ValidateState(self, new_state: int):
+        print("hooblah")
+        if new_state == 2:  # if Checked
+            result = self.ShowConnectionDialog()
+            if result:
+                self.SIG_USER_UPDATE.emit(self.owner, result)
+            else:
+                self.Disconnect()
+                self.checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)  # Undo state change
+                self.Connect()
+        else:  # if Unchecked
+            result = self.ShowConnectionDialog()
+            if result:
+                self.SIG_USER_UPDATE.emit(self.owner, result)
+            else:
+                self.Disconnect()
+                self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)  # Undo state change
+                self.Connect()
+
+    def Connect(self):
+        self.checkbox.stateChanged.connect(self.ValidateState)
+
+    def Disconnect(self):
+        self.checkbox.disconnect()
 
 
-class ConnectButton(QtWidgets.QToolButton):
+class ConnectButton2(QtWidgets.QToolButton):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
+
     def __init__(self, supported_type: ParameterType):
         super().__init__()
         self.supported_type = supported_type  # Allow filtering the list of possible connection targets
@@ -13,7 +57,13 @@ class ConnectButton(QtWidgets.QToolButton):
 
     def ShowConnectionDialog(self):
         connect_dialog = DialogConnection(self.supported_type)
-        connect_dialog.GetVariable()
+        result = connect_dialog.GetVariable()
+        if result == '':
+            return ''
+        #else:
+
+
+
 
 
 class DialogConnection(QtWidgets.QDialog):
@@ -59,7 +109,7 @@ class DialogConnection(QtWidgets.QDialog):
             if selection:
                 return selection[0].text()
 
-        return "None" # TODO: review that this supports 'Global'
+        return ""  # Since 'None' is a legitimate answer, use '' to represent a cancelled dialog
 
     def GetVariablesOfType(self, target_type: ParameterType):
         """ Returns a list of names for all variables that match the provided type """

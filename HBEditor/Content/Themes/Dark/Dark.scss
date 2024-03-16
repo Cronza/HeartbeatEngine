@@ -498,10 +498,18 @@ QCheckBox{
                 background-color: $col_input_inactive;
             }
         }
+        &#connect-button{
+            &:checked {
+                image: url(EditorContent:Icons/Connection_Active.png);
+                &:disabled{
+                    image: url(EditorContent:Icons/Connection_Inactive.png);
+                    background-color: $col_input_inactive;
+                }
+            }
+        }
         &:checked:hover {
             background-color: $col_hover
         }
-
     }
 }
 QDialog{
