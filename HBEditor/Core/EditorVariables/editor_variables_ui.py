@@ -27,6 +27,9 @@ class VariableNameUndefined(Exception):
 class VariableAlreadyExists(Exception):
     pass
 
+class VariableNameReserved(Exception):
+    pass
+
 
 class EditorVariablesUI(EditorBaseUI):
     def __init__(self, core_ref):
@@ -82,6 +85,8 @@ class EditorVariablesUI(EditorBaseUI):
                 raise VariableNameUndefined()
             elif var_name in variables:
                 raise VariableAlreadyExists()
+            elif var_name == '<Global>':
+                raise VariableNameReserved()
             else:
                 variables[var_name] = {'type': var_type, 'value': var_input}
 

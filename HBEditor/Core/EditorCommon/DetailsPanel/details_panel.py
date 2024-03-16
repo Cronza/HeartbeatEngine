@@ -139,9 +139,9 @@ class DetailsPanel(QtWidgets.QWidget):
         input_widget = self.details_tree.itemWidget(tree_item, 1)
         input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
 
-        #global_checkbox = self.details_tree.itemWidget(tree_item, 2)
-        #if global_checkbox:
-        #    global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
+        connect_button = self.details_tree.itemWidget(tree_item, 2)
+        if connect_button:
+            connect_button.SIG_USER_UPDATE.connect(self.UserConnectedVariable)
 
     def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None) -> dict:
         """
@@ -222,9 +222,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
     ### Slots ###
 
-    def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
+    def UserConnectedVariable(self, owning_tree_item: QtWidgets.QTreeWidgetItem, connection_target: str):
         input_widget = self.details_tree.itemWidget(owning_tree_item, 1)
-        if global_active:
+        if connection_target != '' and connection_target != 'None':
             input_widget.SetEditable(2)
         else:
             input_widget.SetEditable(0)

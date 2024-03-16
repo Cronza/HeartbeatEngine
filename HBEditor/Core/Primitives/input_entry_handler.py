@@ -128,18 +128,14 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
     connect_button = None
     if "global" in data and "flags" in data:
         connect_button = ConnectButton(data_type)
+        connect_button.owner = owning_model_item
         owning_view.setItemWidget(owning_model_item, 2, connect_button)
-
-    #    global_checkbox = SimpleCheckbox()
-    #    global_checkbox.owner = owning_model_item
-    #    global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")
-    #    owning_view.setItemWidget(owning_model_item, 2, global_checkbox)
-    #    if "global_active" in data["flags"]:
-    #        global_checkbox.Set(True)
-    #        input_widget.SetEditable(2)
-    #    else:
-    #        global_checkbox.Set(False)
-    #    global_checkbox.Connect()
+        if "global_active" in data["flags"]:
+            connect_button.Set(True)
+            input_widget.SetEditable(2)
+        else:
+            connect_button.Set(False)
+        connect_button.Connect()
 
     return name_widget, input_widget, connect_button
 

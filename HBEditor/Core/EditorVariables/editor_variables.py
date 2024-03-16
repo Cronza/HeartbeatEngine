@@ -17,8 +17,7 @@ from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorVariables.editor_variables_ui import EditorVariablesUI
-from HBEditor.Core.EditorVariables.editor_variables_ui import VariableNameUndefined
-from HBEditor.Core.EditorVariables.editor_variables_ui import VariableAlreadyExists
+from HBEditor.Core.EditorVariables.editor_variables_ui import VariableNameUndefined, VariableAlreadyExists, VariableNameReserved
 
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import path
@@ -54,6 +53,13 @@ class EditorVariables(EditorBase):
                 self.editor_ui,
                 "Unable to Save",
                 "Variable names are unique and can not be duplicated. Please ensure all variables have a unique name and try again."
+            )
+            return
+        except VariableNameReserved:
+            QtWidgets.QMessageBox.about(
+                self.editor_ui,
+                "Unable to Save",
+                "'<Global>' is a reserved word and can not be used for variable names. Please choose a different name and try again."
             )
             return
 

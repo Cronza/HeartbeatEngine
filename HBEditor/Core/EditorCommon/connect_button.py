@@ -4,27 +4,28 @@ from HBEditor.Core.Primitives.input_entries import InputEntryDropdown
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 
+
 class ConnectButton(SimpleCheckbox):
     SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
     
     def __init__(self, supported_type: ParameterType):
         super().__init__()
         self.checkbox.setObjectName("connect-button")
+        self.setToolTip("Connect this parameter to a variable, or to the global setting")
         self.supported_type = supported_type  # Allow filtering the list of possible connection targets
-        self.Connect()
+
+        # Track the setting chosen by the user. This is either 'None', '<global>' or a name of a variable
+        self.data = ''
 
     def ShowConnectionDialog(self) -> str:
         connect_dialog = DialogConnection(self.supported_type)
         return connect_dialog.GetVariable()
-        #if result == '':
-        #    return ''
-        #else:
 
     def ValidateState(self, new_state: int):
-        print("hooblah")
+        """ Based on the new state, show the connection prompt before setting the state appropriately """
         if new_state == 2:  # if Checked
             result = self.ShowConnectionDialog()
-            if result:
+            if result != 'None' and result != '':
                 self.SIG_USER_UPDATE.emit(self.owner, result)
             else:
                 self.Disconnect()
@@ -32,38 +33,30 @@ class ConnectButton(SimpleCheckbox):
                 self.Connect()
         else:  # if Unchecked
             result = self.ShowConnectionDialog()
-            if result:
+            if result == 'None' and result != '':
                 self.SIG_USER_UPDATE.emit(self.owner, result)
             else:
                 self.Disconnect()
                 self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)  # Undo state change
                 self.Connect()
 
+    def Get(self) -> str:
+        """ Returns whether the checkbox is checked """
+        return self.data
+
+    def Set(self, value: str) -> None:
+        if value == 'None':
+            self.checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+        elif value:
+            self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)
+
+        self.data = value
+
     def Connect(self):
         self.checkbox.stateChanged.connect(self.ValidateState)
 
     def Disconnect(self):
         self.checkbox.disconnect()
-
-
-class ConnectButton2(QtWidgets.QToolButton):
-    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
-
-    def __init__(self, supported_type: ParameterType):
-        super().__init__()
-        self.supported_type = supported_type  # Allow filtering the list of possible connection targets
-        self.clicked.connect(self.ShowConnectionDialog)
-        self.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Connection_Inactive")))
-
-    def ShowConnectionDialog(self):
-        connect_dialog = DialogConnection(self.supported_type)
-        result = connect_dialog.GetVariable()
-        if result == '':
-            return ''
-        #else:
-
-
-
 
 
 class DialogConnection(QtWidgets.QDialog):
@@ -113,7 +106,7 @@ class DialogConnection(QtWidgets.QDialog):
 
     def GetVariablesOfType(self, target_type: ParameterType):
         """ Returns a list of names for all variables that match the provided type """
-        applicable_variables = ['None']
+        applicable_variables = ['None', '<Global>']
         for val_name, val_data in settings.user_project_variables.items():
             if ParameterType[val_data['type']] == target_type:
                 applicable_variables.append(val_name)
