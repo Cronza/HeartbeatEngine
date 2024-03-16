@@ -77,8 +77,8 @@ class EditorVariables(EditorBase):
             print(exc)
             Logger.getInstance().Log("Failed to Export!", 4)
 
-            # Reload the project variables
-            settings.LoadVariables()
+        # Reload the project variables
+        settings.LoadVariables()
 
     def Import(self):
         super().Import()

@@ -3,6 +3,7 @@ from HBEditor.Core import settings
 from HBEditor.Core.Primitives.input_entries import InputEntryDropdown
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
+from HBEditor.Core.Logger.logger import Logger
 
 
 class ConnectButton(SimpleCheckbox):
@@ -11,6 +12,8 @@ class ConnectButton(SimpleCheckbox):
     def __init__(self, supported_type: ParameterType):
         super().__init__()
         self.checkbox.setObjectName("connect-button")
+        #self.checkbox.setTristate(True)
+        self.state = QtCore.Qt.CheckState.Checked  # Track existing state to compare against new states
         self.setToolTip("Connect this parameter to a variable, or to the global setting")
         self.supported_type = supported_type  # Allow filtering the list of possible connection targets
 
@@ -23,22 +26,42 @@ class ConnectButton(SimpleCheckbox):
 
     def ValidateState(self, new_state: int):
         """ Based on the new state, show the connection prompt before setting the state appropriately """
-        if new_state == 2:  # if Checked
-            result = self.ShowConnectionDialog()
-            if result != 'None' and result != '':
+        result = self.ShowConnectionDialog()
+
+        if result == self.data or result == '':
+            self.Disconnect()
+            self.checkbox.setCheckState(self.state)
+            self.Connect()
+            Logger.getInstance().Log("Connection unchanged")
+        else:
+            if result != '':
+                if new_state == 2:  # User is activating button while it's not set to something
+                    if result == '<Global>':
+                        self.Disconnect()
+                        self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)  # Differentiate global references
+                        self.Connect()
+                    elif result == 'None':
+                        self.Disconnect()
+                        print("State", self.state)
+                        self.checkbox.setCheckState(self.state)
+                        self.Connect()
+                else:  # User is activating button while it's set to something
+                    if result == '<Global>':
+                        self.Disconnect()
+                        self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)  # Undo state change
+                        self.Connect()
+                    elif result != 'None':
+                        self.Disconnect()
+                        self.checkbox.setCheckState(self.state)
+                        self.Connect()
+
+                # Update stored data and state, then inform onlookers
+                self.data = result
+                self.state = self.checkbox.checkState()
                 self.SIG_USER_UPDATE.emit(self.owner, result)
-            else:
-                self.Disconnect()
-                self.checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)  # Undo state change
-                self.Connect()
-        else:  # if Unchecked
-            result = self.ShowConnectionDialog()
-            if result == 'None' and result != '':
-                self.SIG_USER_UPDATE.emit(self.owner, result)
-            else:
-                self.Disconnect()
-                self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)  # Undo state change
-                self.Connect()
+
+
+
 
     def Get(self) -> str:
         """ Returns whether the checkbox is checked """
@@ -47,9 +70,12 @@ class ConnectButton(SimpleCheckbox):
     def Set(self, value: str) -> None:
         if value == 'None':
             self.checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+        if value == '<Global>':
+            self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)
         elif value:
             self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)
 
+        self.state = self.checkbox.checkState()
         self.data = value
 
     def Connect(self):
