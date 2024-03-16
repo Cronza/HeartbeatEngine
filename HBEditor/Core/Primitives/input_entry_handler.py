@@ -130,7 +130,6 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
         connect_button = ConnectButton(data_type)
         owning_view.setItemWidget(owning_model_item, 2, connect_button)
 
-
     #    global_checkbox = SimpleCheckbox()
     #    global_checkbox.owner = owning_model_item
     #    global_checkbox.setToolTip("Whether to use the global value specified in the project file for this entry")

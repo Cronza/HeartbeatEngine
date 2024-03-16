@@ -84,16 +84,16 @@ def GetProjectSetting(category: str, key: str):
         raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
 
 
-def LoadValues(partial_file_path: str = "Config/Values.yaml"):
-    """ Reads in the project values file path. Defaults to 'Config/Values.yaml' if no path is provided """
+def LoadValues(partial_file_path: str = "Config/Variables.yaml"):
+    """ Reads in the project values file path. Defaults to 'Config/Variables.yaml' if no path is provided """
     global values
 
     file_path = ConvertPartialToAbsolutePath(partial_file_path)
     values = Reader.ReadAll(file_path)
 
 
-def SaveValues(file_path: str = "Config/Values.yaml"):
-    """ Saves the project values to the provided file path. Defaults to 'Config/Values.yaml' if no path is provided """
+def SaveValues(file_path: str = "Config/Variables.yaml"):
+    """ Saves the project values to the provided file path. Defaults to 'Config/Variables.yaml' if no path is provided """
     global project_settings
 
     file_path = ConvertPartialToAbsolutePath(file_path)

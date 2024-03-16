@@ -9,7 +9,7 @@ class ConnectButton(QtWidgets.QToolButton):
         super().__init__()
         self.supported_type = supported_type  # Allow filtering the list of possible connection targets
         self.clicked.connect(self.ShowConnectionDialog)
-        self.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Connection")))
+        self.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Connection_Inactive")))
 
     def ShowConnectionDialog(self):
         connect_dialog = DialogConnection(self.supported_type)
@@ -57,12 +57,9 @@ class DialogConnection(QtWidgets.QDialog):
         if self.exec():
             selection = self.variable_list.selectedItems()
             if selection:
-                if self.variable_list.selectedIndexes()[0].row == 0:
-                    return "None"
-                else:
-                    return selection[0].text()
+                return selection[0].text()
 
-        return "None"
+        return "None" # TODO: review that this supports 'Global'
 
     def GetVariablesOfType(self, target_type: ParameterType):
         """ Returns a list of names for all variables that match the provided type """
