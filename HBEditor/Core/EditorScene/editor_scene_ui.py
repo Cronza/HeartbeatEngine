@@ -65,6 +65,7 @@ class EditorSceneUI(EditorBaseUI):
         # Adjust the space allocation to favor the settings section
         self.main_resize_container.setStretchFactor(1, 0)
         self.main_resize_container.setStretchFactor(0, 1)
+        self.main_resize_container.setStretchFactor(2, 3)  # Increase details panel size to accomodate connection column
 
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()

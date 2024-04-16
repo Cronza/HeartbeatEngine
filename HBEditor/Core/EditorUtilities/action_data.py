@@ -127,9 +127,10 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
 
             elif "children" not in base_param_data:
                 if base_param_name in action_data:
-                    if "global" in base_param_data:
-                        RemoveFlag("global_active", base_param_data)
-                    base_param_data["value"] = action_data[base_param_name]
+                    if "default" in base_param_data and "value" not in base_param_data:
+                        base_param_data["value"] = settings.user_project_data[base_param_data['default'][0]][base_param_data['default'][1]]['value']
+                    else:
+                        base_param_data["value"] = action_data[base_param_name]
                 else:
                     if "global" in base_param_data:
                         # If the req entry isn't found in the engine action data, then it was likely omitted due to a

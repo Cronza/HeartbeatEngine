@@ -2,89 +2,198 @@
 # Created with HBEditor v0.1
 
 Game:
-  title: Project Name
-  author: Project Author
-  company: Company
   starting_scene: ""
-Window:
-  resolution: 0
+Graphics:
+  resolution:
+    type: Int
+    value: 0
   resolution_options:
-  - - 1280
+    - 1280
     - 720
-Text:
-  size: 24
-  color:
-  - 255
-  - 255
-  - 255
-  font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  z_order: 100
-  center_align: true
-  wrap_bounds:
-  - 0.2
-  - 0.2
-Button:
-  sprite: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
-  sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
-  sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png
-  checkbox_sprite: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
-  checkbox_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
-  checkbox_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
-  checkbox_sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
-  z_order: 10001
-  font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-Dialogue:
-  transition_type: "None"
-  transition_speed: 500
+Default Variables - Text:
+  text_size:
+    type: Int
+    value: 24
+  text_color:
+    type: Color
+    value:
+      - 255
+      - 255
+      - 255
+  text_color_hover:
+    type: Color
+    value:
+      - 200
+      - 200
+      - 200
+  text_color_clicked:
+    type: Color
+    value:
+      - 150
+      - 150
+      - 150
+  text_font:
+    type: Asset_Font
+    value: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+  text_z_order:
+    type: Int
+    value: 100
+  text_center_align:
+    type: Boolean
+    value: true
+  text_wrap_bounds:
+    type: Vector2
+    value:
+      - 0.25
+      - 0.05
+
+Default Variables - Sprites:
+  background_sprite:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
+  background_z_order:
+    type: Int
+    value: -9999
+
+Default Variables - Button:
+  button_sprite:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
+  button_sprite_hover:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
+  button_sprite_clicked:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png
+  button_z_order:
+    type: Int
+    value: 10001
+  checkbox_sprite:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
+  checkbox_sprite_hover:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
+  checkbox_sprite_clicked:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
+  checkbox_sprite_icon:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
+
+Default Variables - Dialogue:
+  transition_type:
+    type: "Dropdown"
+    value: "None"
+    options:
+      - "None"
+      - "fade_in"
+  transition_speed:
+    type: Int
+    value: 500
   speaker_text_position:
-  - 0.262
-  - 0.703
-  speaker_text_size: 32
+    type: Vector2
+    value:
+      - 0.262
+      - 0.703
+  speaker_text_size:
+    type: Int
+    value: 32
   speaker_text_color:
-  - 253
-  - 253
-  - 253
-  speaker_text_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  speaker_text_z_order: 10001
-  speaker_text_center_align: true
+    type: Color
+    value:
+      - 253
+      - 253
+      - 253
+  speaker_text_font:
+    type: Asset_Font
+    value: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+  speaker_text_z_order:
+    type: Int
+    value: 10001
+  speaker_text_center_align:
+    type: Bool
+    value: True
   speaker_text_wrap_bounds:
-  - 0.25
-  - 0.05
+    type: Vector2
+    value:
+      - 0.25
+      - 0.05
   dialogue_text_position:
-  - 0.1
-  - 0.75
-  dialogue_text_size: 24
+    type: Vector2
+    value:
+      - 0.1
+      - 0.75
+  dialogue_text_size:
+    type: Int
+    value: 24
   dialogue_text_color:
-  - 253
-  - 253
-  - 253
-  dialogue_text_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
-  dialogue_text_z_order: 10001
-  dialogue_text_center_align: false
+    type: Color
+    value:
+      - 253
+      - 253
+      - 253
+  dialogue_text_font:
+    type: Asset_Font
+    value: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+  dialogue_text_z_order:
+    type: Int
+    value: 10001
+  dialogue_text_center_align:
+    type: Bool
+    value: false
   dialogue_text_wrap_bounds:
-  - 0.8
-  - 0.16
-  choice_button_sprite: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
-  choice_button_sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
-  choice_button_sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
-  choice_button_z_order: 10001
-  choice_button_text_size: 24
+    type: Vector2
+    value:
+      - 0.8
+      - 0.16
+  choice_button_sprite:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
+  choice_button_sprite_hover:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
+  choice_button_sprite_clicked:
+    type: Asset_Image
+    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
+  choice_button_z_order:
+    type: Int
+    value: 10001
+  choice_button_text_size:
+    type: Int
+    value: 24
   choice_button_text_color:
-  - 204
-  - 255
-  - 255
+    type: Vector2
+    value:
+      - 204
+      - 255
+      - 255
   choice_button_text_color_hover:
-  - 204
-  - 255
-  - 255
+    type: Color
+    value:
+      - 204
+      - 255
+      - 255
   choice_button_text_color_clicked:
-  - 204
-  - 255
-  - 255
-  choice_button_font: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
+    type: Color
+    value:
+      - 204
+      - 255
+      - 255
+  choice_button_font:
+    type: Asset_Font
+    value: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf
 Audio:
-  mute: false
-  volume_music: 100
-  volume_sfx: 100
+  mute:
+    type: Bool
+    value: false
+  volume_music:
+    type: Int
+    value: 100
+  volume_sfx:
+    type: Int
+    value: 100
 Pause Menu:
-  interface: ''
+  interface:
+    type: Asset_Interface
+    value: ''

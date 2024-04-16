@@ -16,7 +16,8 @@ from PyQt6.QtWidgets import QWidget, QTreeWidgetItem, QLabel
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorCommon.connect_button import ConnectButton
+from HBEditor.Core.EditorCommon.connection_button import ConnectionButton
+from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core.Primitives.input_entries import *
 
 
@@ -113,29 +114,45 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
 
     # Update the entry with the value key if applicable. Otherwise, use the default value. If no default is available,
     # let the entry load its own default
+    #print("Data", data)
     if "value" in data:
         input_widget.Set(data["value"])
     elif "default" in data:
-        data["value"] = data["default"]
+        data["value"] = settings.user_project_data[data["default"][0]][data["default"][1]]["value"]
         input_widget.Set(data["value"])
     else:
         input_widget.SetDefaultValue()
 
     name_widget = QLabel(name)
 
-    # The global checkbox isn't universally used, so only use it if relevant. If it's enabled, mark
-    # the input widget as uneditable by the user
     connect_button = None
-    if "global" in data and "flags" in data:
-        connect_button = ConnectButton(data_type)
-        connect_button.owner = owning_model_item
-        owning_view.setItemWidget(owning_model_item, 2, connect_button)
-        if "global_active" in data["flags"]:
-            connect_button.Set(True)
-            input_widget.SetEditable(2)
-        else:
-            connect_button.Set(False)
-        connect_button.Connect()
+    if "flags" in data:
+        if "connectable" in data['flags'] or "global" in data:
+            connect_button = ConnectionButton(data_type)
+            owning_view.setItemWidget(owning_model_item, 2, connect_button)
+            if not data['connection']:
+                data['connection'] = 'None'
+                input_widget.SetEditable(0)
+            else:
+                input_widget.SetEditable(2)
+
+            connect_button.Set(data['connection'])
+
+
+    #if "global" in data and "flags" in data:
+    #    #connect_button = ConnectionButton(data_type)
+    #    #connect_button.owner = owning_model_item
+    #    owning_view.setItemWidget(owning_model_item, 2, connect_button)
+    #    if "global_active" in data["flags"]:
+    #        connect_button.Set('<Global>')
+    #        input_widget.SetEditable(2)
+    #    elif "connection" in data:
+    #        print("Testidsbfgsdflksdggds")
+    #        connect_button.Set(data['connection'])
+    #        input_widget.SetEditable(2)
+    #    else:
+    #        connect_button.Set('None')
+    #    #connect_button.Connect()
 
     return name_widget, input_widget, connect_button
 

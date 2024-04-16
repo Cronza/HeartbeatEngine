@@ -500,14 +500,14 @@ QCheckBox{
         }
         &#connect-button{
             &:checked {
-                image: url(EditorContent:Icons/Connection_Active.png);
+                image: url(EditorContent:Icons/Connection_Active_Global.png);
                 &:disabled{
                     image: url(EditorContent:Icons/Connection_Inactive.png);
                     background-color: $col_input_inactive;
                 }
             }
             &:indeterminate {
-                image: url(EditorContent:Icons/Trash.png);
+                image: url(EditorContent:Icons/Connection_Active_Global.png);
             }
         }
         &:checked:hover {

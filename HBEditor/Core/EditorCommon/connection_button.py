@@ -6,13 +6,37 @@ from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.Logger.logger import Logger
 
 
+class ConnectionButton(QtWidgets.QComboBox):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
+
+    def __init__(self, supported_type: ParameterType):
+        super().__init__()
+        self.supported_type = supported_type
+        self.setToolTip("Connect this parameter to a variable, or to the global setting")
+
+    def showPopup(self) -> None:
+        result = self.ShowConnectionDialog()
+        if result == self.currentText() or result == '':
+            Logger.getInstance().Log("Connection unchanged")
+        else:
+            self.Set(result)
+
+    def Set(self, new_value: str):
+        self.removeItem(0)
+        self.addItem(new_value)
+
+    def ShowConnectionDialog(self) -> str:
+        connect_dialog = DialogConnection(self.supported_type)
+        return connect_dialog.GetVariable()
+
+
 class ConnectButton(SimpleCheckbox):
     SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
     
     def __init__(self, supported_type: ParameterType):
         super().__init__()
         self.checkbox.setObjectName("connect-button")
-        #self.checkbox.setTristate(True)
+        self.checkbox.clicked.connect(self.ValidateState)
         self.state = QtCore.Qt.CheckState.Checked  # Track existing state to compare against new states
         self.setToolTip("Connect this parameter to a variable, or to the global setting")
         self.supported_type = supported_type  # Allow filtering the list of possible connection targets
@@ -24,44 +48,29 @@ class ConnectButton(SimpleCheckbox):
         connect_dialog = DialogConnection(self.supported_type)
         return connect_dialog.GetVariable()
 
-    def ValidateState(self, new_state: int):
+    def ValidateState(self, has_checked: bool):
         """ Based on the new state, show the connection prompt before setting the state appropriately """
-        result = self.ShowConnectionDialog()
+        # Checkboxes have no mechanism to react to the state change *before* it happens. As such, we need to quickly
+        # revert the state before we proceed with processing it
+        self.checkbox.setCheckState(self.state)
 
+        result = self.ShowConnectionDialog()
+        new_state = self.state
         if result == self.data or result == '':
-            self.Disconnect()
-            self.checkbox.setCheckState(self.state)
-            self.Connect()
             Logger.getInstance().Log("Connection unchanged")
         else:
-            if result != '':
-                if new_state == 2:  # User is activating button while it's not set to something
-                    if result == '<Global>':
-                        self.Disconnect()
-                        self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)  # Differentiate global references
-                        self.Connect()
-                    elif result == 'None':
-                        self.Disconnect()
-                        print("State", self.state)
-                        self.checkbox.setCheckState(self.state)
-                        self.Connect()
-                else:  # User is activating button while it's set to something
-                    if result == '<Global>':
-                        self.Disconnect()
-                        self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)  # Undo state change
-                        self.Connect()
-                    elif result != 'None':
-                        self.Disconnect()
-                        self.checkbox.setCheckState(self.state)
-                        self.Connect()
+            if has_checked:  # User is activating button while it's not set to something
+                if result != 'None':
+                    new_state = QtCore.Qt.CheckState.Checked
+            else:  # User is activating button while it's set to something
+                if result == 'None':
+                    new_state = QtCore.Qt.CheckState.Unchecked
 
-                # Update stored data and state, then inform onlookers
-                self.data = result
-                self.state = self.checkbox.checkState()
-                self.SIG_USER_UPDATE.emit(self.owner, result)
-
-
-
+            # Update stored data and state, then inform onlookers
+            self.data = result
+            self.state = new_state
+            self.checkbox.setCheckState(self.state)
+            self.SIG_USER_UPDATE.emit(self.owner, result)
 
     def Get(self) -> str:
         """ Returns whether the checkbox is checked """
@@ -77,12 +86,6 @@ class ConnectButton(SimpleCheckbox):
 
         self.state = self.checkbox.checkState()
         self.data = value
-
-    def Connect(self):
-        self.checkbox.stateChanged.connect(self.ValidateState)
-
-    def Disconnect(self):
-        self.checkbox.disconnect()
 
 
 class DialogConnection(QtWidgets.QDialog):

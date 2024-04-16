@@ -24,6 +24,7 @@ class HBEditorUI:
         super().__init__()
 
         self.main_window = QtWidgets.QMainWindow()
+        self.main_window.setWindowState(QtCore.Qt.WindowState.WindowMaximized)
         self.core = core
 
         # Initialize the U.I

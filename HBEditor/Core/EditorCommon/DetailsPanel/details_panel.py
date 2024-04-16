@@ -38,9 +38,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.setContentsMargins(0, 0, 0, 0)
         self.details_layout.setSpacing(0)
 
-        # Create the toolbar
-        #self.details_toolbar = QtWidgets.QToolBar(self)
-
         # Create search filter
         #self.details_filter = QtWidgets.QLineEdit(self.details_toolbar)
         #self.details_filter.setPlaceholderText("filter...")
@@ -51,7 +48,7 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setObjectName("no-top")
         self.details_tree.setColumnCount(3)
-        self.details_tree.setHeaderLabels(['Name', 'Input', 'C'])
+        self.details_tree.setHeaderLabels(['Name', 'Input', 'Connection'])
         self.details_tree.setAutoScroll(False)
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
@@ -63,16 +60,19 @@ class DetailsPanel(QtWidgets.QWidget):
 
         # --- Specialized Settings for the 'C' column ---
         # 1. Allow columns to be significantly smaller than normal
-        self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
+        #self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
         # 2. Force the last column to be barely larger than a standard checkbox
-        self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
+        #self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
 
         # 3. Align the column header text to match the alignment of the checkbox
-        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
+        #self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)
+
+    def ShowConnections(self):
+        pass
 
     def Populate(self, selected_entry):
         """
@@ -160,6 +160,7 @@ class DetailsPanel(QtWidgets.QWidget):
                 entry = parent.child(entry_index)
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
+
                 if "global" in entry_data and "flags" in entry_data:
                     ad.RemoveFlag("global_active", entry_data)
 

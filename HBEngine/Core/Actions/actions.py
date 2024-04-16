@@ -73,8 +73,7 @@ look like the following:
 {
     "key": {
         "type": "String",
-        "value": "",
-        "default": "",
+        "value": "Hello World!",
         "flags": ["editable", "preview"]
     }
 }
@@ -82,23 +81,27 @@ look like the following:
 ---------------------------------
 --- Parameter Entry Legend ---
 ---------------------------------
-    global:   Causes the action to ignore 'default' and 'value', and instead use a value from the project's "Game.yaml"
-              file. The syntax is: [<category>, <value>].
-    value:    Used to store the latest updated value independently of the default.
+    value:      The active contents for the parameter. This represents the starting value for the parameter, and is 
+                where the user stores their inputs. If present, 'default' will be ignored. 
+    default:    Used to connect a parameter to a easily accessible variable defined in the 'Game.yaml' project 
+                settings. The syntax is: [<category>, <value>]. This key is used to allow abstraction from modifying 
+                actions on a per-instance basis, and instead modify their parameters globally in one singular location. 
+                Not every parameter should use this key as some parameters are better suited for manual configuration 
+                per-instance.  
+    connection: Which project variable this parameter is connected to. If set, 'value' and 'default' will be ignored in 
+                favor of the data stored in the referenced variable.
 
     [Editor Specific]
-    default:  Used to allow resetting 'value' 
-    editable: Controls whether a parameter can be changed by the user either in the editor
-    type:     Controls which input widget is used when displayed in the editor (IE. Dropdown vs Text Box)
-    template: A special keyword for parameters that allow children to be dynamically created by the
-              user. This keyword is only usable with the 'Array' type
-    flags:    A list of key words that various sub-editors use. Options:
+    type:       Controls which input widget is used when displayed in the editor (IE. Dropdown vs Text Box)
+    template:   A special keyword for parameters that allow children to be dynamically created by the
+                user. This keyword is only usable with the 'Array' type
+    flags:      A list of key words that various sub-editors use. Options:
+        editable:       Controls whether a parameter can be changed by the user either in the editor
         preview:        Controls whether certain editors can show the value of the parameter in additional areas of 
                         the interface
         no_exclusion:   Controls whether to remove editor-specific property exclusions for a property and its children. 
                         This is necessary when editors such as 'PointAndClick' have blanket exclusions for properties 
                         such as 'post_wait', and you need it available for a particular action
-        global_active:  Controls whether the parameter will use the global value or 'value'
     
 """
 
@@ -107,10 +110,6 @@ look like the following:
 
 
 class Action:
-    #CREATES_SPRITE = False
-    #CREATES_TEXT = False
-    #CREATES_
-
     def __init__(self, simplified_ad: dict, parent: Renderable = None, no_draw: bool = False):
         self.parent: Renderable = parent  # Who should be the parent of new renderables created by this action. If blank, defaults to the scene
         self.simplified_ad = simplified_ad  # User-provided action data using the simplified structure
@@ -212,8 +211,8 @@ class remove_renderable(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "transition": {
             "type": "Container",
@@ -222,14 +221,12 @@ class remove_renderable(Action):
                 "type": {
                     "type": "Dropdown",
                     "value": "None",
-                    "default": "None",
                     "options": ["None", "fade_out"],
                     "flags": ["editable", "preview"],
                 },
                 "speed": {
                     "type": "Int",
                     "value": 500,
-                    "default": 500,
                     "flags": ["editable", "preview"],
                 },
             },
@@ -323,38 +320,37 @@ class create_sprite(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite": {
             "type": "Asset_Image",
             "value": "None",
-            "default": "None",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable", "preview"],
         },
         "z_order": {
             "type": "Int",
             "value": 0,
-            "default": 0,
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "flip": {
             "type": "Bool",
             "value": False,
-            "default": False,
-            "flags": ["editable"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "transition": {
             "type": "Container",
@@ -363,14 +359,13 @@ class create_sprite(Action):
                 "type": {
                     "type": "Dropdown",
                     "value": "None",
-                    "default": "None",
+
                     "options": ["None", "fade_in"],
                     "flags": ["editable", "preview"],
                 },
                 "speed": {
                     "type": "Int",
                     "value": 500,
-                    "default": 500,
                     "flags": ["editable", "preview"],
                 },
             },
@@ -451,23 +446,33 @@ class create_background(Action):
         "key": {
             "type": "String",
             "value": "Background",
-            "default": "Background",
-            "flags": ["editable"],
+            "connection": "",
+            "flags": ["editable", "connectable"]
         },
         "sprite": {
             "type": "Asset_Image",
-            "value": "None",
-            "default": "None",
-            "flags": ["editable", "preview"],
+            "default": ["Default Variables - Sprites", "background_sprite"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"]
         },
-        "position": {"type": "Vector2", "value": [0, 0], "default": [0, 0]},
-        "center_align": {"type": "Bool", "value": False, "default": False},
-        "z_order": {"type": "Int", "value": -9999, "default": -9999},
+        "position": {
+            "type": "Vector2",
+            "value": [0, 0]
+        },
+        "center_align": {  # Not editable as controlled by the action
+            "type": "Bool",
+            "value": False
+        },
+        "z_order": {
+            "type": "Int",
+            "default": ["Default Variables - Sprites", "background_z_order"],
+            "connection": "",
+            "flags": ["editable", "connectable"]
+        },
         "flip": {
             "type": "Bool",
             "value": False,
-            "default": False,
-            "flags": ["editable"],
+            "flags": ["editable"]
         },
         "conditions": {
             "type": "Array",
@@ -522,40 +527,44 @@ class create_interactable(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
             "value": True,
-            "default": True,
-            "flags": ["editable"],
+            "flags": ["editable"]
         },
         "sprite": {
             "type": "Asset_Image",
             "value": "None",
-            "default": "None",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
             "value": "None",
-            "default": "None",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
             "value": "None",
-            "default": "None",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
-        "z_order": {"type": "Int", "value": 0, "default": 0, "flags": ["editable"]},
+        "z_order": {
+            "type": "Int",
+            "value": 0,
+            "connection": "",
+            "flags": ["editable", "connectable"]
+        },
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
@@ -568,7 +577,6 @@ class create_interactable(Action):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "load_scene",
@@ -646,62 +654,55 @@ class create_text(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
-            "value": True,
-            "default": True,
-            "global": ["Text", "center_align"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_center_align"],
+            "flags": ["editable"],
         },
         "text": {
             "type": "Paragraph",
             "value": "Default",
-            "default": "Default",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "text_size": {
             "type": "Int",
-            "value": 24,
-            "default": 24,
-            "global": ["Text", "size"],
-            "flags": ["editable", "preview", "global_active"],
+            "default": ["Default Variables - Text", "text_size"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "text_color": {
             "type": "Color",
-            "value": [255, 255, 255],
-            "default": [255, 255, 255],
-            "global": ["Text", "color"],
-            "flags": ["editable", "preview", "global_active"],
+            "default": ["Default Variables - Text", "text_color"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "font": {
             "type": "Asset_Font",
-            "value": "None",
-            "default": "None",
-            "global": ["Text", "font"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_font"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
-            "value": 0,
-            "default": 0,
-            "global": ["Text", "z_order"],
-            "flags": ["editable", "preview", "global_active"],
+            "default": ["Default Variables - Text", "text_z_order"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "wrap_bounds": {
             "type": "Vector2",
-            "value": [0.2, 0.2],
-            "default": [0.2, 0.2],
-            "global": ["Text", "wrap_bounds"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_wrap_bounds"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "transition": {
             "type": "Container",
@@ -710,32 +711,12 @@ class create_text(Action):
                 "type": {
                     "type": "Dropdown",
                     "value": "None",
-                    "default": "None",
                     "options": ["None", "fade_in"],
                     "flags": ["editable", "preview"],
                 },
                 "speed": {
                     "type": "Int",
                     "value": 500,
-                    "default": 500,
-                    "flags": ["editable", "preview"],
-                },
-            },
-        },
-        "connect_project_setting": {
-            "type": "Container",
-            "flags": ["editable", "preview"],
-            "children": {
-                "category": {
-                    "type": "String",
-                    "value": "",
-                    "default": "",
-                    "flags": ["editable", "preview"],
-                },
-                "setting": {
-                    "type": "String",
-                    "value": "",
-                    "default": "",
                     "flags": ["editable", "preview"],
                 },
             },
@@ -812,48 +793,43 @@ class create_button(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable"],
         },
         "sprite": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png",
-            "global": ["Button", "sprite"],
-            "flags": ["editable", "preview", "global_active"],
+            "default": ["Default Variables - Button", "button_sprite"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png",
-            "global": ["Button", "sprite_hover"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "button_sprite_hover"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png",
-            "global": ["Button", "sprite_clicked"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "button_sprite_clicked"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
-            "value": 10001,
-            "default": 10001,
-            "global": ["Button", "z_order"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "button_z_order"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "button_text": {
             "type": "Container",
@@ -862,66 +838,58 @@ class create_button(Action):
                 "position": {
                     "type": "Vector2",
                     "value": [0.5, 0.5],
-                    "default": [0.5, 0.5],
-                    "flags": ["editable", "preview"],
+                    "connection": "",
+                    "flags": ["editable", "connectable", "preview"],
                 },
                 "center_align": {
                     "type": "Bool",
                     "value": True,
-                    "default": True,
                     "flags": ["editable"],
                 },
                 "text": {
                     "type": "String",
                     "value": "Default",
-                    "default": "Default",
-                    "flags": ["editable", "preview"],
+                    "connection": "",
+                    "flags": ["editable", "connectable", "preview"],
                 },
                 "text_size": {
                     "type": "Int",
-                    "value": 24,
-                    "default": 24,
-                    "global": ["Text", "size"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Text", "text_size"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
-                    "value": [255, 255, 255],
-                    "default": [255, 255, 255],
-                    "global": ["Text", "color"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Text", "text_color"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "text_color_hover": {
                     "type": "Color",
-                    "value": [255, 255, 255],
-                    "default": [255, 255, 255],
-                    "global": ["Text", "color"],
-                    "flags": ["editable", "global_active"]
+                    "default": ["Default Variables - Text", "text_color"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"]
                 },
                 "text_color_clicked": {
                     "type": "Color",
-                    "value": [255, 255, 255],
-                    "default": [255, 255, 255],
-                    "global": ["Text", "color"],
-                    "flags": ["editable", "global_active"]
+                    "default": ["Default Variables - Text", "text_color"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"]
                 },
                 "font": {
                     "type": "Asset_Font",
-                    "value": "None",
-                    "default": "None",
-                    "global": ["Button", "font"],
-                    "flags": ["editable", "global_active"]
+                    "default": ["Default Variables - Text", "text_font"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"]
                 },
                 "wrap_bounds": {
                     "type": "Vector2",
                     "value": [0.2, 0.2],
-                    "default": [0.2, 0.2],
                     "flags": ["editable"],
                 },
-                "z_order": {
+                "z_order": {  # Not editable as controlled by the Button object
                     "type": "Int",
                     "value": 10002,
-                    "default": 10002
                 }
             },
         },
@@ -937,7 +905,6 @@ class create_button(Action):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "load_scene",
@@ -1013,67 +980,64 @@ class create_text_button(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable"],
         },
         "text": {
             "type": "String",
             "value": "Default",
-            "default": "Default",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "text_size": {
             "type": "Int",
-            "value": 24,
-            "default": 24,
-            "global": ["Text", "size"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_size"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "text_color": {
             "type": "Color",
-            "value": [255, 255, 255],
-            "default": [255, 255, 255],
-            "global": ["Text", "color"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_color"],
+            "connection": "",
+            "flags": ["editable", "connectable"]
         },
         "text_color_hover": {
             "type": "Color",
-            "value": [255, 255, 255],
-            "default": [255, 255, 255],
-            "global": ["Text", "color"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_color_hover"],
+            "connection": "",
+            "flags": ["editable", "connectable"]
         },
         "text_color_clicked": {
             "type": "Color",
-            "value": [255, 255, 255],
-            "default": [255, 255, 255],
-            "global": ["Text", "color"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_color_clicked"],
+            "connection": "",
+            "flags": ["editable", "connectable"]
         },
         "font": {
             "type": "Asset_Font",
-            "value": "None",
-            "default": "None",
-            "global": ["Button", "font"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Text", "text_font"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
-        "z_order": {"type": "Int", "value": 10002, "default": 10002},
+        "z_order": {
+            "type": "Int",
+            "value": 10002,
+            "default": 10002
+        },
         "wrap_bounds": {
             "type": "Vector2",
             "value": [0.2, 0.2],
-            "default": [0.2, 0.2],
             "flags": ["editable"],
         },
         "events": {
@@ -1088,7 +1052,6 @@ class create_text_button(Action):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "load_scene",
@@ -1161,73 +1124,49 @@ class create_checkbox(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "default": [0.5, 0.5],
-            "flags": ["editable", "preview"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable"],
         },
         "sprite": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png",
-            "global": ["Button", "checkbox_sprite"],
-            "flags": ["editable", "preview", "global_active"],
+            "default": ["Default Variables - Button", "checkbox_sprite"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png",
-            "global": ["Button", "checkbox_sprite_hover"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "checkbox_sprite_hover"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png",
-            "global": ["Button", "checkbox_sprite_clicked"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "checkbox_sprite_clicked"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "sprite_icon": {
             "type": "Asset_Image",
-            "value": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
-            "default": "HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png",
-            "global": ["Button", "checkbox_sprite_icon"],
-            "flags": ["editable", "global_active"],
+            "default": ["Default Variables - Button", "checkbox_sprite_icon"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "z_order": {
             "type": "Int",
-            "value": 10001,
-            "default": 10001,
-            "global": ["Button", "z_order"],
-            "flags": ["editable", "global_active"],
-        },
-        "connect_project_setting": {
-            "type": "Container",
-            "flags": ["editable", "preview"],
-            "children": {
-                "category": {
-                    "type": "String",
-                    "value": "",
-                    "default": "",
-                    "flags": ["editable", "preview"],
-                },
-                "setting": {
-                    "type": "String",
-                    "value": "",
-                    "default": "",
-                    "flags": ["editable", "preview"],
-                },
-            },
+            "default": ["Default Variables - Button", "button_z_order"],
+            "connection": "",
+            "flags": ["editable", "connectable"],
         },
         "events": {
             "type": "Array",
@@ -1308,7 +1247,6 @@ class start_dialogue(Action):
         "dialogue_file": {
             "type": "Asset_Dialogue",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"]
         },
         "conditions": {
@@ -1361,58 +1299,51 @@ class dialogue(Action):
             "type": "Container",
             "flags": ["editable", "preview"],
             "children": {
-                "key": {
+                "key": {  # Not editable as controlled by action
                     "type": "String",
                     "value": "SpeakerText",
                     "default": "SpeakerText",
                 },
                 "position": {
                     "type": "Vector2",
-                    "value": [0, 0],
-                    "default": [0, 0],
-                    "global": ["Dialogue", "speaker_text_position"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_position"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"]
                 },
                 "center_align": {
                     "type": "Bool",
-                    "value": True,
-                    "default": True,
-                    "global": ["Dialogue", "speaker_text_center_align"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_center_align"],
+                    "flags": ["editable"],
                 },
                 "text": {
                     "type": "String",
                     "value": "",
-                    "default": "",
-                    "flags": ["editable", "preview"],
+                    "connection": "",
+                    "flags": ["editable", "connectable", "preview"],
                 },
                 "text_size": {
                     "type": "Int",
-                    "value": 24,
-                    "default": 24,
-                    "global": ["Dialogue", "speaker_text_size"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_size"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
-                    "value": [255, 255, 255],
-                    "default": [255, 255, 255],
-                    "global": ["Dialogue", "speaker_text_color"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_color"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "font": {
                     "type": "Asset_Font",
-                    "value": "None",
-                    "default": "None",
-                    "global": ["Dialogue", "speaker_text_font"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_font"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "z_order": {
                     "type": "Int",
-                    "value": 0,
-                    "default": 0,
-                    "global": ["Dialogue", "speaker_text_z_order"],
-                    "flags": ["global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_z_order"],
+                    "connection": "",
+                    "flags": ["connectable"],
                 },
                 "transition": {
                     "type": "Container",
@@ -1420,27 +1351,21 @@ class dialogue(Action):
                     "children": {
                         "type": {
                             "type": "Dropdown",
-                            "value": "None",
-                            "default": "None",
-                            "global": ["Dialogue", "transition_type"],
+                            "default": ["Default Variables - Dialogue", "transition_type"],
                             "options": ["fade_in", "None"],
-                            "flags": ["editable", "global_active"],
+                            "flags": ["editable"]
                         },
                         "speed": {
                             "type": "Int",
-                            "value": 500,
-                            "default": 500,
-                            "global": ["Dialogue", "transition_speed"],
-                            "flags": ["editable", "global_active"],
+                            "default": ["Default Variables - Dialogue", "transition_speed"],
+                            "flags": ["editable"]
                         },
                     },
                 },
                 "wrap_bounds": {
                     "type": "Vector2",
-                    "value": [0.2, 0.2],
-                    "default": [0.2, 0.2],
-                    "global": ["Dialogue", "speaker_text_wrap_bounds"],
-                    "flags": ["global_active"],
+                    "default": ["Default Variables - Dialogue", "speaker_text_wrap_bounds"],
+                    "flags": ["editable"],
                 }
             },
         },
@@ -1450,56 +1375,45 @@ class dialogue(Action):
             "children": {
                 "key": {
                     "type": "String",
-                    "value": "DialogueText",
-                    "default": "DialogueText",
+                    "value": "",
                 },
                 "position": {
                     "type": "Vector2",
-                    "value": [0, 0],
-                    "default": [0, 0],
-                    "global": ["Dialogue", "dialogue_text_position"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_position"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "center_align": {
                     "type": "Bool",
-                    "value": True,
-                    "default": True,
-                    "global": ["Dialogue", "dialogue_text_center_align"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_center_align"],
+                    "flags": ["editable"],
                 },
                 "text": {
                     "type": "Paragraph",
-                    "value": "Default",
-                    "default": "Default",
+                    "value": "",
                     "flags": ["editable", "preview"],
                 },
                 "text_size": {
                     "type": "Int",
-                    "value": 24,
-                    "default": 24,
-                    "global": ["Dialogue", "dialogue_text_size"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_size"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
-                    "value": [255, 255, 255],
-                    "default": [255, 255, 255],
-                    "global": ["Dialogue", "dialogue_text_color"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_color"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "font": {
                     "type": "Asset_Font",
-                    "value": "None",
-                    "default": "None",
-                    "global": ["Dialogue", "dialogue_text_font"],
-                    "flags": ["editable", "global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_font"],
+                    "connection": "",
+                    "flags": ["editable", "connectable"],
                 },
                 "z_order": {
                     "type": "Int",
-                    "value": 0,
-                    "default": 0,
-                    "global": ["Dialogue", "dialogue_text_z_order"],
-                    "flags": ["global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_z_order"],
                 },
                 "transition": {
                     "type": "Container",
@@ -1507,27 +1421,20 @@ class dialogue(Action):
                     "children": {
                         "type": {
                             "type": "Dropdown",
-                            "value": "fade_in",
-                            "default": "fade_in",
-                            "global": ["Dialogue", "transition_type"],
+                            "default": ["Default Variables - Dialogue", "transition_type"],
                             "options": ["fade_in", "None"],
-                            "flags": ["editable", "global_active"],
+                            "flags": ["editable"],
                         },
                         "speed": {
                             "type": "Int",
-                            "value": 1000,
-                            "default": 1000,
-                            "global": ["Dialogue", "transition_speed"],
-                            "flags": ["editable", "global_active"],
+                            "default": ["Default Variables - Dialogue", "transition_speed"],
+                            "flags": ["editable"],
                         },
                     },
                 },
                 "wrap_bounds": {
                     "type": "Vector2",
-                    "value": [0.8, 0.16],
-                    "default": [0.8, 0.16],
-                    "global": ["Dialogue", "dialogue_text_wrap_bounds"],
-                    "flags": ["global_active"],
+                    "default": ["Default Variables - Dialogue", "dialogue_text_wrap_bounds"],
                 }
             },
         },
@@ -1611,46 +1518,39 @@ class choice(Action):
                         "branch": {
                             "type": "String",
                             "value": "",
-                            "default": "",
                             "flags": ["editable", "preview"],
                         },
                         "position": {
                             "type": "Vector2",
                             "value": [0.5, 0.5],
-                            "default": [0.5, 0.5],
-                            "flags": ["editable", "preview"],
+                            "flags": ["editable"],
                         },
                         "center_align": {
                             "type": "Bool",
                             "value": True,
-                            "default": True,
                         },
                         "sprite": {
                             "type": "Asset_Image",
-                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
-                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png",
-                            "global": ["Dialogue", "choice_button_sprite"],
-                            "flags": ["editable", "preview", "global_active"],
+                            "default": ["Default Variables - Dialogue", "choice_button_sprite"],
+                            "connection": "",
+                            "flags": ["editable", "connectable"],
                         },
                         "sprite_hover": {
                             "type": "Asset_Image",
-                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
-                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png",
-                            "global": ["Dialogue", "choice_button_sprite_hover"],
-                            "flags": ["editable", "global_active"],
+                            "default": ["Default Variables - Dialogue", "choice_button_sprite_hover"],
+                            "connection": "",
+                            "flags": ["editable", "connectable"],
                         },
                         "sprite_clicked": {
                             "type": "Asset_Image",
-                            "value": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
-                            "default": "HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png",
-                            "global": ["Dialogue", "choice_button_sprite_clicked"],
-                            "flags": ["editable", "global_active"],
+                            "default": ["Default Variables - Dialogue", "choice_button_sprite_clicked"],
+                            "connection": "",
+                            "flags": ["editable", "connectable"],
                         },
                         "z_order": {
                             "type": "Int",
-                            "value": 10001,
-                            "default": 10001,
-                            "global": ["Dialogue", "choice_button_text_size"],
+                            "default": ["Default Variables - Dialogue", "choice_button_text_size"],
+                            "connection": "",
                             "flags": ["global_active"],
                         },
                         "button_text": {
@@ -1660,77 +1560,55 @@ class choice(Action):
                                 "position": {
                                     "type": "Vector2",
                                     "value": [0.5, 0.5],
-                                    "default": [0.5, 0.5],
                                     "flags": ["editable"],
                                 },
                                 "center_align": {
                                     "type": "Bool",
                                     "value": True,
-                                    "default": True,
                                     "flags": ["editable"],
                                 },
                                 "text": {
                                     "type": "String",
                                     "value": "Default",
-                                    "default": "Default",
                                     "flags": ["editable", "preview"],
                                 },
                                 "text_size": {
                                     "type": "Int",
-                                    "value": 24,
-                                    "default": 24,
-                                    "global": [
-                                        "Dialogue",
-                                        "choice_button_text_size",
-                                    ],
-                                    "flags": ["editable", "global_active"],
+                                    "default": ["Default Variables - Dialogue", "choice_button_text_size"],
+                                    "connection": "",
+                                    "flags": ["editable", "connectable"],
                                 },
                                 "text_color": {
                                     "type": "Color",
-                                    "value": [255, 255, 255],
-                                    "default": [255, 255, 255],
-                                    "global": [
-                                        "Dialogue",
-                                        "choice_button_text_color",
-                                    ],
-                                    "flags": ["editable", "global_active"],
+                                    "default": ["Default Variables - Dialogue", "choice_button_text_color"],
+                                    "connection": "",
+                                    "flags": ["editable", "connectable"],
                                 },
                                 "text_color_hover": {
                                     "type": "Color",
-                                    "value": [255, 255, 255],
-                                    "default": [255, 255, 255],
-                                    "global": [
-                                        "Dialogue",
-                                        "choice_button_text_color_hover",
-                                    ],
-                                    "flags": ["editable", "global_active"],
+                                    "default": ["Default Variables - Dialogue", "choice_button_text_color_hover"],
+                                    "connection": "",
+                                    "flags": ["editable", "connectable"],
                                 },
                                 "text_color_clicked": {
                                     "type": "Color",
-                                    "value": [255, 255, 255],
-                                    "default": [255, 255, 255],
-                                    "global": [
-                                        "Dialogue",
-                                        "choice_button_text_color_clicked",
-                                    ],
-                                    "flags": ["editable", "global_active"],
+                                    "default": ["Default Variables - Dialogue", "choice_button_text_color_clicked"],
+                                    "connection": "",
+                                    "flags": ["editable", "connectable"],
                                 },
                                 "font": {
                                     "type": "Asset_Font",
-                                    "value": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
-                                    "default": "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf",
-                                    "global": ["Dialogue", "choice_button_font"],
-                                    "flags": ["editable", "global_active"],
+                                    "default": ["Default Variables - Dialogue", "choice_button_font"],
+                                    "connection": "",
+                                    "flags": ["editable", "connectable"],
                                 },
                                 "z_order": {
                                     "type": "Int",
                                     "value": 10002,
-                                    "default": 10002,
                                 },
                                 "wrap_bounds": {
                                     "type": "Vector2",
                                     "value": [0.25, 0.25],
-                                    "default": [0.25, 0.25],
                                     "flags": ["editable"],
                                 }
                             }
@@ -1815,7 +1693,6 @@ class switch_branch(Action):
         "branch": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -1879,25 +1756,21 @@ class play_sfx(SoundAction):
         "key": {
             "type": "String",
             "value": "SFX",
-            "default": "SFX",
             "flags": ["editable", "preview"],
         },
         "sound": {
             "type": "Asset_Sound",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "volume": {
             "type": "Float",
             "value": 1.0,
-            "default": 1.0,
             "flags": ["editable", "preview"],
         },
         "loop": {
             "type": "Bool",
             "value": False,
-            "default": False,
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -1962,7 +1835,6 @@ class stop_sfx(Action):
         "key": {
             "type": "String",
             "value": "SFX",
-            "default": "SFX",
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2017,19 +1889,16 @@ class play_music(SoundAction):
         "music": {
             "type": "Asset_Sound",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "volume": {
             "type": "Float",
             "value": 1.0,
-            "default": 1.0,
             "flags": ["editable", "preview"],
         },
         "loop": {
             "type": "Bool",
             "value": False,
-            "default": False,
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2095,7 +1964,6 @@ class stop_music(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2146,13 +2014,11 @@ class set_mute(Action):
         "toggle": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable"],
         },
         "value": {
             "type": "Bool",
             "value": True,
-            "default": True,
             "flags": ["editable"],
         },
         "conditions": {
@@ -2220,13 +2086,11 @@ class set_value(Action):
         "name": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "value": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2280,7 +2144,6 @@ class load_scene(Action):
     ACTION_DATA = {
         "scene_file": {
             "type": "Asset_Scene",
-            "default": "",
             "value": "",
             "flags": ["editable", "preview"],
         },
@@ -2329,7 +2192,6 @@ class wait(Action):
         "seconds": {
             "type": "Int",
             "value": 300,
-            "default": 300,
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2415,14 +2277,12 @@ class scene_fade_in(Action):
         "color": {
             "type": "Dropdown",
             "value": "black",
-            "default": "black",
             "options": ["black", "white"],
             "flags": ["editable", "preview"],
         },
         "speed": {
             "type": "Int",
             "value": 300,
-            "default": 300,
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2510,14 +2370,12 @@ class scene_fade_out(Action):
         "color": {
             "type": "Dropdown",
             "value": "black",
-            "default": "black",
             "options": ["black", "white"],
             "flags": ["editable", "preview"],
         },
         "speed": {
             "type": "Int",
             "value": 300,
-            "default": 300,
             "flags": ["editable", "preview"],
         },
         "conditions": {
@@ -2604,7 +2462,6 @@ class load_interface(Action):
         "interface_file": {
             "type": "Asset_Interface",
             "value": "None",
-            "default": "None",
             "flags": ["editable", "preview"],
         }
     }
@@ -2626,7 +2483,6 @@ class unload_interface(Action):
         "key": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable", "preview"]
         }
     }
@@ -2672,7 +2528,6 @@ class switch_page(Action):
         "owner": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable"],
         },
         "page": {
@@ -2728,7 +2583,6 @@ class remove_page(Action):
         "owner": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable"],
         },
         "conditions": {

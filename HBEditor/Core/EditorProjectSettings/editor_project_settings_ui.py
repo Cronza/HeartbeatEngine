@@ -20,12 +20,6 @@ from HBEditor.Core.Primitives import input_entry_handler as ieh
 class EditorProjectSettingsUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
-        # Note: This editor uses a specialized schema in order to understand how to interpret the data types of
-        # project settings entries. This schema is stored in 'ProjectSettingsSchema.yaml
-        #
-        # Normally, we'd try to use something like 'isinstance' to deduce the type which would work for a few cases, but
-        # wouldn't for custom types such as 'file_font' or 'font'. These can't be deduced out of the box
-
         # Track the active category, as we need a reference to it when we switch categories
         self.active_category = None
 

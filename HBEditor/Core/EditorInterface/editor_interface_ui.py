@@ -71,6 +71,7 @@ class EditorInterfaceUI(EditorBaseUI):
 
         # Adjust the main view so it's consuming as much space as possible
         self.main_resize_container.setStretchFactor(1, 10)
+        self.main_resize_container.setStretchFactor(2, 3)  # Increase details panel size to accomodate connection column
 
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()

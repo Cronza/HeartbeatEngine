@@ -358,12 +358,12 @@ QCheckBox:indicator {
       image: url(EditorContent:Icons/Checkmark_Disabled.png);
       background-color: #343436; }
   QCheckBox:indicator#connect-button:checked {
-    image: url(EditorContent:Icons/Connection_Active.png); }
+    image: url(EditorContent:Icons/Connection_Active_Global.png); }
     QCheckBox:indicator#connect-button:checked:disabled {
       image: url(EditorContent:Icons/Connection_Inactive.png);
       background-color: #343436; }
   QCheckBox:indicator#connect-button:indeterminate {
-    image: url(EditorContent:Icons/Trash.png); }
+    image: url(EditorContent:Icons/Connection_Active_Global.png); }
   QCheckBox:indicator:checked:hover {
     background-color: #686d70; }
 
