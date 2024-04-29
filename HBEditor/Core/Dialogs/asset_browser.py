@@ -109,7 +109,7 @@ class AssetBrowser(QtWidgets.QDialog):
                 assets.extend(self.GetFilteredAssets(cur_depth[asset], cur_path))
                 cur_path.pop()  # Remove the extra depth as we're no longer there
             else:
-                if FileType[data] in self.type_filter:
+                if FileType[data] == self.type_filter:
                     assets.append((asset, data, "/".join(copy.deepcopy(cur_path))))
 
         return assets

@@ -94,27 +94,26 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
         input_widget = InputEntryResolution(data)
 
         # Asset selectors
-    elif data_type == ParameterType.Asset_Scene:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Scene})
-    elif data_type == ParameterType.Asset_Dialogue:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Dialogue})
-    elif data_type == ParameterType.Asset_Interface:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Interface})
+    elif data_type == ParameterType.Scene:
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Scene)
+    elif data_type == ParameterType.Dialogue:
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Dialogue)
+    elif data_type == ParameterType.Interface:
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Interface)
     elif data_type == ParameterType.Asset_Data:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Data})
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Asset_Data)
     elif data_type == ParameterType.Asset_Image:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Image})
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Asset_Image)
     elif data_type == ParameterType.Asset_Font:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Font})
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Asset_Font)
     elif data_type == ParameterType.Asset_Sound:
-        input_widget = InputEntryAssetSelector(data, owner, {FileType.Asset_Sound})
+        input_widget = InputEntryAssetSelector(data, owner, FileType.Asset_Sound)
 
     input_widget.owning_model_item = owning_model_item
     input_widget.Connect()
 
     # Update the entry with the value key if applicable. Otherwise, use the default value. If no default is available,
     # let the entry load its own default
-    #print("Data", data)
     if "value" in data:
         input_widget.Set(data["value"])
     elif "default" in data:

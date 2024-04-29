@@ -106,10 +106,10 @@ class VariablesTable(QtWidgets.QTableWidget):
         ParameterType.Vector2,
         ParameterType.Paragraph,
         ParameterType.Color,
-        ParameterType.Asset_Scene,
-        ParameterType.Asset_Dialogue,
+        ParameterType.Scene,
+        ParameterType.Dialogue,
+        ParameterType.Interface,
         ParameterType.Asset_Data,
-        ParameterType.Asset_Interface,
         ParameterType.Asset_Font,
         ParameterType.Asset_Image,
         ParameterType.Asset_Sound

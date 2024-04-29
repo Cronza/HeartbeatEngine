@@ -105,13 +105,14 @@ class EditorProjectSettingsUI(EditorBaseUI):
         wishes to avoid saving their changes, they just need to close this editor
         """
         current_category_name = self.active_category.text()
-
         root = self.settings_tree.invisibleRootItem()
         for index in range(0, root.childCount()):
             name = self.settings_tree.itemWidget(root.child(index), 0).text()
+            input_type = self.settings_tree.itemWidget(root.child(index), 1).GetType()
             value = self.settings_tree.itemWidget(root.child(index), 1).Get()["value"]
 
-            self.core.project_settings[current_category_name][name] = value
+            self.core.project_settings[current_category_name][name]['type'] = input_type.name
+            self.core.project_settings[current_category_name][name]['value'] = value
 
     def PopulateSettings(self):
         """ Populates the settings list based on the selected category """
@@ -122,20 +123,13 @@ class EditorProjectSettingsUI(EditorBaseUI):
         # schema as well for the data types of each setting
         selected_category = self.category_list.currentItem().text()
         for setting_name, setting_data in self.core.project_settings[selected_category].items():
-            schema = self.core.project_settings_schema[selected_category]
-            if schema[setting_name]:
-                data = {
-                    "name": setting_name,
-                    "type": schema[setting_name],
-                    "value": setting_data
-                }
-                ieh.Add(
-                    owner=self,
-                    view=self.settings_tree,
-                    name=setting_name,
-                    data=data,
-                    signal_func=self.ConnectSignals
-                )
+            ieh.Add(
+                owner=self,
+                view=self.settings_tree,
+                name=setting_name,
+                data=setting_data,
+                signal_func=self.ConnectSignals
+            )
 
     def ConnectSignals(self, tree_item):
         """ Connects the InputEntry signals to slots within this class """

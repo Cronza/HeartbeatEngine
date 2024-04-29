@@ -1245,7 +1245,7 @@ class start_dialogue(Action):
     DISPLAY_NAME = "Start Dialogue"
     ACTION_DATA = {
         "dialogue_file": {
-            "type": "Asset_Dialogue",
+            "type": "Dialogue",
             "value": "",
             "flags": ["editable", "preview"]
         },
@@ -2143,7 +2143,7 @@ class load_scene(Action):
     DISPLAY_NAME = "Load Scene"
     ACTION_DATA = {
         "scene_file": {
-            "type": "Asset_Scene",
+            "type": "Scene",
             "value": "",
             "flags": ["editable", "preview"],
         },
@@ -2460,7 +2460,7 @@ class load_interface(Action):
     DISPLAY_NAME = "Load Interface"
     ACTION_DATA = {
         "interface_file": {
-            "type": "Asset_Interface",
+            "type": "Interface",
             "value": "None",
             "flags": ["editable", "preview"],
         }

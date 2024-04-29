@@ -23,10 +23,10 @@ class ParameterType(Enum):
     Vector2 = 5
     Paragraph = 6
     Color = 7
-    Asset_Scene = 8
-    Asset_Dialogue = 9
-    Asset_Data = 10
-    Asset_Interface = 11
+    Scene = 8
+    Dialogue = 9
+    Interface = 10
+    Asset_Data = 11
     Asset_Font = 12
     Asset_Image = 13
     Asset_Sound = 14
