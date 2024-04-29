@@ -36,23 +36,22 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
                 if param_name in excluded_properties and "no_exclusion" not in param_data["flags"]:
                     continue
 
-        if "global" in param_data:
-            if "flags" in param_data:
-                # Exclude parameters that are pointing to a global setting. The engine will take care of
-                # this at runtime since any global value stored in a file will become outdated as soon as the
-                # global setting is changed
-                if "global_active" not in param_data["flags"]:
-                    conv_data[param_name] = param_data["value"]
-
-        elif "value" in param_data:
-            # Exclude parameters that don't have any flags. These are, by default, not editable
-            # Containers don't have the 'value' key
-            if "flags" in param_data:
+        # Exclude parameters that don't have any flags. These are, by default, not editable
+        # Containers don't have the 'value' key
+        if "flags" in param_data:
+            if "value" in param_data:
                 if force_when_no_change or 'default' not in param_data:
                     conv_data[param_name] = param_data["value"]
                 elif 'default' in param_data:
-                    if param_data["value"] != param_data["default"]:
+                    # Check if the user has changed the value at all, or if it still matches 'default'. If so, don't
+                    # save it as the engine will load it from scratch at runtime
+                    if settings.GetProjectSetting(param_data['default'][0], param_data['default'][1]) != param_data['value']:
                         conv_data[param_name] = param_data["value"]
+
+            # Override the 'value' key if a connection is active
+            if 'connectable' in param_data['flags']:
+                if param_data["connection"] and param_data["connection"] != 'None':
+                    conv_data[param_name] = f"!&{{{param_data["connection"]}}}"
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])

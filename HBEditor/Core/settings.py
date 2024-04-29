@@ -61,6 +61,15 @@ def LoadVariables():
     user_project_variables = Reader.ReadAll(GetVariablesPath())
 
 
+def GetProjectSetting(category: str, key: str):
+    """ Returns the project setting value that matches the provided category and key """
+    global user_project_data
+
+    try:
+        return user_project_data[category][key]['value']
+    except KeyError:
+        raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
+
 def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
     """
     Registers the provided file. 'parent_path' must be a partial path with the content directory as the root

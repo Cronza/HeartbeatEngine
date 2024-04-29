@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
-import copy, operator
+import copy, operator, re
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -182,7 +182,6 @@ class Action:
                 # Update each ArrayElement
                 for element_name, element_data in simplified_ad[param_name].items():
                     # Skip a level as this is the "ArrayElement" container
-
                     self.ValidateActionData(template_data["children"], element_data)
 
             elif param_name not in simplified_ad:
@@ -191,21 +190,18 @@ class Action:
                 # Likely scenarios:
                 # 1. Param is managed by the action and not editable by user, thus not included in the file
                 # 2. User left the param unedited and the editor removed it during saving as an optimization
-
                 if "value" in param_data:
                     # Use the original value from the ACTION_DATA
                     simplified_ad[param_name] = param_data['value']
                 else:
                     # Fallback to the default from the ACTION_DATA
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["default"][0], param_data["default"][1])
-                """
-                if "global" in param_data:
-                    # Global active. Set 'value' to the corresponding global value
-                    simplified_ad[param_name] = settings.GetProjectSetting(param_data["global"][0], param_data["global"][1])
-                else:
-                    # No global active. Use default value from the expanded data
-                    simplified_ad[param_name] = param_data["default"]
-                """
+            else:
+                # Evaluate any connections if applicable
+                if isinstance(simplified_ad[param_name], str):
+                    result = re.match("!&{(.*)}", simplified_ad[param_name])
+                    if result:
+                        simplified_ad[param_name] = settings.GetVariable(result.group(1))
 
 
 class SoundAction(Action):
@@ -254,7 +250,7 @@ class remove_renderable(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -393,7 +389,7 @@ class create_sprite(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -497,7 +493,7 @@ class create_background(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -618,7 +614,7 @@ class create_interactable(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -744,7 +740,7 @@ class create_text(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -946,7 +942,7 @@ class create_button(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1093,7 +1089,7 @@ class create_text_button(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1216,7 +1212,7 @@ class create_checkbox(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1272,7 +1268,7 @@ class start_dialogue(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1460,7 +1456,7 @@ class dialogue(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1639,7 +1635,7 @@ class choice(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1717,7 +1713,7 @@ class switch_branch(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1795,7 +1791,7 @@ class play_sfx(SoundAction):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1859,7 +1855,7 @@ class stop_sfx(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1923,7 +1919,7 @@ class play_music(SoundAction):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -1988,7 +1984,7 @@ class stop_music(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2043,7 +2039,7 @@ class set_mute(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2115,7 +2111,7 @@ class set_value(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2169,7 +2165,7 @@ class load_scene(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2216,7 +2212,7 @@ class wait(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2307,7 +2303,7 @@ class scene_fade_in(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2400,7 +2396,7 @@ class scene_fade_out(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2558,7 +2554,7 @@ class switch_page(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],
@@ -2607,7 +2603,7 @@ class remove_page(Action):
                     "type": "Array_Element",
                     "flags": ["editable"],
                     "children": {
-                        "value_name": {
+                        "variable": {
                             "type": "String",
                             "value": "",
                             "flags": ["editable"],

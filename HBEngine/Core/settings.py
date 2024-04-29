@@ -97,30 +97,30 @@ def SaveVariables(file_path: str = "Config/Variables.yaml"):
     Writer.WriteFile(project_settings, file_path)
 
 
-def SetValue(value_name: str, value_data: str):
+def SetVariable(variable_name: str, variable_data: str):
     """
-    Set the corresponding project value
+    Set the corresponding project variable
 
     Note: This change will not persist between runs of the game unless the user saves the game
     """
-    global values
-    global value_listeners
+    global variables
+    global variable_listeners
 
-    values[value_name] = value_data
+    variables[variable_name] = variable_data
 
     # Inform any applicable listeners
-    for listener_name, connect_func in value_listeners[value_name].items():
-        connect_func(value_name)
+    for listener_name, connect_func in variable_listeners[variable_name].items():
+        connect_func(variable_name)
 
 
-def GetValue(value_name: str) -> str:
-    """ Returns the user value that matches the provided name """
-    global values
+def GetVariable(variable_name: str) -> any:
+    """ Returns the project variable that matches the provided name """
+    global variables
 
     try:
-        return str(values[value_name])
+        return variables[variable_name]['value']
     except KeyError:
-        raise ValueError(f"Project Value Not Found: '{value_name}'")
+        raise ValueError(f"Project Variable Not Found: '{variable_name}'")
 
 
 def ConvertPartialToAbsolutePath(partial_path):

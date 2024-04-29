@@ -157,7 +157,7 @@ def CheckCondition(conditional_data: dict) -> bool:
     # resolve to True in order for the overall condition to be considered met
     condition_met = True
     for con_name, con_data in conditional_data.items():
-        cur_value_data = settings.GetValue(con_data['value_name'])
+        cur_value_data = settings.GetVariable(con_data['variable'])
 
         # Equality operators support any data type, while numerical comparisons require that the value and goal
         # be numerical (Float or Int). If performing a numerical comparison, perform type enforcement
@@ -165,7 +165,7 @@ def CheckCondition(conditional_data: dict) -> bool:
 
             if not con_data['goal'].isnumeric():
                 raise ValueError(
-                    f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric value: '{con_data['value_name']}'")
+                    f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric value: '{con_data['variable']}'")
             elif not cur_value_data.isnumeric():
                 raise ValueError(
                     f"Condition uses a numeric operator '{con_data['operator']}' but targets a non-numeric goal: '{con_data['goal']}")
