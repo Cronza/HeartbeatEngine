@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEditor.Core.Primitives.input_entries import *
+from HBEditor.Core.EditorCommon.input_entries import *
 from HBEditor.Core.EditorUtilities import action_data as ad
-from HBEditor.Core.Primitives import input_entry_handler as ieh
+from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 
 
 class DetailsPanel(QtWidgets.QWidget):
@@ -161,12 +161,9 @@ class DetailsPanel(QtWidgets.QWidget):
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
 
-                if "global" in entry_data and "flags" in entry_data:
-                    ad.RemoveFlag("global_active", entry_data)
-
-                    global_checkbox = self.details_tree.itemWidget(entry, 2)
-                    if global_checkbox.Get():
-                        ad.AddFlag("global_active", entry_data)
+                if "connectable" in entry_data['flags']:
+                    # Update the entry data as the connection status is tracked separately
+                    entry_data['connection'] = self.details_tree.itemWidget(entry, 2).Get()
 
                 if entry_data["type"] == "Array":
                     # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
@@ -203,7 +200,6 @@ class DetailsPanel(QtWidgets.QWidget):
                     entry_data["children"].update(self.StoreData(entry))
 
                 elif entry.childCount() > 0:
-
                     # We do an update here as not all items within the action_data were displayed (uneditable details
                     # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
                     entry_data["children"].update(self.StoreData(entry))

@@ -18,7 +18,6 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 

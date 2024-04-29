@@ -2,6 +2,9 @@
 # Created with HBEditor v0.1
 
 Game:
+  title:
+    type: "String"
+    value: "My Game"
   starting_scene:
     type: "Scene"
     value: ""

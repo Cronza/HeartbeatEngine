@@ -15,9 +15,8 @@
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.Primitives.input_entries import InputEntryText, InputEntryDropdown
-from HBEditor.Core.Primitives import input_entry_handler as ieh
-from HBEditor.Core import settings
+from HBEditor.Core.EditorCommon.input_entries import InputEntryText
+from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 
 
 class VariableNameUndefined(Exception):

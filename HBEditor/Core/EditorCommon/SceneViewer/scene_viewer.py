@@ -12,14 +12,12 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
 from typing import List
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.SceneViewer.scene_view import SceneView, Scene
 from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
-from HBEditor.Core.Primitives.input_entries import InputEntryAssetSelector
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core import settings
 

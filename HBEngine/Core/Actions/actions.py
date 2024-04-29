@@ -186,12 +186,26 @@ class Action:
                     self.ValidateActionData(template_data["children"], element_data)
 
             elif param_name not in simplified_ad:
+                # Param was not edited by the user. Let's try to infer *why* it wasn't
+                #
+                # Likely scenarios:
+                # 1. Param is managed by the action and not editable by user, thus not included in the file
+                # 2. User left the param unedited and the editor removed it during saving as an optimization
+
+                if "value" in param_data:
+                    # Use the original value from the ACTION_DATA
+                    simplified_ad[param_name] = param_data['value']
+                else:
+                    # Fallback to the default from the ACTION_DATA
+                    simplified_ad[param_name] = settings.GetProjectSetting(param_data["default"][0], param_data["default"][1])
+                """
                 if "global" in param_data:
                     # Global active. Set 'value' to the corresponding global value
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["global"][0], param_data["global"][1])
                 else:
                     # No global active. Use default value from the expanded data
                     simplified_ad[param_name] = param_data["default"]
+                """
 
 
 class SoundAction(Action):
@@ -1302,7 +1316,6 @@ class dialogue(Action):
                 "key": {  # Not editable as controlled by action
                     "type": "String",
                     "value": "SpeakerText",
-                    "default": "SpeakerText",
                 },
                 "position": {
                     "type": "Vector2",

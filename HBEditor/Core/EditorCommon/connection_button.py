@@ -1,18 +1,17 @@
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore
 from HBEditor.Core import settings
-from HBEditor.Core.Primitives.input_entries import InputEntryDropdown
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
 from HBEditor.Core.Logger.logger import Logger
 
 
 class ConnectionButton(QtWidgets.QComboBox):
     SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
 
-    def __init__(self, supported_type: ParameterType):
+    def __init__(self, supported_type: ParameterType, owning_model_item: QtWidgets.QWidgetItem = None):
         super().__init__()
+        self.owning_model_item = owning_model_item  # Track the owning widget so we can emit signals properly
         self.supported_type = supported_type
-        self.setToolTip("Connect this parameter to a variable, or to the global setting")
+        self.setToolTip("Connect this parameter to a project variable")
 
     def showPopup(self) -> None:
         result = self.ShowConnectionDialog()
@@ -20,6 +19,10 @@ class ConnectionButton(QtWidgets.QComboBox):
             Logger.getInstance().Log("Connection unchanged")
         else:
             self.Set(result)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item, result)
+
+    def Get(self) -> str:
+        return self.currentText()
 
     def Set(self, new_value: str):
         self.removeItem(0)
@@ -28,64 +31,6 @@ class ConnectionButton(QtWidgets.QComboBox):
     def ShowConnectionDialog(self) -> str:
         connect_dialog = DialogConnection(self.supported_type)
         return connect_dialog.GetVariable()
-
-
-class ConnectButton(SimpleCheckbox):
-    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
-    
-    def __init__(self, supported_type: ParameterType):
-        super().__init__()
-        self.checkbox.setObjectName("connect-button")
-        self.checkbox.clicked.connect(self.ValidateState)
-        self.state = QtCore.Qt.CheckState.Checked  # Track existing state to compare against new states
-        self.setToolTip("Connect this parameter to a variable, or to the global setting")
-        self.supported_type = supported_type  # Allow filtering the list of possible connection targets
-
-        # Track the setting chosen by the user. This is either 'None', '<global>' or a name of a variable
-        self.data = ''
-
-    def ShowConnectionDialog(self) -> str:
-        connect_dialog = DialogConnection(self.supported_type)
-        return connect_dialog.GetVariable()
-
-    def ValidateState(self, has_checked: bool):
-        """ Based on the new state, show the connection prompt before setting the state appropriately """
-        # Checkboxes have no mechanism to react to the state change *before* it happens. As such, we need to quickly
-        # revert the state before we proceed with processing it
-        self.checkbox.setCheckState(self.state)
-
-        result = self.ShowConnectionDialog()
-        new_state = self.state
-        if result == self.data or result == '':
-            Logger.getInstance().Log("Connection unchanged")
-        else:
-            if has_checked:  # User is activating button while it's not set to something
-                if result != 'None':
-                    new_state = QtCore.Qt.CheckState.Checked
-            else:  # User is activating button while it's set to something
-                if result == 'None':
-                    new_state = QtCore.Qt.CheckState.Unchecked
-
-            # Update stored data and state, then inform onlookers
-            self.data = result
-            self.state = new_state
-            self.checkbox.setCheckState(self.state)
-            self.SIG_USER_UPDATE.emit(self.owner, result)
-
-    def Get(self) -> str:
-        """ Returns whether the checkbox is checked """
-        return self.data
-
-    def Set(self, value: str) -> None:
-        if value == 'None':
-            self.checkbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
-        if value == '<Global>':
-            self.checkbox.setCheckState(QtCore.Qt.CheckState.PartiallyChecked)
-        elif value:
-            self.checkbox.setCheckState(QtCore.Qt.CheckState.Checked)
-
-        self.state = self.checkbox.checkState()
-        self.data = value
 
 
 class DialogConnection(QtWidgets.QDialog):
@@ -135,7 +80,7 @@ class DialogConnection(QtWidgets.QDialog):
 
     def GetVariablesOfType(self, target_type: ParameterType):
         """ Returns a list of names for all variables that match the provided type """
-        applicable_variables = ['None', '<Global>']
+        applicable_variables = ['None']
         for val_name, val_data in settings.user_project_variables.items():
             if ParameterType[val_data['type']] == target_type:
                 applicable_variables.append(val_name)

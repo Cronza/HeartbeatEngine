@@ -18,7 +18,6 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
-from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 

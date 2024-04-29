@@ -13,12 +13,11 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
-from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 

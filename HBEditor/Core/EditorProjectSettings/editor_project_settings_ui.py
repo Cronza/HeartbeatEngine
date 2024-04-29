@@ -13,8 +13,8 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEditor.Core.base_editor_ui import EditorBaseUI
-from HBEditor.Core.Primitives.input_entries import *
-from HBEditor.Core.Primitives import input_entry_handler as ieh
+from HBEditor.Core.EditorCommon.input_entries import *
+from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 
 
 class EditorProjectSettingsUI(EditorBaseUI):

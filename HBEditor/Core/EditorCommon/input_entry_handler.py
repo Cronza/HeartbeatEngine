@@ -13,12 +13,8 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from PyQt6.QtWidgets import QWidget, QTreeWidgetItem, QLabel
-from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
-from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorCommon.connection_button import ConnectionButton
-from HBEditor.Core.EditorUtilities import action_data as ad
-from HBEditor.Core.Primitives.input_entries import *
+from HBEditor.Core.EditorCommon.input_entries import *
 
 
 def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
@@ -124,40 +120,25 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
 
     name_widget = QLabel(name)
 
+    # Set up the connection button if applicable
     connect_button = None
     if "flags" in data:
-        if "connectable" in data['flags'] or "global" in data:
-            connect_button = ConnectionButton(data_type)
+        if "connectable" in data['flags']:
+            connect_button = ConnectionButton(data_type, owning_model_item)
             owning_view.setItemWidget(owning_model_item, 2, connect_button)
-            if not data['connection']:
+            if data['connection'] and data['connection'] != 'None':
+                input_widget.SetEditable(2)
+            else:
                 data['connection'] = 'None'
                 input_widget.SetEditable(0)
-            else:
-                input_widget.SetEditable(2)
 
             connect_button.Set(data['connection'])
-
-
-    #if "global" in data and "flags" in data:
-    #    #connect_button = ConnectionButton(data_type)
-    #    #connect_button.owner = owning_model_item
-    #    owning_view.setItemWidget(owning_model_item, 2, connect_button)
-    #    if "global_active" in data["flags"]:
-    #        connect_button.Set('<Global>')
-    #        input_widget.SetEditable(2)
-    #    elif "connection" in data:
-    #        print("Testidsbfgsdflksdggds")
-    #        connect_button.Set(data['connection'])
-    #        input_widget.SetEditable(2)
-    #    else:
-    #        connect_button.Set('None')
-    #    #connect_button.Connect()
 
     return name_widget, input_widget, connect_button
 
 
 def Remove(item: QTreeWidgetItem, owning_view: QtWidgets.QTreeView = None):
-    """ Removes the provided item and all of its children from the provided QTreeView"""
+    """ Removes the provided item and all of its children from the provided QTreeView """
     parent = item.parent()
     if parent:
         parent.removeChild(item)
