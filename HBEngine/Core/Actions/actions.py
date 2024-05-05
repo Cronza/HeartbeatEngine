@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
-import copy, operator, re
+import copy, operator
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -26,6 +26,7 @@ from HBEngine.Core.Objects.audio import Sound, Music
 from HBEngine.Core.Objects.renderable_container import Container
 from HBEngine.Core.Modules import dialogue as m_dialogue
 from Tools.HBYaml.hb_yaml import Reader
+from Tools.HBYaml.CustomTags.connection import Connection
 
 """
 ----------------
@@ -197,11 +198,10 @@ class Action:
                     # Fallback to the default from the ACTION_DATA
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["default"][0], param_data["default"][1])
             else:
-                # Evaluate any connections if applicable
-                if isinstance(simplified_ad[param_name], str):
-                    result = re.match("!&{(.*)}", simplified_ad[param_name])
-                    if result:
-                        simplified_ad[param_name] = settings.GetVariable(result.group(1))
+                #@TODO: Evaluate performance consequences and general implementation details here as it performs this type check for *every* parameter
+                # Evaluate any connections if applicable.
+                if isinstance(simplified_ad[param_name], Connection):
+                    simplified_ad[param_name] = settings.GetVariable(simplified_ad[param_name].variable)
 
 
 class SoundAction(Action):

@@ -13,14 +13,22 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import yaml
+from Tools.HBYaml.CustomTags import connection
 
 
 class Reader:
     @staticmethod
     def ReadAll(file_path: str):
-        """ Given a file path, read in the contents of the file and return them """
+        """
+        Given a file path, read in the contents of the file and return them
+        """
+        loader = yaml.FullLoader
+
+        # Add custom constructors that may be needed
+        loader.add_constructor("!Connection", connection.connection_constructor)
+
         with open(file_path) as f:
-            return yaml.load(f, Loader=yaml.FullLoader)
+            return yaml.load(f, Loader=loader)
 
 
 class Writer:
@@ -34,8 +42,13 @@ class Writer:
             if metadata:
                 file.write(metadata + "\n\n")
 
+            dumper = yaml.SafeDumper
+
+            # Add custom representors that may be needed
+            dumper.add_representer(connection.Connection, connection.connection_representer)
+
             # By default, yaml dumps data in a 'sorted order' instead of by 'insertion order'. As per this:
             # https://github.com/yaml/pyyaml/issues/110, you can specify 'sort_keys=False' to force the dump to
             # skip the sorting and use insertion order
-            return yaml.dump(data, file, sort_keys=False)
+            return yaml.dump(data, file, sort_keys=False, Dumper=dumper)
 

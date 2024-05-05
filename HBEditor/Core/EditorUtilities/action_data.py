@@ -12,8 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
+import copy, re
 from HBEditor.Core import settings
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties: list = None, force_when_no_change: bool = False):
@@ -48,10 +49,10 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
                     if settings.GetProjectSetting(param_data['default'][0], param_data['default'][1]) != param_data['value']:
                         conv_data[param_name] = param_data["value"]
 
-            # Override the 'value' key if a connection is active
+            # Alter the structure further to note the active connection
             if 'connectable' in param_data['flags']:
                 if param_data["connection"] and param_data["connection"] != 'None':
-                    conv_data[param_name] = f"!&{{{param_data["connection"]}}}"
+                    conv_data[param_name] = Connection(variable=param_data["connection"])
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])
@@ -126,15 +127,15 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
 
             elif "children" not in base_param_data:
                 if base_param_name in action_data:
-                    if "default" in base_param_data and "value" not in base_param_data:
+                    if isinstance(action_data[base_param_name], Connection):
+                        # Assign the connection but don't update value. It'll fall back to a default
+                        #@TODO: Because this isn't setting 'value', that key is missing is missing if not supplied elsewhere which is failing in certain editors
+                        #@TODO: We should probably set value here...somehow
+                        base_param_data['connection'] = action_data[base_param_name].variable
+                    elif "default" in base_param_data and "value" not in base_param_data:
                         base_param_data["value"] = settings.user_project_data[base_param_data['default'][0]][base_param_data['default'][1]]['value']
                     else:
                         base_param_data["value"] = action_data[base_param_name]
-                else:
-                    if "global" in base_param_data:
-                        # If the req entry isn't found in the engine action data, then it was likely omitted due to a
-                        # global setting being enabled
-                        AddFlag("global_active", base_param_data)
 
             if "children" in base_param_data:
                 # Ensure the param in the base AD exists in the supplied AD
