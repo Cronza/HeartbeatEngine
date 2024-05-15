@@ -48,7 +48,7 @@ class EditorInterfaceUI(EditorBaseUI):
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.interface_settings = DetailsPanel()
+        self.interface_settings = DetailsPanel(use_connections=False)
         self.interface_settings_src_obj = InterfaceSettings()
         self.interface_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.interface_settings.Populate(self.interface_settings_src_obj)
@@ -69,26 +69,36 @@ class EditorInterfaceUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setStretchFactor(1, 10)
-        self.main_resize_container.setStretchFactor(2, 4)  # Increase details panel size to accomodate connection column
+        self.main_resize_container.setStretchFactor(0, 6)
+        self.main_resize_container.setStretchFactor(1, 8)
+        self.main_resize_container.setStretchFactor(2, 8)  # Increase details panel size to accomodate connection column
 
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()
         self.core.UpdateActiveSceneItem(selected_items)
 
+    def FreezeSignals(self):
+        """ Block signals for all connected child widgets """
+        self.pages_panel.blockSignals(True)
+        self.scene_viewer.blockSignals(True)
+        self.details.blockSignals(True)
+
+    def UnfreezeSignals(self):
+        """ Unblock signals for all connected child widgets """
+        self.pages_panel.blockSignals(False)
+        self.scene_viewer.blockSignals(False)
+        self.details.blockSignals(False)
 
 class InterfaceSettings(QtCore.QObject, SourceEntry):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
     ACTION_DATA = {
         "key": {
             "type": "String",
-            "default": "!&INTERFACE&!",
             "value": "!&INTERFACE&!",
             "flags": ["editable"]
         },
         "description": {
             "type": "Paragraph",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         }

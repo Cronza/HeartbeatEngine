@@ -26,7 +26,7 @@ class DetailsPanel(QtWidgets.QWidget):
     """
     SIG_USER_UPDATE = QtCore.pyqtSignal()
 
-    def __init__(self, excluded_properties: list = None):
+    def __init__(self, excluded_properties: list = None, use_connections: bool = True):
         super().__init__()
 
         self.active_entry = None
@@ -53,24 +53,24 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Fixed)
         self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
-        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.details_tree.header().setStretchLastSection(True)
 
-        # --- Specialized Settings for the 'C' column ---
-        # 1. Allow columns to be significantly smaller than normal
-        #self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
-
-        # 2. Force the last column to be barely larger than a standard checkbox
-        #self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
-
-        # 3. Align the column header text to match the alignment of the checkbox
-        #self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
+        #@TODO: Investigate why this adding this line makes 'setColumnWidth' start working
+        self.details_tree.header().setDefaultSectionSize(self.details_tree.header().defaultSectionSize())
+        self.details_tree.setColumnWidth(1, round(self.details_tree.width() * 1.3))
+        #self.adjustSize()
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)
+        #self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
+        if not use_connections:
+            self.details_tree.hideColumn(2)
+
+    #@TODO: Do something with this
     def ShowConnections(self):
         pass
 

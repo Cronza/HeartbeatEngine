@@ -19,7 +19,7 @@ from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.EditorUtilities import action_data as adh
+from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core.Dialogs.asset_browser import AssetBrowser
 
 """
@@ -543,9 +543,9 @@ class InputEntryArray(InputEntryBase):
                 data = copy.deepcopy(self.data["template"])
 
                 # Array elements have generated names to avoid having to be stored as a list when caching or saving
-                name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
+                name = f"{ad.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
-            data_no_key = data[adh.GetActionName(data)]
+            data_no_key = data[ad.GetActionName(data)]
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
@@ -636,6 +636,7 @@ class InputEntryEvent(InputEntryBase):
 
             # Grab the ACTION_DATA for the event action, and generate children for all of its parameters
             action_data = settings.GetActionData(self.input_widget.currentText())
+            ad.SetDefaults(action_data, True)
             if action_data:
                 self.AddItems(action_data)
 

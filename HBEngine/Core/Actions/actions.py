@@ -1042,8 +1042,9 @@ class create_text_button(Action):
         },
         "z_order": {
             "type": "Int",
-            "value": 10002,
-            "default": 10002
+            "default": ["Default Variables - Button", "button_z_order"],
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
         },
         "wrap_bounds": {
             "type": "Vector2",
@@ -1190,7 +1191,6 @@ class create_checkbox(Action):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "play_sfx",
@@ -1470,7 +1470,6 @@ class dialogue(Action):
                         "goal": {
                             "type": "String",
                             "value": "",
-                            "default": "",
                             "flags": ["editable"],
                         }
                     }
@@ -2542,7 +2541,6 @@ class switch_page(Action):
         "page": {
             "type": "String",
             "value": "",
-            "default": "",
             "flags": ["editable"],
         },
         "conditions": {

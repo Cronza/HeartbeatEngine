@@ -104,6 +104,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
+            ad.SetDefaults(action_data, True)
 
         new_item = QtWidgets.QListWidgetItem()
         if index is not None:

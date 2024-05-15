@@ -19,6 +19,7 @@ from HBEditor.Core.EditorCommon.SceneViewer.scene_view import SceneView, Scene
 from HBEditor.Core.EditorCommon.SceneViewer.scene_items import RootItem
 from HBEditor.Core.Primitives.toggleable_menu_action import ToggleableAction
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core import settings
 
 
@@ -136,6 +137,7 @@ class SceneViewer(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
+            ad.SetDefaults(action_data, True)
 
         new_item = RootItem(
             action_name=action_name,

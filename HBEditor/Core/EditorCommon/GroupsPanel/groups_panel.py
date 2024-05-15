@@ -101,8 +101,6 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Select the new entry
         self.entry_list.setCurrentItem(list_item)
-        if self.enable_togglable_entries:
-            new_entry.SetToggle(True)
 
     def AddEntry(self):
         """ Prompts the user for entry information, and creates an entry with that information """

@@ -42,7 +42,7 @@ class EditorSceneUI(EditorBaseUI):
         self.details = DetailsPanel(self.core.excluded_properties)
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.scene_settings = DetailsPanel()
+        self.scene_settings = DetailsPanel(use_connections=False)
         self.scene_settings_src_obj = SceneSettings()
         self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.scene_settings.Populate(self.scene_settings_src_obj)
@@ -62,9 +62,8 @@ class EditorSceneUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
         # Adjust the space allocation to favor the settings section
-        self.main_resize_container.setStretchFactor(1, 0)
-        self.main_resize_container.setStretchFactor(0, 1)
-        self.main_resize_container.setStretchFactor(2, 4)  # Increase details panel size to accomodate connection column
+        self.main_resize_container.setStretchFactor(0, 10)
+        self.main_resize_container.setStretchFactor(1, 8)  # Increase details panel size to accomodate connection column
 
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()
@@ -76,19 +75,16 @@ class SceneSettings(QtCore.QObject, SourceEntry):
     ACTION_DATA = {
         "interface": {
             "type": "Interface",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         },
         "description": {
             "type": "Paragraph",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         },
         "allow_pausing": {
             "type": "Bool",
-            "default": "True",
             "value": "True",
             "flags": ["editable"]
         },
@@ -103,7 +99,6 @@ class SceneSettings(QtCore.QObject, SourceEntry):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "create_background",

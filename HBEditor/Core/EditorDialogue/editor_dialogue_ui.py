@@ -38,7 +38,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.dialogue_settings = DetailsPanel()
+        self.dialogue_settings = DetailsPanel(use_connections=False)
         self.dialogue_settings_src_obj = DialogueSettings()
         self.dialogue_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.dialogue_settings.Populate(self.dialogue_settings_src_obj)
@@ -63,6 +63,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
         # Adjust the main view so it's consuming as much space as possible
+        self.main_resize_container.setStretchFactor(0, 3)
         self.main_resize_container.setStretchFactor(1, 10)
         self.main_resize_container.setStretchFactor(2, 4)  # Increase details panel size to accomodate connection column
 
@@ -72,13 +73,11 @@ class DialogueSettings(QtCore.QObject, SourceEntry):
     ACTION_DATA = {
         "interface": {
             "type": "Interface",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         },
         "description": {
             "type": "Paragraph",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         }

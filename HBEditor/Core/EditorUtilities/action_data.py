@@ -98,7 +98,7 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                         }
                     }
                     # Merge in the target parameters
-                    event_target_base_ad = copy.deepcopy(settings.GetActionData(action_data[base_param_name]["action"]))
+                    event_target_base_ad = settings.GetActionData(action_data[base_param_name]["action"])
                     base_param_data["children"].update(event_target_base_ad)
 
                     # By default, 'value' will be the entire child dict (IE. {'action': ..., 'scene_file': ...})
@@ -128,14 +128,18 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
             elif "children" not in base_param_data:
                 if base_param_name in action_data:
                     if isinstance(action_data[base_param_name], Connection):
-                        # Assign the connection but don't update value. It'll fall back to a default
-                        #@TODO: Because this isn't setting 'value', that key is missing is missing if not supplied elsewhere which is failing in certain editors
-                        #@TODO: We should probably set value here...somehow
                         base_param_data['connection'] = action_data[base_param_name].variable
-                    elif "default" in base_param_data and "value" not in base_param_data:
-                        base_param_data["value"] = settings.user_project_data[base_param_data['default'][0]][base_param_data['default'][1]]['value']
+
+                        # Since the connection is separate from the 'value' key, load the default if available.
+                        # Otherwise, stick with the 'value' key from the base ACTION_DATA
+                        if "default" in base_param_data and "value" not in base_param_data:
+                            base_param_data["value"] = settings.GetProjectSetting(base_param_data['default'][0], base_param_data['default'][1])
                     else:
                         base_param_data["value"] = action_data[base_param_name]
+
+                elif "default" in base_param_data and "value" not in base_param_data:
+                    base_param_data["value"] = settings.GetProjectSetting(base_param_data['default'][0], base_param_data['default'][1])
+
 
             if "children" in base_param_data:
                 # Ensure the param in the base AD exists in the supplied AD
@@ -144,6 +148,19 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                         base_action_data=base_param_data["children"],
                         action_data=action_data[base_param_name]
                     )
+
+
+def SetDefaults(action_data: dict, force: bool = False):
+    """
+    Given action data, recurse through it and set 'value' to 'default' if applicable. If 'force' is provided,
+    stomp any pre-existing 'value'
+    """
+    for param_name, param_data in action_data.items():
+        if 'default' in param_data:
+            if 'value' not in param_data or force:
+                param_data["value"] = settings.GetProjectSetting(param_data['default'][0], param_data['default'][1])
+        elif "children" in param_data:
+            SetDefaults(param_data['children'], force)
 
 
 def GetActionName(action_data: dict) -> str:

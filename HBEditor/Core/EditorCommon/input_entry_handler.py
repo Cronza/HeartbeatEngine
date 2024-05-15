@@ -113,7 +113,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
     if "value" in data:
         input_widget.Set(data["value"])
     elif "default" in data:
-        data["value"] = settings.user_project_data[data["default"][0]][data["default"][1]]["value"]
+        data["value"] = settings.GetProjectSetting(data["default"][0], data["default"][1])
         input_widget.Set(data["value"])
     else:
         input_widget.SetDefaultValue()
