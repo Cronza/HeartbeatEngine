@@ -16,21 +16,28 @@ from enum import Enum
 
 
 class FileType(Enum):
-    Scene_Dialogue = 1
+    Folder = 1
     Project_Settings = 2
-    Scene_Point_And_Click = 3
+    Variables = 3
+    Interface = 4
+    Dialogue = 5
+    Scene = 6
+    Asset_Data = 7
+    Asset_Image = 8
+    Asset_Font = 9
+    Asset_Sound = 10
     #Character = 3
-    #Project_Settings = 4
 
 
-class FileTypeDescriptions:
-    descriptions = {
-        FileType.Scene_Dialogue: "A scene containing a sequence of dialogue between characters. "
-                                 "These files may contain additional branches",
-
-        FileType.Scene_Point_And_Click: "A scene with interactable objects. Perfect for designing "
-                                        "Point & Click scenes, or interactive maps"#,
-
-        #FileType.Character: "A file containing details on a character, such as a special font for "
-        #                    "their name, their unique color, or various sprites representing their moods"
+class FileTypeIcons:
+    icons = {
+        FileType.Folder: "EditorContent:Icons/Folder.png",
+        FileType.Interface: "EditorContent:Icons/Interface.png",
+        FileType.Project_Settings: "EditorContent:Icons/File.png",
+        FileType.Dialogue: "EditorContent:Icons/File.png",
+        FileType.Scene: "EditorContent:Icons/File.png",
+        FileType.Asset_Data: "EditorContent:Icons/File.png",
+        FileType.Asset_Image: "EditorContent:Icons/File_Image.png",
+        FileType.Asset_Font: "EditorContent:Icons/File.png",
+        FileType.Asset_Sound: "EditorContent:Icons/File.png"
     }

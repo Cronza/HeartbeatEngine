@@ -1,0 +1,448 @@
+import copy
+from PyQt6 import QtWidgets, QtGui, QtCore
+from HBEditor.Core.EditorUtilities import font
+from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
+from HBEditor.Core.EditorUtilities import action_data as ad
+from HBEditor.Core.EditorUtilities import path
+
+
+class BaseItem:
+    def __init__(self):
+        self.root_item = None
+
+
+class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
+    """
+    A basic GraphicsItem that acts as the root of a scene_item and its descendants. It serves a few purposes:
+    - It is the 'active_entry' for the details panel
+    - It can easily be found when using scene.items(), which returns a 1-dimensional array of items (There is no known
+    way of just getting the top-most items, so this is workaround)
+
+    Children items don't have the ability to be selected directly. Instead, this item has a bounding rect equal to the
+    combined bounding rects of all children, allowing any selection to bubble to this object to decide what should
+    happen. When selecting this object, all children are recursively selected as well to allow grouped movement
+    """
+
+    def __init__(self, action_name: str, action_data: dict):
+        super().__init__(None)
+        self.action_name = action_name
+        self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
+
+        self.setFlag(self.GraphicsItemFlag.ItemIsMovable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, True)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges)
+
+        self.setAcceptDrops(True)
+
+        self._movement_locked = False  # User controlled
+        self._movement_perm_locked = False  # System enforced - Disables the usage of 'movement_locked'
+
+        # If the implementing editor desires organizing by group, track the group who owns this widget by using a unique
+        # ID. This is commonly the name of the group
+        self.owner_id = ""
+
+        self.allow_icon_drawing = True  # Toggles whether icons can appear for this item
+        self.condition_active = False
+        self.icon_condition = QtGui.QPixmap("EditorContent:Icons/Condition.png")
+        self.icon_condition = self.icon_condition.scaled(
+            round(self.icon_condition.width() / 2),
+            round(self.icon_condition.height() / 2),
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio
+        )
+
+    def Get(self) -> dict:
+        """ Returns the action_data (including the action name) stored in this item """
+        return {self.action_name: self.action_data}
+
+    def GetLocked(self):
+        if self._movement_perm_locked:
+            return self._movement_perm_locked
+        else:
+            return self._movement_locked
+
+    def SetLocked(self, state: bool) -> bool:
+        """
+        Updates the locked state of the item. Return whether the operation was performed successfully
+
+        If the item is permanently locked, then always return False
+        """
+        if self._movement_perm_locked:
+            return False
+
+        self._movement_locked = state
+        if state:
+            self.setFlags(self.flags() & ~self.GraphicsItemFlag.ItemIsMovable)
+        else:
+            self.setFlags(self.flags() | self.GraphicsItemFlag.ItemIsMovable)
+
+        return True
+
+    def GenerateChildren(self, parent: QtWidgets.QGraphicsItem = None, action_data: dict = None,
+                         pixmap: QtGui.QPixmap = None, text: str = "", init_iter: bool = True):
+        """
+        Recursively generate child items in the tree for each item in the action_data. All items are created with
+        the full parameters data block
+        """
+        # Set values for the top-most item
+        if not action_data and not parent:
+            action_data = self.action_data
+            parent = self
+
+            # Some properties have special implications on usability within the editor (IE. position being uneditable
+            # could apply a lock which prevents user control). Apply these effects only based on the data
+            # from the top-most item
+            if "position" in action_data:
+                if "flags" in action_data["position"]:
+                    if "editable" not in action_data["position"]["flags"]:
+                        self.SetLocked(True)
+                        self._movement_perm_locked = True
+                else:
+                    self.SetLocked(True)
+                    self._movement_perm_locked = True
+
+        # In order to determine what child to spawn, we need to look through all the parameters at a given
+        # level, and see if certain names appear. If they do, we give them the full data block
+        #
+        # IE. {text: '', text_size: '', position: ''}. If 'text' is found, provide all 3 keys
+        #
+        # Note: Only one of these can appear at any level, otherwise multiple items would share a data block and cause
+        # stomping issues
+        new_item = None
+
+        for param_name, param_data in action_data.items():
+            if param_name == "sprite":
+                new_item = SpriteItem(
+                    action_data=action_data,  # Pass by ref
+                    pixmap=pixmap
+                )
+                new_item.setParentItem(parent)
+                new_item.root_item = self
+
+            elif param_name == "text":
+                new_item = TextItem(
+                    action_data=action_data,  # Pass by ref
+                    text=text
+                )
+                new_item.setParentItem(parent)
+                new_item.root_item = self
+
+            if "children" in param_data:
+                if param_data['children']:
+                    self.GenerateChildren(
+                        parent=new_item,
+                        action_data=param_data["children"],
+                        pixmap=pixmap,
+                        text=text,
+                        init_iter=False
+                    )
+
+        if init_iter:
+            self.Refresh()
+
+    def Refresh(self, change_tree: list = None):
+        # Since 'Refresh' is inherited, we can't change it to allow recursion. To avoid some weird algorithm to achieve
+        # that here, use this func as a wrapper to invoke the recursive refresh funcs
+        if change_tree:
+            self.RefreshRecursivePartial(self, change_tree)
+        else:
+            self.RefreshRecursiveAll(self)
+
+        # The root item uses the top-most child's z-order, so they both need to be updated
+        if change_tree:
+            if change_tree[0] == "z_order":
+                self.UpdateZValue()
+
+        # Update condition state if applicable
+        if "conditions" in self.action_data:
+            if self.action_data["conditions"]['children']:
+                self.condition_active = True
+            else:
+                self.condition_active = False
+
+    def RefreshRecursiveAll(self, cur_target: QtWidgets.QGraphicsItem) -> bool:
+        """ Perform a full Refresh for all children """
+        for child in cur_target.childItems():
+            child.Refresh()
+            self.RefreshRecursiveAll(child)
+
+        return True
+
+    def RefreshRecursivePartial(self, cur_target: QtWidgets.QGraphicsItem, change_tree: list,
+                                search_term: str = "requirements") -> bool:
+        """
+        Recurse through the child tree for the affected child, then call it's 'Refresh' function with the change
+        specified in the change tree
+        """
+        for child in cur_target.childItems():
+            if change_tree[0] in child.action_data:
+                if len(change_tree) == 1:
+                    # We're at the end, so this must be it
+                    child.Refresh(change_tree[0])
+
+                    # Certain changes may impact the item's 'boundingRect', which child objects rely on for their
+                    # positions. When these changes are detected, we need to fully refresh the item's children
+                    # just in case
+                    if change_tree[0] == "sprite":
+                        self.RefreshRecursiveAll(child)
+
+                    return True
+                else:
+                    # Still more to go. Recurse, removing this level from the list we're passing along
+                    del change_tree[0]
+                    self.RefreshRecursivePartial(
+                        cur_target=child,
+                        change_tree=change_tree,
+                        search_term="children"
+                    )
+        return False
+
+    def UpdateZValue(self):
+        """ Updates this object's z-value using it's top-most child's z-value """
+        self.setZValue(self.childItems()[0].zValue())
+
+    def boundingRect(self) -> QtCore.QRectF:
+        return self.childrenBoundingRect()
+
+    def paint(self, painter, style, widget=None) -> None:
+        if self.isSelected():
+            # Draw a selection border
+            pen = painter.pen()
+            pen.setColor(QtGui.QColor(45, 83, 115))
+            pen.setWidth(3)
+            painter.setPen(pen)
+            painter.drawRect(self.boundingRect())
+
+        if self.allow_icon_drawing:
+            if self.condition_active:
+                painter.drawPixmap(
+                    QtCore.QPointF(
+                        self.boundingRect().x() + (self.boundingRect().width()),
+                        self.boundingRect().y() - (self.icon_condition.height())
+                    ),
+                    self.icon_condition
+                )
+
+    def mousePressEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mousePressEvent(event)
+        if self.allow_icon_drawing:
+            self.allow_icon_drawing = False
+            self.scene().update(self.scene().sceneRect())
+
+    def mouseReleaseEvent(self, event: QtWidgets.QGraphicsSceneMouseEvent) -> None:
+        super().mouseReleaseEvent(event)
+        if not self.allow_icon_drawing:
+            self.allow_icon_drawing = True
+            self.scene().update(self.scene().sceneRect())
+
+
+class SpriteItem(QtWidgets.QGraphicsPixmapItem, BaseItem):
+    def __init__(self, action_data: dict, pixmap: QtGui.QPixmap = None):
+        super().__init__(pixmap)
+        self.action_data = action_data
+
+        self.is_centered = False
+        self.is_flipped = False
+
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
+        self.setAcceptDrops(True)
+
+    def Refresh(self, changed_entry_name: str = ""):
+        if changed_entry_name == "position" or changed_entry_name == "":
+            self.UpdatePosition()
+
+        if changed_entry_name == "sprite" or changed_entry_name == "":
+            self.UpdateSprite()
+
+        if changed_entry_name == "z_order" or changed_entry_name == "":
+            self.UpdateZOrder()
+
+        # Any changes that require a transform adjustment requires all others be updated as well
+        if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "flip" or changed_entry_name == "":
+            self.resetTransform()
+            new_transform = QtGui.QTransform()
+
+            self.UpdateCenterAlign(new_transform)
+            self.UpdateFlip(new_transform)
+
+            self.setTransform(new_transform)
+
+    def UpdatePosition(self):
+        # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
+        # parent's coordinate system, and we typically store position data as scene coordinates. So, we need to:
+        #
+        # - Take the normalize (0-1) position, and denormalize it so we have 'scene coordinates'
+        # - Convert the scene coordinates to the equivalent position in this item's coordinates
+        # - Convert the item coordinates to the equivalent position in this item's parent's coordinates
+        #
+        # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
+        # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
+        if self.action_data["position"]["value"] is not None:
+            if self.parentItem() == self.root_item:
+                scene_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * self.scene().width(),
+                    float(self.action_data["position"]["value"][1]) * self.scene().height()
+                )
+                item_pos = self.mapFromScene(scene_pos)
+                parent_pos = self.mapToParent(item_pos)
+                self.setPos(parent_pos)
+            else:
+                parent_bounds = self.parentItem().boundingRect()
+                scene_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * parent_bounds.width(),
+                    float(self.action_data["position"]["value"][1]) * parent_bounds.height()
+                )
+                parent_pos = self.mapToParent(scene_pos)
+                self.setPos(parent_pos)
+
+    def UpdateSprite(self):
+        img_path = path.ResolveFilePath(self.action_data["sprite"]["value"])
+        if img_path:
+            self.setPixmap(QtGui.QPixmap(img_path))
+        else:
+            self.setPixmap(QtGui.QPixmap("EditorContent:Icons/SceneItem_Sprite.png"))
+
+    def UpdateZOrder(self):
+        self.setZValue(float(self.action_data["z_order"]["value"]))
+
+    def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
+        if self.action_data["center_align"]["value"]:
+            new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+            self.is_centered = True
+        else:
+            self.is_centered = False
+
+    def UpdateFlip(self, new_transform: QtGui.QTransform):
+        if "flip" in self.action_data:
+            if self.action_data["flip"]["value"]:
+                # Due to the fact scaling inherently moves the object due to using the transform origin, AND due to the
+                # fact you can't change the origin, we have a hard dependency on knowing whether center align
+                # is active, so we know how to counter the movement from the scaling
+                if self.is_centered:
+                    # We need to reverse the movement from center_align in the X (we don't flip in the Y).
+                    # m31 represents the amount of horizontal translation that has been applied so far
+                    new_transform.translate(-new_transform.m31() * 2, 0)
+                else:
+                    new_transform.translate(self.boundingRect().width(), 0)
+
+                new_transform.scale(-1, 1)
+                self.is_flipped = True
+            else:
+                self.is_flipped = False
+        else:
+            self.is_flipped = False
+
+
+class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
+    def __init__(self, action_data: dict, text: str = "Default"):
+        super().__init__(text)
+        self.action_data = action_data
+
+        self.is_centered = False
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
+        self.setAcceptDrops(True)
+        self.document().setDocumentMargin(0)
+
+    def Refresh(self, changed_entry_name: str = ""):
+        """
+        Refresh is the common function used by elements that need refreshing when an important U.I change is made
+        """
+        if changed_entry_name == "position" or changed_entry_name == "":
+            self.UpdatePosition()
+
+        if changed_entry_name == "text" or changed_entry_name == "":
+            self.UpdateText()
+
+        if changed_entry_name == "font" or changed_entry_name == "":
+            # Changing the font resets the font size, so we must refresh both
+            self.UpdateFont()
+            self.UpdateTextSize()
+
+        if changed_entry_name == "text_size" or changed_entry_name == "":
+            self.UpdateTextSize()
+
+        if changed_entry_name == "text_color" or changed_entry_name == "":
+            self.UpdateTextColor()
+
+        if changed_entry_name == "z_order" or changed_entry_name == "":
+            self.UpdateZOrder()
+
+        # Any changes that require a transform adjustment requires all others be updated as well
+        if changed_entry_name == "center_align" or self.is_centered or changed_entry_name == "":
+            self.resetTransform()
+            new_transform = QtGui.QTransform()
+
+            self.UpdateCenterAlign(new_transform)
+
+            #@TODO: The engine and editor differ on text spacing, and the following code is experimental towards fixing it
+            #metrics = QtGui.QFontMetricsF(self.font())
+            #normal_rect = metrics.boundingRect(self.toPlainText())
+            #tight_rect = metrics.tightBoundingRect(self.toPlainText())
+            #print(self.toPlainText())
+            #print(f"Normal: {normal_rect}")
+            #print(f"Tight: {tight_rect}")
+            #print(f"Height: {metrics.height()}")
+            #print("\n")
+
+            self.setTransform(new_transform)
+
+    def UpdatePosition(self):
+        # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
+        # parent's coordinate system, and we typically store position data as scene coordinates. So, we need to:
+        #
+        # - Take the normalize (0-1) position, and de-normalize it so we have 'scene coordinates'
+        # - Convert the scene coordinates to the equivalent position in this item's coordinates
+        # - Convert the item coordinates to the equivalent position in this item's parent's coordinates
+        #
+        # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
+        # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
+        if self.action_data["position"]["value"] is not None:
+            if self.parentItem() == self.root_item:
+                scene_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * self.scene().width(),
+                    float(self.action_data["position"]["value"][1]) * self.scene().height()
+                )
+                item_pos = self.mapFromScene(scene_pos)
+                parent_pos = self.mapToParent(item_pos)
+                self.setPos(parent_pos)
+            else:
+                parent_bounds = self.parentItem().boundingRect()
+                parent_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * parent_bounds.width(),
+                    float(self.action_data["position"]["value"][1]) * parent_bounds.height()
+                )
+                self.setPos(parent_pos)
+
+    def UpdateText(self):
+        if self.action_data["text"]["value"] == "" or self.action_data["text"]["value"].lower() == "none":
+            self.setPlainText("None")
+        else:
+            self.setPlainText(self.action_data["text"]["value"])
+
+    def UpdateTextSize(self):
+        # Enforce a minimum text size
+        if self.action_data["text_size"]["value"] < 1:
+            self.action_data["text_size"]["value"] = 1
+
+        cur_font = self.font()
+        cur_font.setPixelSize(self.action_data["text_size"]["value"])
+        self.setFont(cur_font)
+
+    def UpdateFont(self):
+        new_font = font.LoadCustomFont(path.ResolveFontFilePath(self.action_data["font"]["value"]))
+        self.setFont(new_font)
+
+    def UpdateTextColor(self):
+        color = self.action_data["text_color"]["value"]
+        self.setDefaultTextColor(QtGui.QColor(color[0], color[1], color[2]))
+
+    def UpdateZOrder(self):
+        self.setZValue(float(self.action_data["z_order"]["value"]))
+
+    def UpdateCenterAlign(self, new_transform: QtGui.QTransform):
+        if self.action_data["center_align"]["value"]:
+            new_transform.translate(-self.boundingRect().width() / 2, -self.boundingRect().height() / 2)
+            self.is_centered = True
+        else:
+            self.is_centered = False

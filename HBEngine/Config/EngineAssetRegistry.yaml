@@ -1,0 +1,34 @@
+# This file contains a registry of engine content files that are accessible by users. This file is manually maintained,
+# and should not be touched
+Content:
+  Interfaces:
+    pause_menu_01.interface: Interface
+    dialogue_01.interface: Interface
+    main_menu_01.interface: Interface
+  Fonts:
+    Comfortaa:
+      Comfortaa-Bold.ttf: Asset_Font
+      Comfortaa-Light.ttf: Asset_Font
+      Comfortaa-Regular.ttf: Asset_Font
+  Music:
+    Jazz:
+      bensound-romantic.mp3: Asset_Sound
+  SFX:
+    whistle.wav: Asset_Sound
+  Sprites:
+    Interface:
+      Buttons:
+        Choice_Button_Normal.png: Asset_Image
+        Choice_Button_Hover.png: Asset_Image
+        Choice_Button_Clicked.png: Asset_Image
+        Menu_Button_Normal.png: Asset_Image
+        Menu_Button_Hover.png: Asset_Image
+        Menu_Button_Clicked.png: Asset_Image
+      Dialogue:
+        Dialogue_Frame.png: Asset_Image
+      Backgrounds:
+        Dark_Transparent_1280x720.png: Asset_Image
+    Placeholder.png: Asset_Image
+    Backgrounds:
+      Orientation_Lines_1280x720.jpg: Asset_Image
+      Basic_Dark_1280x720.png: Asset_Image

@@ -12,92 +12,185 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+import os
 import argparse
 import pygame
-from HBEngine.Core.scene_manager import SceneManager
-from HBEngine.Core.settings import Settings
+from HBEngine.Core import settings
+from HBEngine.Core.scene import Scene
+from HBEngine.Core.Objects.interface_pause import InterfacePause
+
 from pygame import mixer
 
 
-class HBEngine:
-    def __init__(self, project_path):
-        #@TODO: What is the right way to handle this?
-        if not project_path:
-            print("Warning: No project path provided - Defaulting to the engine root")
+def Initialize(project_path: str):
+    """ Loads project information and paths, and updates the pygame module with project-specific settings """
+    # @TODO: What is the right way to handle this?
+    if not project_path:
+        print("Warning: No project path provided - Defaulting to the engine root")
 
-        Settings.getInstance().SetProjectRoot(project_path)
-        Settings.getInstance().Evaluate(Settings.getInstance().project_dir + "/Config/Game.yaml")
+    settings.SetProjectRoot(project_path)
+    settings.LoadProjectSettings()
+    settings.LoadVariables()
+    if settings.GetProjectSetting('Game', 'title') == '':
+        settings.SetProjectSetting('Game', 'title', 'My Game')
+    pygame.display.set_caption(settings.GetProjectSetting('Game', 'title'))
 
-        pygame.display.set_caption(Settings.getInstance().project_settings['Game']['title'])
 
-        # Declare the scene manager, but we'll initialize it during the game loop
-        self.scene_manager = None
+def Main():
+    # Debug toggles
+    show_fps = False
 
-        # DEBUG TRIGGERS
-        self.show_fps = False
+    pygame.init()
+    mixer.init()
+    settings.clock = pygame.time.Clock()
+    settings.window = pygame.display.set_mode(settings.resolution)
+    pause_interface = None  # Instantiated and set during runtime
 
-    def Main(self):
+    # Load the starting scene
+    if settings.GetProjectSetting("Game", "starting_scene"):
+        LoadScene(settings.GetProjectSetting("Game", "starting_scene"))
+    else:
+        raise ValueError("No starting scene was provided in the project settings")
 
-        pygame.init()
-        mixer.init()
-        clock = pygame.time.Clock()
-        window = pygame.display.set_mode(Settings.getInstance().active_resolution)
+    # Start the game loop
+    is_running = True
+    while is_running is True:
+        events = pygame.event.get()
 
-        self.scene_manager = SceneManager(window)
+        # Handle all system actions
+        for event in events:
+            if event.type == pygame.QUIT:
+                is_running = False
+            if event.type == pygame.KEYDOWN:
+                # Exit
+                if event.key == pygame.K_ESCAPE:
+                    if settings.scene:
+                        if settings.scene.allow_pausing:
+                            if settings.paused:
+                                Unpause()
+                                pause_interface = None
+                            else:
+                                pause_interface = Pause()
 
-        # Start the game loop
-        is_running = True
-        while is_running is True:
-            events = pygame.event.get()
-
-            # Handle all system actions
-            for event in events:
                 if event.type == pygame.QUIT:
                     is_running = False
-                if event.type == pygame.KEYDOWN:
-                    # Maximize
-                    if event.key == pygame.K_1:
-                        self.UpdateResolution(1, pygame.FULLSCREEN)
-                        self.scene_manager.ResizeScene()
-                    # Minimize
-                    if event.key == pygame.K_2:
-                        self.UpdateResolution(0)
-                        self.scene_manager.ResizeScene()
-                    # Exit
-                    if event.key == pygame.K_ESCAPE:
-                        is_running = False
-                    if event.type == pygame.QUIT:
-                        is_running = False
-                    # Debug - FPS
-                    if event.key == pygame.K_F3:
-                        self.show_fps = not self.show_fps
+                # Debug - FPS
+                if event.key == pygame.K_F3:
+                    show_fps = not show_fps
 
+        if settings.paused:
+            settings.scene.active_renderables.Update([pause_interface])
+        elif settings.input_owner:
+            # Input owners lock out updates for everything but themselves. If one is active, only update it
+            settings.input_owner.Update(events)
+        else:
             # Update scene logic. This drives the core game functionality
-            self.scene_manager.active_scene.Update(events)
+            settings.scene.Update(events)
 
-            # Debug Logging
-            if self.show_fps:
-                print(clock.get_fps())
+            # Update active modules. These provide supplementary features
+            for module_name, module_obj in settings.modules.items():
+                module_obj.Update(events)
 
-            # Refresh any changes
-            pygame.display.update()
+        # Debug Logging
+        if show_fps:
+            print(settings.clock.get_fps())
 
-            # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
-            # on actions
-            self.scene_manager.active_scene.delta_time = clock.tick(60) / 1000
+        # Refresh any changes
+        pygame.display.update()
 
-    def UpdateResolution(self, new_size_index, flag=0):
-        # Use the given, but always add HWSURFACE and DOUBLEBUF
-        if not Settings.getInstance().resolution == new_size_index:
-            Settings.getInstance().resolution = new_size_index
-            pygame.display.set_mode(Settings.getInstance().resolution_options[new_size_index], flag)
+        # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
+        # on actions
+        settings.scene.delta_time = settings.clock.tick(60) / 1000
 
-            self.scene_manager.active_scene.Draw()
+
+def Pause() -> InterfacePause:
+    pause_interface = settings.GetProjectSetting('Pause Menu', 'interface')
+    if pause_interface and pause_interface != 'None':
+        interface = settings.scene.LoadInterface(pause_interface, InterfacePause)
+    else:
+        print("No pause interface set - Falling back to default")
+        interface = settings.scene.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
+
+    settings.scene.Draw()
+    settings.paused = True
+    return interface
+
+
+def Unpause():
+    settings.scene.UnloadInterface("!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&")
+    settings.scene.Draw()
+    settings.paused = False
+
+
+def LoadScene(partial_file_path: str):
+    """ Deletes the active scene if applicable, and creates a new one using the provided scene file """
+    # Validate the scene path
+    scene_path = settings.ConvertPartialToAbsolutePath(partial_file_path)
+    if not os.path.exists(scene_path):
+        raise ValueError(f"Scene '{scene_path}' does not exist")
+
+    # Shutdown any modules that shouldn't persist between scenes
+    active_modules = list(settings.modules.items())
+    for module_name, module_obj in active_modules:
+        if module_obj.CLOSE_ON_SCENE_CHANGE:
+            UnloadModule(module_name)
+
+    # Clear any existing scene, and create a new scene with the provided info
+    settings.scene = None
+    settings.scene = Scene(scene_data_file=scene_path)
+    settings.scene.LoadSceneData()
+
+
+def LoadModule(module_obj: callable, module_file_path: str) -> bool:
+    """
+    Creates the provided module, and adds it to the active module dict. Returns whether the module was
+    successfully created
+    """
+    # Confirm we haven't already loaded this module
+    if module_obj.MODULE_NAME in settings.modules:
+        print(f"Warning: Module '{module_obj.MODULE_NAME}' has already been loaded - Unable to load a second time!")
+        return False
+    else:
+        # Instantiate the module
+        module = module_obj(module_file_path)
+
+        if module_obj.RESERVE_INPUT:
+            if settings.input_owner:
+                print(f"Warning: Module '{settings.input_owner.MODULE_NAME}' has already reserved input - Unable to load a second module that reserves input!")
+                return False
+            settings.input_owner = module
+
+        # Assign and start the module
+        settings.modules[module_obj.MODULE_NAME] = module
+        module.Start()
+
+    return True
+
+
+def UnloadModule(module_name: str) -> bool:
+    """
+    Shuts down the module of the provided name and then deletes it. Returns whether the module was successfully shut
+    down and deleted
+    """
+    if module_name in settings.modules:
+        settings.modules[module_name].Shutdown()
+
+        # Clear the input reservation if applicable
+        if settings.modules[module_name] is settings.input_owner:
+            settings.input_owner = None
+
+        del settings.modules[module_name]
+        return True
+    else:
+        print(f"Warning: Module '{module_name}' is not currently loaded")
+
+    return False
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--project_path", type=str, nargs="?", const="", help="A file path for a HBEngine Project")
     args = parser.parse_args()
     print(args)
-    engine = HBEngine(args.project_path)
-    engine.Main()
+    Initialize(args.project_path)
+    Main()

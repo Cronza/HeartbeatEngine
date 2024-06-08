@@ -12,11 +12,13 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
-from HBEditor.Core.BaseClasses.base_editor_ui import EditorBaseUI
-from HBEditor.Core.DetailsPanel.details_panel import DetailsPanel
-from HBEditor.Core.EditorDialogue.dialogue_branches_panel import BranchesPanel
+import copy
+from PyQt6 import QtWidgets, QtCore
+from HBEditor.Core.base_editor_ui import EditorBaseUI
+from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
+from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
+from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 
 class EditorDialogueUI(EditorBaseUI):
@@ -28,44 +30,62 @@ class EditorDialogueUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.CreateBranchesPanel()
-        self.CreateDialogueSequencePanel()
-        self.CreateDetailsPanel()
+        self.branches_panel = GroupsPanel(title="Branches")
+        self.branches_panel.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.branches_panel.SIG_USER_GROUP_CHANGE.connect(self.core.SwitchBranches)
+        self.dialogue_sequence = DialogueSequencePanel(self.core)
+        self.dialogue_sequence.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.details = DetailsPanel()
+        self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+
+        self.dialogue_settings = DetailsPanel(use_connections=False)
+        self.dialogue_settings_src_obj = DialogueSettings()
+        self.dialogue_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.dialogue_settings.Populate(self.dialogue_settings_src_obj)
 
         # The dialogue editor makes use of the "Choice" input widget, which requires a reference
         # to the branches list
-        self.details.branch_list = self.branches.branches_list
+        self.details.branch_list = self.branches_panel.entry_list
 
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
+        # Add a sub tab widget for details, settings, etc
+        self.sub_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_tab_widget.addTab(self.details, "Details")
+        self.sub_tab_widget.addTab(self.dialogue_settings, "Dialogue Settings")
+
         # Add everything to the editor interface
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        self.main_resize_container.addWidget(self.branches)
+        self.main_resize_container.addWidget(self.branches_panel)
         self.main_resize_container.addWidget(self.dialogue_sequence)
-        self.main_resize_container.addWidget(self.details)
+        self.main_resize_container.addWidget(self.sub_tab_widget)
 
-        # Adjust the main view so its consuming as much space as possible
-        self.main_resize_container.setStretchFactor(1, 10)
+    def AdjustSize(self):
+        # Adjust the main view so it's consuming as much space as possible
+        self.main_resize_container.setSizes([round(self.width() / 5), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
+        self.details.AdjustSize()
 
-    def CreateDialogueSequencePanel(self):
-        """
-        Create the dialogue sequence panel. Since this panel is fundamental to the dialogue editor,
-        it needs a reference to the editor core to access toolbar functions
-        """
-        self.dialogue_sequence = DialogueSequencePanel(self.core)
 
-    def CreateBranchesPanel(self):
-        """
-        Create the branches panel. Since this panel is fundamental to the dialogue editor,
-        it needs a reference to the editor core to access toolbar functions
-        """
-        self.branches = BranchesPanel(self.core)
+class DialogueSettings(QtCore.QObject, SourceEntry):
+    SIG_USER_UPDATE = QtCore.pyqtSignal()
+    ACTION_DATA = {
+        "interface": {
+            "type": "Interface",
+            "value": "",
+            "flags": ["editable"]
+        },
+        "description": {
+            "type": "Paragraph",
+            "value": "",
+            "flags": ["editable"]
+        }
+    }
 
-    def CreateDetailsPanel(self):
-        """
-        Create the details panel using the generic details object. Since this panel is generic,
-        it functions independently of whether it has a reference to the editor core
-        """
-        self.details = DetailsPanel()
+    def __init__(self):
+        super().__init__()
+        self.action_data = copy.deepcopy(self.ACTION_DATA)
 
+    def Refresh(self, change_tree: list = None):
+        self.SIG_USER_UPDATE.emit()

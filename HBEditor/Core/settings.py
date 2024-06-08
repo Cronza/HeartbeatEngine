@@ -13,150 +13,282 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from PyQt5 import QtGui
+import inspect
+import copy
 from HBEditor.Core.DataTypes.file_types import FileType
-from Tools.HBYaml.hb_yaml import Reader
+from HBEngine.Core.Actions import actions
+from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
-class Settings:
+def GetProjectContentDirectory():
+    """ Returns the 'Content' folder for the active project """
+    global user_project_dir
+    return f"{user_project_dir}/Content"
+
+
+def GetMetadataString():
+    """ Return the metadata string used to mark HBEditor-authored files """
+    global editor_data
+    metadata_str = f"# {editor_data['EditorSettings']['version_string']}"
+
+    return metadata_str
+
+
+def GetProjectSettingsPath() -> str:
+    """ Returns the absolute path to the active project's 'Game.yaml' file """
+    global user_project_dir
+    return user_project_dir + "/" + 'Config/Game.yaml'
+
+
+def GetVariablesPath() -> str:
+    """ Returns the absolute path to the active project's 'Variables.yaml' file """
+    global user_project_dir
+    return user_project_dir + "/" + 'Config/Variables.yaml'
+
+
+def LoadProjectSettings():
+    """ Reads the 'Game.yaml' file for the active project """
+    global user_project_dir
+    global user_project_data
+    global project_default_files
+    user_project_data = Reader.ReadAll(GetProjectSettingsPath())
+
+
+def LoadVariables():
+    """ Reads the 'Variables.yaml' file for the active project """
+    global user_project_dir
+    global user_project_variables
+    user_project_variables = Reader.ReadAll(GetVariablesPath())
+
+
+def GetProjectSetting(category: str, key: str):
+    """ Returns the project setting value that matches the provided category and key """
+    global user_project_data
+
+    try:
+        return user_project_data[category][key]['value']
+    except KeyError:
+        raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
+
+def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
     """
-    A singleton that holds user project information, editor style settings, and utility functions for navigating
-    the project folder structure
+    Registers the provided file. 'parent_path' must be a partial path with the content directory as the root
     """
-    __instance = None
+    global asset_registry
+    split_path = parent_path.split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-    @staticmethod
-    def getInstance():
-        """
-        Static access method - Used to acquire the singleton instance, or instantiate it if it doesn't already exist
-        """
-        if Settings.__instance is None:
-            Settings()
-        return Settings.__instance
+    cur_depth[asset_name] = asset_type.name
 
-    def __init__(self):
-        # Enforce the use of the singleton instance
-        if Settings.__instance is not None:
-            raise Exception("This class is a singleton!")
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
+
+
+def RegisterAssetFolder(path_to_create: str):
+    """ Registers the provided folder path. This must be a partial path with the content directory as the root """
+    global asset_registry
+    split_path = path_to_create.split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        if folder not in cur_depth:
+            cur_depth[folder] = {}
         else:
-            Settings.__instance = self
+            cur_depth = cur_depth[folder]
 
-        self.root = os.getcwd().replace("\\", "/")
-        self.engine_root = f"{self.root}/HBEngine"
-        self.editor_root = f"{self.root}/HBEditor"
-        self.editor_temp_root = f"{self.editor_root}/Temp"
-        self.temp_history_path = f"{self.editor_temp_root}/history.yaml"
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
 
-        self.project_file = ".heartbeat"
-        self.project_folder_structure = [
-            "Content",
-            "Config"
-        ]
 
-        # A dict of files that are provided in new projects. Format: <target_folder>: <source_file>
-        self.project_default_files = {
-            "Config": "Config/Game.yaml"
-        }
+def DeregisterAsset(source_file_path: str, asset_name: str):
+    """
+    Removes the registration for 'asset_name' at the provided directory. 'parent_path' must be a partial path with
+    the content directory as the root
+    """
+    global asset_registry
+    split_path = os.path.dirname(source_file_path).split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-        # A dict of types of files, and the individual formats which are supported in the engine / editor
-        self.supported_content_types = {
-            "Image": "Image Files (*.png *.jpg)",
-            "Data": "YAML Files (*.yaml)",
-            "Font": "Font Files (*.ttf)",
-            "Sound": "Sound Files (*.mp3 *.wav)",
-        }
+    if asset_name in cur_depth:
+        del cur_depth[asset_name]
 
-        self.style_data = None
-        self.action_database = None
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
 
-        self.user_project_name = None
-        self.user_project_dir = None
-        self.user_project_data = None
 
-        self.LoadEditorSettings(f"{self.editor_root}/Config/Editor.yaml")
-        self.LoadStyleSettings(f"{self.editor_root}/Config/EditorStyle.yaml")
-        self.LoadActionDatabase(f"{self.editor_root}/Config/ActionsDatabase.yaml")
+def DuplicateAssetRegistration(source_file_path: str, asset_name: str, new_name: str):
+    """
+    Duplicates the registration for 'asset_name', registering it under 'new_name'. 'path_to_clone' must be a
+    partial path with the content directory as the root
+    """
+    global asset_registry
+    split_path = os.path.dirname(source_file_path).split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-    def GetProjectContentDirectory(self):
-        """ Returns the 'Content' folder for the active project """
-        return self.user_project_dir + "/" + "Content"
+    if asset_name in cur_depth:
+        cur_depth[new_name] = cur_depth[asset_name]
 
-    def GetMetadataString(self, file_type: FileType):
-        """ Return the metadata string used to mark HBEditor-exported files """
-        return f"# Type: {file_type.name}\n# {self.editor_data['EditorSettings']['version_string']}"
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
 
-    def LoadProjectSettings(self):
-        """ Reads the 'Game.yaml' file for the active project """
-        self.user_project_data = Reader.ReadAll(self.user_project_dir + "/" + self.project_default_files['Config'])
 
-    def LoadActionDatabase(self, data_path):
-        """ Reads in the 'ActionsDatabase.yaml' file """
-        self.action_database = Reader.ReadAll(data_path)
+def RenameAssetRegistration(source_file_path: str, asset_name: str, new_name: str):
+    """ Reregister the provided project path using the new name, removing the registration under the old name """
+    global asset_registry
+    split_path = os.path.dirname(source_file_path).split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-    def LoadEditorSettings(self, data_path):
-        """ Reads in the main editor settings """
-        self.editor_data = Reader.ReadAll(data_path)
+    if asset_name in cur_depth:
+        source = cur_depth[asset_name]
+        del cur_depth[asset_name]
+        cur_depth[new_name] = source
 
-    def LoadStyleSettings(self, data_path):
-        """ Load the editor style settings """
-        #@TODO: Investigate QPalette use
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
 
-        self.style_data = Reader.ReadAll(data_path)
 
-        # Text and Font
-        self.header_1_font = QtGui.QFont(self.style_data["EditorTextSettings"]["header_1_font"],self.style_data["EditorTextSettings"]["header_1_text_size"],)
-        self.header_1_color = f"color: rgb({self.style_data['EditorTextSettings']['header_1_color']})"
-        self.header_1_font.setBold(self.style_data["EditorTextSettings"]["header_1_is_bold"])
-        self.header_1_font.setItalic(self.style_data["EditorTextSettings"]["header_1_is_italicized"])
+def MoveAssetRegistration(source_file_path: str, asset_name: str, target_path: str):
+    """
+    Moves the registration for 'asset_name' 'from 'source_file_path' to 'target_path'. Paths must be a partial
+    path with the content directory as the root
+    """
+    global asset_registry
 
-        self.header_2_font = QtGui.QFont(self.style_data["EditorTextSettings"]["header_2_font"],self.style_data["EditorTextSettings"]["header_2_text_size"])
-        self.header_2_color = f"color: rgb({self.style_data['EditorTextSettings']['header_2_color']})"
-        self.header_2_font.setBold(self.style_data["EditorTextSettings"]["header_2_is_bold"])
-        self.header_2_font.setItalic(self.style_data["EditorTextSettings"]["header_2_is_italicized"])
+    # Find the source data and cache it before removing it
+    split_path = os.path.dirname(source_file_path).split("/")
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-        self.editor_info_title_font = QtGui.QFont(self.style_data["EditorTextSettings"]["editor_info_title_font"],self.style_data["EditorTextSettings"]["editor_info_title_text_size"])
-        self.editor_info_title_color = f"color: rgb({self.style_data['EditorTextSettings']['editor_info_title_color']})"
-        self.editor_info_title_font.setBold(self.style_data["EditorTextSettings"]["editor_info_title_is_bold"])
-        self.editor_info_title_font.setItalic(self.style_data["EditorTextSettings"]["editor_info_title_is_italicized"])
+    # Only perform the move if we can find the source
+    if asset_name in cur_depth:
+        source_data = cur_depth[asset_name]
+        del cur_depth[asset_name]
 
-        self.paragraph_font = QtGui.QFont(self.style_data["EditorTextSettings"]["paragraph_font"],self.style_data["EditorTextSettings"]["paragraph_text_size"])
-        self.paragraph_color = f"color: rgb({self.style_data['EditorTextSettings']['paragraph_color']})"
-        self.paragraph_font.setBold(self.style_data["EditorTextSettings"]["paragraph_is_bold"])
-        self.paragraph_font.setItalic(self.style_data["EditorTextSettings"]["paragraph_is_italicized"])
+        # Find the target directory, and create a new registration there
+        split_path = target_path.split("/")
+        cur_depth = asset_registry
+        for folder in split_path:
+            cur_depth = cur_depth[folder]
+        cur_depth[asset_name] = source_data
 
-        self.editor_info_paragraph_font = QtGui.QFont(self.style_data["EditorTextSettings"]["editor_info_paragraph_font"],self.style_data["EditorTextSettings"]["editor_info_paragraph_text_size"])
-        self.editor_info_paragraph_color = f"color: rgb({self.style_data['EditorTextSettings']['editor_info_paragraph_color']})"
-        self.editor_info_paragraph_font.setBold(self.style_data["EditorTextSettings"]["editor_info_paragraph_is_bold"])
-        self.editor_info_paragraph_font.setItalic(self.style_data["EditorTextSettings"]["editor_info_paragraph_is_italicized"])
+    SortRegistry(cur_depth)
+    SaveHeartbeatFile(asset_registry)
 
-        self.subtext_font = QtGui.QFont(self.style_data["EditorTextSettings"]["subtext_font"], self.style_data["EditorTextSettings"]["subtext_text_size"],QtGui.QFont.Bold)
-        self.subtext_color = f"color: rgb({self.style_data['EditorTextSettings']['subtext_color']})"
-        self.subtext_font.setBold(self.style_data["EditorTextSettings"]["subtext_is_bold"])
-        self.subtext_font.setItalic(self.style_data["EditorTextSettings"]["subtext_is_italicized"])
 
-        self.button_font = QtGui.QFont(self.style_data["EditorTextSettings"]["button_font"], self.style_data["EditorTextSettings"]["button_text_size"])
-        self.button_color = f"color: rgb({self.style_data['EditorTextSettings']['button_color']})"
-        self.button_font.setBold(self.style_data["EditorTextSettings"]["button_is_bold"])
-        self.button_font.setItalic(self.style_data["EditorTextSettings"]["button_is_italicized"])
+def GetAssetRegistryFolder(project_path: str) -> dict:
+    """ Returns the asset registry data for the provided project path """
+    global asset_registry
+    split_path = project_path.split("/")
 
-        self.button_font = QtGui.QFont(self.style_data["EditorTextSettings"]["button_font"], self.style_data["EditorTextSettings"]["button_text_size"])
-        self.button_color = f"color: rgb({self.style_data['EditorTextSettings']['button_color']})"
-        self.button_font.setBold(self.style_data["EditorTextSettings"]["button_is_bold"])
-        self.button_font.setItalic(self.style_data["EditorTextSettings"]["button_is_italicized"])
+    cur_depth = asset_registry
+    for folder in split_path:
+        cur_depth = cur_depth[folder]
 
-        # Widget Misc
-        self.toolbar_background_color = self.style_data["EditorInterfaceSettings"]["toolbar_background_color"]
+    return cur_depth
 
-        # Buttons
-        self.general_button_background_color = self.style_data["EditorInterfaceSettings"]["general_button_background_color"]
-        self.general_button_border_color = self.style_data["EditorInterfaceSettings"]["general_button_border_color"]
 
-        self.toolbar_button_background_color = self.style_data["EditorInterfaceSettings"]["toolbar_button_background_color"]
+def SortRegistry(registry_data: dict):
+    """
+    Given Asset Registry data, sort and modify the data in place. This only applies to the top level of the data.
+    This does not recurse if given multiple depths
+    """
+    folders = {}
+    assets = {}
 
-        # State
-        self.read_only_background_color = f"background-color: rgb({self.style_data['EditorStateSettings']['read_only_background_color']})"
-        self.selection_color = f"selection-background-color: rgb({self.style_data['EditorStateSettings']['selection_color']})"
+    # Split up assets into Folders and Assets so we can apply sorting rules correctly
+    for key, value in registry_data.items():
+        if isinstance(value, dict):
+            folders[key] = value
+        else:
+            assets[key] = value
 
-    def ConvertPartialToAbsolutePath(self, partial_path):
-        """ Given a parital path, return a absolute path """
-        return self.editor_root + "/" + partial_path
+    # Sort assets by value first and then by key
+    sorted_assets = {key: value for key, value in sorted(assets.items(), key=lambda item: (str(item[1]), item[0]))}
+
+    # Combine folders and assets before updating the passed-in registry dict
+    registry_data.clear()
+    registry_data.update({**folders, **sorted_assets})
+
+
+
+def LoadHeartbeatFile():
+    """ Read in the active project's .heartbeat file, updating the asset registry using what is found"""
+    global asset_registry
+    global user_project_dir
+    global heartbeat_file
+
+    asset_registry = Reader.ReadAll(f"{user_project_dir}/{heartbeat_file}")
+
+
+def SaveHeartbeatFile(data: dict):
+    """ Save the heartbeat file that contains asset registrations for Heartbeat projects """
+    Writer.WriteFile(data, f"{user_project_dir}/{heartbeat_file}", GetMetadataString())
+
+
+def GetActionData(action_name: str) -> dict:
+    """ Returns a copy of the 'ACTION_DATA' for an engine action that matches the provided name """
+    return copy.deepcopy(_engine_actions[action_name].ACTION_DATA)
+
+
+root = os.getcwd().replace("\\", "/")
+engine_root = f"{root}/HBEngine"
+editor_root = f"{root}/HBEditor"
+editor_temp_root = f"{editor_root}/Temp"
+temp_history_path = f"{editor_temp_root}/history.yaml"
+thumbnail_root = "Thumbnails"
+
+heartbeat_file = ".heartbeat"
+project_folder_structure = [
+    "Content",
+    "Config"
+]
+
+# A list of tuples for files that are provided in new projects. Format: (<target_folder>, <source_file>)
+project_default_files = [
+    ("Config", "Config/Game.yaml"),
+    ("Config", "Config/Variables.yaml"),
+]
+
+# The master dict of file types supported by the engine / editor
+supported_file_types = {
+    ".interface": FileType.Interface,
+    ".png": FileType.Asset_Image,
+    ".jpg": FileType.Asset_Image,
+    ".yaml": FileType.Asset_Data,
+    ".ttf": FileType.Asset_Font,
+    ".mp3": FileType.Asset_Sound,
+    ".wav": FileType.Asset_Sound,
+    ".ogg": FileType.Asset_Sound
+}
+
+# A dict of types of files, and the individual formats which are supported in the engine / editor. This is a
+# categorization of 'supported_file_types' used often in file system browsers
+supported_file_types_cat = {
+    "Image": "Image Files (*.png *.jpg)",
+    "Data": "YAML Files (*.yaml)",
+    "Font": "Font Files (*.ttf)",
+    "Sound": "Sound Files (*.mp3 *.wav *.ogg)",
+}
+
+user_project_name = None
+user_project_dir = None
+user_project_data = None  # The contents of the project's 'Game.yaml' file
+user_project_variables = None  # The contents of the project's 'Variables.yaml' file
+
+asset_registry = {}  # Loaded when project is loaded
+engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")  # Engine files which are accessible via the asset registration system
+editor_data = Reader.ReadAll(f"{editor_root}/Config/Editor.yaml")  # Editor function and style settings
+
+# Contains categorized engine actions and definitions for which editors can use which actions
+available_actions = Reader.ReadAll(f"{editor_root}/Config/Actions.yaml")
+
+# A list of action classes available in the HBEngine. This is not meant to be accessed outside this file
+_engine_actions = dict(inspect.getmembers(actions, lambda obj: inspect.isclass(obj) and obj.__module__ == actions.__name__))

@@ -1,0 +1,220 @@
+# Created by Cronza
+type: Interface
+settings:
+  description: ''
+  key: ''
+pages:
+  Persistent:
+    description: ''
+    items:
+      # Background
+      - create_background:
+          key: "!&INTERFACE_PAUSE_Background&!"
+          sprite: HBEngine/Content/Sprites/Interface/Backgrounds/Dark_Transparent_1280x720.png
+          z_order: 100000
+          conditions: { }
+
+      # Title
+      - create_text:
+          key: "!&INTERFACE_PAUSE_Title&!"
+          position:
+            - 0.15
+            - 0.2
+          text: Paused
+          text_size: 60
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.4
+          conditions: { }
+
+      # Resume Button
+      - create_text_button:
+          key: "!&INTERFACE_PAUSE_Resume_Button&!"
+          position:
+            - 0.15
+            - 0.3
+          center_align: true
+          z_order: 100002
+          text: Resume
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: unpause
+          conditions: { }
+
+      # Options Button
+      - create_text_button:
+          key: "!&INTERFACE_PAUSE_Options_Button&!"
+          position:
+            - 0.15
+            - 0.35
+          center_align: true
+          z_order: 100002
+          text: Option
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: switch_page
+                owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+                page: page_Options
+                conditions: { }
+          conditions: { }
+
+      # Save Button
+      - create_text_button:
+          key: "!&INTERFACE_PAUSE_Save_Button&!"
+          position:
+            - 0.15
+            - 0.4
+          center_align: true
+          z_order: 100002
+          text: Save
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: switch_page
+                owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+                page: page_Save
+                conditions: { }
+          conditions: { }
+
+      # Main Menu Button
+      - create_text_button:
+          key: "!&INTERFACE_PAUSE_Main_Menu_Button&!"
+          position:
+            - 0.15
+            - 0.45
+          center_align: true
+          z_order: 100002
+          text: Main Menu
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: load_scene
+                scene_file: ''
+                conditions: { }
+          conditions: { }
+
+      # Quit Button
+      - create_text_button:
+          key: "!&INTERFACE_PAUSE_Quit_Button&!"
+          position:
+            - 0.15
+            - 0.5
+          center_align: true
+          z_order: 100002
+          text: Quit
+          text_size: 16
+          text_color_hover:
+            - 0
+            - 127
+            - 255
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events:
+            event_0:
+              action:
+                action: quit_game
+          conditions: { }
+
+  page_Options:
+    description: ''
+    items:
+      # Page Title
+      - create_text:
+          key: "!&INTERFACE_PAUSE_pageOptions_Title&!"
+          position:
+            - 0.4
+            - 0.2
+          text: Options
+          text_size: 60
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.4
+          conditions: { }
+
+      # Mute Button Text
+      - create_text:
+          key: "!&INTERFACE_PAUSE_pageOptions_Mute_All_Button_Text&!"
+          position:
+            - 0.34
+            - 0.3
+          text: Mute
+          text_size: 18
+          z_order: 100001
+          conditions: { }
+
+      # Mute Button
+      - create_checkbox:
+          key: "!&INTERFACE_PAUSE_pageOptions_Mute_All_Button&!"
+          position:
+            - 0.4
+            - 0.3
+          center_align: true
+          z_order: 100002
+          sprite: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Normal.png
+          sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
+          sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
+          sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
+          connect_project_setting:
+            category: Audio
+            setting: mute
+          events:
+            event_0:
+              action:
+                action: set_mute
+                toggle: True
+                conditions: { }
+          conditions: { }
+
+  page_Save:
+    description: ''
+    items:
+      # Page Title
+      - create_text:
+          key: "!&INTERFACE_PAUSE_pageSave_Title&!"
+          position:
+            - 0.4
+            - 0.2
+          text: Save
+          text_size: 60
+          z_order: 100001
+          wrap_bounds:
+            - 0.8
+            - 0.4
+          conditions: { }

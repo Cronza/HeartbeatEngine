@@ -1,0 +1,96 @@
+# Created by Cronza
+type: Interface
+settings:
+  description: ''
+  key: "!&INTERFACE_DIALOGUE&!"
+pages:
+  Persistent:
+    description: ''
+    items:
+      # Dialogue Frame
+      - create_sprite:
+          key: "!&INTERFACE_DIALOGUE_Frame&!"
+          sprite: HBEngine/Content/Sprites/Interface/Dialogue/Dialogue_Frame.png
+          position:
+            - 0.5
+            - 0.8
+          center_align: true
+          z_order: 10000
+          conditions: { }
+
+      # Main Menu Button
+      - create_text_button:
+          key: "!&INTERFACE_DIALOGUE_Main_Menu_Button&!"
+          position:
+            - 0.3
+            - 0.96
+          center_align: true
+          z_order: 10001
+          text: Menu
+          text_size: 16
+          text_color_hover:
+            - 92
+            - 176
+            - 255
+          text_color_clicked:
+            - 255
+            - 111
+            - 111
+          wrap_bounds:
+            - 0.06
+            - 0.05
+          events:
+            event_0:
+              action:
+                action: load_scene
+                scene_file: ''
+                conditions: { }
+          conditions: { }
+
+      # Quick Save Button
+      - create_text_button:
+          key: "!&INTERFACE_DIALOGUE_Quick_Save_Button&!"
+          position:
+            - 0.375
+            - 0.96
+          center_align: true
+          z_order: 10001
+          text: Q. Save
+          text_size: 16
+          text_color_hover:
+            - 92
+            - 176
+            - 255
+          text_color_clicked:
+            - 255
+            - 111
+            - 111
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events: { }
+          conditions: { }
+
+      # Quick Load Button
+      - create_text_button:
+          key: "!&INTERFACE_DIALOGUE_Quick_Load_Button&!"
+          position:
+            - 0.45
+            - 0.96
+          center_align: true
+          z_order: 10001
+          text: Q. Load
+          text_size: 16
+          text_color_hover:
+            - 92
+            - 176
+            - 255
+          text_color_clicked:
+            - 255
+            - 111
+            - 111
+          wrap_bounds:
+            - 0.2
+            - 0.2
+          events: { }
+          conditions: { }

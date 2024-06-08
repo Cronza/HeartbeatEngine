@@ -23,7 +23,6 @@ class HBBuilder:
     def Build(logger, engine_dir: str, project_dir: str, project_name: str):
         """ Generate an executable based on the provided information and project """
         logger.Log(f"*** Starting build for: '{project_dir}'... ***")
-        print(project_dir)
         build_dir = f"{project_dir}/build"
         working_dir = f"{build_dir}/intermediate"
         output_dir = f"{build_dir}/output"

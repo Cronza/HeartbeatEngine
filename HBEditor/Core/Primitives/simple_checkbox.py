@@ -12,14 +12,19 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets, QtCore
+
 
 class SimpleCheckbox(QtWidgets.QWidget):
     """
     A custom wrapper for the QCheckbox class when provides a textless, centered checkbox
     """
-    def __init__(self, click_function):
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, bool)
+
+    def __init__(self):
         super().__init__()
+        self.owner = None
+
         # For some unholy reason, the QCheckbox widget does not support center alignment natively. To make matters
         # worse, the text is considered in the size when used in layouts regardless if text is actually specified
 
@@ -28,22 +33,26 @@ class SimpleCheckbox(QtWidgets.QWidget):
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.left_spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding)
-        self.right_spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding)
+        self.left_spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding)
+        self.right_spacer = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding)
 
-        self.checkbox = QtWidgets.QCheckBox()
+        self.checkbox = QtWidgets.QCheckBox(self)
         self.checkbox.setText("")
 
         self.main_layout.addItem(self.left_spacer)
         self.main_layout.addWidget(self.checkbox)
         self.main_layout.addItem(self.right_spacer)
 
-        if click_function:
-            self.checkbox.stateChanged.connect(click_function)
-
     def Get(self) -> bool:
         """ Returns whether the checkbox is checked """
         return self.checkbox.isChecked()
 
-    def Set(self, value) -> None:
+    def Set(self, value: bool) -> None:
         self.checkbox.setChecked(value)
+
+    def Connect(self):
+        #@TODO: Investigate moving this to init
+        self.checkbox.stateChanged.connect(lambda update: self.SIG_USER_UPDATE.emit(self.owner, self.Get()))
+
+    def Disconnect(self):
+        self.checkbox.disconnect()

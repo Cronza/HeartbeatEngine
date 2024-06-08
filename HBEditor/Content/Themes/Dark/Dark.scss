@@ -1,0 +1,572 @@
+/*
+ *   The Heartbeat Engine is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   The Heartbeat Engine is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with the Heartbeat Engine. If not, see <httpsEditorContent:/www.gnu.org/licenses/>.
+ */
+
+/* *** Colors *** */
+$col_primary: #3F4245;
+$col_secondary: #2A2A2B;
+$col_tertiary: #46494D;
+
+/* Used for input fields, for editable fields */
+$col_input: #4E4E52;
+$col_input_hover: #5C5C61;
+$col_input_pressed: #3F3F42;
+$col_input_inactive: #343436;
+
+/* Used for tabs, menu dropdowns, buttons, etc */
+$col_hover: #686d70;
+$col_active: #585D61;
+
+/* Used for dialogue entries, branch entries, etc */
+//$col_entry_active: #1E384D;
+
+/* Used for view items */
+$col_view_item_hover: #25455f;
+$col_view_item_active: #1E384D;
+$col_view_item_alt: #252526; // This is a slightly darker version of $col_secondary
+
+/* *** Text *** */
+$size_text: 9pt;
+$col_text: rgba(255, 255, 255, 0.80);
+$col_text_read_only: rgba(150, 150, 150, 0.80);
+
+$size_text_h1: 11pt;
+$col_text_h1: rgba(255, 255, 255, 0.80);
+
+$size_text_h2: 10pt;
+$col_text_h2: rgba(255, 255, 255, 0.80);
+
+$size_text_soft: 9pt;
+$size_text_soft_h1: 11pt;
+$col_text_soft: rgba(255, 255, 255, 0.70);
+
+/* Misc */
+$size_border: 1px;
+$size_icon: 18px;
+
+QMainWindow{
+    background-color: $col_primary;
+}
+QWidget{
+    font-family: "Cabin";
+    font-size: $size_text;
+
+    &#drag-source{  // A widget used for drag representation
+        background-color: $col_secondary;
+    }
+}
+
+QToolBar{
+    icon-size: $size_icon; /* maximum icon size */
+    background-color: $col_primary;
+    border-top: $size_border solid $col_secondary;
+
+    &:separator{
+        &#horizontal{
+            background-color: $col_secondary;
+            height: 1px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+        &#vertical{
+            background-color: $col_secondary;
+            width: 1px;
+            margin-left: 4px;
+            margin-right: 4px;
+        }
+    }
+
+    &#vertical{ /* The logger is pressed against another border above it */
+        border-top: 0px solid transparent;
+    }
+
+
+}
+QToolButton{
+    background-color: $col_primary;
+    color: $col_text;
+    border: $size_border solid $col_primary;
+    padding: 2px;
+    &:hover {
+        background-color: $col_hover;
+    }
+
+    &:pressed {
+        background-color: $col_active;
+    }
+
+    &:menu-indicator {
+        image: none;
+    }
+
+    &:right-arrow {
+        image: url("EditorContent:Icons/Arrow_Right.png");
+        padding: 3px;
+
+    }
+
+    &#non-toolbar{ /* ToolButtons that are used outside of a toolbar */
+        background-color: $col_input;
+        padding: 1px;
+        border: $size_border solid $col_primary;
+
+        &:hover {
+            background-color: $col_hover;
+        }
+
+        &:pressed {
+            background-color: $col_active;
+        }
+
+        &:disabled{
+            background-color: $col_input_inactive;
+        }
+    }
+    &#choice-add{ /* Choice buttons don't use the typical button background */
+        background-color: $col_secondary;
+        border: 0px solid transparent;
+        image: url("EditorContent:Icons/Small_Plus.png");
+        padding: 0px;
+        &:hover {
+            image: url("EditorContent:Icons/Small_Plus_Hover.png");
+        }
+    }
+    &#choice-remove{ /* Choice buttons don't use the typical button background */
+        background-color: $col_secondary;
+        border: 0px solid transparent;
+        image: url("EditorContent:Icons/Small_Minus.png");
+        padding: 0px;
+        &:hover {
+            image: url("EditorContent:Icons/Small_Minus_Hover.png");
+        }
+    }
+}
+QTabWidget{
+    icon-size: 24px;
+    &:pane{ /* The tab widget frame */
+        border-color: $col_secondary;
+        border-top: $size_border solid $col_secondary;
+    }
+}
+QTabBar{
+    &:tab{
+        border: $size_border solid $col_secondary;
+        border-bottom: $col_primary;
+        border-top: 0px solid transparent;
+        background-color: $col_primary;
+        color: $col_text;
+        min-width: 50px;
+        min-height: 20px;
+        padding: 2px 4px 2px 4px;
+        &:hover {
+            background-color: $col_hover;
+        }
+        &:selected {
+            background-color: $col_active;
+        }
+
+        border-left: 0px solid transparent;
+
+    }
+    &:close-button {
+        image: url("EditorContent:Icons/Close.png");
+        padding: 2px;
+        &:hover {
+            image: url("EditorContent:Icons/Close_Hover.png");
+        }
+    }
+}
+QAbstractScrollArea{
+    &selected:item{
+        border: 0px solid transparent;
+    }
+}
+QAbstractItemView {
+    background-color: $col_secondary;
+    alternate-background-color: $col_view_item_alt;
+    border: $size_border solid $col_secondary;
+    outline: none;
+    &:item{
+        border: 0px solid transparent;
+        outline: none;
+        color: $col_text;
+        selection-background-color: $col_view_item_active;
+        selection-color: $col_text;
+
+        &:hover{
+            background-color: $col_view_item_hover;
+        }
+        &:selected{
+            background-color: $col_view_item_active;
+
+            &:hover{
+                border: $size_border solid $col_view_item_hover;
+            }
+        }
+
+    }
+    &#variables-table{ /* The variables table doesn't have the typical surrounding U.I elements, which requires border changes */
+        border-left: $size_border solid $col_secondary;
+        border-top: 0px solid transparent;
+    }
+}
+QHeaderView{
+    border: 0px solid transparent;
+
+    &:section{
+        background-color: $col_primary;
+        color: $col_text;
+        border: $size_border solid $col_secondary;
+        border-top: 0px solid transparent;
+        border-left: 0px solid transparent;
+        padding-left: 4px;
+
+        &:last{
+            border-right: 0px solid transparent;
+        }
+
+        &#vertical{
+            padding-left: 0px;
+        }
+    }
+
+    &#outliner{ /* The outliner doesn't use a top border */
+        &:section{
+            border-top: 0px solid transparent;
+        }
+    }
+}
+QTableView{
+    border: 0px solid transparent;
+    border-top: $size_border solid $col_secondary;
+
+    color: $col_text;
+    background-color: $col_secondary;
+}
+QTableView QTableCornerButton{
+    &:section{
+        border: $size_border solid $col_secondary;
+        border-top: 0px solid transparent;
+        border-left: 0px solid transparent;
+        background-color: $col_primary;
+        padding: 0px;
+    }
+}
+QTreeView{
+    border: 0px solid transparent;
+    border-top: $size_border solid $col_secondary;
+    background-color: $col_secondary;
+    outline: none;
+    qproperty-indentation: 10; // Edits the indentation distance when using branches
+
+    &#no-top{ /* Remove the top border */
+        border-top: 0px solid transparent;
+    }
+    &:item {
+        padding: 3px;
+        background-color: $col_secondary;
+        &:hover{
+            background-color: transparent;
+        }
+        &:selected{
+            background-color: transparent;
+        }
+    }
+    &:branch {
+        &:open {
+            border-image: none;
+            &:has-children {
+                image: url("EditorContent:Icons/Arrow_Down.png");
+
+                &:hover{
+                    image: url("EditorContent:Icons/Arrow_Down_Hover.png");
+                }
+            }
+        }
+        &:closed {
+            border-image: none;
+            &:has-children {
+                image: url("EditorContent:Icons/Arrow_Right.png");
+
+                &:hover{
+                    image: url("EditorContent:Icons/Arrow_Right_Hover.png");
+                }
+            }
+        }
+    }
+}
+QGraphicsView{
+    border: $size_border solid $col_secondary;
+    &#scene-viewer{
+        border-bottom: 0px solid transparent;
+        border-right: 0px solid transparent;
+    }
+}
+QScrollBar{
+    border: 0px solid transparent;
+     &:vertical {
+        border-left: $size_border solid $col_primary;
+        background: $col_secondary;
+        width: 10px;
+     }
+     &:handle:vertical {
+        background: $col_input;
+        min-height: 20px;
+     }
+     &:horizontal {
+        border-top: $size_border solid $col_primary;
+        background: $col_secondary;
+        height: 10px;
+     }
+     &:handle:horizontal {
+        background: $col_input;
+        min-width: 20px;
+     }
+     &:add-line:vertical, &:sub-line:vertical, &:up-arrow:vertical, &:down-arrow:vertical, &:add-page:vertical, &:sub-page:vertical {
+        background: none
+     }
+     &:add-line:horizontal, &:sub-line:horizontal, &:up-arrow:horizontal, &:down-arrow:horizontal, &:add-page:horizontal, &:sub-page:horizontal {
+        background: none
+     }
+}
+QMenuBar{
+    background-color: $col_primary;
+    border-bottom: $size_border solid $col_secondary;
+    &:item {
+        background-color: $col_primary;
+        color: $col_text;
+        padding: 4px 8px 4px 8px;
+        &:selected  {
+            background-color: $col_hover;
+        }
+        &:pressed {
+            background-color: $col_active;
+        }
+    }
+
+}
+QMenu{
+    border: 1px solid $col_secondary;
+    background-color: $col_tertiary;
+    color: $col_text;
+    &:item {
+        box-shadow: 0px 0px;
+        &:selected {
+            background-color: $col_hover;
+        }
+    }
+}
+QLabel{
+    color: $col_text;
+    font-size: $size_text;
+
+    &#h1{
+        color: $col_text_h1;
+        font-size: $size_text_h1;
+        margin: 0px;
+        padding: 2px 0px 2px 0px;
+        qproperty-indent:0; /* Removes the auto-magic indent that's applied when using padding */
+    }
+    &#h2{
+        color: $col_text_h2;
+        font-size: $size_text_h2;
+        margin: 0px;
+        padding: 0px 0px 0px 0px;
+        qproperty-indent:0; /* Removes the auto-magic indent that's applied when using padding */
+    }
+    &#text-soft{
+        color: $col_text_soft;
+        font-size: $size_text;
+    }
+    &#text-soft-italic{
+        color: $col_text_soft;
+        font-style: italic;
+        font-size: $size_text;
+    }
+    &#text-soft-h1{
+        color: $col_text_soft;
+        font-size: $size_text_h1;
+    }
+}
+QSplitter{
+    &:handle{
+        width: 3px;
+        height: 3px;
+        background-color: $col_primary;
+        border: $size_border solid $col_secondary;
+
+        &:horizontal {
+            border-top: 0px solid transparent;
+            border-bottom: 0px solid transparent;
+
+        }
+        &:vertical {
+            border-left: 0px solid transparent;
+            border-right: 0px solid transparent;
+        }
+    }
+
+}
+QComboBox {
+    background-color: $col_input;
+    border: $size_border solid $col_primary;
+    color: $col_text;
+
+    &:hover{
+        background-color: $col_input_hover;
+        outline: none;
+    }
+    &:drop-down {
+        image: url(EditorContent:Icons/Arrow_Down.png);
+        subcontrol-position: top right;
+        width: 15px;
+        border-left-width: 1px;
+        border-left-color: $col_secondary;
+        border-left-style: solid; /* just a single line */
+        border-bottom-right-radius: 3px;
+    }
+    &:disabled{
+        color: $col_text_read_only;
+        background-color: $col_input_inactive;
+    }
+    QAbstractItemView {
+        border: &size_border solid $col_primary;
+        background-color: $col_tertiary;
+        color: $col_text;
+        selection-background-color: $col_hover;
+    }
+}
+
+QComboBox::down-arrow {
+    image: url(/usr/share/icons/crystalsvg/16x16/actions/1downarrow.png);
+}
+
+QComboBox::down-arrow:on { /* shift the arrow when popup is open */
+    top: 1px;
+    left: 1px;
+}
+QPlainTextEdit{
+    background-color: $col_input;
+    color: $col_text;
+}
+QLineEdit{
+    background-color: $col_input;
+    color: $col_text;
+    border: $size_border solid $col_primary;
+    selection-background-color: $col_hover;
+}
+QLineEdit[readOnly="true"]{
+    background-color: $col_input_inactive;
+    color: $col_text_read_only;
+}
+QLineEdit[readOnly="false"]{
+    background-color: $col_input;
+    color: $col_text;
+    border: $size_border solid $col_primary;
+}
+QCheckBox{
+    &:indicator {
+        width: 13px;
+        height: 13px;
+        border: $size_border solid $col_input;
+        background-color: $col_secondary;
+
+        &:unchecked {
+            &:disabled {
+                border: $size_border solid $col_primary;
+                background-color: $col_input_inactive;
+            }
+        }
+        &:unchecked:hover {
+            background-color: $col_hover;
+        }
+        &:checked {
+            image: url(EditorContent:Icons/Checkmark.png);
+            &:disabled{
+                image: url(EditorContent:Icons/Checkmark_Disabled.png);
+                background-color: $col_input_inactive;
+            }
+        }
+        &#connect-button{
+            &:checked {
+                image: url(EditorContent:Icons/Connection_Active_Global.png);
+                &:disabled{
+                    image: url(EditorContent:Icons/Connection_Inactive.png);
+                    background-color: $col_input_inactive;
+                }
+            }
+            &:indeterminate {
+                image: url(EditorContent:Icons/Connection_Active_Global.png);
+            }
+        }
+        &:checked:hover {
+            background-color: $col_hover
+        }
+    }
+}
+QDialog{
+    background-color: $col_primary;
+    color: $col_text;
+    border: $size_border solid $col_secondary;
+}
+QPushButton{
+    background-color: $col_input;
+    color: $col_text;
+    padding: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border: $size_border solid $col_secondary;
+
+    &:hover {
+        background-color: $col_hover;
+    }
+
+    &:pressed {
+        background-color: $col_active;
+    }
+
+    &:disabled{
+        background-color: $col_input_inactive;
+    }
+    &#file{
+        &:disabled{
+            image: url(EditorContent:Icons/Folder.png);
+        }
+    }
+}
+/* QProperties - Custom overrides referenced in code */
+QWidget[model-entry]{
+    background-color: $col_secondary;
+}
+QWidget[model-entry="text-normal"]{
+    color: $col_text;
+}
+QWidget[model-entry="text-success"]{
+    color: rgba(51, 153, 0, 1.0);
+}
+QWidget[model-entry="text-warning"]{
+    color: rgba(217, 173, 0, 1.0);
+}
+QWidget[model-entry="text-error"]{
+    color: rgba(204, 51, 0, 1.0);
+}
+QWidget[toggleable-action="toggled"]{
+    background-color: $col_hover;
+}
+
+QWidget[model-entry="text-error"]{
+    color: rgba(204, 51, 0, 1.0);
+}
+
+

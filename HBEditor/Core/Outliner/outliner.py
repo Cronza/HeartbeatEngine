@@ -13,87 +13,133 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-import shutil
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.settings import Settings
-from HBEditor.Core.Outliner.outliner_ui import OutlinerUI
+from HBEditor.Core import settings
+from HBEditor.Core.Outliner.outliner_ui import OutlinerUI, OutlinerAsset
 from HBEditor.Core.DataTypes.file_types import FileType
-from Tools.HBYaml.hb_yaml import Writer
+from HBEditor.Core.EditorUtilities import image
+
 
 class Outliner:
     def __init__(self, hb_core):
 
-        # We need an explicit reference to the Heartbeat core in order to access file commands
-        self.hb_core = hb_core
+        self.cur_directory = "Content"
 
-        # Build the Logger UI
-        self.ui = OutlinerUI(self)
-
-    def UpdateRoot(self, new_root):
-        """ Requests that the FileSystemTree refresh it's tree using a new root """
-        self.ui.fs_tree.UpdateRoot(new_root)
+        self.hb_core = hb_core  # We need an explicit reference to the Heartbeat core in order to access file commands
+        self.ui = OutlinerUI(self)  # Build the Logger UI
+        self.Populate()  # Populate the view with assets from the registry
 
     def GetUI(self):
-        """ Returns a reference to the outliner U.I """
         return self.ui
 
-    def CreateFile(self, path: str, file_type) -> str:
+    def Populate(self):
+        """ Create an asset widget for each registered asset in the current directory """
+        self.ui.ClearAssets()
+        self.ui.ClearQAB()
+        self.ui.CreateQuickAccessButtons()
+
+        cur_dir = settings.GetAssetRegistryFolder(self.cur_directory)
+        for asset in cur_dir:
+            # File assets are registered with their respective type enum. Folders hold nested dicts
+            if isinstance(cur_dir[asset], dict):
+                self.ui.AddAsset(asset, FileType.Folder)
+
+            elif FileType[cur_dir[asset]] == FileType.Asset_Image:
+                thumbnail_path = image.GetThumbnail(f"{self.cur_directory}/{asset}")
+                if not thumbnail_path:
+                    thumbnail_path = image.GenerateThumbnail(f"{self.cur_directory}/{asset}")
+
+                self.ui.AddAsset(asset, FileType[cur_dir[asset]], thumbnail_path)
+
+            else:
+                self.ui.AddAsset(asset, FileType[cur_dir[asset]])
+
+    def CreateFolder(self):
+        asset_name = self.hb_core.NewFolder(self.cur_directory)
+        if asset_name:
+            self.Populate()
+
+    def CreateScene(self):
+        asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Scene)
+        if asset_name:
+            self.Populate()
+
+
+    def CreateDialogue(self):
+        asset_name = self.hb_core.NewFile(self.cur_directory, FileType.Dialogue)
+        if asset_name:
+            self.Populate()
+
+    def CreateInterface(self):
+        asset_name = self.hb_core.NewInterface(self.cur_directory)
+        if asset_name:
+            self.Populate()
+
+    def OpenFile(self, asset_name: str):
+        self.hb_core.OpenFile(f"{self.cur_directory}/{asset_name}")
+
+    def DeleteAsset(self):
+        selected_items = self.ui.asset_list.selectedItems()  # Multi-select deletions are not supported currently
+        if selected_items:
+            self.hb_core.DeleteFileOrFolder(
+                f"{self.cur_directory}/{selected_items[0].text()}",
+                selected_items[0].GetType() == FileType.Folder
+            )
+            self.Populate()
+
+    def DuplicateAsset(self):
+        selected_items = self.ui.asset_list.selectedItems()  # Multi-select deletions are not supported currently
+        if selected_items:
+            is_folder = False
+            if selected_items[0].GetType() == FileType.Folder:
+                is_folder = True
+
+            self.hb_core.DuplicateFileOrFolder(f"{self.cur_directory}/{selected_items[0].text()}", is_folder)
+            self.Populate()
+
+    def RenameAsset(self):
+        selected_items = self.ui.asset_list.selectedItems()  # Multi-select deletions are not supported currently
+        if selected_items:
+            is_folder = False
+            if selected_items[0].GetType() == FileType.Folder:
+                is_folder = True
+
+            self.hb_core.RenameFileOrFolder(f"{self.cur_directory}/{selected_items[0].text()}", is_folder)
+            self.Populate()
+
+    def MoveAsset(self, source: OutlinerAsset, target: OutlinerAsset):
+        """ Moves the 'source' asset to the 'target' asset directory """
+        source_path = f"{self.cur_directory}/{source.text()}"
+        target_path = f"{self.cur_directory}/{target.text()}"
+
+        if target.asset_type == FileType.Folder:
+            if self.hb_core.MoveFileOrFolder(source_path, target_path):
+                self.ui.RemoveAsset(source.text())
+
+        self.Populate()
+
+    def MoveAssetUsingQAB(self, source: str, target: str):
         """
-        Create a file of the given file type, initially assigning it a temp name. Returns whether the action was
-        successful
+        Moves an asset to the corresponding directory based on the Quick Access Button that was used. Both paths must
+        be full paths with the content directory as their roots
         """
-        file_name_exists = True
 
-        # Keep trying to create the file using a simple iterator. At some point, don't allow creating if the user has
-        # somehow created enough files to max this...I really hope they don't
-        for num in range(0, 100):
-            full_file_path = path + f"/New_{file_type}_{num}.yaml"
-            if not os.path.exists(full_file_path):
+        if self.hb_core.MoveFileOrFolder(source, target):
+            self.ui.RemoveAsset(os.path.basename(source))
 
-                # Doesn't exist. Create it!
-                Writer.WriteFile(
-                    "",
-                    full_file_path,
-                    Settings.getInstance().GetMetadataString(FileType[file_type])
-                )
-                return full_file_path
+        self.Populate()
 
-        # Somehow the user has all versions of the default name covered...Inform the user
-        Logger.getInstance().Log("Unable to create file as all default name iterations are taken", 4)
-        return None
+    def ImportAsset(self, import_targets: list = None):
+        if not import_targets:
+            # No specified target, use full import process
+            self.hb_core.Import(self.cur_directory)
 
-    def CreateFolder(self, path: str) -> bool:
-        """ Create a directory, initially assigning it a temp name. Returns whether the action was successful """
-        folder_name_exists = True
+        elif len(import_targets) == 1 and not os.path.isdir(import_targets[0]):
+            # Singular target, use partial import process (Warning and error prompts, but no file dialog)
+            self.hb_core.Import(self.cur_directory, import_targets[0])
 
-        # Keep trying to create the folder using a simple iterator. At some point, don't allow creating if the user has
-        # somehow created enough folders to max this...I really hope they don't
-        for num in range(0, 100):
-            full_folder_path = path + f"/New_Folder_{num}"
-            if not os.path.exists(full_folder_path):
-                # Doesn't exist. Create it!
-                os.mkdir(full_folder_path)
-                return full_folder_path
+        else:
+            # N targets, use batch import process (No prompts except for a collective results window)
+            self.hb_core.BatchImport(self.cur_directory, import_targets)
 
-        # Somehow the user has all versions of the default name covered...Inform the user
-        Logger.getInstance().Log("Unable to create folder as all default name iterations are taken", 4)
-        return None
-
-    def DeleteFile(self, path):
-        """ Delete the provided file. Editor will remain open if the user wishes to resave """
-        try:
-            os.remove(path)
-            Logger.getInstance().Log(f"Successfully deleted file '{path}'", 2)
-        except Exception as exc:
-            Logger.getInstance().Log(f"Failed to delete file '{path}' - Please review the exception to understand more", 4)
-
-    def DeleteFolder(self, path):
-        """ Delete the provided folder recursively. Editors will remain open if the user wishes to resave """
-        print("Deleting folder")
-        try:
-            print(path)
-            shutil.rmtree(path)
-            Logger.getInstance().Log(f"Successfully deleted folder '{path}' and all of it's contents", 2)
-        except Exception as exc:
-            Logger.getInstance().Log(f"Failed to delete folder '{path}' - Please review the exception to understand more", 4)
-            print(exc)
+        self.Populate()

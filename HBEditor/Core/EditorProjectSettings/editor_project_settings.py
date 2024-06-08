@@ -12,11 +12,12 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEditor.Core.settings import Settings
+from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.BaseClasses.base_editor import EditorBase
+from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorProjectSettings.editor_project_settings_ui import EditorProjectSettingsUI
 from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorUtilities import path
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
@@ -24,13 +25,8 @@ class EditorProjectSettings(EditorBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
-        self.file_type = FileType.Project_Settings
-
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
-        self.project_settings_schema = Reader.ReadAll(
-            Settings.getInstance().ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
-        )
 
         self.editor_ui = EditorProjectSettingsUI(self)
         Logger.getInstance().Log("Editor initialized")
@@ -48,9 +44,12 @@ class EditorProjectSettings(EditorBase):
             Writer.WriteFile(
                 self.project_settings,
                 self.file_path,
-                f"# Type: {FileType.Project_Settings.name}\n" +
-                f"# {Settings.getInstance().editor_data['EditorSettings']['version_string']}"
+                f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
+            self.editor_ui.SIG_USER_SAVE.emit()
             Logger.getInstance().Log("File Exported!", 2)
         except:
             Logger.getInstance().Log("Failed to Export!", 4)
+
+        # Reload the project settings
+        settings.LoadProjectSettings()

@@ -12,67 +12,55 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtGui
-from HBEditor.Core.settings import Settings
+from PyQt6 import QtWidgets, QtGui, QtCore
+from HBEditor.Core import settings
 
 
 class LoggerUI(QtWidgets.QWidget):
+
     def __init__(self, l_core):
         super().__init__()
 
         self.l_core = l_core
 
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+        self.setObjectName("vertical")
 
         # Main Layout
         self.main_layout = QtWidgets.QVBoxLayout(self)
-        self.main_layout.setContentsMargins(4, 2, 4, 2)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
         # Toolbar
-        self.logger_toolbar = QtWidgets.QFrame(self)
-        self.logger_toolbar.setAutoFillBackground(False)
-        self.logger_toolbar.setStyleSheet(
-            "QFrame, QLabel, QToolTip {\n"
-            "    border-radius: 4px;\n"
-            f"   background-color: rgb({Settings.getInstance().toolbar_background_color});\n"
-            "}")
-        self.logger_toolbar.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.logger_toolbar.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.logger_toolbar_layout = QtWidgets.QHBoxLayout(self.logger_toolbar)
-        self.logger_toolbar_layout.setContentsMargins(2, 2, 2, 2)
-        self.logger_toolbar_layout.setSpacing(0)
-
-        # Generic Button Settings
-        icon = QtGui.QIcon()
-        button_style = (
-            f"background-color: rgb({Settings.getInstance().toolbar_button_background_color});\n"
-        )
+        self.logger_toolbar = QtWidgets.QToolBar(self)
+        self.logger_toolbar.setObjectName("vertical")
 
         # Clear Log Button
-        self.clear_log_button = QtWidgets.QToolButton(self.logger_toolbar)
-        self.clear_log_button.setStyleSheet(button_style)
-        icon.addPixmap(
-            QtGui.QPixmap(Settings.getInstance().ConvertPartialToAbsolutePath("Content/Icons/Trash.png")),
-            QtGui.QIcon.Normal,
-            QtGui.QIcon.Off
+        self.logger_toolbar.addAction(
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Trash.png")),
+            "Clear Log",
+            self.l_core.ClearLog
         )
-        self.clear_log_button.setIcon(icon)
-        self.clear_log_button.clicked.connect(self.l_core.ClearLog)
-
-        # Add buttons to toolbar
-        self.logger_toolbar_layout.addWidget(self.clear_log_button)
-        toolbar_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.logger_toolbar_layout.addItem(toolbar_spacer)
 
         # Logger data list
         self.log_list = QtWidgets.QListWidget(self)
-        self.log_list.setFont(Settings.getInstance().paragraph_font)
-        self.log_list.setStyleSheet(Settings.getInstance().paragraph_color)
+        self.log_list.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.log_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
         self.log_list.setAutoScroll(True)
 
         # Add everything to the main container
         self.main_layout.addWidget(self.logger_toolbar)
         self.main_layout.addWidget(self.log_list)
+
+    def AddEntry(self, text, style):
+        new_entry = QtWidgets.QListWidgetItem()
+        entry_text = QtWidgets.QLabel(text)  # Use a QLabel so we can apply css styling per-entry
+        entry_text.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
+        entry_text.setProperty("model-entry", style)  # Apply the match css rule in the active .qss file
+
+        self.log_list.addItem(new_entry)
+        self.log_list.setItemWidget(new_entry, entry_text)
+
+        # Since Qt only refreshes widgets when it regains control of the main thread, force the update here
+        # as long updates are high priority in terms of visibility
+        self.log_list.repaint()
+        self.repaint()

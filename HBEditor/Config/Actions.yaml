@@ -1,0 +1,123 @@
+Renderables:
+  icon: "EditorContent:Icons/Renderable.png"
+  options:
+    - name: "create_sprite"
+      display_name: "Create Sprite"
+      applicable_editors:
+        - Dialogue
+        - Scene
+        - Interface
+    - name: "create_background"
+      display_name: "Create Background"
+      applicable_editors:
+        - Dialogue
+        - Scene
+        - Interface
+    - name: "create_text"
+      display_name: "Create Text"
+      applicable_editors:
+        - Dialogue
+        - Scene
+        - Interface
+    - name: "remove_renderable"
+      display_name: "Remove Renderable"
+      applicable_editors:
+        - Dialogue
+
+Interactables:
+  icon: "EditorContent:Icons/Renderable.png"
+  options:
+    - name: "create_interactable"
+      display_name: "Create Interactable"
+      applicable_editors:
+        - Scene
+        - Interface
+    - name: "create_button"
+      display_name: "Create Button"
+      applicable_editors:
+        - Scene
+        - Interface
+    - name: "create_text_button"
+      display_name: "Create Button (Text Only)"
+      applicable_editors:
+        - Scene
+        - Interface
+
+Dialogue:
+  icon: "EditorContent:Icons/Dialogue.png"
+  options:
+    - name: "dialogue"
+      display_name: "Dialogue"
+      applicable_editors:
+        - Dialogue
+    - name: "choice"
+      display_name: "Choice"
+      applicable_editors:
+        - Dialogue
+
+Scene:
+  icon: "EditorContent:Icons/Scene.png"
+  options:
+    - name: "load_scene"
+      display_name: "Load Scene"
+      applicable_editors:
+        - Dialogue
+    - name: "scene_fade_in"
+      display_name: "Fade In"
+      applicable_editors:
+        - Dialogue
+    - name: "scene_fade_out"
+      display_name: "Fade Out"
+      applicable_editors:
+        - Dialogue
+
+Sound:
+  icon: "EditorContent:Icons/Dialogue.png"
+  options:
+    - name: "play_sfx"
+      display_name: "Play SFX"
+      applicable_editors:
+        - Dialogue
+    - name: "play_music"
+      display_name: "Play Music"
+      applicable_editors:
+        - Dialogue
+    - name: "stop_sfx"
+      display_name: "Stop SFX"
+      applicable_editors:
+        - Dialogue
+    - name: "stop_music"
+      display_name: "Stop Music"
+      applicable_editors:
+        - Dialogue
+    - name: "set_mute"
+      display_name: "Set Mute"
+      applicable_editors:
+        - Dialogue
+Interface:
+  icon: "EditorContent:Icons/Interface.png"
+  options:
+    - name: "load_interface"
+      display_name: "Load Interface"
+      applicable_editors:
+        - Dialogue
+    - name: "unload_interface"
+      display_name: "Unload Interface"
+      applicable_editors:
+        - Dialogue
+Utils:
+  icon: "EditorContent:Icons/Dialogue.png"
+  options:
+    - name: "set_value"
+      display_name: "Set Value"
+      applicable_editors:
+        - Dialogue
+    - name: "conditional"
+      display_name: "Conditional"
+      applicable_editors:
+        - Scene
+        - Interface
+    - name: "conditional_dialogue"
+      display_name: "Conditional"
+      applicable_editors:
+        - Dialogue
