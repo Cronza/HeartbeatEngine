@@ -925,7 +925,10 @@ class create_button(Action):
                                 "set_mute",
                                 "set_value",
                                 "start_dialogue",
-                                "remove_renderable"
+                                "remove_renderable",
+                                "pause",
+                                "unpause",
+                                "switch_page"
                             ],
                             "flags": ["editable"],
                         }
@@ -1073,7 +1076,10 @@ class create_text_button(Action):
                                 "set_mute",
                                 "set_value",
                                 "start_dialogue",
-                                "remove_renderable"
+                                "remove_renderable",
+                                "pause",
+                                "unpause",
+                                "switch_page"
                             ],
                             "flags": ["editable"],
                         }
