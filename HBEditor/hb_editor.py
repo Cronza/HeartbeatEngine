@@ -634,7 +634,9 @@ class HBEditor:
             self.active_editor = editor_classes[editor_type](target_file_path)
 
             # Create a tab to house the editor UI
-            self.e_ui.AddMainTab(self.active_editor.GetUI(), os.path.basename(target_file_path), True)
+            active_ui = self.active_editor.GetUI()
+            self.e_ui.AddMainTab(active_ui, os.path.basename(target_file_path), True)
+            active_ui.AdjustSize()  # Adjust the UI size now that it has been added to the window
 
             if import_file:
                 self.active_editor.Import()

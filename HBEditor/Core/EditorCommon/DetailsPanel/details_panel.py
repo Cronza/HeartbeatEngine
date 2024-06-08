@@ -54,21 +54,22 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.details_tree.header().setStretchLastSection(True)
 
-        #@TODO: Investigate why this adding this line makes 'setColumnWidth' start working
-        self.details_tree.header().setDefaultSectionSize(self.details_tree.header().defaultSectionSize())
-        self.details_tree.setColumnWidth(1, round(self.details_tree.width() * 1.3))
-        #self.adjustSize()
-
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)
-        #self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
 
         if not use_connections:
             self.details_tree.hideColumn(2)
+
+    def AdjustSize(self):
+        """
+        Adjust the size of columns based on parent size. This is typically only called when the parent has changed in a
+        meaningful way
+        """
+        self.details_tree.setColumnWidth(1, round((self.width() / 2) - 10))  # Subtract a buffer to account for frame
 
     #@TODO: Do something with this
     def ShowConnections(self):

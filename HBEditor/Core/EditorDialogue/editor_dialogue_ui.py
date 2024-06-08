@@ -62,10 +62,10 @@ class EditorDialogueUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.dialogue_sequence)
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
+    def AdjustSize(self):
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setStretchFactor(0, 3)
-        self.main_resize_container.setStretchFactor(1, 10)
-        self.main_resize_container.setStretchFactor(2, 4)  # Increase details panel size to accomodate connection column
+        self.main_resize_container.setSizes([round(self.width() / 5), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
+        self.details.AdjustSize()
 
 
 class DialogueSettings(QtCore.QObject, SourceEntry):
