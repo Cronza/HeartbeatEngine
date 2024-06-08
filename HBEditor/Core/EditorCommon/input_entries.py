@@ -17,7 +17,9 @@ import copy
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Logger.logger import Logger
-from HBEditor.Core.EditorUtilities import action_data as adh
+from HBEditor.Core.DataTypes.parameter_types import ParameterType
+from HBEditor.Core.DataTypes.file_types import FileType
+from HBEditor.Core.EditorUtilities import action_data as ad
 from HBEditor.Core.Dialogs.asset_browser import AssetBrowser
 
 """
@@ -42,6 +44,7 @@ class InputEntryBase(QtWidgets.QWidget):
     def __init__(self, data):
         super().__init__()
 
+        self.input_type = None
         self.data = data
 
         # QWidgets don't natively know if they've been added as a child to a model widget item, so we need our own
@@ -52,10 +55,13 @@ class InputEntryBase(QtWidgets.QWidget):
         self.input_widget = None
 
         self.main_layout = QtWidgets.QHBoxLayout(self)
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(1, 0, 1, 0)
 
     def Get(self):
         return self.data
+
+    def GetType(self) -> ParameterType:
+        return self.input_type
 
     def Set(self, data):
         self.data = data
@@ -69,10 +75,15 @@ class InputEntryBase(QtWidgets.QWidget):
     def SetEditable(self, state: int):
         pass
 
+    def SetDefaultValue(self):
+        pass
+
 
 class InputEntryBool(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.Bool
+
         self.input_widget = QtWidgets.QCheckBox()
         self.main_layout.addWidget(self.input_widget)
 
@@ -97,10 +108,15 @@ class InputEntryBool(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = False
+
 
 class InputEntryColor(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.Color
+
         self.input_widget = QtWidgets.QFrame()
         self.input_widget.setFrameStyle(QtWidgets.QFrame.Shape.Panel)
         self.input_widget.setStyleSheet("border: 1px solid rgb(122,122,122);background-color: rgb(255,255,255)")
@@ -137,6 +153,9 @@ class InputEntryColor(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = [255, 255, 255]
+
     def OpenColorPrompt(self):
         color_choice = QtWidgets.QColorDialog().getColor(
             QtGui.QColor(self.data['value'][0], self.data['value'][1], self.data['value'][2])
@@ -156,11 +175,12 @@ class InputEntryDropdown(InputEntryBase):
     def __init__(self, data):
         """ A variant of the details entry that uses a pre-set list of options, instead of accepting anything """
         super().__init__(data)
+        self.input_type = ParameterType.Dropdown
 
         self.input_widget = QtWidgets.QComboBox()
         self.options = data["options"]
 
-        # Pre-load the list of dropdown options
+        # Preload the list of dropdown options
         for option in self.options:
             self.input_widget.addItem(str(option))
 
@@ -187,15 +207,19 @@ class InputEntryDropdown(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = self.options[0]
+        self.Set(self.data['value'])
+
 
 class InputEntryAssetSelector(InputEntryBase):
-    def __init__(self, data: dict, details_panel: object, type_filter: set):
+    def __init__(self, data: dict, details_panel: object, type_filter: FileType):
         super().__init__(data)
+        # Translate the file type to a parameter type
+        self.input_type = ParameterType[type_filter.name]
+        self.type_filter = type_filter
 
         self.details_panel = details_panel
-
-        # Store a type filter to restrict what assets can be chosen in the browser
-        self.type_filter = type_filter
 
         self.input_widget = QtWidgets.QLineEdit()
         self.input_widget.setText("None")
@@ -233,6 +257,10 @@ class InputEntryAssetSelector(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = 'None'
+        self.Set(self.data['value'])
+
     def OpenAssetPrompt(self):
         """
         Prompts the user with the AssetBrowser, allowing them to select an asset matching the type
@@ -246,6 +274,7 @@ class InputEntryAssetSelector(InputEntryBase):
 class InputEntryFloat(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.Float
 
         self.input_widget = QtWidgets.QLineEdit()
 
@@ -283,10 +312,15 @@ class InputEntryFloat(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = 0.0
+        self.Set(self.data['value'])
+
 
 class InputEntryInt(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.Int
 
         self.input_widget = QtWidgets.QLineEdit()
 
@@ -324,10 +358,15 @@ class InputEntryInt(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = 0
+        self.Set(self.data['value'])
+
 
 class InputEntryParagraph(InputEntryBase):
     def __init__(self,data):
         super().__init__(data)
+        self.input_type = ParameterType.Paragraph
 
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
@@ -354,10 +393,15 @@ class InputEntryParagraph(InputEntryBase):
         elif state == 2:
             self.input_widget.setReadOnly(True)
 
+    def SetDefaultValue(self):
+        self.data['value'] = ''
+        self.Set(self.data['value'])
+
 
 class InputEntryText(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.String
 
         self.input_widget = QtWidgets.QLineEdit()
         self.main_layout.addWidget(self.input_widget)
@@ -381,10 +425,15 @@ class InputEntryText(InputEntryBase):
 
         self.input_widget.style().polish(self.input_widget)
 
+    def SetDefaultValue(self):
+        self.data['value'] = ''
+        self.Set(self.data['value'])
+
 
 class InputEntryTuple(InputEntryBase):
     def __init__(self, data):
         super().__init__(data)
+        self.input_type = ParameterType.Vector2
 
         #@TODO: Make this two floats, not two ints
         self.input_widget_title = QtWidgets.QLabel('X')
@@ -394,7 +443,7 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget_alt = QtWidgets.QLineEdit()
 
         # Limit entered values to int only
-        validator = QtGui.QDoubleValidator(-2, 2, 8, notation=QtGui.QDoubleValidator.Notation.StandardNotation)
+        validator = QtGui.QDoubleValidator(notation=QtGui.QDoubleValidator.Notation.StandardNotation)
         self.input_widget.setValidator(validator)
         self.input_widget_alt.setValidator(validator)
         self.input_widget.setText("0")
@@ -448,6 +497,10 @@ class InputEntryTuple(InputEntryBase):
         self.input_widget.style().polish(self.input_widget)
         self.input_widget_alt.style().polish(self.input_widget_alt)
 
+    def SetDefaultValue(self):
+        self.data['value'] = (0,0)
+        self.Set(self.data['value'])
+
 
 class InputEntryArray(InputEntryBase):
     """
@@ -457,6 +510,7 @@ class InputEntryArray(InputEntryBase):
     def __init__(self, data: dict, owning_view: QtWidgets.QAbstractItemView,
                  add_func: callable, signal_func: callable, excluded_properties: dict = None):
         super().__init__(data)
+        self.input_type = ParameterType.Array
 
         self.excluded_properties = excluded_properties
         self.owning_view = owning_view
@@ -489,9 +543,9 @@ class InputEntryArray(InputEntryBase):
                 data = copy.deepcopy(self.data["template"])
 
                 # Array elements have generated names to avoid having to be stored as a list when caching or saving
-                name = f"{adh.GetActionName(data)}_{self.owning_model_item.childCount()}"
+                name = f"{ad.GetActionName(data)}_{self.owning_model_item.childCount()}"
 
-            data_no_key = data[adh.GetActionName(data)]
+            data_no_key = data[ad.GetActionName(data)]
             new_entry = self.add_func(
                 owner=self,
                 view=self.owning_view,
@@ -519,6 +573,7 @@ class InputEntryArrayElement(InputEntryBase):
 
     def __init__(self, data, owning_view: QtWidgets.QAbstractItemView):
         super().__init__(data)
+        self.input_type = ParameterType.Array_Element
 
         # Store a reference to the owning view in order to inform it when we're deleted, so the parent InputEntryArray
         # can recalculate its entries
@@ -541,6 +596,7 @@ class InputEntryEvent(InputEntryBase):
                  add_func: callable, remove_func: callable, signal_func: callable,
                  excluded_properties: dict = None):
         super().__init__(data)
+        self.input_type = ParameterType.Event
 
         self.excluded_properties = []
         self.owning_view = owning_view
@@ -580,6 +636,7 @@ class InputEntryEvent(InputEntryBase):
 
             # Grab the ACTION_DATA for the event action, and generate children for all of its parameters
             action_data = settings.GetActionData(self.input_widget.currentText())
+            ad.SetDefaults(action_data, True)
             if action_data:
                 self.AddItems(action_data)
 

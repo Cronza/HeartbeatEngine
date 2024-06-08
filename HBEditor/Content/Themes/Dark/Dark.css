@@ -137,6 +137,10 @@ QAbstractItemView {
       background-color: #1E384D; }
       QAbstractItemView:item:selected:hover {
         border: 1px solid #25455f; }
+  QAbstractItemView#variables-table {
+    /* The variables table doesn't have the typical surrounding U.I elements, which requires border changes */
+    border-left: 1px solid #2A2A2B;
+    border-top: 0px solid transparent; }
 
 QHeaderView {
   border: 0px solid transparent; }
@@ -161,10 +165,13 @@ QTableView {
   border-top: 1px solid #2A2A2B;
   color: rgba(255, 255, 255, 80%);
   background-color: #2A2A2B; }
-  QTableView#values-table {
-    /* The values table doesn't have the typical surrounding U.I elements, which requires border changes */
-    border-left: 1px solid #2A2A2B;
-    border-top: 0px solid transparent; }
+
+QTableView QTableCornerButton:section {
+  border: 1px solid #2A2A2B;
+  border-top: 0px solid transparent;
+  border-left: 0px solid transparent;
+  background-color: #3F4245;
+  padding: 0px; }
 
 QTreeView {
   border: 0px solid transparent;
@@ -291,6 +298,7 @@ QComboBox {
     background-color: #5C5C61;
     outline: none; }
   QComboBox:drop-down {
+    image: url(EditorContent:Icons/Arrow_Down.png);
     subcontrol-position: top right;
     width: 15px;
     border-left-width: 1px;
@@ -349,6 +357,13 @@ QCheckBox:indicator {
     QCheckBox:indicator:checked:disabled {
       image: url(EditorContent:Icons/Checkmark_Disabled.png);
       background-color: #343436; }
+  QCheckBox:indicator#connect-button:checked {
+    image: url(EditorContent:Icons/Connection_Active_Global.png); }
+    QCheckBox:indicator#connect-button:checked:disabled {
+      image: url(EditorContent:Icons/Connection_Inactive.png);
+      background-color: #343436; }
+  QCheckBox:indicator#connect-button:indeterminate {
+    image: url(EditorContent:Icons/Connection_Active_Global.png); }
   QCheckBox:indicator:checked:hover {
     background-color: #686d70; }
 
@@ -391,3 +406,6 @@ QWidget[model-entry="text-error"] {
 
 QWidget[toggleable-action="toggled"] {
   background-color: #686d70; }
+
+QWidget[model-entry="text-error"] {
+  color: rgba(204, 51, 0, 100%); }

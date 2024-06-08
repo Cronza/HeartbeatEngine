@@ -40,10 +40,10 @@ def GetProjectSettingsPath() -> str:
     return user_project_dir + "/" + 'Config/Game.yaml'
 
 
-def GetValuesPath() -> str:
-    """ Returns the absolute path to the active project's 'Values.yaml' file """
+def GetVariablesPath() -> str:
+    """ Returns the absolute path to the active project's 'Variables.yaml' file """
     global user_project_dir
-    return user_project_dir + "/" + 'Config/Values.yaml'
+    return user_project_dir + "/" + 'Config/Variables.yaml'
 
 
 def LoadProjectSettings():
@@ -53,6 +53,22 @@ def LoadProjectSettings():
     global project_default_files
     user_project_data = Reader.ReadAll(GetProjectSettingsPath())
 
+
+def LoadVariables():
+    """ Reads the 'Variables.yaml' file for the active project """
+    global user_project_dir
+    global user_project_variables
+    user_project_variables = Reader.ReadAll(GetVariablesPath())
+
+
+def GetProjectSetting(category: str, key: str):
+    """ Returns the project setting value that matches the provided category and key """
+    global user_project_data
+
+    try:
+        return user_project_data[category][key]['value']
+    except KeyError:
+        raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
 
 def RegisterAsset(parent_path: str, asset_name: str, asset_type: FileType):
     """
@@ -238,7 +254,7 @@ project_folder_structure = [
 # A list of tuples for files that are provided in new projects. Format: (<target_folder>, <source_file>)
 project_default_files = [
     ("Config", "Config/Game.yaml"),
-    ("Config", "Config/Values.yaml"),
+    ("Config", "Config/Variables.yaml"),
 ]
 
 # The master dict of file types supported by the engine / editor
@@ -265,6 +281,7 @@ supported_file_types_cat = {
 user_project_name = None
 user_project_dir = None
 user_project_data = None  # The contents of the project's 'Game.yaml' file
+user_project_variables = None  # The contents of the project's 'Variables.yaml' file
 
 asset_registry = {}  # Loaded when project is loaded
 engine_asset_registry = Reader.ReadAll(f"{engine_root}/Config/EngineAssetRegistry.yaml")  # Engine files which are accessible via the asset registration system

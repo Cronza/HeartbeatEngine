@@ -104,6 +104,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if not action_data:
             # Load a fresh copy of the ACTION_DATA
             action_data = settings.GetActionData(action_name)
+            ad.SetDefaults(action_data, True)
 
         new_item = QtWidgets.QListWidgetItem()
         if index is not None:
@@ -173,7 +174,7 @@ class DialogueSequence(QtWidgets.QListWidget):
         self.setFocusPolicy(QtCore.Qt.FocusPolicy.ClickFocus)
         self.setResizeMode(QtWidgets.QListWidget.ResizeMode.Adjust)
         self.setDragEnabled(True)
-        self.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
         self.setDropIndicatorShown(False)
         self.setAcceptDrops(True)
@@ -304,6 +305,5 @@ class DialogueEntry(QtWidgets.QWidget, SourceEntry):
                         QtCore.Qt.AspectRatioMode.KeepAspectRatio
                     )
                 )
-                self.icon_condition.setToolTip("This shits conditional")
-
+                self.icon_condition.setToolTip("This entry has an active condition")
                 self.icon_layout.addWidget(self.icon_condition)

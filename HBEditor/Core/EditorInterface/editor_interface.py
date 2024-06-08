@@ -59,14 +59,16 @@ class EditorInterface(EditorBase):
             # No entries left to select. Wipe remaining details
             self.editor_ui.details.ClearActiveItem()
 
-    def RegisterItemToPage(self, item: RootItem, page: GroupEntry = None):
+    def RegisterItemToPage(self, item: RootItem, page: GroupEntry = None, emit_signal: bool = True):
         """
         Sets the owner ID of the provided item to the active page ID. If 'page' is provided, make it the owner instead
         """
         if not page:
             page = self.editor_ui.pages_panel.active_entry
         item.owner_id = page.Get()[0]
-        self.editor_ui.SIG_USER_UPDATE.emit()
+
+        if emit_signal:
+            self.editor_ui.SIG_USER_UPDATE.emit()
 
     def ShowPageItems(self, make_visible: bool, page_name: str):
         """
@@ -144,16 +146,18 @@ class EditorInterface(EditorBase):
             )
             self.editor_ui.interface_settings.Populate(self.editor_ui.interface_settings_src_obj)
 
+            self.editor_ui.FreezeSignals()
             for page_name, page_data in file_data["pages"].items():
                 # Create the page entry (The persistent page is created on editor init, so skip that)
                 if page_name.lower() != "persistent":
-                    self.editor_ui.pages_panel.CreateEntry(page_name, page_data["description"])
+                    self.editor_ui.pages_panel.CreateEntry(page_name, page_data["description"], False)
 
                 # Populate the page entry
                 conv_page_items = self.ConvertInterfaceItemsToEditorFormat(page_data["items"])
                 for item in conv_page_items:
                     action_name, action_data = next(iter(item.items()))
                     new_item = self.editor_ui.scene_viewer.AddRenderable(action_name, action_data, True)
+                    self.RegisterItemToPage(new_item, self.editor_ui.pages_panel.active_entry, False)
 
                     # Apply any imported editor-specific properties
                     if "editor_properties" in item[ad.GetActionName(item)]:
@@ -166,6 +170,7 @@ class EditorInterface(EditorBase):
                         new_item.setVisible(False)
 
         # Select the persistent layer
+        self.editor_ui.UnfreezeSignals()
         self.editor_ui.pages_panel.ChangeEntry(0)
 
     def ConvertInterfaceItemsToEngineFormat(self, scene_items: dict) -> dict:
@@ -201,7 +206,7 @@ class EditorInterface(EditorBase):
             # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
             # the matching ACTION_DATA and clone it
             action_name, action_data = next(iter(item.items()))
-            base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
+            base_ad_clone = settings.GetActionData(action_name)
 
             # Pass the entry by ref, and let the convert func edit it directly
             ad.ConvertActionDataToEditorFormat(

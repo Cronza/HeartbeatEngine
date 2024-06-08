@@ -134,6 +134,9 @@ class EditorDialogue(EditorBase):
 
         # Skip importing if the file has no data to load
         if file_data:
+            # Disable signals to prevent marking the editor as dirty while we're populating it
+            self.editor_ui.blockSignals(True)
+
             # Populate the dialogue settings
             ad.ConvertActionDataToEditorFormat(
                 base_action_data=self.editor_ui.dialogue_settings_src_obj.action_data,
@@ -154,6 +157,8 @@ class EditorDialogue(EditorBase):
 
             # Select the main branch by default
             self.editor_ui.branches_panel.ChangeEntry(0)
+
+            self.editor_ui.blockSignals(False)
 
     def ConvertDialogueToEngineFormat(self, action_data: dict):
         """
@@ -192,7 +197,7 @@ class EditorDialogue(EditorBase):
                 # Entries are dicts with only one top level key, which is the name of the action. Use it to look up
                 # the matching ACTION_DATA and clone it
                 action_name, action_data = next(iter(entry.items()))
-                base_ad_clone = copy.deepcopy(settings.GetActionData(action_name))
+                base_ad_clone = settings.GetActionData(action_name)
 
                 # Pass the entry by ref, and let the convert func edit it directly
                 ad.ConvertActionDataToEditorFormat(

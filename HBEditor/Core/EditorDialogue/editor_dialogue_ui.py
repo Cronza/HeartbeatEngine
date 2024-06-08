@@ -18,7 +18,6 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorDialogue.dialogue_sequence_panel import DialogueSequencePanel
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
-from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 
@@ -39,7 +38,7 @@ class EditorDialogueUI(EditorBaseUI):
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.dialogue_settings = DetailsPanel()
+        self.dialogue_settings = DetailsPanel(use_connections=False)
         self.dialogue_settings_src_obj = DialogueSettings()
         self.dialogue_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.dialogue_settings.Populate(self.dialogue_settings_src_obj)
@@ -63,22 +62,22 @@ class EditorDialogueUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.dialogue_sequence)
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
+    def AdjustSize(self):
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setStretchFactor(1, 10)
+        self.main_resize_container.setSizes([round(self.width() / 5), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
+        self.details.AdjustSize()
 
 
 class DialogueSettings(QtCore.QObject, SourceEntry):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
     ACTION_DATA = {
         "interface": {
-            "type": "Asset_Interface",
-            "default": "",
+            "type": "Interface",
             "value": "",
             "flags": ["editable"]
         },
         "description": {
             "type": "Paragraph",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         }

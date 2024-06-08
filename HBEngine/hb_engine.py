@@ -30,8 +30,10 @@ def Initialize(project_path: str):
 
     settings.SetProjectRoot(project_path)
     settings.LoadProjectSettings()
-    settings.LoadValues()
-    pygame.display.set_caption(settings.project_settings['Game']['title'])
+    settings.LoadVariables()
+    if settings.GetProjectSetting('Game', 'title') == '':
+        settings.SetProjectSetting('Game', 'title', 'My Game')
+    pygame.display.set_caption(settings.GetProjectSetting('Game', 'title'))
 
 
 def Main():
@@ -41,12 +43,12 @@ def Main():
     pygame.init()
     mixer.init()
     settings.clock = pygame.time.Clock()
-    settings.window = pygame.display.set_mode(settings.active_resolution)
-    pause_interface = None  # Instatiated and set during runtime
+    settings.window = pygame.display.set_mode(settings.resolution)
+    pause_interface = None  # Instantiated and set during runtime
 
     # Load the starting scene
-    if settings.project_settings["Game"]["starting_scene"]:
-        LoadScene(settings.project_settings["Game"]["starting_scene"])
+    if settings.GetProjectSetting("Game", "starting_scene"):
+        LoadScene(settings.GetProjectSetting("Game", "starting_scene"))
     else:
         raise ValueError("No starting scene was provided in the project settings")
 

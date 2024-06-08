@@ -101,8 +101,6 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Select the new entry
         self.entry_list.setCurrentItem(list_item)
-        if self.enable_togglable_entries:
-            new_entry.SetToggle(True)
 
     def AddEntry(self):
         """ Prompts the user for entry information, and creates an entry with that information """
@@ -309,7 +307,7 @@ class GroupEntry(QtWidgets.QWidget):
             self.toggle_layout = QtWidgets.QHBoxLayout(self)
             self.toggle_layout.addStretch(10)
             self.toggle_button = SimpleCheckbox()
-            self.toggle_button.setToolTip("Whether to use the global value specified in the project file for this entry")
+            self.toggle_button.setToolTip("Toggle this group on and off")
             self.toggle_button.Connect()
             self.toggle_button.SIG_USER_UPDATE.connect(lambda toggle: self.SIG_USER_TOGGLE.emit(self.toggle_button.Get(), self.Get()[0]))
             self.toggle_layout.addWidget(self.toggle_button)

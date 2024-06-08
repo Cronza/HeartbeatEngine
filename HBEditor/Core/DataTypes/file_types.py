@@ -18,7 +18,7 @@ from enum import Enum
 class FileType(Enum):
     Folder = 1
     Project_Settings = 2
-    Values = 3
+    Variables = 3
     Interface = 4
     Dialogue = 5
     Scene = 6

@@ -24,6 +24,7 @@ class HBEditorUI:
         super().__init__()
 
         self.main_window = QtWidgets.QMainWindow()
+        self.main_window.setWindowState(QtCore.Qt.WindowState.WindowMaximized)
         self.core = core
 
         # Initialize the U.I
@@ -202,10 +203,10 @@ class MainMenuBar(QtWidgets.QMenuBar):
         self.edit_menu.setWindowFlags(self.edit_menu.windowFlags() | QtCore.Qt.WindowType.NoDropShadowWindowHint)
         self.a_open_project_settings = QtGui.QAction(parent)
         self.a_open_project_settings.triggered.connect(engine_core.OpenProjectSettings)
-        self.a_open_values = QtGui.QAction(parent)
-        self.a_open_values.triggered.connect(engine_core.OpenValues)
+        self.a_open_variables = QtGui.QAction(parent)
+        self.a_open_variables.triggered.connect(engine_core.OpenVariables)
         self.edit_menu.addAction(self.a_open_project_settings)
-        self.edit_menu.addAction(self.a_open_values)
+        self.edit_menu.addAction(self.a_open_variables)
 
         # Play Menu
         self.play_menu = QtWidgets.QMenu(self)
@@ -255,8 +256,8 @@ class MainMenuBar(QtWidgets.QMenuBar):
         self.edit_menu.setTitle(_translate("MainWindow", "Edit"))
         self.a_open_project_settings.setText(_translate("MainWindow", "Project Settings"))
         self.a_open_project_settings.setShortcut(_translate("MainWindow", "Ctrl+Shift+P"))
-        self.a_open_values.setText(_translate("MainWindow", "Values"))
-        self.a_open_values.setShortcut(_translate("MainWindow", "Ctrl+Shift+V"))
+        self.a_open_variables.setText(_translate("MainWindow", "Variables"))
+        self.a_open_variables.setShortcut(_translate("MainWindow", "Ctrl+Shift+V"))
 
 
 class MainTabWidget(QtWidgets.QTabWidget):

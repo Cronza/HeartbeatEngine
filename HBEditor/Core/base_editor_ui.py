@@ -24,3 +24,9 @@ class EditorBaseUI(QtWidgets.QWidget):
 
         self.core = core_ref
         self.pending_changes = False
+
+    def AdjustSize(self):
+        """
+        Adjust the size of child widgets. This is typically only called when the window has changed in a meaningful way
+        """
+        pass

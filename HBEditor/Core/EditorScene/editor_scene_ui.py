@@ -18,7 +18,6 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.DataTypes.file_types import FileType
-from HBEditor.Core.Primitives import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
 
@@ -43,7 +42,7 @@ class EditorSceneUI(EditorBaseUI):
         self.details = DetailsPanel(self.core.excluded_properties)
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
-        self.scene_settings = DetailsPanel()
+        self.scene_settings = DetailsPanel(use_connections=False)
         self.scene_settings_src_obj = SceneSettings()
         self.scene_settings.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.scene_settings.Populate(self.scene_settings_src_obj)
@@ -63,8 +62,13 @@ class EditorSceneUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.sub_tab_widget)
 
         # Adjust the space allocation to favor the settings section
-        self.main_resize_container.setStretchFactor(1, 0)
-        self.main_resize_container.setStretchFactor(0, 1)
+        self.main_resize_container.setStretchFactor(0, 10)
+        self.main_resize_container.setStretchFactor(1, 8)  # Increase details panel size to accomodate connection column
+
+    def AdjustSize(self):
+        # Adjust the main view so it's consuming as much space as possible
+        self.main_resize_container.setSizes([round((self.width() / 4) * 3), round(self.width() / 4)])
+        self.details.AdjustSize()
 
     def OnItemMove(self, selected_items: list = None):
         self.SIG_USER_UPDATE.emit()
@@ -75,20 +79,17 @@ class SceneSettings(QtCore.QObject, SourceEntry):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
     ACTION_DATA = {
         "interface": {
-            "type": "Asset_Interface",
-            "default": "",
+            "type": "Interface",
             "value": "",
             "flags": ["editable"]
         },
         "description": {
             "type": "Paragraph",
-            "default": "",
             "value": "",
             "flags": ["editable"]
         },
         "allow_pausing": {
             "type": "Bool",
-            "default": "True",
             "value": "True",
             "flags": ["editable"]
         },
@@ -103,7 +104,6 @@ class SceneSettings(QtCore.QObject, SourceEntry):
                         "action": {
                             "type": "Event",
                             "value": "None",
-                            "default": "None",
                             "options": [
                                 "None",
                                 "create_background",

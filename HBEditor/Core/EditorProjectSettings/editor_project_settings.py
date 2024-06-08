@@ -27,9 +27,6 @@ class EditorProjectSettings(EditorBase):
 
         # Read this data in first as the U.I will need it to initialize properly
         self.project_settings = Reader.ReadAll(self.file_path)
-        self.project_settings_schema = Reader.ReadAll(
-            path.ConvertPartialToAbsolutePath("Config/ProjectSettingsSchema.yaml")
-        )
 
         self.editor_ui = EditorProjectSettingsUI(self)
         Logger.getInstance().Log("Editor initialized")

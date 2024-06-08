@@ -12,8 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import copy
+import copy, re
 from HBEditor.Core import settings
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties: list = None, force_when_no_change: bool = False):
@@ -36,23 +37,22 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
                 if param_name in excluded_properties and "no_exclusion" not in param_data["flags"]:
                     continue
 
-        if "global" in param_data:
-            if "flags" in param_data:
-                # Exclude parameters that are pointing to a global setting. The engine will take care of
-                # this at runtime since any global value stored in a file will become outdated as soon as the
-                # global setting is changed
-                if "global_active" not in param_data["flags"]:
-                    conv_data[param_name] = param_data["value"]
-
-        elif "value" in param_data:
-            # Exclude parameters that don't have any flags. These are, by default, not editable
-            # Containers don't have the 'value' key
-            if "flags" in param_data:
+        # Exclude parameters that don't have any flags. These are, by default, not editable
+        # Containers don't have the 'value' key
+        if "flags" in param_data:
+            if "value" in param_data:
                 if force_when_no_change or 'default' not in param_data:
                     conv_data[param_name] = param_data["value"]
                 elif 'default' in param_data:
-                    if param_data["value"] != param_data["default"]:
+                    # Check if the user has changed the value at all, or if it still matches 'default'. If so, don't
+                    # save it as the engine will load it from scratch at runtime
+                    if settings.GetProjectSetting(param_data['default'][0], param_data['default'][1]) != param_data['value']:
                         conv_data[param_name] = param_data["value"]
+
+            # Alter the structure further to note the active connection
+            if 'connectable' in param_data['flags']:
+                if param_data["connection"] and param_data["connection"] != 'None':
+                    conv_data[param_name] = Connection(variable=param_data["connection"])
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])
@@ -98,7 +98,7 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                         }
                     }
                     # Merge in the target parameters
-                    event_target_base_ad = copy.deepcopy(settings.GetActionData(action_data[base_param_name]["action"]))
+                    event_target_base_ad = settings.GetActionData(action_data[base_param_name]["action"])
                     base_param_data["children"].update(event_target_base_ad)
 
                     # By default, 'value' will be the entire child dict (IE. {'action': ..., 'scene_file': ...})
@@ -127,14 +127,19 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
 
             elif "children" not in base_param_data:
                 if base_param_name in action_data:
-                    if "global" in base_param_data:
-                        RemoveFlag("global_active", base_param_data)
-                    base_param_data["value"] = action_data[base_param_name]
-                else:
-                    if "global" in base_param_data:
-                        # If the req entry isn't found in the engine action data, then it was likely omitted due to a
-                        # global setting being enabled
-                        AddFlag("global_active", base_param_data)
+                    if isinstance(action_data[base_param_name], Connection):
+                        base_param_data['connection'] = action_data[base_param_name].variable
+
+                        # Since the connection is separate from the 'value' key, load the default if available.
+                        # Otherwise, stick with the 'value' key from the base ACTION_DATA
+                        if "default" in base_param_data and "value" not in base_param_data:
+                            base_param_data["value"] = settings.GetProjectSetting(base_param_data['default'][0], base_param_data['default'][1])
+                    else:
+                        base_param_data["value"] = action_data[base_param_name]
+
+                elif "default" in base_param_data and "value" not in base_param_data:
+                    base_param_data["value"] = settings.GetProjectSetting(base_param_data['default'][0], base_param_data['default'][1])
+
 
             if "children" in base_param_data:
                 # Ensure the param in the base AD exists in the supplied AD
@@ -143,6 +148,19 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
                         base_action_data=base_param_data["children"],
                         action_data=action_data[base_param_name]
                     )
+
+
+def SetDefaults(action_data: dict, force: bool = False):
+    """
+    Given action data, recurse through it and set 'value' to 'default' if applicable. If 'force' is provided,
+    stomp any pre-existing 'value'
+    """
+    for param_name, param_data in action_data.items():
+        if 'default' in param_data:
+            if 'value' not in param_data or force:
+                param_data["value"] = settings.GetProjectSetting(param_data['default'][0], param_data['default'][1])
+        elif "children" in param_data:
+            SetDefaults(param_data['children'], force)
 
 
 def GetActionName(action_data: dict) -> str:

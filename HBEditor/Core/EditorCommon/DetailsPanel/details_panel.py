@@ -12,9 +12,9 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-from HBEditor.Core.Primitives.input_entries import *
+from HBEditor.Core.EditorCommon.input_entries import *
 from HBEditor.Core.EditorUtilities import action_data as ad
-from HBEditor.Core.Primitives import input_entry_handler as ieh
+from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 
 
 class DetailsPanel(QtWidgets.QWidget):
@@ -26,7 +26,7 @@ class DetailsPanel(QtWidgets.QWidget):
     """
     SIG_USER_UPDATE = QtCore.pyqtSignal()
 
-    def __init__(self, excluded_properties: list = None):
+    def __init__(self, excluded_properties: list = None, use_connections: bool = True):
         super().__init__()
 
         self.active_entry = None
@@ -38,9 +38,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_layout.setContentsMargins(0, 0, 0, 0)
         self.details_layout.setSpacing(0)
 
-        # Create the toolbar
-        #self.details_toolbar = QtWidgets.QToolBar(self)
-
         # Create search filter
         #self.details_filter = QtWidgets.QLineEdit(self.details_toolbar)
         #self.details_filter.setPlaceholderText("filter...")
@@ -51,28 +48,28 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree = QtWidgets.QTreeWidget(self)
         self.details_tree.setObjectName("no-top")
         self.details_tree.setColumnCount(3)
-        self.details_tree.setHeaderLabels(['Name', 'Input', 'G'])
+        self.details_tree.setHeaderLabels(['Name', 'Input', 'Connection'])
         self.details_tree.setAutoScroll(False)
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
-        self.details_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-        # --- Specialized Settings for the 'G' column ---
-        # 1. Allow columns to be significantly smaller than normal
-        self.details_tree.header().setMinimumSectionSize(round(self.details_tree.header().width() / 4))
-
-        # 2. Force the last column to be barely larger than a standard checkbox
-        self.details_tree.setColumnWidth(2, round(self.details_tree.header().width() / 5))
-
-        # 3. Align the column header text to match the alignment of the checkbox
-        self.details_tree.headerItem().setTextAlignment(2, QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.details_tree.header().setStretchLastSection(True)
 
         # ********** Add All Major Pieces to details layout **********
         self.details_layout.addWidget(self.details_tree)
+
+        if not use_connections:
+            self.details_tree.hideColumn(2)
+
+    def AdjustSize(self):
+        """
+        Adjust the size of columns based on parent size. This is typically only called when the parent has changed in a
+        meaningful way
+        """
+        self.details_tree.setColumnWidth(1, round((self.width() / 2) - 10))  # Subtract a buffer to account for frame
 
     def Populate(self, selected_entry):
         """
@@ -139,9 +136,9 @@ class DetailsPanel(QtWidgets.QWidget):
         input_widget = self.details_tree.itemWidget(tree_item, 1)
         input_widget.SIG_USER_UPDATE.connect(self.UserUpdatedInputWidget)
 
-        global_checkbox = self.details_tree.itemWidget(tree_item, 2)
-        if global_checkbox:
-            global_checkbox.SIG_USER_UPDATE.connect(self.UserClickedGlobalCheckbox)
+        connect_button = self.details_tree.itemWidget(tree_item, 2)
+        if connect_button:
+            connect_button.SIG_USER_UPDATE.connect(self.UserConnectedVariable)
 
     def StoreData(self, parent: QtWidgets.QTreeWidgetItem = None) -> dict:
         """
@@ -160,12 +157,10 @@ class DetailsPanel(QtWidgets.QWidget):
                 entry = parent.child(entry_index)
                 entry_name = self.details_tree.itemWidget(entry, 0).text()
                 entry_data = self.details_tree.itemWidget(entry, 1).Get()
-                if "global" in entry_data and "flags" in entry_data:
-                    ad.RemoveFlag("global_active", entry_data)
 
-                    global_checkbox = self.details_tree.itemWidget(entry, 2)
-                    if global_checkbox.Get():
-                        ad.AddFlag("global_active", entry_data)
+                if "connectable" in entry_data['flags']:
+                    # Update the entry data as the connection status is tracked separately
+                    entry_data['connection'] = self.details_tree.itemWidget(entry, 2).Get()
 
                 if entry_data["type"] == "Array":
                     # Arrays allow the user to remove their children, which can lead to a desync in the displayed child
@@ -202,7 +197,6 @@ class DetailsPanel(QtWidgets.QWidget):
                     entry_data["children"].update(self.StoreData(entry))
 
                 elif entry.childCount() > 0:
-
                     # We do an update here as not all items within the action_data were displayed (uneditable details
                     # aren't added). If we were to do a stomp using '=' instead, it'd erase the action data for these
                     entry_data["children"].update(self.StoreData(entry))
@@ -222,9 +216,9 @@ class DetailsPanel(QtWidgets.QWidget):
 
     ### Slots ###
 
-    def UserClickedGlobalCheckbox(self, owning_tree_item: QtWidgets.QTreeWidgetItem, global_active: bool):
+    def UserConnectedVariable(self, owning_tree_item: QtWidgets.QTreeWidgetItem, connection_target: str):
         input_widget = self.details_tree.itemWidget(owning_tree_item, 1)
-        if global_active:
+        if connection_target != '' and connection_target != 'None':
             input_widget.SetEditable(2)
         else:
             input_widget.SetEditable(0)

@@ -33,7 +33,6 @@ def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
     global project_settings
     global resolution
     global resolution_options
-    global active_resolution
     global project_setting_listeners
 
     file_path = ConvertPartialToAbsolutePath(partial_file_path)
@@ -46,10 +45,8 @@ def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
             project_setting_listeners[cat][name] = {}
 
     # Apply the effects of various project settings
-    resolution = project_settings['Window']['resolution']
-    resolution_options = project_settings['Window']['resolution_options']
-    active_resolution = tuple(resolution_options[resolution])
-
+    resolution = tuple(map(int, project_settings['Graphics']['resolution']['value'].split('x')))
+    resolution_options = project_settings['Graphics']['resolution']['options']
 
 def SaveProjectSettings(file_path: str = "Config/Game.yaml"):
     """ Saves the project settings to the provided file path. Defaults to 'Config/Game.yaml' if no path is provided """
@@ -64,7 +61,7 @@ def SetProjectSetting(category: str, setting: str, value: any):
     global project_settings
     global project_setting_listeners
 
-    project_settings[category][setting] = value
+    project_settings[category][setting]['value'] = value
 
     # Inform any applicable listeners
     for listener_name, connect_func in project_setting_listeners[category][setting].items():
@@ -79,51 +76,51 @@ def GetProjectSetting(category: str, key: str):
     global project_settings
 
     try:
-        return project_settings[category][key]
+        return project_settings[category][key]['value']
     except KeyError:
         raise ValueError(f"Project Setting Not Found: '{category}', '{key}'")
 
 
-def LoadValues(partial_file_path: str = "Config/Values.yaml"):
-    """ Reads in the project values file path. Defaults to 'Config/Values.yaml' if no path is provided """
-    global values
+def LoadVariables(partial_file_path: str = "Config/Variables.yaml"):
+    """ Reads in the project values file path. Defaults to 'Config/Variables.yaml' if no path is provided """
+    global variables
 
     file_path = ConvertPartialToAbsolutePath(partial_file_path)
-    values = Reader.ReadAll(file_path)
+    variables = Reader.ReadAll(file_path)
 
 
-def SaveValues(file_path: str = "Config/Values.yaml"):
-    """ Saves the project values to the provided file path. Defaults to 'Config/Values.yaml' if no path is provided """
+def SaveVariables(file_path: str = "Config/Variables.yaml"):
+    """ Saves the project variables to the provided file path. Defaults to 'Config/Variables.yaml' if no path is provided """
     global project_settings
 
     file_path = ConvertPartialToAbsolutePath(file_path)
     Writer.WriteFile(project_settings, file_path)
 
 
-def SetValue(value_name: str, value_data: str):
+def SetVariable(variable_name: str, variable_data: str):
     """
-    Set the corresponding project value
+    Set the corresponding project variable
 
     Note: This change will not persist between runs of the game unless the user saves the game
     """
-    global values
-    global value_listeners
+    global variables
+    global variable_listeners
 
-    values[value_name] = value_data
+    variables[variable_name] = variable_data
 
     # Inform any applicable listeners
-    for listener_name, connect_func in value_listeners[value_name].items():
-        connect_func(value_name)
+    for listener_name, connect_func in variable_listeners[variable_name].items():
+        connect_func(variable_name)
 
 
-def GetValue(value_name: str) -> str:
-    """ Returns the user value that matches the provided name """
-    global values
+def GetVariable(variable_name: str) -> any:
+    """ Returns the project variable that matches the provided name """
+    global variables
 
     try:
-        return str(values[value_name])
+        return variables[variable_name]['value']
     except KeyError:
-        raise ValueError(f"Project Value Not Found: '{value_name}'")
+        raise ValueError(f"Project Variable Not Found: '{variable_name}'")
 
 
 def ConvertPartialToAbsolutePath(partial_path):
@@ -165,18 +162,17 @@ paused = False
 root_dir = os.getcwd().replace("\\", "/")
 project_root = ""
 project_settings = {}
-values = {}
+variables = {}
 
-# Window
-resolution = None
+# Graphics
+resolution = (1280, 720)
 resolution_options = None
 resolution_multiplier = 1
-active_resolution = None
 
 # When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
 # to change based on the mute setting), we need a way of tracking who needs to be informed. These dicts
 # represents that tracking
 project_setting_listeners = {}  # Structure: {"<category>": {"<setting>": {"<object_ref>": "<connect_func>"}}}
-value_listeners = {}  # Structure: {"<value_name">: {"<object_ref>": "<connect_func>"}}
+variable_listeners = {}  # Structure: {"<var_name">: {"<object_ref>": "<connect_func>"}}
 
 

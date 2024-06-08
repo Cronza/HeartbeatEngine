@@ -31,7 +31,7 @@ from HBEditor.Core.EditorDialogue.editor_dialogue import EditorDialogue
 from HBEditor.Core.EditorScene.editor_scene import EditorScene
 from HBEditor.Core.EditorInterface.editor_interface import EditorInterface
 from HBEditor.Core.EditorProjectSettings.editor_project_settings import EditorProjectSettings
-from HBEditor.Core.EditorValues.editor_values import EditorValues
+from HBEditor.Core.EditorVariables.editor_variables import EditorVariables
 from HBEditor.Core.EditorUtilities import path
 from Tools.HBBuilder.hb_builder import HBBuilder
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -498,7 +498,6 @@ class HBEditor:
             self.OpenEditor(full_path, file_type, True)
             return True
 
-
     def Import(self, partial_dest_path: str, import_target: str = "", batch_mode: bool = False) -> bool:
         """
         Given a partial path with the content folder as the root, prompt the user to choose a file to import. Then,
@@ -621,7 +620,7 @@ class HBEditor:
             FileType.Dialogue: EditorDialogue,
             FileType.Interface: EditorInterface,
             FileType.Project_Settings: EditorProjectSettings,
-            FileType.Values: EditorValues
+            FileType.Variables: EditorVariables
          }
 
         # Let's check if we already have an editor open for this file
@@ -633,11 +632,14 @@ class HBEditor:
         else:
             # Initialize the Editor
             self.active_editor = editor_classes[editor_type](target_file_path)
-            if import_file:
-                self.active_editor.Import()
 
             # Create a tab to house the editor UI
-            self.e_ui.AddMainTab(self.active_editor.GetUI(), os.path.basename(target_file_path), True)
+            active_ui = self.active_editor.GetUI()
+            self.e_ui.AddMainTab(active_ui, os.path.basename(target_file_path), True)
+            active_ui.AdjustSize()  # Adjust the UI size now that it has been added to the window
+
+            if import_file:
+                self.active_editor.Import()
 
     def CloseEditor(self, target_file_path: str):
         """
@@ -655,6 +657,7 @@ class HBEditor:
         settings.user_project_name = project_name
         settings.user_project_dir = project_dir.replace("\\", "/")
         settings.LoadProjectSettings()
+        settings.LoadVariables()
         settings.LoadHeartbeatFile()
 
         # Inform the U.I so it cleans up and prepares the U.I
@@ -669,14 +672,14 @@ class HBEditor:
         else:
             self.OpenEditor(settings.GetProjectSettingsPath(), FileType.Project_Settings, True)
 
-    def OpenValues(self):
-        """ Opens the 'Values' editor """
+    def OpenVariables(self):
+        """ Opens the 'Variables' editor """
         # Normally we would have loaded this editor like the others, but since we need to bind loading this to a menu
         # button, we need it in the form of a function
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            self.OpenEditor(settings.GetValuesPath(), FileType.Values, True)
+            self.OpenEditor(settings.GetVariablesPath(), FileType.Variables, True)
 
     def CheckForOpenFiles(self, root: str) -> list:
         """
