@@ -71,10 +71,6 @@ class DetailsPanel(QtWidgets.QWidget):
         """
         self.details_tree.setColumnWidth(1, round((self.width() / 2) - 10))  # Subtract a buffer to account for frame
 
-    #@TODO: Do something with this
-    def ShowConnections(self):
-        pass
-
     def Populate(self, selected_entry):
         """
         Fill out the details tree based on the active entry's action data. If the provided item is the same as
