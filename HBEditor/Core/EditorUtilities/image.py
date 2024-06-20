@@ -2,7 +2,7 @@ import os
 import pathlib
 from PIL import Image, UnidentifiedImageError
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 def GenerateThumbnail(path: str) -> str:
@@ -34,7 +34,7 @@ def GenerateThumbnail(path: str) -> str:
 
         return thumbnail_image_path
     except UnidentifiedImageError:
-        Logger.getInstance().Log(
+        logger.Log(
             f"Unable to generate thumbnail for '{full_image_path}' as it does not appear to be an image")
 
     return ""

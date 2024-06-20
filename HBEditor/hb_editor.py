@@ -20,7 +20,7 @@ from pathlib import Path
 from PyQt6 import QtWidgets, QtCore
 
 from HBEditor import hb_editor_ui as hbe
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.engine_launcher import EngineLauncher
@@ -41,6 +41,8 @@ class HBEditor:
     def __init__(self):
         self.app = QtWidgets.QApplication(sys.argv)
 
+        logger.Initialize()
+
         # Add a search path so references to editor assets are simplified. This is particularly important for theme
         # files where paths can't be resolved programatically
         QtCore.QDir.addSearchPath("EditorContent", (os.path.join(settings.editor_root, "Content")))
@@ -58,7 +60,7 @@ class HBEditor:
         Prompts the user for a directory to create a new project, and for a project name. Then creates the
         chosen project
         """
-        Logger.getInstance().Log("Requesting directory for the new project...'")
+        logger.Log("Requesting directory for the new project...'")
         prompt = DialogFileSystem(self.e_ui.GetWindow())
         new_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
@@ -68,10 +70,10 @@ class HBEditor:
         self.UpdateSearchHistory(new_project_dir)
 
         if not new_project_dir:
-            Logger.getInstance().Log("Project directory was not provided - Cancelling 'New Project' action", 3)
+            logger.Log("Project directory was not provided - Cancelling 'New Project' action", 3)
         else:
             # [0] = user_input: str, [1] = value_provided: bool
-            Logger.getInstance().Log("Requesting a name for the new project...'")
+            logger.Log("Requesting a name for the new project...'")
             user_project_name = QtWidgets.QInputDialog.getText(
                 self.e_ui.GetWindow(),
                 "New Project",
@@ -79,11 +81,11 @@ class HBEditor:
             )[0]
 
             if not user_project_name:
-                Logger.getInstance().Log("Project name was not provided - Cancelling 'New Project' action", 3)
+                logger.Log("Project name was not provided - Cancelling 'New Project' action", 3)
             else:
                 # Check if the project folder exists. If so, inform the user that this is already a project dir
                 if os.path.exists(new_project_dir + "/" + user_project_name):
-                    Logger.getInstance().Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
+                    logger.Log("Chosen project directory already exists - Cancelling 'New Project' action", 4)
                     QtWidgets.QMessageBox.about(
                         self.e_ui.GetWindow(),
                         "Project Already Exists!",
@@ -93,7 +95,7 @@ class HBEditor:
 
                 # Everything is good to go. Create a new project!
                 else:
-                    Logger.getInstance().Log("Valid project destination chosen! Creating project folder structure...")
+                    logger.Log("Valid project destination chosen! Creating project folder structure...")
 
                     # Create the project directory
                     project_path = new_project_dir + "/" + user_project_name
@@ -115,14 +117,14 @@ class HBEditor:
                             project_path + "/" + rel_path
                         )
 
-                    Logger.getInstance().Log(f"Project Created at: {project_path}", 2)
+                    logger.Log(f"Project Created at: {project_path}", 2)
 
                     # Set this as the active project
                     self.SetActiveProject(user_project_name, project_path)
 
     def OpenProject(self):
         """ Prompts the user for a project directory, then loads that file in the respective editor """
-        Logger.getInstance().Log("Requesting path to project root...")
+        logger.Log("Requesting path to project root...")
         prompt = DialogFileSystem(self.e_ui.GetWindow())
         existing_project_dir = prompt.GetDirectory(
             self.GetLastSearchPath(),
@@ -132,17 +134,17 @@ class HBEditor:
         self.UpdateSearchHistory(existing_project_dir)
 
         if not existing_project_dir:
-            Logger.getInstance().Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
+            logger.Log("Project directory was not provided - Cancelling 'Open Project' action", 3)
         else:
             # Does the directory already have a project in it (Denoted by the heartbeat file's existence)
             if os.path.exists(f"{existing_project_dir}/{settings.heartbeat_file}"):
-                Logger.getInstance().Log("Valid project selected - Setting as Active Project...")
+                logger.Log("Valid project selected - Setting as Active Project...")
 
                 # Since we aren't asking for the project name, let's infer it from the path
                 project_name = os.path.basename(existing_project_dir)
                 self.SetActiveProject(project_name, existing_project_dir)
             else:
-                Logger.getInstance().Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
+                logger.Log("An invalid Heartbeat project was selected - Cancelling 'Open Project' action", 4)
                 QtWidgets.QMessageBox.about(
                     self.e_ui.GetWindow(),
                     "Not a Valid Project Directory!",
@@ -175,7 +177,7 @@ class HBEditor:
                     # Confirm that the folder doesn't already exist. If not, then create it. Otherwise, raise an error
                     if not os.path.exists(full_path):
                         os.mkdir(full_path)
-                        Logger.getInstance().Log(f"Folder created - {full_path}", 2)
+                        logger.Log(f"Folder created - {full_path}", 2)
                         settings.RegisterAssetFolder(f"{parent_dir}/{folder_name}")
                         return folder_name
                     else:
@@ -200,14 +202,14 @@ class HBEditor:
                 "Please Enter a File Name:"
             )[0]
             if not selected_name:
-                Logger.getInstance().Log("File name was not provided - Cancelling 'New File' action", 3)
+                logger.Log("File name was not provided - Cancelling 'New File' action", 3)
             else:
                 if self.ValidateFileName(selected_name):
                     file_name = f"{selected_name}.{file_type.name.lower()}"
                     full_path = f"{settings.user_project_dir}/{parent_dir}/{file_name}"
                     if not os.path.exists(full_path):
                         with open(full_path, 'w'):
-                            Logger.getInstance().Log(f"File created - {full_path}", 2)
+                            logger.Log(f"File created - {full_path}", 2)
 
                         settings.RegisterAsset(parent_dir, file_name, file_type)
 
@@ -247,7 +249,7 @@ class HBEditor:
                             shutil.copy(path.ResolveFilePath(selected_template_path), full_path)
                         else:
                             with open(full_path, 'w'):
-                                Logger.getInstance().Log(f"File created - {full_path}", 2)
+                                logger.Log(f"File created - {full_path}", 2)
 
                         settings.RegisterAsset(parent_dir, file_name, FileType.Interface)
 
@@ -315,10 +317,10 @@ class HBEditor:
                                 raise exc
 
                 except Exception as exc:
-                    Logger.getInstance().Log(f"Failed to delete '{full_path}' - Please review the exception to understand more\n{exc}", 4)
+                    logger.Log(f"Failed to delete '{full_path}' - Please review the exception to understand more\n{exc}", 4)
                 else:
                     settings.DeregisterAsset(partial_file_path, os.path.basename(full_path))
-                    Logger.getInstance().Log(f"Successfully deleted '{full_path}'", 2)
+                    logger.Log(f"Successfully deleted '{full_path}'", 2)
                     return True
 
         return False
@@ -346,14 +348,14 @@ class HBEditor:
                         else:
                             shutil.copy(full_path, copy_full_path)
                     except Exception as exc:
-                        Logger.getInstance().Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}",4)
+                        logger.Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}",4)
                         return False
                     else:
                         settings.DuplicateAssetRegistration(partial_file_path, orig_name, copy_name)
-                        Logger.getInstance().Log(f"Successfully duplicated file '{full_path}'", 2)
+                        logger.Log(f"Successfully duplicated file '{full_path}'", 2)
                         return True
 
-            Logger.getInstance().Log(f"Failed to find an acceptable name for the duplicate file - Please contact the developer as this shouldn't happen!")
+            logger.Log(f"Failed to find an acceptable name for the duplicate file - Please contact the developer as this shouldn't happen!")
 
         return False
 
@@ -403,11 +405,11 @@ class HBEditor:
                             try:
                                 os.rename(full_path, new_full_path)
                             except Exception as exc:
-                                Logger.getInstance().Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}", 4)
+                                logger.Log(f"Failed to duplicate path '{full_path}' - Please review the exception to understand more\n{exc}", 4)
                             else:
                                 settings.RenameAssetRegistration(partial_file_path, os.path.basename(full_path), os.path.basename(new_full_path))
                                 self.CloseEditor(full_path)
-                                Logger.getInstance().Log(f"Successfully renamed '{new_full_path}'", 2)
+                                logger.Log(f"Successfully renamed '{new_full_path}'", 2)
                                 return True
                     else:
                         self.ShowFileAlreadyExistsPrompt()
@@ -430,7 +432,7 @@ class HBEditor:
 
             # Only directories are valid targets. Fail silently if the user targeted a file
             if os.path.isfile(tar_full_path):
-                Logger.getInstance().Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Invalid destination", 3)
+                logger.Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Invalid destination", 3)
                 return False
 
             is_folder = os.path.isdir(src_full_path)
@@ -463,11 +465,11 @@ class HBEditor:
                     try:
                         shutil.move(src_full_path, tar_full_path)
                     except Exception as exc:
-                        Logger.getInstance().Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Please review the exception to understand more\n{exc}", 4)
+                        logger.Log(f"Failed to move path '{src_full_path}' to '{tar_full_path}' - Please review the exception to understand more\n{exc}", 4)
                         return False
                     else:
                         settings.MoveAssetRegistration(src_partial_path, source_name, tar_partial_path)
-                        Logger.getInstance().Log(f"Successfully moved '{tar_full_path}'", 2)
+                        logger.Log(f"Successfully moved '{tar_full_path}'", 2)
                         return True
             else:
                 self.ShowFileAlreadyExistsPrompt()
@@ -492,7 +494,7 @@ class HBEditor:
             elif ".scene" in partial_file_path: file_type = FileType.Scene
             elif ".dialogue" in partial_file_path: file_type = FileType.Dialogue
             else:
-                Logger.getInstance().Log("File type does not have any interact functionality", 3)
+                logger.Log("File type does not have any interact functionality", 3)
                 return False
 
             self.OpenEditor(full_path, file_type, True)
@@ -529,10 +531,10 @@ class HBEditor:
                     try:
                         shutil.copy(import_target, full_path)
                     except Exception as exc:
-                        Logger.getInstance().Log(f"Failed to copy '{import_target}' to '{full_path}' - Please review the exception to understand more\n{exc}",4)
+                        logger.Log(f"Failed to copy '{import_target}' to '{full_path}' - Please review the exception to understand more\n{exc}",4)
                     else:
                         settings.RegisterAsset(partial_dest_path, tar_name, tar_type)
-                        Logger.getInstance().Log(f"Successfully imported file '{partial_dest_path}/{tar_name}'", 2)
+                        logger.Log(f"Successfully imported file '{partial_dest_path}/{tar_name}'", 2)
                         return True
 
         return False
@@ -587,7 +589,7 @@ class HBEditor:
             self.ShowNoStartingScenePrompt()
         else:
             HBBuilder.Build(
-                Logger.getInstance(),
+                logger,
                 settings.engine_root,
                 settings.user_project_dir,
                 settings.user_project_name
@@ -600,7 +602,7 @@ class HBEditor:
             self.ShowNoActiveProjectPrompt()
         else:
             HBBuilder.Clean(
-                Logger.getInstance(),
+                logger,
                 settings.user_project_dir
             )
 
@@ -626,7 +628,7 @@ class HBEditor:
         # Let's check if we already have an editor open for this file
         result = self.CheckIfFileOpen(target_file_path)
         if result:
-            Logger.getInstance().Log("An editor for the selected file is already open - Switching to the open editor ", 3)
+            logger.Log("An editor for the selected file is already open - Switching to the open editor ", 3)
             self.e_ui.main_tab_widget.setCurrentWidget(result.editor_ui)
             self.active_editor = result
         else:
@@ -785,8 +787,8 @@ class HBEditor:
                 with open(temp_file, "w"):
                     pass
             except Exception as exc:
-                Logger.getInstance().Log(f"Unable to create '{temp_file}'", 4)
-                Logger.getInstance().Log(str(exc), 4)
+                logger.Log(f"Unable to create '{temp_file}'", 4)
+                logger.Log(str(exc), 4)
                 return False
         temp_data = Reader.ReadAll(temp_file)
         if not temp_data:
@@ -795,8 +797,8 @@ class HBEditor:
             for key, val in data.items():
                 temp_data[key] = val
         except Exception as exc:
-            Logger.getInstance().Log(f"Failed to update '{temp_file}'", 4)
-            Logger.getInstance().Log(str(exc), 4)
+            logger.Log(f"Failed to update '{temp_file}'", 4)
+            logger.Log(str(exc), 4)
             return False
         Writer.WriteFile(temp_data, temp_file)
         return True
@@ -804,18 +806,18 @@ class HBEditor:
     def ReadFromTemp(self, temp_file: str, key: str) -> str:
         """ Read from the provided temp file using the provided key, returning the results if found """
         if not os.path.exists(temp_file):
-            Logger.getInstance().Log(f"The temp file '{temp_file}' was not found")
+            logger.Log(f"The temp file '{temp_file}' was not found")
             return ""
         try:
             req_data = Reader.ReadAll(temp_file)[key]
             return req_data
         except Exception as exc:
-            Logger.getInstance().Log(f"Failed to read '{temp_file}'")
-            Logger.getInstance().Log(str(exc), 4)
+            logger.Log(f"Failed to read '{temp_file}'")
+            logger.Log(str(exc), 4)
             return ""
 
     def ShowNoActiveProjectPrompt(self):
-        Logger.getInstance().Log("There is no active project", 4)
+        logger.Log("There is no active project", 4)
         QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "No Active Project",
@@ -824,7 +826,7 @@ class HBEditor:
         )
 
     def ShowFileAlreadyExistsPrompt(self, batch_mode: bool = False):
-        Logger.getInstance().Log("A file / folder of that name already exists", 4)
+        logger.Log("A file / folder of that name already exists", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "File / Folder Already Exists",
@@ -832,7 +834,7 @@ class HBEditor:
         )
 
     def ShowNoStartingScenePrompt(self, batch_mode: bool = False):
-        Logger.getInstance().Log("There is no starting scene set", 4)
+        logger.Log("There is no starting scene set", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "No Starting Scene",
@@ -841,7 +843,7 @@ class HBEditor:
         )
 
     def ShowUnsupportedFileTypePrompt(self, batch_mode: bool = False):
-        Logger.getInstance().Log("The chosen file type is unsupported", 4)
+        logger.Log("The chosen file type is unsupported", 4)
         if not batch_mode: QtWidgets.QMessageBox.about( # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "Unsupported File Type",
@@ -849,7 +851,7 @@ class HBEditor:
         )
 
     def ShowInvalidFileNamePrompt(self, batch_mode: bool = False):
-        Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
+        logger.Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
         if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "Invalid Name",
@@ -858,7 +860,7 @@ class HBEditor:
         )
 
     def ShowInternalImportErrorPrompt(self, batch_mode: bool = False):
-        Logger.getInstance().Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
+        logger.Log("The chosen file has an invalid name. Please remove special characters such as ?!(+",4)
         if not batch_mode: QtWidgets.QMessageBox.about(  # @TODO: Replace with a custom wrapper that removes the large icon
             self.e_ui.GetWindow(),
             "Unable to Import",

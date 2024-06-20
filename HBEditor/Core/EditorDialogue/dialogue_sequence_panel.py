@@ -16,7 +16,7 @@ import copy
 
 import yaml
 from PyQt6 import QtWidgets, QtGui, QtCore
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.ActionMenu.action_menu import ActionMenu
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 from HBEditor.Core.EditorUtilities import action_data as ad

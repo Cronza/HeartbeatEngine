@@ -15,7 +15,7 @@
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.Primitives.simple_checkbox import SimpleCheckbox
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 class GroupsPanel(QtWidgets.QWidget):
@@ -374,7 +374,7 @@ class EditEntryPrompt(QtWidgets.QDialog):
 
     def Accept(self):
         if self.entry_name_input.text() == "":
-            Logger.getInstance.Log("No entry name provided - Cancelling prompt")
+            logger.Log("No entry name provided - Cancelling prompt")
             self.reject()
         else:
             self.accept()

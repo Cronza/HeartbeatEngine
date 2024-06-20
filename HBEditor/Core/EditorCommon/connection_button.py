@@ -1,7 +1,7 @@
 from PyQt6 import QtWidgets, QtCore
 from HBEditor.Core import settings
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 class ConnectionButton(QtWidgets.QComboBox):
@@ -16,7 +16,7 @@ class ConnectionButton(QtWidgets.QComboBox):
     def showPopup(self) -> None:
         result = self.ShowConnectionDialog()
         if result == self.currentText() or result == '':
-            Logger.getInstance().Log("Connection unchanged")
+            logger.Log("Connection unchanged")
         else:
             self.Set(result)
             self.SIG_USER_UPDATE.emit(self.owning_model_item, result)

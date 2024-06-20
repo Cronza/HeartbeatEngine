@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from pathlib import Path
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core import settings
 
 
@@ -43,10 +43,10 @@ def ResolveFilePath(path: str, fallback_path: str = ""):
             return f"{settings.user_project_dir}/{path}"
         else:
             if fallback_path:
-                Logger.getInstance().Log(f"File does not Exist: '{path}' - Loading default file: '{fallback_path}'", 3)
+                logger.Log(f"File does not Exist: '{path}' - Loading default file: '{fallback_path}'", 3)
                 return f"{settings.engine_root}/{fallback_path}"
             else:
-                Logger.getInstance().Log(f"File does not Exist: '{path}'", 3)
+                logger.Log(f"File does not Exist: '{path}'", 3)
 
 
 def ResolveFontFilePath(path: str):

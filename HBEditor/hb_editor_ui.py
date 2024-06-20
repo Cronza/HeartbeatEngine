@@ -15,7 +15,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.Outliner.outliner import Outliner
 
 
@@ -26,6 +26,7 @@ class HBEditorUI:
         self.main_window = QtWidgets.QMainWindow()
         self.main_window.setWindowState(QtCore.Qt.WindowState.WindowMaximized)
         self.core = core
+
 
         # Initialize the U.I
         self.setupUi(self.main_window)
@@ -64,7 +65,7 @@ class HBEditorUI:
         # Sub tab widget - Ideal for widgets that should be accessible alongside the core editors
         self.sub_tab_widget = QtWidgets.QTabWidget(self.main_resize_container)
         self.sub_tab_widget.setContentsMargins(0, 0, 0, 0)
-        self.AddSubTab(Logger.getInstance().GetUI(), "Logger")
+        self.AddSubTab(logger.GetUI(), "Logger")
         self.main_resize_container.insertWidget(1, self.sub_tab_widget)
 
         # Adjust the main editor container, so it takes up as much space as possible. This needs to happen once
@@ -75,7 +76,7 @@ class HBEditorUI:
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.retranslateUi(MainWindow)
 
-        Logger.getInstance().Log("Initialized Editor Interface")
+        logger.Log("Initialized Editor Interface")
 
     def retranslateUi(self, MainWindow):
         """ Sets the text of all UI components using available translation """
@@ -114,7 +115,7 @@ class HBEditorUI:
         # Clear old data
         self.main_tab_widget.clear()
         self.outliner.cur_directory = "Content"
-        Logger.getInstance().ClearLog()
+        logger.ClearLog()
 
         # Reload the Outliner (This clears old data)
         self.outliner.Populate()
@@ -155,11 +156,11 @@ class HBEditorUI:
     def RemoveTab(self, index):
         """ Remove the tab for the given index """
         #@TODO: Review if a memory leak is created here due to not going down the editor reference tree and deleting things
-        Logger.getInstance().Log("Closing editor...")
+        logger.Log("Closing editor...")
         self.main_tab_widget.removeTab(index)
         if self.main_tab_widget.count() == 0:
             self.core.active_editor = None
-        Logger.getInstance().Log("Editor closed")
+        logger.Log("Editor closed")
 
     def LoadTheme(self, theme_path: str) -> None:
         """ Given the 'EditorContent' path to a theme .css file, load it and apply it to the editor application """
@@ -167,13 +168,13 @@ class HBEditorUI:
         if theme_file.open(QtCore.QIODevice.OpenModeFlag.ReadOnly):
             self.core.app.setStyleSheet(QtCore.QTextStream(theme_file).readAll())
         else:
-            Logger.getInstance().Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
+            logger.Log(f"Failed to initialize editor theme '{theme_path}'\n{theme_file.errorString()}", 4)
 
     def LoadFonts(self, font_paths: list):
         """ Given a list of 'EditorContent' font paths, load them so that they're available throughout the editor """
         for path in font_paths:
             if QtGui.QFontDatabase.addApplicationFont(QtCore.QDir(path).path()) < 0:
-                Logger.getInstance().Log(f"Failed to load font '{path}'", 4)
+                logger.Log(f"Failed to load font '{path}'", 4)
 
     def GetWindow(self) -> QtWidgets.QMainWindow:
         return self.main_window

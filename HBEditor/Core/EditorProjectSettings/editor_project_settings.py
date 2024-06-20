@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorProjectSettings.editor_project_settings_ui import EditorProjectSettingsUI
 from HBEditor.Core.DataTypes.file_types import FileType
@@ -29,17 +29,17 @@ class EditorProjectSettings(EditorBase):
         self.project_settings = Reader.ReadAll(self.file_path)
 
         self.editor_ui = EditorProjectSettingsUI(self)
-        Logger.getInstance().Log("Editor initialized")
+        logger.Log("Editor initialized")
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Project Settings")
+        logger.Log(f"Exporting Project Settings")
 
         # Just in case the user has made any changes to the settings, save them
         self.editor_ui.UpdateProjectSettingsData()
 
         # Write the data out
-        Logger.getInstance().Log("Writing data to file...")
+        logger.Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 self.project_settings,
@@ -47,9 +47,9 @@ class EditorProjectSettings(EditorBase):
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             self.editor_ui.SIG_USER_SAVE.emit()
-            Logger.getInstance().Log("File Exported!", 2)
+            logger.Log("File Exported!", 2)
         except:
-            Logger.getInstance().Log("Failed to Export!", 4)
+            logger.Log("Failed to Export!", 4)
 
         # Reload the project settings
         settings.LoadProjectSettings()

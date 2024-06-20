@@ -15,7 +15,7 @@
 import subprocess
 import os
 from PyQt6.QtWidgets import QMessageBox
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 class EngineLauncher:
@@ -26,7 +26,7 @@ class EngineLauncher:
 
     @staticmethod
     def Play(parent, project_path, engine_parent_root):
-        Logger.getInstance().Log("Launching engine...")
+        logger.Log("Launching engine...")
         try:
             # Launch the engine, and wait until it shuts down before continuing
             result = subprocess.Popen(

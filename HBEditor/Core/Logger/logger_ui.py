@@ -18,10 +18,8 @@ from HBEditor.Core import settings
 
 class LoggerUI(QtWidgets.QWidget):
 
-    def __init__(self, l_core):
+    def __init__(self):
         super().__init__()
-
-        self.l_core = l_core
 
         self.setObjectName("vertical")
 
@@ -38,7 +36,7 @@ class LoggerUI(QtWidgets.QWidget):
         self.logger_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Trash.png")),
             "Clear Log",
-            self.l_core.ClearLog
+            lambda clear: self.log_list.clear()
         )
 
         # Logger data list

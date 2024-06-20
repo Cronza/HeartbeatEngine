@@ -16,7 +16,7 @@ import os
 from io import BytesIO
 from PIL import ImageFont
 from PyQt6 import QtGui, QtCore
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 def LoadCustomFont(file_path):
@@ -55,7 +55,7 @@ def LoadCustomFont(file_path):
 
 
     else:
-        Logger.getInstance().Log(f"File does not Exist: '{file_path}'", 3)
+        logger.Log(f"File does not Exist: '{file_path}'", 3)
         return None
 
 def LoadFont(name, style=""):
@@ -70,14 +70,14 @@ def LoadFont(name, style=""):
                 ApplyStyle(style, new_font)
                 return new_font
             else:
-                Logger.getInstance().Log(f"Invalid style provided for '{name}'", 3)
+                logger.Log(f"Invalid style provided for '{name}'", 3)
                 style = available_styles[0]
                 new_font = QtGui.QFont(name)
                 ApplyStyle(style, new_font)
                 return new_font
         else:
             style = available_styles[0]
-            Logger.getInstance().Log(f"No style provided for '{name}' - Defaulting to '{style}'", 3)
+            logger.Log(f"No style provided for '{name}' - Defaulting to '{style}'", 3)
             new_font = QtGui.QFont(name)
             ApplyStyle(style, new_font)
             return new_font

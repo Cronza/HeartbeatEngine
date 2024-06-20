@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core import settings
 from HBEditor.Core.Outliner.outliner_ui import OutlinerUI, OutlinerAsset
 from HBEditor.Core.DataTypes.file_types import FileType

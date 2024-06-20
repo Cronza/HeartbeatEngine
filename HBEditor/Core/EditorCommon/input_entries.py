@@ -16,7 +16,7 @@ import re
 import copy
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import action_data as ad
@@ -534,7 +534,7 @@ class InputEntryArray(InputEntryBase):
 
     def AddItems(self, name="", data=None, parent=None, init_iter: bool = True):
         if self.owning_model_item.childCount() >= self.child_limit and not data:  # Don't run when recursing
-            Logger.getInstance().Log("Unable to add more elements - Limit Reached!", 3)
+            logger.Log("Unable to add more elements - Limit Reached!", 3)
         else:
             if not parent:
                 parent = self.owning_model_item

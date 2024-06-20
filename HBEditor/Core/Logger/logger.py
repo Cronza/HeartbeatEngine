@@ -20,27 +20,17 @@ from HBEditor.Core.Logger.logger_ui import LoggerUI
 from HBEditor.Core.DataTypes.log_types import LogType
 
 
+logger = None  # Contains the logger ref when it is initialized
+
+# The perhaps odd structure of this singleton is due to issues surrounding instantiating PyQt classes in a module,
+# outside of a class. When attempting this, it would cause some sort of seg fault crash. As such, we wrap the U.I
+# instantiation in an arbitrary 'logger' class to prevent this crash
+
+
 class Logger:
-    __instance = None
-
-    @staticmethod
-    def getInstance():
-        """
-        Static access method - Used to acquire the singleton instance, or instantiate it if it doesn't already exist
-        """
-        if Logger.__instance is None:
-            Logger()
-        return Logger.__instance
-
     def __init__(self):
-        # Enforce the use of the singleton instance
-        if Logger.__instance is not None:
-            raise Exception("This class is a singleton!")
-        else:
-            Logger.__instance = self
-
         # Build the Logger UI
-        self.log_ui = LoggerUI(self)
+        self.log_ui = LoggerUI()
 
         # Values refer to QProperties defined in the active .qss file
         self.log_styles = {
@@ -77,10 +67,26 @@ class Logger:
         self.log_ui.AddEntry(log_str, style)
         print(log_str)
 
-    def ClearLog(self):
-        """ Deletes all log entries """
-        self.log_ui.log_list.clear()
 
-    def GetUI(self):
-        """ Returns a reference to the logger U.I """
-        return self.log_ui
+def Initialize():
+    """ Instantiate the logger and the logger U.I """
+    global logger
+    logger = Logger()
+
+
+def ClearLog():
+    """ Deletes all log entries """
+    global logger
+    logger.log_ui.log_list.clear()
+
+
+def GetUI():
+    """ Returns a reference to the logger U.I """
+    global logger
+    return logger.log_ui
+
+
+def Log(log_text, log_type=LogType.Normal):
+    global logger
+    logger.Log(log_text, log_type)
+

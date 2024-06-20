@@ -14,7 +14,7 @@
 """
 import copy
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorDialogue.editor_dialogue_ui import EditorDialogueUI
 from HBEditor.Core.DataTypes.file_types import FileType
@@ -30,7 +30,7 @@ class EditorDialogue(EditorBase):
             "Main",
             "This is the default, main branch\nConsider this the root of your dialogue tree"
         )
-        Logger.getInstance().Log("Editor initialized")
+        logger.Log("Editor initialized")
 
     def UpdateDetails(self, selected_item):
         """
@@ -77,7 +77,7 @@ class EditorDialogue(EditorBase):
             # happens when the active branch is switched). To account for this, make sure the active branch is checked
             # differently by scanning the current dialogue entries
             if branch is self.editor_ui.branches_panel.active_entry:
-                Logger.getInstance().Log("Scanning dialogue entries...")
+                logger.Log("Scanning dialogue entries...")
                 self.StoreActiveData(branch)
 
             branch_name, branch_description = branch.Get()
@@ -94,7 +94,7 @@ class EditorDialogue(EditorBase):
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Dialogue data for: {self.file_path}")
+        logger.Log(f"Exporting Dialogue data for: {self.file_path}")
 
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
@@ -114,7 +114,7 @@ class EditorDialogue(EditorBase):
         }
 
         # Write the data out
-        Logger.getInstance().Log("Writing data to file...")
+        logger.Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 data=data_to_export,
@@ -122,13 +122,13 @@ class EditorDialogue(EditorBase):
                 metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
-            Logger.getInstance().Log("File Exported!", 2)
+            logger.Log("File Exported!", 2)
         except Exception as exc:
-            Logger.getInstance().Log(f"Failed to Export: {exc}", 4)
+            logger.Log(f"Failed to Export: {exc}", 4)
 
     def Import(self):
         super().Import()
-        Logger.getInstance().Log(f"Importing Dialogue data for: {self.file_path}")
+        logger.Log(f"Importing Dialogue data for: {self.file_path}")
 
         file_data = Reader.ReadAll(self.file_path)
 

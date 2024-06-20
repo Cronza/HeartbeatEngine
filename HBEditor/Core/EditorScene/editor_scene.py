@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import copy
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core import settings
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.DataTypes.file_types import FileType
@@ -29,7 +29,7 @@ class EditorScene(EditorBase):
         self.excluded_properties = ["transition"]
 
         self.editor_ui = EditorSceneUI(self)
-        Logger.getInstance().Log("Editor initialized")
+        logger.Log("Editor initialized")
 
     def UpdateActiveSceneItem(self, selected_items: list = None):
         """
@@ -58,7 +58,7 @@ class EditorScene(EditorBase):
 
     def Export(self):
         super().Export()
-        Logger.getInstance().Log(f"Exporting Scene data for: {self.file_path}")
+        logger.Log(f"Exporting Scene data for: {self.file_path}")
 
         # Store any active changes in the details panel
         self.editor_ui.details.StoreData()
@@ -74,7 +74,7 @@ class EditorScene(EditorBase):
             "scene_items": self.ConvertSceneItemsToEngineFormat(self.editor_ui.scene_viewer.GetSceneItems())
         }
 
-        Logger.getInstance().Log("Writing data to file...")
+        logger.Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 data=data_to_export,
@@ -82,13 +82,13 @@ class EditorScene(EditorBase):
                 metadata=settings.GetMetadataString()
             )
             self.editor_ui.SIG_USER_SAVE.emit()
-            Logger.getInstance().Log("File Exported!", 2)
+            logger.Log("File Exported!", 2)
         except Exception as exc:
-            Logger.getInstance().Log(f"Failed to Export: {exc}", 4)
+            logger.Log(f"Failed to Export: {exc}", 4)
 
     def Import(self):
         super().Import()
-        Logger.getInstance().Log(f"Importing Point & Click data for: {self.file_path}")
+        logger.Log(f"Importing Point & Click data for: {self.file_path}")
 
         file_data = Reader.ReadAll(self.file_path)
 

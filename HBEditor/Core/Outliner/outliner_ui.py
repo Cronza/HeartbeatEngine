@@ -17,7 +17,7 @@ from functools import partial
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.DataTypes.file_types import FileType, FileTypeIcons
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 class OutlinerUI(QtWidgets.QWidget):
@@ -222,7 +222,7 @@ class OutlinerAsset(QtWidgets.QListWidgetItem):
             else:
                 self.setIcon(QtGui.QIcon(QtGui.QPixmap(FileTypeIcons.icons[asset_type])))
         except:
-            Logger.getInstance().Log(f"Unable to load icon for file type '{self.asset_type}' - Using generic default")
+            logger.Log(f"Unable to load icon for file type '{self.asset_type}' - Using generic default")
             self.setIcon(QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/File")))
 
     def GetType(self):

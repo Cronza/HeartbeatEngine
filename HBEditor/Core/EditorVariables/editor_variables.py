@@ -14,7 +14,7 @@
 """
 from PyQt6 import QtWidgets
 from HBEditor.Core import settings
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorVariables.editor_variables_ui import EditorVariablesUI
 from HBEditor.Core.EditorVariables.editor_variables_ui import VariableNameUndefined, VariableAlreadyExists, VariableNameReserved
@@ -32,10 +32,10 @@ class EditorVariables(EditorBase):
         self.variables_data = Reader.ReadAll(self.file_path)
 
         self.editor_ui = EditorVariablesUI(self)
-        Logger.getInstance().Log("Editor initialized")
+        logger.Log("Editor initialized")
 
     def Export(self):
-        Logger.getInstance().Log(f"Exporting Variables")
+        logger.Log(f"Exporting Variables")
 
         # Collect the table data
         data_to_export = {}
@@ -64,7 +64,7 @@ class EditorVariables(EditorBase):
             return
 
         # Write the data out
-        Logger.getInstance().Log("Writing data to file...")
+        logger.Log("Writing data to file...")
         try:
             Writer.WriteFile(
                 data_to_export,
@@ -72,17 +72,17 @@ class EditorVariables(EditorBase):
                 f"# {settings.editor_data['EditorSettings']['version_string']}"
             )
             self.editor_ui.SIG_USER_SAVE.emit()
-            Logger.getInstance().Log("File Exported!", 2)
+            logger.Log("File Exported!", 2)
         except Exception as exc:
             print(exc)
-            Logger.getInstance().Log("Failed to Export!", 4)
+            logger.Log("Failed to Export!", 4)
 
         # Reload the project variables
         settings.LoadVariables()
 
     def Import(self):
         super().Import()
-        Logger.getInstance().Log(f"Importing Variables data for: {self.file_path}")
+        logger.Log(f"Importing Variables data for: {self.file_path}")
 
         file_data = Reader.ReadAll(self.file_path)
 

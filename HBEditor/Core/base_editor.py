@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import os
-from HBEditor.Core.Logger.logger import Logger
+from HBEditor.Core.Logger import logger
 
 
 class EditorBase:
@@ -21,7 +21,7 @@ class EditorBase:
         self.file_path = file_path
         self.editor_ui = None
 
-        Logger.getInstance().Log("Initializing Editor...")
+        logger.Log("Initializing Editor...")
 
     def GetFileName(self):
         """ Returns the name of the file that is being targeted by this editor """
