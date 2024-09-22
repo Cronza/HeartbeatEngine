@@ -49,8 +49,7 @@ class EngineLauncher:
                 parent,
                 "Unable to Launch Engine",
                 "The HBEngine could not be launched.\n\n"
-                "Please make sure the engine is available alongside the editor, or that you're\n"
-                "PYTHONPATH is configured correctly to include the engine."
+                f"Exception: {exc}"
             )
             print(exc)
 

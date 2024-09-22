@@ -24,8 +24,8 @@ Audio:
   volume_sfx:
     type: "Int"
     value: 100
-Pause Menu:
-  interface:
+Default Variables - UI:
+  pause_menu_interface:
     type: "Interface"
     value: ''
 Default Variables - Text:

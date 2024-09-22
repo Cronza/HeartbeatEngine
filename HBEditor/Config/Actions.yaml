@@ -108,8 +108,8 @@ Interface:
 Utils:
   icon: "EditorContent:Icons/Dialogue.png"
   options:
-    - name: "set_value"
-      display_name: "Set Value"
+    - name: "set_variable"
+      display_name: "Set Variable"
       applicable_editors:
         - Dialogue
     - name: "conditional"

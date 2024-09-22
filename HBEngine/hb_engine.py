@@ -104,7 +104,7 @@ def Main():
 
 
 def Pause() -> InterfacePause:
-    pause_interface = settings.GetProjectSetting('Pause Menu', 'interface')
+    pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
     if pause_interface and pause_interface != 'None':
         interface = settings.scene.LoadInterface(pause_interface, InterfacePause)
     else:
