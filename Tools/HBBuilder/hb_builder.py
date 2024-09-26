@@ -57,9 +57,8 @@ class HBBuilder:
             logger.Log("*** BUILD FAILED ***", 4)
 
     @staticmethod
-    def Clean(logger, project_dir: str):
+    def Clean(logger, build_dir: str):
         """ Deletes the active project's build directory """
-        build_dir = f"{project_dir}/build"
         if os.path.exists(build_dir):
             logger.Log(f"Build folder exists - Cleaning...", 3)
             try:

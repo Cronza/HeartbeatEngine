@@ -12,20 +12,25 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
-import os
+import os, pathlib
 from Tools.HBYaml.hb_yaml import Reader, Writer
 
 
-def SetProjectRoot(new_root):
+def SetProjectRoot(new_root: str):
     global root_dir
+    global saves_dir
     global project_root
 
-    # If a project was not provided, use the engine root (Necessary for builds where project
-    # and engine are conjoined)
     if new_root:
         project_root = new_root
     else:
-        project_root = root_dir
+        packaged_root = os.path.join(root_dir, "_internal")
+        if os.path.exists(packaged_root):
+            print(f"Packaged path found - Setting root to '{packaged_root}'")
+            project_root = packaged_root
+            saves_dir = os.path.join(project_root, "saves")
+        else:
+            raise ValueError("No project root provided, and this does not seem to be a packaged build")
 
 
 def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
@@ -127,26 +132,17 @@ def ConvertPartialToAbsolutePath(partial_path):
     """
     Given a partial path, return an absolute path
 
+    The returned path is within the project root if this is ran through the editor, or packaged build if this is ran
+    from a compiled .exe.
+
     If the provided path has 'HBEngine' at the beginning, then the returned path will be relative
-    to the engine, not the project. This is to allow references to engine default files that are not
-    a part of Heartbeat projects
+    to the engine, not the project.
     """
     global root_dir
     global project_root
-    #@TODO: Figure out how to solve this path reference with packaged builds
-    # Context: If using the "main" script to launch the engine from the editor, then the root
-    # will be "<root>/HBEngine", which means to access engine files, you'll need to append another
-    # "HBEngine". This doesn't quite make sense, as this directory struture would likely change for builds
-    # where we won't need the editor, so "main" would be non-existent. At that point, we'd likely start
-    # in the deeper "HBEngine", which doesn't require that additional concatenation
 
-    # Idea 1: We still use main, but we don't package the editor, and in main, we have a flag to skip
-    # the editor (Likely ill-advised)
-    #print(os.getcwd())
-
-    # Idea 2: We modify this code for the build
     if partial_path.startswith("HBEngine"):
-        return partial_path.replace("HBEngine", f"{root_dir}/HBEngine")
+        return partial_path.replace("HBEngine", f"{project_root}/HBEngine")
     else:
         return project_root + "/" + partial_path
 
@@ -159,10 +155,11 @@ scene = None
 input_owner = None
 paused = False
 
-root_dir = os.getcwd().replace("\\", "/")
+root_dir = os.getcwd().replace("\\", "/")  # Either the engine root, or the packaged root
 project_root = ""
 project_settings = {}
 variables = {}
+saves_dir = ""  # Set by 'SetProjectRoot'
 
 # Graphics
 resolution = (1280, 720)

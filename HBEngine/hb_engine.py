@@ -24,10 +24,6 @@ from pygame import mixer
 
 def Initialize(project_path: str):
     """ Loads project information and paths, and updates the pygame module with project-specific settings """
-    # @TODO: What is the right way to handle this?
-    if not project_path:
-        print("Warning: No project path provided - Defaulting to the engine root")
-
     settings.SetProjectRoot(project_path)
     settings.LoadProjectSettings()
     settings.LoadVariables()
@@ -180,6 +176,10 @@ def UnloadModule(module_name: str) -> bool:
             settings.input_owner = None
 
         del settings.modules[module_name]
+
+        # Redraw the scene to remove blitted artifacts
+        settings.scene.Draw()
+
         return True
     else:
         print(f"Warning: Module '{module_name}' is not currently loaded")

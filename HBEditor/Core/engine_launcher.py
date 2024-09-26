@@ -39,10 +39,10 @@ class EngineLauncher:
                 stdout=True,
                 stderr=True
             )
-            Logger.getInstance().Log("Engine Launched - Editor temporarily unavailable")
+            logger.Log("Engine Launched - Editor temporarily unavailable")
             result.wait()
 
-            Logger.getInstance().Log("Engine closed - Editor functionality resumed")
+            logger.Log("Engine closed - Editor functionality resumed")
 
         except Exception as exc:
             QMessageBox.about(
