@@ -73,6 +73,7 @@ class RenderableGroup:
             target = list(self.renderables.values())
         #@TODO: Is there a safer way of parsing these lists that avoid issues with size changing?
         for renderable in target:
-            renderable.update()
-            if renderable.children:
-                self.Update(renderable.children)
+            if renderable.enable_updates:
+                renderable.update()
+                if renderable.children:
+                    self.Update(renderable.children)

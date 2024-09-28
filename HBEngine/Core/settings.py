@@ -140,9 +140,8 @@ def ConvertPartialToAbsolutePath(partial_path):
     """
     global root_dir
     global project_root
-
     if partial_path.startswith("HBEngine"):
-        return partial_path.replace("HBEngine", f"{project_root}/HBEngine")
+        return partial_path.replace("HBEngine", f"{root_dir}/HBEngine")
     else:
         return project_root + "/" + partial_path
 

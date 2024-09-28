@@ -30,6 +30,8 @@ class Renderable(pygame.sprite.Sprite):
     """
     def __init__(self, renderable_data: dict, parent: Renderable = None):
         super().__init__()
+        self.enable_updates = True  # Toggles whether updates can propagate to children
+
         self.parent = parent
         self.children = []
 

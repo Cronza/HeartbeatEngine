@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 import pygame.mixer
-import copy, operator
+import copy, operator, os
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -2094,8 +2094,8 @@ class set_mute(Action):
 # -------------- VALUE ACTIONS --------------
 
 
-class set_value(Action):
-    DISPLAY_NAME = "Set Value"
+class set_variable(Action):
+    DISPLAY_NAME = "Set Variable"
     ACTION_DATA = {
         "name": {
             "type": "String",
@@ -2272,6 +2272,42 @@ class quit_game(Action):
         pygame.quit()
         exit()
 
+
+class save(Action):
+    """
+    Saves the game to the provided save slot id. If "force" is false, then a confirmation prompt will be shown to the
+    user if a save already exists in that slot
+    """
+    DISPLAY_NAME = "Quit Game"
+    ACTION_DATA = {
+        "id": {
+            "type": "Int",
+            "value": "",
+            "flags": ["editable", "preview"],
+        },
+        "name": {
+            "type": "String",
+            "value": "",
+            "flags": ["editable", "preview"],
+        },
+        "force": {
+            "type": "Bool",
+            "value": False,
+            "flags": ["editable"],
+        },
+    }
+
+    def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+        self.skippable = False
+
+        #settings.variables
+
+        # Confirm whether a save already exists in the provided slot id
+        os.path.exists()
+
+
+        exit()
 
 # -------------- TRANSITION ACTIONS --------------
 """ 

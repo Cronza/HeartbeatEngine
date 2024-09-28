@@ -15,17 +15,18 @@
 import pygame
 from HBEngine.Core import settings, action_manager
 from Tools.HBYaml.hb_yaml import Reader
+from HBEngine.Core.Modules.base import BaseModule
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.interface import Interface
 
 
-class Dialogue:
+class Dialogue(BaseModule):
     MODULE_NAME = "Dialogue"
     RESERVE_INPUT = True  # Disable updates for everything but this module (IE. Scene, other modules)
     CLOSE_ON_SCENE_CHANGE = True  # Prevent this module from persisting between scenes
 
     def __init__(self, file_path: str):
-        self.active_renderables = {}
+        super().__init__(file_path)
 
         self.dialogue_index = 0
         self.dialogue_data = {}
@@ -36,7 +37,6 @@ class Dialogue:
         self.root_renderable = Renderable({'key': '!&MODULE_DIALOGUE_ROOT&!', 'z_order': 99999})
         self.root_renderable.visible = False
         settings.scene.active_renderables.Add(self.root_renderable)
-        self.interface = None
 
         # Read in the dialogue file data
         self.dialogue_data = Reader.ReadAll(settings.ConvertPartialToAbsolutePath(file_path))
@@ -44,15 +44,6 @@ class Dialogue:
     def Start(self):
         self.LoadInterface()
         self.LoadAction()
-
-    def Shutdown(self):
-        """" Shut down the module, cleaning up spawned renderables and objects"""
-        settings.scene.active_renderables.Remove(self.root_renderable.key)
-        if self.interface:
-            settings.scene.active_renderables.Remove(self.interface.key)
-            del settings.scene.active_interfaces[self.interface.key]
-        self.root_renderable = None
-        self.interface = None
 
     def Update(self, events):
         for event in events:
@@ -68,15 +59,7 @@ class Dialogue:
                     else:
                         self.LoadAction()
 
-        # Update the AM and all child renderables (if applicable) since we reserve input with this module
-        action_manager.Update(events)
-        if self.root_renderable: self.UpdateRenderables([self.root_renderable])
-
-    def UpdateRenderables(self, target: list = None):
-        for renderable in target:
-            renderable.update()
-            if renderable.children:
-                self.UpdateRenderables(renderable.children)
+        super().Update(events)
 
     def LoadAction(self):
         """
@@ -106,6 +89,7 @@ class Dialogue:
                 self.dialogue_index += 1
                 self.LoadAction()
         else:
+            #print("End of Dialogue Sequence - The game will not proceed past this point.")
             from HBEngine import hb_engine
             hb_engine.UnloadModule(self.MODULE_NAME)
 
