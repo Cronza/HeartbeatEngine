@@ -64,10 +64,8 @@ def Main():
                         if settings.scene.allow_pausing:
                             if settings.paused:
                                 Unpause()
-                                pause_interface = None
                             else:
-                                pause_interface = Pause()
-
+                                Pause()
                 if event.type == pygame.QUIT:
                     is_running = False
                 # Debug - FPS
@@ -99,6 +97,20 @@ def Main():
         settings.scene.delta_time = settings.clock.tick(60) / 1000
 
 
+def Pause():
+    #@TODO: Add fallback engine pause screen if one is unset so an exception isn't thrown
+    pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
+
+    if pause_interface == "None" or not pause_interface:
+        # Use fallback interface
+        pause_interface = "HBEngine/Content/Interfaces/pause_menu_01.interface"
+
+    LoadModule(Pause, pause_interface)
+
+def Unpause():
+    UnloadModule("Pause")
+
+"""
 def Pause() -> InterfacePause:
     pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
     if pause_interface and pause_interface != 'None':
@@ -110,12 +122,14 @@ def Pause() -> InterfacePause:
     settings.scene.Draw()
     settings.paused = True
     return interface
+"""
 
-
+"""
 def Unpause():
     settings.scene.UnloadInterface("!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&")
     settings.scene.Draw()
     settings.paused = False
+"""
 
 
 def LoadScene(partial_file_path: str):
