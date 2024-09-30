@@ -2,7 +2,8 @@
 type: Interface
 settings:
   description: ''
-  key: ''
+  key: '!&INTERFACE_PAUSE&!'
+  z_order: 10000000000
 pages:
   Persistent:
     description: ''
@@ -72,7 +73,7 @@ pages:
             event_0:
               action:
                 action: switch_page
-                owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+                owner: "!&INTERFACE_PAUSE&!"
                 page: page_Options
                 conditions: { }
           conditions: { }
@@ -98,7 +99,7 @@ pages:
             event_0:
               action:
                 action: switch_page
-                owner: "!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&"
+                owner: "!&INTERFACE_PAUSE&!"
                 page: page_Save
                 conditions: { }
           conditions: { }
@@ -191,9 +192,7 @@ pages:
           sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
           sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
           sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
-          connect_project_setting:
-            category: Audio
-            setting: mute
+
           events:
             event_0:
               action:

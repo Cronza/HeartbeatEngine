@@ -23,14 +23,18 @@ class Interface(Renderable):
         # Page renderables are independent of the persistent renderables, and can be created and removed at runtime. In
         # order to faciliate quick removal, keep a list of page renderables as they're created
         self.page_renderables = []
-
         self.visible = False
-        if "key" not in renderable_data: renderable_data["key"] = id(self) #@TODO: Dialogue files don't have a key
-        if "z_order" not in renderable_data: renderable_data["z_order"] = 10000
-        super().__init__(renderable_data, parent)
 
-        if "Persistent" in renderable_data["pages"]:
-            for item in renderable_data["pages"]["Persistent"]["items"]:
+        if "settings" not in renderable_data:
+            raise ValueError("'Settings' block not found in Interface file. This is required to store renderable data such as the Key for the interface as a root object")
+
+        # Since interface files aren't designed like renderable files, the 'renderable' elements are kept in the
+        # 'settings' block. We need to ensure everything points to this section of the file
+        self.interface_data = renderable_data
+        super().__init__(renderable_data['settings'], parent)
+
+        if "Persistent" in self.interface_data["pages"]:
+            for item in self.interface_data["pages"]["Persistent"]["items"]:
                 action_name, action_data = next(iter(item.items()))
                 action_manager.PerformAction(action_data=action_data, action_name=action_name, parent=self, no_draw=True)
         else:
@@ -41,13 +45,13 @@ class Interface(Renderable):
         Unload the prior page if applicable, and load the provided page. Only one page is supported at a time.
         Returns whether the load succeeded
         """
-        if "pages" in self.renderable_data:
-            if page_name in self.renderable_data["pages"]:
+        if "pages" in self.interface_data:
+            if page_name in self.interface_data["pages"]:
                 if self.page_renderables:
                     self.RemovePage()
 
                 # Create and record new page renderables
-                for page_action in self.renderable_data["pages"][page_name]["items"]:
+                for page_action in self.interface_data["pages"][page_name]["items"]:
                     action_name, action_data = next(iter(page_action.items()))
                     renderable = action_manager.PerformAction(action_data=action_data, action_name=action_name, parent=self, no_draw=True)
                     self.page_renderables.append(renderable)

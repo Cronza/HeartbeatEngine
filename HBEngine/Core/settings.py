@@ -151,7 +151,7 @@ modules = {}
 clock = None
 window = None
 scene = None
-input_owner = None
+thread_reservations = []  # Descending list of objects that are reserving control of the main thread
 paused = False
 
 root_dir = os.getcwd().replace("\\", "/")  # Either the engine root, or the packaged root

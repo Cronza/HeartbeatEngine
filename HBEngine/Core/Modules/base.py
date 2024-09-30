@@ -21,7 +21,7 @@ from HBEngine.Core.Objects.interface import Interface
 
 class BaseModule:
     MODULE_NAME = "Default"
-    RESERVE_INPUT = True  # Disable updates for everything but this module (IE. Scene, other modules)
+    RESERVE_THREAD = True  # Reserve the main thread while this module is active, disabling updates for everything but this module (IE. Scene, other modules)
     CLOSE_ON_SCENE_CHANGE = True  # Prevent this module from persisting between scenes
 
     def __init__(self, file_path: str):
@@ -38,15 +38,20 @@ class BaseModule:
     def Shutdown(self):
         """" Shut down the module, cleaning up spawned renderables and objects"""
         if self.root_renderable:
+            # This may fail if a user targetted a module renderable, or if a scene changed as that wipes the
+            # renderable list. Since this is difficult to control and we're going to delete the root anyways, handle
+            # this situation gracefully
             settings.scene.active_renderables.Remove(self.root_renderable.key)
+
             self.root_renderable = None
-        if self.interface:
-            settings.scene.active_renderables.Remove(self.interface.key)
-            del settings.scene.active_interfaces[self.interface.key]
             self.interface = None
+        #if self.interface:
+        #    settings.scene.active_renderables.Remove(self.interface.key)
+        #    del settings.scene.active_interfaces[self.interface.key]
+        #    self.interface = None
 
     def Update(self, events):
-        # Update the AM and all child renderables (if applicable) since we reserve input with this module
+        # Update the AM and all child renderables (if applicable) since we reserve the thread with this module
         action_manager.Update(events)
         if self.root_renderable:
             self.UpdateRenderables([self.root_renderable])
@@ -58,6 +63,13 @@ class BaseModule:
             if renderable.children:
                 self.UpdateRenderables(renderable.children)
 
-    def LoadInterface(self):
-        pass
+    def LoadInterface(self, interface_file: str):
+        """ Load the module interface, adding it as a child to the root renderable and registering it with the scene """
+        self.interface = Interface(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)))
+        self.root_renderable.children.append(self.interface)
+
+        # Add the interface to the scene so actions can still target it, but leave it out of the renderables list so
+        # it's drawn as a group with other module-specific renderables
+        print("Setting active interface under key ", self.interface.key, " | ", self)
+        settings.scene.active_interfaces[self.interface.key] = self.interface
 

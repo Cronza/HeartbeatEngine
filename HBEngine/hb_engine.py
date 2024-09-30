@@ -17,7 +17,7 @@ import argparse
 import pygame
 from HBEngine.Core import settings
 from HBEngine.Core.scene import Scene
-from HBEngine.Core.Objects.interface_pause import InterfacePause
+from HBEngine.Core.Modules.pause import Pause as ModulePause
 
 from pygame import mixer
 
@@ -40,7 +40,6 @@ def Main():
     mixer.init()
     settings.clock = pygame.time.Clock()
     settings.window = pygame.display.set_mode(settings.resolution)
-    pause_interface = None  # Instantiated and set during runtime
 
     # Load the starting scene
     if settings.GetProjectSetting("Game", "starting_scene"):
@@ -63,20 +62,19 @@ def Main():
                     if settings.scene:
                         if settings.scene.allow_pausing:
                             if settings.paused:
-                                Unpause()
+                                UnloadModule(ModulePause.MODULE_NAME)
                             else:
-                                Pause()
+                                LoadModule(ModulePause)
                 if event.type == pygame.QUIT:
                     is_running = False
                 # Debug - FPS
                 if event.key == pygame.K_F3:
                     show_fps = not show_fps
 
-        if settings.paused:
-            settings.scene.active_renderables.Update([pause_interface])
-        elif settings.input_owner:
-            # Input owners lock out updates for everything but themselves. If one is active, only update it
-            settings.input_owner.Update(events)
+        if settings.thread_reservations:
+            # Thread reservations lock out updates for everything but themselves. If one is active, only update it.
+            # If multiple are active, only update the top-most reservation
+            settings.thread_reservations[0].Update(events)
         else:
             # Update scene logic. This drives the core game functionality
             settings.scene.Update(events)
@@ -95,41 +93,6 @@ def Main():
         # Get the time in miliseconds converted to seconds since the last frame. Used to avoid frame dependency
         # on actions
         settings.scene.delta_time = settings.clock.tick(60) / 1000
-
-
-def Pause():
-    #@TODO: Add fallback engine pause screen if one is unset so an exception isn't thrown
-    pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
-
-    if pause_interface == "None" or not pause_interface:
-        # Use fallback interface
-        pause_interface = "HBEngine/Content/Interfaces/pause_menu_01.interface"
-
-    LoadModule(Pause, pause_interface)
-
-def Unpause():
-    UnloadModule("Pause")
-
-"""
-def Pause() -> InterfacePause:
-    pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
-    if pause_interface and pause_interface != 'None':
-        interface = settings.scene.LoadInterface(pause_interface, InterfacePause)
-    else:
-        print("No pause interface set - Falling back to default")
-        interface = settings.scene.LoadInterface("HBEngine/Content/Interfaces/pause_menu_01.interface", InterfacePause)
-
-    settings.scene.Draw()
-    settings.paused = True
-    return interface
-"""
-
-"""
-def Unpause():
-    settings.scene.UnloadInterface("!&HBENGINE_INTERNAL_PAUSE_INTERFACE!&")
-    settings.scene.Draw()
-    settings.paused = False
-"""
 
 
 def LoadScene(partial_file_path: str):
@@ -151,7 +114,7 @@ def LoadScene(partial_file_path: str):
     settings.scene.LoadSceneData()
 
 
-def LoadModule(module_obj: callable, module_file_path: str) -> bool:
+def LoadModule(module_obj: callable, module_file_path: str = '') -> bool:
     """
     Creates the provided module, and adds it to the active module dict. Returns whether the module was
     successfully created
@@ -164,11 +127,8 @@ def LoadModule(module_obj: callable, module_file_path: str) -> bool:
         # Instantiate the module
         module = module_obj(module_file_path)
 
-        if module_obj.RESERVE_INPUT:
-            if settings.input_owner:
-                print(f"Warning: Module '{settings.input_owner.MODULE_NAME}' has already reserved input - Unable to load a second module that reserves input!")
-                return False
-            settings.input_owner = module
+        if module_obj.RESERVE_THREAD:
+            settings.thread_reservations.insert(0, module)
 
         # Assign and start the module
         settings.modules[module_obj.MODULE_NAME] = module
@@ -185,10 +145,9 @@ def UnloadModule(module_name: str) -> bool:
     if module_name in settings.modules:
         settings.modules[module_name].Shutdown()
 
-        # Clear the input reservation if applicable
-        if settings.modules[module_name] is settings.input_owner:
-            settings.input_owner = None
-
+        # Clear the thread reservation if applicable
+        if settings.modules[module_name] in settings.thread_reservations:
+            settings.thread_reservations.remove(settings.modules[module_name])
         del settings.modules[module_name]
 
         # Redraw the scene to remove blitted artifacts

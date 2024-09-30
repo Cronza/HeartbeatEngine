@@ -17,36 +17,45 @@ from HBEngine.Core import settings, action_manager
 from Tools.HBYaml.hb_yaml import Reader
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.interface import Interface
+from HBEngine.Core.Modules.base import BaseModule
 
 
-class Pause:
+class Pause(BaseModule):
     MODULE_NAME = "Pause"
-    RESERVE_INPUT = True  # Disable updates for everything but this module (IE. Scene, other modules)
+    RESERVE_THREAD = True  # Disable updates for everything but this module (IE. Scene, other modules)
     CLOSE_ON_SCENE_CHANGE = True  # Prevent this module from persisting between scenes
 
     def __init__(self, file_path: str):
-        self.active_renderables = {}
+        super().__init__(file_path)
 
         # Keep track of all spawned renderables by adding them as children to a root object. When removing this module,
         # instead of tracking each instance down, we can just delete the root and all children will go with it
         self.root_renderable = Renderable({'key': '!&MODULE_PAUSE_ROOT&!', 'z_order': 10000000000})
         self.root_renderable.visible = False
         settings.scene.active_renderables.Add(self.root_renderable)
-        self.interface = None
+
+        # Enable the global 'Pause' state
+        settings.paused = True
 
     def Start(self):
-        self.LoadInterface()
+        pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
+        if pause_interface == "None" or not pause_interface:
+            # Use fallback interface
+            # @TODO: Replace this with a generic empty pause menu with the word "Pause" written on it. Maybe a 'quit' button
+            # @TODO: That, or update this when we have a starting project where 'Play' doesn't lead to a FileNotFound error
+            pause_interface = "HBEngine/Content/Interfaces/pause_menu_01.interface"
+
+        self.LoadInterface(pause_interface)
+        settings.scene.Draw()
 
     def Shutdown(self):
         """" Shut down the module, cleaning up spawned renderables and objects"""
-        settings.scene.active_renderables.Remove(self.root_renderable.key)
-        if self.interface:
-            settings.scene.active_renderables.Remove(self.interface.key)
-            del settings.scene.active_interfaces[self.interface.key]
-        self.root_renderable = None
-        self.interface = None
+        super().Shutdown()
 
-    """
+        # Disable the global 'Pause' state
+        settings.paused = False
+
+
     def Update(self, events):
         for event in events:
             if event.type == pygame.KEYUP:
@@ -57,28 +66,8 @@ class Pause:
                             if action.skippable:
                                 action.Skip()
 
-                    # No actions active. Go to next
-                    else:
-                        self.LoadAction()
-
         # Update the AM and all child renderables (if applicable) since we reserve input with this module
         action_manager.Update(events)
         if self.root_renderable:
             self.UpdateRenderables([self.root_renderable])
-    """
 
-    def UpdateRenderables(self, target: list = None):
-        for renderable in target:
-            renderable.update()
-            if renderable.children:
-                self.UpdateRenderables(renderable.children)
-
-    def LoadInterface(self):
-        """ Load the module interface, adding it as a child to the root renderable and registering it with the scene """
-        interface = settings.GetProjectSetting("Default Variables - UI", "pause_menu_interface")
-        self.interface = Interface(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface)))
-        self.root_renderable.children.append(self.interface)
-
-        # Add the interface to the scene so actions can still target it, but leave it out of the renderables list so
-        # it's drawn as a group with other module-specific renderables
-        settings.scene.active_interfaces[self.interface.key] = self.interface

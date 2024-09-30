@@ -71,9 +71,8 @@ class RenderableGroup:
     def Update(self, target: list = None):
         if not target:
             target = list(self.renderables.values())
-        #@TODO: Is there a safer way of parsing these lists that avoid issues with size changing?
+        #@TODO: Is there a safer way of parsing these lists that avoid issues with size changing?n
         for renderable in target:
-            if renderable.enable_updates:
-                renderable.update()
-                if renderable.children:
-                    self.Update(renderable.children)
+            renderable.update()
+            if renderable.children:
+                self.Update(renderable.children)

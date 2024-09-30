@@ -106,7 +106,12 @@ class InterfaceSettings(QtCore.QObject, SourceEntry):
             "type": "Paragraph",
             "value": "",
             "flags": ["editable"]
-        }
+        },
+        "z_order": {
+            "type": "Int",
+            "value": "10000",
+            "flags": ["editable"]
+        },
     }
 
     def __init__(self):
