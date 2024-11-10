@@ -20,11 +20,6 @@ class Checkbox(Interactable):
         self.children.append(self.check_icon_renderable)
         self.check_icon_renderable.visible = False
 
-        # Setup Connections
-        if "connect_project_setting" in self.renderable_data:
-            if not self.ConnectProjectSetting(self.renderable_data["connect_project_setting"]):
-                print(f"Unable to setup project setting connection for '{self.key}'. Please review the connection settings")
-
     def Interact(self):
         # If a connection has been established, then the check state is determined by the connected value. If no
         # connection is active, then the check state is set by the interaction
@@ -37,8 +32,8 @@ class Checkbox(Interactable):
         super().Interact()
         settings.scene.Draw()  # Draw to apply the icon changes
 
-    def ConnectionUpdate(self, new_value):
-        if isinstance(new_value, bool):
-            self.check_icon_renderable.visible = new_value
-        else:
-            raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'bool'")
+    #def ConnectionUpdate(self, new_value):
+    #    if isinstance(new_value, bool):
+    #        self.check_icon_renderable.visible = new_value
+    #    else:
+    #        raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'bool'")

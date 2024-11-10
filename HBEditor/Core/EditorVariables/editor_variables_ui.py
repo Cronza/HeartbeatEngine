@@ -29,7 +29,7 @@ class VariableAlreadyExists(Exception):
 class VariableNameReserved(Exception):
     pass
 
-
+# TODO: Make the ui like the project settings UI, but add 'Add' and 'Remove' buttons to the category list
 class EditorVariablesUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
@@ -39,16 +39,45 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
+        # Allow the user to resize each section
+        self.main_resize_container = QtWidgets.QSplitter(self)
+
         # Create the toolbar
         self.main_toolbar = QtWidgets.QToolBar()
         self.main_toolbar.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.main_toolbar.setObjectName("vertical")
         self.main_layout.addWidget(self.main_toolbar)
 
-        # Main Table
+        # Category Section
+        self.categories = QtWidgets.QWidget()
+        self.category_layout = QtWidgets.QVBoxLayout(self)
+        self.category_layout.setContentsMargins(0, 0, 0, 0)
+        self.category_layout.setSpacing(0)
+        self.categories.setLayout(self.category_layout)
+
+        self.category_title = QtWidgets.QLabel(self)
+        self.category_title.setText("Categories")
+        self.category_title.setObjectName("h1")
+        self.category_list = QtWidgets.QListWidget()
+        #self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
+        self.category_layout.addWidget(self.category_title)
+        self.category_layout.addWidget(self.category_list)
+
+        # Variables Section
+        self.variables = QtWidgets.QWidget()
+        self.variables_layout = QtWidgets.QVBoxLayout(self)
+        self.variables_layout.setContentsMargins(0, 0, 0, 0)
+        self.variables_layout.setSpacing(0)
+        self.variables.setLayout(self.variables_layout)
+        self.variables_title = QtWidgets.QLabel(self)
+        self.variables_title.setText("Variables")
+        self.variables_title.setObjectName("h1")
+
         self.variables_table = VariablesTable(self)
         self.variables_table.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-        self.main_layout.addWidget(self.variables_table)
+        self.variables_layout.addWidget(self.variables_title)
+        self.variables_layout.addWidget(self.variables_table)
+        #self.main_layout.addWidget(self.variables_table)
 
         # Instead of having wrapper functions for modifying the table, I moved those inside the table itself.
         # As such, the buttons can be configured to point to the table functions directly
@@ -65,6 +94,15 @@ class EditorVariablesUI(EditorBaseUI):
             "Remove Value",
             self.variables_table.RemoveValue
         )
+
+        # Assign everything to the main widget
+        self.main_layout.addWidget(self.main_resize_container)
+        self.main_resize_container.addWidget(self.categories)
+        self.main_resize_container.addWidget(self.variables)
+
+        # Adjust the space allocation to favor the settings section
+        self.main_resize_container.setStretchFactor(0, 0)
+        self.main_resize_container.setStretchFactor(1, 1)
 
     def AddValue(self, name: str = '', type_data: str = '', input_data: any = None):
         self.variables_table.AddValue(name, type_data, input_data)
@@ -127,7 +165,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.hovered_row = -1 # TEST
         self.is_dragging = False
 
-        self.setObjectName('variables-table')
+        #self.setObjectName('variables-table')
         self.setColumnCount(4)
         self.verticalHeader().hide()
 

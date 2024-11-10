@@ -1185,6 +1185,12 @@ class create_checkbox(Action):
             "connection": "",
             "flags": ["editable", "connectable"],
         },
+        "is_checked": {
+            "type": "Bool",
+            "value": False,
+            "connection": "",
+            "flags": ["editable", "connectable", "preview"],
+        },
         "events": {
             "type": "Array",
             "flags": ["editable", "no_exclusion"],
@@ -2070,7 +2076,7 @@ class set_mute(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        # Update the project setting
+        # Update the project setting either by flipping it (If toggle active), or setting it to the provided value
         if self.simplified_ad["toggle"]:
             settings.SetProjectSetting("Audio", "mute", not settings.GetProjectSetting("Audio", "mute"))
         else:
@@ -2566,7 +2572,8 @@ class unpause(Action):
 
     def Start(self):
         from HBEngine import hb_engine
-        hb_engine.Unpause()
+        from HBEngine.Core.Modules.pause import Pause as ModulePause
+        hb_engine.UnloadModule(ModulePause.MODULE_NAME)
         self.Complete()
         return None
 

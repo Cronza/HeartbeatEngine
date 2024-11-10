@@ -28,7 +28,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        # Allow the user to resize each column
+        # Allow the user to resize each section
         self.main_resize_container = QtWidgets.QSplitter(self)
 
         # Category Section

@@ -149,11 +149,11 @@ class TextRenderable(Renderable):
         self.surface = new_surface
         self.rect = pygame.Rect(self.rect.x, self.rect.y, new_rect.w, new_rect.h)
 
-    def ConnectionUpdate(self, new_value):
-        if isinstance(new_value, str):
-            self.text = new_value
-            self.WrapText()
-            self.RecalculateSize(settings.resolution_multiplier)
-        else:
-            raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'str'")
+    #def ConnectionUpdate(self, new_value):
+    #    if isinstance(new_value, str):
+    #        self.text = new_value
+    #        self.WrapText()
+    #        self.RecalculateSize(settings.resolution_multiplier)
+    #    else:
+    #        raise ValueError(f"Connection value is an invalid type. Received '{type(new_value)}' when expecting 'str'")
 

@@ -90,10 +90,10 @@ class Music:
     def __init__(self, sound_data: dict):
         self.sound_data = sound_data
         self.paused = False
+        self.loop_count = 1
         if "loop" in self.sound_data:
             if self.sound_data["loop"]:
                 self.loop_count = -1
-
         # Preset the volume (Use the base implementation to avoid the mute lock in 'SetVolume')
         pygame.mixer.music.set_volume(self.sound_data["volume"])
 
