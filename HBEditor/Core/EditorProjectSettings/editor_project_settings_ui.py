@@ -119,8 +119,7 @@ class EditorProjectSettingsUI(EditorBaseUI):
 
         self.settings_tree.clear()
 
-        # Loop to add all settings for the selected category. Double up the search by parsing the
-        # schema as well for the data types of each setting
+        # Loop to add all settings for the selected category
         selected_category = self.category_list.currentItem().text()
         for setting_name, setting_data in self.core.project_settings[selected_category].items():
             ieh.Add(

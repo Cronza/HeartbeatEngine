@@ -29,10 +29,11 @@ class VariableAlreadyExists(Exception):
 class VariableNameReserved(Exception):
     pass
 
-# TODO: Make the ui like the project settings UI, but add 'Add' and 'Remove' buttons to the category list
 class EditorVariablesUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
+        # Track the active category, as we need a reference to it when we switch categories
+        self.active_category = None
 
         # Build the core editor layout object
         self.main_layout = QtWidgets.QHBoxLayout(self)
@@ -104,8 +105,35 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_resize_container.setStretchFactor(0, 0)
         self.main_resize_container.setStretchFactor(1, 1)
 
-    def AddValue(self, name: str = '', type_data: str = '', input_data: any = None):
-        self.variables_table.AddValue(name, type_data, input_data)
+    def PopulateCategories(self):
+        self.category_list.clear()
+
+        for category in self.core.variables:
+            self.category_list.addItem(QtWidgets.QListWidgetItem(category))
+
+        self.category_list.setCurrentRow(0)
+        self.active_category = self.category_list.item(0)
+
+    #def SwitchCategory(self):
+    #    """ Switch the active category by saving the current settings data, then repopulates the settings list """
+    #    if self.active_category:
+    #        self.UpdateProjectSettingsData()
+
+    #    self.active_category = self.category_list.currentItem()
+    #    self.PopulateSettings()
+
+    def PopulateVariables(self):
+        """ Populates the settings list based on the selected category """
+
+        self.variables_table.clear()
+
+        # Loop to add all settings for the selected category
+        selected_category = self.category_list.currentItem().text()
+        for var_name, var_data in self.core.variables[selected_category].items():
+            self.variables_table.AddValue(var_name, var_data['type'], var_data['value'])
+
+    #def AddValue(self, name: str = '', type_data: str = '', input_data: any = None):
+    #    self.variables_table.AddValue(name, type_data, input_data)
 
     def RemoveValue(self):
         self.variables_table.RemoveValue()

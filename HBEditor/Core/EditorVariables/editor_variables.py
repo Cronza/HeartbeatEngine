@@ -29,7 +29,7 @@ class EditorVariables(EditorBase):
         super().__init__(file_path)
 
         # Read this data in first as the U.I will need it to initialize properly
-        self.variables_data = Reader.ReadAll(self.file_path)
+        self.variables = Reader.ReadAll(self.file_path)
 
         self.editor_ui = EditorVariablesUI(self)
         logger.Log("Editor initialized")
@@ -86,12 +86,20 @@ class EditorVariables(EditorBase):
 
         file_data = Reader.ReadAll(self.file_path)
 
+        # Generate entries for each project setting and category
+        self.editor_ui.blockSignals(True)
+        self.editor_ui.PopulateCategories()
+        self.editor_ui.PopulateVariables()
+        self.editor_ui.blockSignals(False)
+
         # Skip importing if the file has no data to load
-        if file_data:
+        #if file_data:
             # Disable signals to prevent marking the editor as dirty while we're populating it
-            self.editor_ui.blockSignals(True)
 
-            for val_name, val_data in file_data.items():
-                self.editor_ui.AddValue(val_name, val_data['type'], val_data['value'])
+            #self.editor_ui.PopulateCategories()
+            #for var_cat, var_list in file_data.items():
+#
+            #    for var_name, var_data in file_data.items():
+            #        self.editor_ui.AddValue(var_name, var_data['type'], var_data['value'])
 
-            self.editor_ui.blockSignals(False)
+
