@@ -43,12 +43,6 @@ class EditorVariablesUI(EditorBaseUI):
         # Allow the user to resize each section
         self.main_resize_container = QtWidgets.QSplitter(self)
 
-        # Create the toolbar
-        self.main_toolbar = QtWidgets.QToolBar()
-        self.main_toolbar.setOrientation(QtCore.Qt.Orientation.Vertical)
-        self.main_toolbar.setObjectName("vertical")
-        self.main_layout.addWidget(self.main_toolbar)
-
         # Category Section
         self.categories = QtWidgets.QWidget()
         self.category_layout = QtWidgets.QVBoxLayout(self)
@@ -61,7 +55,25 @@ class EditorVariablesUI(EditorBaseUI):
         self.category_title.setObjectName("h1")
         self.category_list = QtWidgets.QListWidget()
         #self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
+
+        self.category_toolbar = QtWidgets.QToolBar()
+        self.category_toolbar.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.category_toolbar.setObjectName("horizontal")
+
+        self.category_toolbar.addAction(
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
+            "Add Category",
+            #self.variables_table.AddVariable
+        )
+
+        self.category_toolbar.addAction(
+            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
+            "Remove Category",
+            #self.variables_table.RemoveVariable
+        )
+
         self.category_layout.addWidget(self.category_title)
+        self.category_layout.addWidget(self.category_toolbar)
         self.category_layout.addWidget(self.category_list)
 
         # Variables Section
@@ -76,25 +88,25 @@ class EditorVariablesUI(EditorBaseUI):
 
         self.variables_table = VariablesTable(self)
         self.variables_table.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-        self.variables_layout.addWidget(self.variables_title)
-        self.variables_layout.addWidget(self.variables_table)
-        #self.main_layout.addWidget(self.variables_table)
 
-        # Instead of having wrapper functions for modifying the table, I moved those inside the table itself.
-        # As such, the buttons can be configured to point to the table functions directly
-        # Toolbar - Add Button
-        self.main_toolbar.addAction(
+        self.variables_toolbar = QtWidgets.QToolBar()
+        self.variables_toolbar.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.variables_toolbar.setObjectName("horizontal")
+        self.variables_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
             "Add Variable",
-            self.variables_table.AddValue
+            self.variables_table.AddVariable
         )
 
-        # Toolbar - Remove Button
-        self.main_toolbar.addAction(
+        self.variables_toolbar.addAction(
             QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
-            "Remove Value",
-            self.variables_table.RemoveValue
+            "Remove Variable",
+            self.variables_table.RemoveVariable
         )
+
+        self.variables_layout.addWidget(self.variables_title)
+        self.variables_layout.addWidget(self.variables_toolbar)
+        self.variables_layout.addWidget(self.variables_table)
 
         # Assign everything to the main widget
         self.main_layout.addWidget(self.main_resize_container)
@@ -109,7 +121,7 @@ class EditorVariablesUI(EditorBaseUI):
         self.category_list.clear()
 
         for category in self.core.variables:
-            self.category_list.addItem(QtWidgets.QListWidgetItem(category))
+            self.AddCategory(category)
 
         self.category_list.setCurrentRow(0)
         self.active_category = self.category_list.item(0)
@@ -124,19 +136,17 @@ class EditorVariablesUI(EditorBaseUI):
 
     def PopulateVariables(self):
         """ Populates the settings list based on the selected category """
-
-        self.variables_table.clear()
+        self.variables_table.clearContents()
 
         # Loop to add all settings for the selected category
         selected_category = self.category_list.currentItem().text()
         for var_name, var_data in self.core.variables[selected_category].items():
-            self.variables_table.AddValue(var_name, var_data['type'], var_data['value'])
+            self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
 
-    #def AddValue(self, name: str = '', type_data: str = '', input_data: any = None):
-    #    self.variables_table.AddValue(name, type_data, input_data)
-
-    def RemoveValue(self):
-        self.variables_table.RemoveValue()
+    def AddCategory(self, category: str):
+        self.category_list.addItem(QtWidgets.QListWidgetItem(category))
+    def RemoveCategory(self):
+        pass
 
     def GetData(self) -> dict:
         """ Returns a dict of {'var_name': {'type: <var_type>, 'value': 'var_data'}} """
@@ -217,10 +227,10 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.horizontalHeader().setDefaultSectionSize(self.horizontalHeader().defaultSectionSize() * 3)
         self.setColumnWidth(2, round(self.horizontalHeader().defaultSectionSize() / 2))
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked | QtWidgets.QAbstractItemView.EditTrigger.SelectedClicked)
-        values_delegate = ValuesItemDelegate(self)
-        self.setItemDelegate(values_delegate)
+        variables_delegate = VariablesItemDelegate(self)
+        self.setItemDelegate(variables_delegate)
 
-    def AddValue(self, name: str = '', type_data: str = '', input_data: any = None, index: int = -1):
+    def AddVariable(self, name: str = '', type_data: str = '', input_data: any = None, index: int = -1):
         """ Adds a new row, populating each column with the provided data if applicable """
         if index == -1:
             index = self.rowCount()
@@ -297,7 +307,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.resizeRowsToContents()
         self.SIG_USER_UPDATE.emit()
 
-    def RemoveValue(self):
+    def RemoveVariable(self):
         selected_rows = self.selectedIndexes()
         if selected_rows:
             for row_index in reversed(range(0, len(selected_rows))):
@@ -346,10 +356,10 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.removeRow(row_to_move)
 
         # Add the new item
-        self.AddValue(name, type_data, input_data, target_dest)
+        self.AddVariable(name, type_data, input_data, target_dest)
 
 
-class ValuesItemDelegate(QtWidgets.QStyledItemDelegate):
+class VariablesItemDelegate(QtWidgets.QStyledItemDelegate):
     """ A custom item delegate that enforces unique 'Name' column values """
     def __init__(self, table_parent: VariablesTable):
         super().__init__()
