@@ -1,9 +1,16 @@
 from PyQt6 import QtWidgets
+from HBEditor.Core.Logger import logger
 
 
 class EditEntryPrompt(QtWidgets.QDialog):
-    def __init__(self, name, description, parent=None):
+    """
+    A dialog designed to offer a simple Request-for-Information prompt designed for editing items in an
+    AbstractItemView. Depending on the provided params, certain fields will not be display and ultimately returned
+    """
+    def __init__(self, name: str = "", description: str = "", use_desc: bool = True, parent=None):
         super().__init__(parent)
+        self.use_desc = use_desc
+
         self.setWindowTitle("Entry Configuration")
 
         # Create layout and add widgets
@@ -14,8 +21,9 @@ class EditEntryPrompt(QtWidgets.QDialog):
         self.entry_name_input = QtWidgets.QLineEdit(name)
 
         # Description
-        self.entry_description_header = QtWidgets.QLabel("Description:")
-        self.entry_description_input = QtWidgets.QPlainTextEdit(description)
+        if use_desc:
+            self.entry_description_header = QtWidgets.QLabel("Description:")
+            self.entry_description_input = QtWidgets.QPlainTextEdit(description)
 
         # Cancel & Accept
         self.button_layout = QtWidgets.QHBoxLayout()
@@ -27,8 +35,9 @@ class EditEntryPrompt(QtWidgets.QDialog):
         # Add everything together
         self.main_layout.addWidget(self.entry_name_header)
         self.main_layout.addWidget(self.entry_name_input)
-        self.main_layout.addWidget(self.entry_description_header)
-        self.main_layout.addWidget(self.entry_description_input)
+        if use_desc:
+            self.main_layout.addWidget(self.entry_description_header)
+            self.main_layout.addWidget(self.entry_description_input)
         self.main_layout.addLayout(self.button_layout)
 
         # Set dialog layout
@@ -49,7 +58,13 @@ class EditEntryPrompt(QtWidgets.QDialog):
             self.accept()
 
     def Get(self):
-        """ Returns the name and description as a tuple """
-        return self.entry_name_input.text(), self.entry_description_input.toPlainText()
-
+        """
+        Returns requested data in order depending on what was requested originally:
+         0 - Name
+         1 - Description
+        """
+        if self.use_desc:
+            return self.entry_name_input.text(), self.entry_description_input.toPlainText()
+        else:
+            return self.entry_name_input.text()
 
