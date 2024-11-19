@@ -24,7 +24,7 @@ class GroupsPanel(QtWidgets.QWidget):
     SIG_USER_GROUP_TOGGLE = QtCore.pyqtSignal(bool, str)  # Emits when the user toggles an entry. Returns <toggle_state>, <group_name>
     SIG_USER_GROUP_CHANGE = QtCore.pyqtSignal(object, object) # Emits when the user selects a different entry than the active one
 
-    def __init__(self, title: str = "Groups", enable_togglable_entries: bool = False):
+    def __init__(self, title: str = "Groups", enable_togglable_entries: bool = False, use_descriptions: bool = True):
         super().__init__()
 
         # Simplify the reference to the active group
@@ -32,6 +32,7 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Configurable properties
         self.enable_togglable_entries = enable_togglable_entries
+        self.use_descriptions = use_descriptions
 
         ### U.I ###
 
@@ -89,7 +90,7 @@ class GroupsPanel(QtWidgets.QWidget):
             list_item.setFlags(list_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsDragEnabled)
 
         # Create the core part of the entry
-        new_entry = GroupEntry(self.enable_togglable_entries)
+        new_entry = GroupEntry(self.enable_togglable_entries, show_description=self.use_descriptions)
         if self.enable_togglable_entries:
             new_entry.SetToggle(toggle)
             new_entry.SIG_USER_TOGGLE.connect(self.SIG_USER_GROUP_TOGGLE.emit)
@@ -261,7 +262,7 @@ class GroupEntry(QtWidgets.QWidget):
     """
     SIG_USER_TOGGLE = QtCore.pyqtSignal(bool, str)
 
-    def __init__(self, use_toggle: bool = False):
+    def __init__(self, use_toggle: bool = False, show_description: bool = True):
         super().__init__()
         # Allow CSS to stylize the drag visualization for this widget
         self.setObjectName("drag-source")
@@ -301,6 +302,10 @@ class GroupEntry(QtWidgets.QWidget):
         self.subtext_widget.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.subtext_widget.setSizePolicy(size_policy)
         self.info_layout.addWidget(self.subtext_widget)
+
+        if show_description:
+            self.subtext_widget.hide()
+
 
         self.toggle_button = None
         if use_toggle:

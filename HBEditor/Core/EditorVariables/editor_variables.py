@@ -88,7 +88,13 @@ class EditorVariables(EditorBase):
 
         # Generate entries for each project setting and category
         self.editor_ui.blockSignals(True)
-        self.editor_ui.PopulateCategories()
+        print("File Data", file_data)
+        for cat_name, cat_data in file_data.items():
+            self.editor_ui.categories.CreateEntry(cat_name, "")
+
+        # Select the Default category by default
+        self.editor_ui.categories.ChangeEntry(0)
+
         self.editor_ui.PopulateVariables()
         self.editor_ui.blockSignals(False)
 

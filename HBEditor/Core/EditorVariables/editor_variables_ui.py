@@ -17,6 +17,7 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
 from HBEditor.Core.EditorCommon.input_entries import InputEntryText
 from HBEditor.Core.EditorCommon import input_entry_handler as ieh
+from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
 
 
 class VariableNameUndefined(Exception):
@@ -44,37 +45,7 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_resize_container = QtWidgets.QSplitter(self)
 
         # Category Section
-        self.categories = QtWidgets.QWidget()
-        self.category_layout = QtWidgets.QVBoxLayout(self)
-        self.category_layout.setContentsMargins(0, 0, 0, 0)
-        self.category_layout.setSpacing(0)
-        self.categories.setLayout(self.category_layout)
-
-        self.category_title = QtWidgets.QLabel(self)
-        self.category_title.setText("Categories")
-        self.category_title.setObjectName("h1")
-        self.category_list = QtWidgets.QListWidget()
-        #self.category_list.itemSelectionChanged.connect(self.SwitchCategory)
-
-        self.category_toolbar = QtWidgets.QToolBar()
-        self.category_toolbar.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.category_toolbar.setObjectName("horizontal")
-
-        self.category_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Plus.png")),
-            "Add Category",
-            #self.variables_table.AddVariable
-        )
-
-        self.category_toolbar.addAction(
-            QtGui.QIcon(QtGui.QPixmap("EditorContent:Icons/Minus.png")),
-            "Remove Category",
-            #self.variables_table.RemoveVariable
-        )
-
-        self.category_layout.addWidget(self.category_title)
-        self.category_layout.addWidget(self.category_toolbar)
-        self.category_layout.addWidget(self.category_list)
+        self.categories = GroupsPanel("Categories", False)
 
         # Variables Section
         self.variables = QtWidgets.QWidget()
@@ -117,14 +88,16 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_resize_container.setStretchFactor(0, 0)
         self.main_resize_container.setStretchFactor(1, 1)
 
+    """
     def PopulateCategories(self):
-        self.category_list.clear()
+        self.category.clear()
 
         for category in self.core.variables:
             self.AddCategory(category)
 
         self.category_list.setCurrentRow(0)
         self.active_category = self.category_list.item(0)
+    """
 
     #def SwitchCategory(self):
     #    """ Switch the active category by saving the current settings data, then repopulates the settings list """
@@ -139,12 +112,16 @@ class EditorVariablesUI(EditorBaseUI):
         self.variables_table.clearContents()
 
         # Loop to add all settings for the selected category
-        selected_category = self.category_list.currentItem().text()
+        selected_category = self.categories.active_entry.Get()[0]
         for var_name, var_data in self.core.variables[selected_category].items():
             self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
 
-    def AddCategory(self, category: str):
-        self.category_list.addItem(QtWidgets.QListWidgetItem(category))
+    def AddCategory(self, category: str = ""):
+        pass
+        #if not category:
+
+        #self.category_list.addItem(QtWidgets.QListWidgetItem(category))
+
     def RemoveCategory(self):
         pass
 
