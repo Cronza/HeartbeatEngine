@@ -45,7 +45,9 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_resize_container = QtWidgets.QSplitter(self)
 
         # Category Section
-        self.categories = GroupsPanel("Categories", False)
+        self.categories = GroupsPanel("Categories", False, False)
+        self.categories.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        self.categories.SIG_USER_GROUP_CHANGE.connect(self.core.SwitchCategories)
 
         # Variables Section
         self.variables = QtWidgets.QWidget()
@@ -107,13 +109,12 @@ class EditorVariablesUI(EditorBaseUI):
     #    self.active_category = self.category_list.currentItem()
     #    self.PopulateSettings()
 
-    def PopulateVariables(self):
-        """ Populates the settings list based on the selected category """
-        self.variables_table.clearContents()
+    def PopulateVariables(self, variables: dict):
+        """ Clears existing entries nad Populates the variables list based on the selected category """
+        self.variables_table.setRowCount(0)
 
-        # Loop to add all settings for the selected category
-        selected_category = self.categories.active_entry.Get()[0]
-        for var_name, var_data in self.core.variables[selected_category].items():
+        # Populate the variables table with the provided data
+        for var_name, var_data in variables.items():
             self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
 
     def AddCategory(self, category: str = ""):
@@ -127,6 +128,7 @@ class EditorVariablesUI(EditorBaseUI):
 
     def GetData(self) -> dict:
         """ Returns a dict of {'var_name': {'type: <var_type>, 'value': 'var_data'}} """
+        STORE THE VARIABLES AS A LIST IN MEMORY WHILE WE ARE EDITING, AND WHEN SAVING, THATS WHEN WE VALIDATE VARIABLES'
         variables = {}
         for row_index in range(0, self.variables_table.rowCount()):
             var_name = self.variables_table.cellWidget(row_index, self.variables_table.name_column).Get()['value']
@@ -137,7 +139,7 @@ class EditorVariablesUI(EditorBaseUI):
                 raise VariableNameUndefined()
             elif var_name in variables:
                 raise VariableAlreadyExists()
-            elif var_name == '<Global>':
+            elif var_name == '<Global>': #@TODO: Is this still used?
                 raise VariableNameReserved()
             else:
                 variables[var_name] = {'type': var_type, 'value': var_input}

@@ -21,9 +21,8 @@ class EditEntryPrompt(QtWidgets.QDialog):
         self.entry_name_input = QtWidgets.QLineEdit(name)
 
         # Description
-        if use_desc:
-            self.entry_description_header = QtWidgets.QLabel("Description:")
-            self.entry_description_input = QtWidgets.QPlainTextEdit(description)
+        self.entry_description_header = QtWidgets.QLabel("Description:")
+        self.entry_description_input = QtWidgets.QPlainTextEdit(description)
 
         # Cancel & Accept
         self.button_layout = QtWidgets.QHBoxLayout()
@@ -63,8 +62,5 @@ class EditEntryPrompt(QtWidgets.QDialog):
          0 - Name
          1 - Description
         """
-        if self.use_desc:
-            return self.entry_name_input.text(), self.entry_description_input.toPlainText()
-        else:
-            return self.entry_name_input.text()
+        return self.entry_name_input.text(), self.entry_description_input.toPlainText()
 

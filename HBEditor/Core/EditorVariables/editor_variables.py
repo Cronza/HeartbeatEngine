@@ -34,12 +34,31 @@ class EditorVariables(EditorBase):
         self.editor_ui = EditorVariablesUI(self)
         logger.Log("Editor initialized")
 
+    def SwitchCategories(self, cur_cat, new_cat):
+        """ Switches the active category, storing all existing variable entries in the old branch """
+        # If there is no source category, then there is nothing to store
+        if cur_cat:
+            self.StoreActiveData(cur_cat)
+
+        # Load any entries in the new branch (if applicable)
+        if new_cat.data:
+            self.editor_ui.PopulateVariables(new_cat.data)
+        else:
+            self.editor_ui.variables_table.setRowCount(0)
+
+    def StoreActiveData(self, cur_cat):
+        """ Updates the active category with the data from all active variable entries """
+
+        cur_cat.data.clear()  # Clear the contents of the current category since we're forcefully updating it
+        cur_cat.data = self.editor_ui.GetData()
+
     def Export(self):
         logger.Log(f"Exporting Variables")
 
         # Collect the table data
         data_to_export = {}
         try:
+            #@TODO: Update this to loop through each category
             data_to_export = self.editor_ui.GetData()
         except VariableNameUndefined:
             QtWidgets.QMessageBox.about(
@@ -95,7 +114,7 @@ class EditorVariables(EditorBase):
         # Select the Default category by default
         self.editor_ui.categories.ChangeEntry(0)
 
-        self.editor_ui.PopulateVariables()
+        self.editor_ui.PopulateVariables(file_data['Default'])
         self.editor_ui.blockSignals(False)
 
         # Skip importing if the file has no data to load

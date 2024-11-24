@@ -146,7 +146,7 @@ class GroupsPanel(QtWidgets.QWidget):
     def ConfigurePrompt(self, name="New Name", description="New Description", source_entry=None) -> tuple:
         """ Prompts the user with a configuration window. Returns the new data if provided, or None if not """
         # Create the prompt object
-        prompt = EditEntryPrompt(name, description)
+        prompt = EditEntryPrompt(name, description, self.use_descriptions)
 
         # Use a loop here to allow the user to continually try again until they choose to cancel the process
         # This is particularly useful in case they wrote a description they really don't want to lose
@@ -303,7 +303,7 @@ class GroupEntry(QtWidgets.QWidget):
         self.subtext_widget.setSizePolicy(size_policy)
         self.info_layout.addWidget(self.subtext_widget)
 
-        if show_description:
+        if not show_description:
             self.subtext_widget.hide()
 
 
