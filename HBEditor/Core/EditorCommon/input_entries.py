@@ -399,6 +399,7 @@ class InputEntryParagraph(InputEntryBase):
 
 
 class InputEntryText(InputEntryBase):
+    SIG_USER_COMMIT = QtCore.pyqtSignal(object)
     def __init__(self, data):
         super().__init__(data)
         self.input_type = ParameterType.String
@@ -410,12 +411,13 @@ class InputEntryText(InputEntryBase):
         self.data["value"] = self.input_widget.text()
         return self.data
 
-    def Set(self, data):
+    def Set(self, data: str):
         self.input_widget.setText(data)
         self.input_widget.setCursorPosition(0)
 
     def Connect(self):
         self.input_widget.textEdited.connect(lambda: self.SIG_USER_UPDATE.emit(self.owning_model_item))
+        self.input_widget.editingFinished.connect(lambda: self.SIG_USER_COMMIT.emit(self.owning_model_item))
 
     def SetEditable(self, state: int):
         if state == 0:

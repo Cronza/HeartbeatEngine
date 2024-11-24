@@ -81,7 +81,7 @@ class GroupsPanel(QtWidgets.QWidget):
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.entry_list)
 
-    def CreateEntry(self, name, description, toggle: bool = False):
+    def CreateEntry(self, name, description, data: any = None, toggle: bool = False, skip_select: bool = False):
         """ Adds a new entry to the group list, and set its name and description using the given data """
         # Create the list item container. If this is the first element in the panel, lock it to prevent dragging
         list_item = QtWidgets.QListWidgetItem()
@@ -97,12 +97,14 @@ class GroupsPanel(QtWidgets.QWidget):
 
         self.entry_list.setItemWidget(list_item, new_entry)
         new_entry.Set((name, description))
+        new_entry.SetData(data)
 
         # Adjust the size hint of the item container to match the contents
         list_item.setSizeHint(new_entry.sizeHint())
 
-        # Select the new entry
-        self.entry_list.setCurrentItem(list_item)
+        if not skip_select:
+            # Select the new entry
+            self.entry_list.setCurrentItem(list_item)
 
     def AddEntry(self):
         """ Prompts the user for entry information, and creates an entry with that information """
@@ -255,8 +257,6 @@ class GroupEntry(QtWidgets.QWidget):
     """
     An entry for the Group Panel.
 
-    'data' represents a list of actions and their data in the format of: {<action_name>: <action_param_data>}
-
     Attributes
         SIG_USER_TOGGLE: - Signal that reports (toggle_state, group_name)
     """
@@ -267,8 +267,8 @@ class GroupEntry(QtWidgets.QWidget):
         # Allow CSS to stylize the drag visualization for this widget
         self.setObjectName("drag-source")
 
-        # Store any necessary ACTION_DATA associated with this entry (From another panel or otherwise)
-        self.data = []
+        # Store any necessary data associated with this entry (From another panel or otherwise)
+        self.data = None
 
         # ****** DISPLAY WIDGETS ******
         # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use
@@ -336,3 +336,7 @@ class GroupEntry(QtWidgets.QWidget):
     def GetData(self) -> list:
         """ Returns the data stored in this entry """
         return self.data
+
+    def SetData(self, data: any):
+        """ Updates the data stored in this entry with the provided data """
+        self.data = data

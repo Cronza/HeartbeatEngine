@@ -149,6 +149,10 @@ class EditorDialogue(EditorBase):
             for branch_name, branch_data in converted_data.items():
                 # The main branch is treated uniquely since we don't need to create it
                 if not branch_name == "Main":
+                    #@TODO: CreateEntry causes the selection to change, which means StoreActiveData is reran every branch that is made.
+                    #@TODO: We need to check if this is this necessary, and if not, add a "SkipSelectionChange" function
+                    #@TODO: Additionally, it is very confusing to know how the dialogue import process updates the branch .data var.
+                    #@TODO: Is it worth restructuring things and putting an explicit call here to "SetData" for the branch?
                     self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"])
 
                 for entry in branch_data["entries"]:

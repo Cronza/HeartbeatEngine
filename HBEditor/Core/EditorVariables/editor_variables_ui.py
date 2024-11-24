@@ -20,16 +20,6 @@ from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
 
 
-class VariableNameUndefined(Exception):
-    pass
-
-
-class VariableAlreadyExists(Exception):
-    pass
-
-class VariableNameReserved(Exception):
-    pass
-
 class EditorVariablesUI(EditorBaseUI):
     def __init__(self, core_ref):
         super().__init__(core_ref)
@@ -128,24 +118,14 @@ class EditorVariablesUI(EditorBaseUI):
 
     def GetData(self) -> dict:
         """ Returns a dict of {'var_name': {'type: <var_type>, 'value': 'var_data'}} """
-        STORE THE VARIABLES AS A LIST IN MEMORY WHILE WE ARE EDITING, AND WHEN SAVING, THATS WHEN WE VALIDATE VARIABLES'
         variables = {}
         for row_index in range(0, self.variables_table.rowCount()):
             var_name = self.variables_table.cellWidget(row_index, self.variables_table.name_column).Get()['value']
             var_type = self.variables_table.cellWidget(row_index, self.variables_table.type_column).Get()['value']
             var_input = self.variables_table.cellWidget(row_index, self.variables_table.input_column).Get()['value']
-
-            if not var_name:
-                raise VariableNameUndefined()
-            elif var_name in variables:
-                raise VariableAlreadyExists()
-            elif var_name == '<Global>': #@TODO: Is this still used?
-                raise VariableNameReserved()
-            else:
-                variables[var_name] = {'type': var_type, 'value': var_input}
+            variables[var_name] = {'type': var_type, 'value': var_input}
 
         return variables
-
 
 class VariablesTable(QtWidgets.QTableWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
@@ -229,13 +209,18 @@ class VariablesTable(QtWidgets.QTableWidget):
         name_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
         self.setItem(index, self.name_column, name_item)
         name_input = InputEntryText({})
+        name_input.owning_model_item = name_item
+        self.setCellWidget(index, self.name_column, name_input)
         if name:
             name_input.Set(name)
         else:
-            name_input.SetDefaultValue()
-        self.setCellWidget(index, self.name_column, name_input)
+            var_names = {}
+            for row_index in range(0, self.rowCount()):
+                var_names[self.cellWidget(row_index, self.name_column).Get()['value']] = ''
+            name_input.Set(self.DetermineNewVariableName(var_names))
         name_input.Connect()
         name_input.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+        name_input.SIG_USER_COMMIT.connect(self.ValidateVariable)
 
         # Type Column
         type_item = QtWidgets.QTableWidgetItem()
@@ -298,6 +283,63 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.hovered_column = item.column()
         self.hovered_row = item.row()
         self.viewport().update()
+
+    def ValidateVariable(self, var_name_item: QtWidgets.QTableWidgetItem) -> bool:
+        name = self.cellWidget(var_name_item.row(), var_name_item.column()).Get()['value']
+        validation_failed = False
+
+        # Preliminary Action: Build a dict of all var names for quick lookups
+        var_names = {}
+        for row_index in range(0, self.rowCount()):
+            if row_index == var_name_item.row():
+                # Exempt the row that was edited
+                continue
+
+            var_names[self.cellWidget(row_index, self.name_column).Get()['value']] = ''
+
+        # Check 1 - Variable Name can't be blank
+        if not name:
+            QtWidgets.QMessageBox.about(
+                self,
+                "Invalid Variable Name",
+                "Variables are required to have a name. Please specify a name for all variables and try again."
+            )
+
+            validation_failed = True
+
+        # Check 2 - Variable Name must be unique
+        else:
+            if name in var_names:
+                QtWidgets.QMessageBox.about(
+                    self,
+                    "Invalid Variable Name",
+                    f"Variable Name '{name}' already exists. Please ensure all variables have a unique name and try again."
+                )
+
+                validation_failed = True
+
+        if validation_failed:
+            # Reset the name to a generic one in case we can't prevent any destructive action that invokes this
+            input_entry = self.cellWidget(var_name_item.row(), var_name_item.column())
+            input_entry.Set(self.DetermineNewVariableName(var_names))
+            return False
+        else:
+            # All checks have passed
+            return True
+
+    def DetermineNewVariableName(self, var_names: dict) -> str:
+        """ Given a dict of all variable names, generate a name with a unique identifier and return it """
+        iter = 0
+        stop_checking = False
+        fallback_name = f"New_Variable_{iter}"
+        while not stop_checking:
+            if fallback_name not in var_names:
+                stop_checking = True
+            else:
+                iter += 1
+                fallback_name = f"New_Variable_{iter}"
+
+        return fallback_name
 
     def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
         if supportedActions.MoveAction:

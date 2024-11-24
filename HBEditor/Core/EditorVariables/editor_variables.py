@@ -17,8 +17,6 @@ from HBEditor.Core import settings
 from HBEditor.Core.Logger import logger
 from HBEditor.Core.base_editor import EditorBase
 from HBEditor.Core.EditorVariables.editor_variables_ui import EditorVariablesUI
-from HBEditor.Core.EditorVariables.editor_variables_ui import VariableNameUndefined, VariableAlreadyExists, VariableNameReserved
-
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorUtilities import path
 from Tools.HBYaml.hb_yaml import Reader, Writer
@@ -48,39 +46,35 @@ class EditorVariables(EditorBase):
 
     def StoreActiveData(self, cur_cat):
         """ Updates the active category with the data from all active variable entries """
-
         cur_cat.data.clear()  # Clear the contents of the current category since we're forcefully updating it
         cur_cat.data = self.editor_ui.GetData()
+
+    def GetAllVariableData(self) -> dict:
+        """ Collects all variable data, including all categories, and returns them as a dict """
+        data_to_export = {}
+        cat_count = self.editor_ui.categories.GetCount()
+        for index in range(0, cat_count):
+            # Get the actual category entry widget instead of the container
+            category = self.editor_ui.categories.GetEntryItemWidget(index)
+
+            # If a category is currently active, then it's likely to of not updated its cached category data (Only
+            # happens when the active category is switched). To account for this, make sure the active category is
+            # checked differently by scanning the current variable entries
+            if category is self.editor_ui.categories.active_entry:
+                logger.Log("Scanning variables...")
+                self.StoreActiveData(category)
+
+            cat_name, cat_description = category.Get()
+            cat_data = category.GetData()
+            data_to_export[cat_name] = cat_data
+
+        return data_to_export
 
     def Export(self):
         logger.Log(f"Exporting Variables")
 
         # Collect the table data
-        data_to_export = {}
-        try:
-            #@TODO: Update this to loop through each category
-            data_to_export = self.editor_ui.GetData()
-        except VariableNameUndefined:
-            QtWidgets.QMessageBox.about(
-                self.editor_ui,
-                "Unable to Save",
-                "Variables are required to have a name. Please specify a name for all variables and try again."
-            )
-            return
-        except VariableAlreadyExists:
-            QtWidgets.QMessageBox.about(
-                self.editor_ui,
-                "Unable to Save",
-                "Variable names are unique and can not be duplicated. Please ensure all variables have a unique name and try again."
-            )
-            return
-        except VariableNameReserved:
-            QtWidgets.QMessageBox.about(
-                self.editor_ui,
-                "Unable to Save",
-                "'<Global>' is a reserved word and can not be used for variable names. Please choose a different name and try again."
-            )
-            return
+        data_to_export = self.GetAllVariableData()
 
         # Write the data out
         logger.Log("Writing data to file...")
@@ -105,26 +99,14 @@ class EditorVariables(EditorBase):
 
         file_data = Reader.ReadAll(self.file_path)
 
-        # Generate entries for each project setting and category
-        self.editor_ui.blockSignals(True)
-        print("File Data", file_data)
-        for cat_name, cat_data in file_data.items():
-            self.editor_ui.categories.CreateEntry(cat_name, "")
+        if file_data:
+            # Generate entries for each category
+            self.editor_ui.blockSignals(True)
+            for cat_name, cat_data in file_data.items():
+                self.editor_ui.categories.CreateEntry(cat_name, "", cat_data, False, True)
 
-        # Select the Default category by default
-        self.editor_ui.categories.ChangeEntry(0)
-
-        self.editor_ui.PopulateVariables(file_data['Default'])
-        self.editor_ui.blockSignals(False)
-
-        # Skip importing if the file has no data to load
-        #if file_data:
-            # Disable signals to prevent marking the editor as dirty while we're populating it
-
-            #self.editor_ui.PopulateCategories()
-            #for var_cat, var_list in file_data.items():
-#
-            #    for var_name, var_data in file_data.items():
-            #        self.editor_ui.AddValue(var_name, var_data['type'], var_data['value'])
+            # Select the Default category by default
+            self.editor_ui.categories.ChangeEntry(0)
+            self.editor_ui.blockSignals(False)
 
 
