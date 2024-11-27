@@ -28,7 +28,10 @@ class EditorDialogue(EditorBase):
         self.editor_ui = EditorDialogueUI(self)
         self.editor_ui.branches_panel.CreateEntry(
             "Main",
-            "This is the default, main branch\nConsider this the root of your dialogue tree"
+            "This is the default, main branch\nConsider this the root of your dialogue tree",
+            [],
+            False,
+            True
         )
         logger.Log("Editor initialized")
 
@@ -52,6 +55,7 @@ class EditorDialogue(EditorBase):
         # Load any entries in the new branch (if applicable)
         if new_branch.data:
             for entry in new_branch.data:
+                print(entry)
                 action_name, action_data = next(iter(entry.items()))
                 self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
 
@@ -147,13 +151,15 @@ class EditorDialogue(EditorBase):
             # Populate the branches and dialogue sequence
             converted_data = self.ConvertDialogueToEditorFormat(file_data["dialogue"])
             for branch_name, branch_data in converted_data.items():
+                if branch_name == "Main":
+                    self.editor_ui.branches_panel.GetEntryItemWidget(0).SetData = branch_data
                 # The main branch is treated uniquely since we don't need to create it
-                if not branch_name == "Main":
+                else:
                     #@TODO: CreateEntry causes the selection to change, which means StoreActiveData is reran every branch that is made.
                     #@TODO: We need to check if this is this necessary, and if not, add a "SkipSelectionChange" function
                     #@TODO: Additionally, it is very confusing to know how the dialogue import process updates the branch .data var.
                     #@TODO: Is it worth restructuring things and putting an explicit call here to "SetData" for the branch?
-                    self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"])
+                    self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"], branch_data['entries'], False, True)
 
                 for entry in branch_data["entries"]:
                     action_name, action_data = next(iter(entry.items()))

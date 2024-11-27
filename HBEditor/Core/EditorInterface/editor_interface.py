@@ -31,6 +31,8 @@ class EditorInterface(EditorBase):
         self.editor_ui.pages_panel.CreateEntry(
             "Persistent",
             "This is the default, main view",
+            [],
+            True,
             True
         )
         logger.Log("Editor initialized")
@@ -150,7 +152,12 @@ class EditorInterface(EditorBase):
             for page_name, page_data in file_data["pages"].items():
                 # Create the page entry (The persistent page is created on editor init, so skip that)
                 if page_name.lower() != "persistent":
-                    self.editor_ui.pages_panel.CreateEntry(page_name, page_data["description"], False)
+                    self.editor_ui.pages_panel.CreateEntry(page_name, page_data["description"], page_data['items'], False, True)
+
+                # Mark the new entry as the active one, but don't select it to avoid redundant processing
+                self.editor_ui.pages_panel.active_entry = self.editor_ui.pages_panel.GetEntryItemWidget(
+                    self.editor_ui.pages_panel.GetCount() - 1
+                )
 
                 # Populate the page entry
                 conv_page_items = self.ConvertInterfaceItemsToEditorFormat(page_data["items"])
