@@ -56,11 +56,10 @@ class EditorProjectSettingsUI(EditorBaseUI):
         self.settings_title.setText("Settings")
         self.settings_title.setObjectName("h1")
         self.settings_tree = QtWidgets.QTreeWidget(self)
+        self.settings_tree.setObjectName("disable-row-highlights")
         self.settings_tree.setColumnCount(2)
-        self.settings_tree.setHeaderLabels(['Name', 'Input'])
         self.settings_tree.setAutoScroll(False)
-        self.settings_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.settings_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.settings_tree.header().hide()
         self.settings_tree.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.settings_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
         self.settings_layout.addWidget(self.settings_title)

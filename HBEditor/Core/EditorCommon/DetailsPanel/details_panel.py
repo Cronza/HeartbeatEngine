@@ -46,7 +46,7 @@ class DetailsPanel(QtWidgets.QWidget):
         # Create Details List
         #@TODO: Investigate implementing 'dataChanged' signal so the Array entry can bubble up a refresh call
         self.details_tree = QtWidgets.QTreeWidget(self)
-        self.details_tree.setObjectName("no-top")
+        self.details_tree.setObjectName("disable-row-highlights")
         self.details_tree.setColumnCount(3)
         self.details_tree.setHeaderLabels(['Name', 'Input', 'Connection'])
         self.details_tree.setAutoScroll(False)

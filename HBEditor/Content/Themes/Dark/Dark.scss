@@ -71,7 +71,9 @@ QToolBar{
     icon-size: $size_icon; /* maximum icon size */
     background-color: $col_primary;
     border-top: $size_border solid $col_secondary;
-
+    &#horizontal{
+        border-bottom: $size_border solid $col_secondary;
+    }
     &:separator{
         &#horizontal{
             background-color: $col_secondary;
@@ -249,7 +251,7 @@ QHeaderView{
 }
 QTableView{
     border: 0px solid transparent;
-    border-top: $size_border solid $col_secondary;
+    //border-top: $size_border solid $col_secondary;
 
     color: $col_text;
     background-color: $col_secondary;
@@ -265,22 +267,24 @@ QTableView QTableCornerButton{
 }
 QTreeView{
     border: 0px solid transparent;
-    border-top: $size_border solid $col_secondary;
     background-color: $col_secondary;
     outline: none;
     qproperty-indentation: 10; // Edits the indentation distance when using branches
 
-    &#no-top{ /* Remove the top border */
-        border-top: 0px solid transparent;
+    &#add-top-border{
+        border-top: $size_border solid $col_secondary;
     }
     &:item {
         padding: 3px;
         background-color: $col_secondary;
-        &:hover{
-            background-color: transparent;
-        }
-        &:selected{
-            background-color: transparent;
+
+        &#disable-row-highlights{
+            &:hover{
+                background-color: transparent;
+            }
+            &:selected{
+                background-color: transparent;
+            }
         }
     }
     &:branch {
