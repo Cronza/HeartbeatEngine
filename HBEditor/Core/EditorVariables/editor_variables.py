@@ -44,10 +44,18 @@ class EditorVariables(EditorBase):
         else:
             self.editor_ui.variables_table.setRowCount(0)
 
-    def StoreActiveData(self, cur_cat):
-        """ Updates the active category with the data from all active variable entries """
-        cur_cat.data.clear()  # Clear the contents of the current category since we're forcefully updating it
-        cur_cat.data = self.editor_ui.GetData()
+    def StoreActiveData(self, cur_group):
+        """ Updates the active group with the data from all active variable entries """
+        # Clear the contents of the current group since we're forcefully updating it
+        cur_group.data.clear()
+
+        var_table = self.editor_ui.variables_table
+        for row_index in range(0, var_table.rowCount()):
+            var_name = var_table.cellWidget(row_index, var_table.name_column).Get()['value']
+            var_type = var_table.cellWidget(row_index, var_table.type_column).Get()['value']
+            var_input = var_table.cellWidget(row_index, var_table.input_column).Get()['value']
+
+            cur_group.data.append({var_name: {'type': var_type, 'value': var_input}})
 
     def GetAllVariableData(self) -> dict:
         """ Collects all variable data, including all categories, and returns them as a dict """
@@ -65,7 +73,13 @@ class EditorVariables(EditorBase):
                 self.StoreActiveData(category)
 
             cat_name, cat_description = category.Get()
-            cat_data = category.GetData()
+
+            # Since we store the variable entries as a list while editing, we need to convert it back into
+            # a dict which is a more suitable representation
+            cat_data = {}
+            for entry in category.GetData():
+                cat_data.update(entry)
+
             data_to_export[cat_name] = cat_data
 
         return data_to_export
@@ -103,7 +117,12 @@ class EditorVariables(EditorBase):
             # Generate entries for each category
             self.editor_ui.blockSignals(True)
             for cat_name, cat_data in file_data.items():
-                self.editor_ui.categories.CreateEntry(cat_name, "", cat_data, False, True)
+
+                # Sinc vars are stored as a dict, we need to convert them into a list for use in the editor
+                var_list = []
+                for var_name, var_data in cat_data.items():
+                    var_list.append({var_name: var_data})
+                self.editor_ui.categories.CreateEntry(cat_name, "", var_list, False, True)
 
             # Select the Default category by default
             self.editor_ui.categories.ChangeEntry(0)

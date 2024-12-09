@@ -80,52 +80,14 @@ class EditorVariablesUI(EditorBaseUI):
         self.main_resize_container.setStretchFactor(0, 0)
         self.main_resize_container.setStretchFactor(1, 1)
 
-    """
-    def PopulateCategories(self):
-        self.category.clear()
-
-        for category in self.core.variables:
-            self.AddCategory(category)
-
-        self.category_list.setCurrentRow(0)
-        self.active_category = self.category_list.item(0)
-    """
-
-    #def SwitchCategory(self):
-    #    """ Switch the active category by saving the current settings data, then repopulates the settings list """
-    #    if self.active_category:
-    #        self.UpdateProjectSettingsData()
-
-    #    self.active_category = self.category_list.currentItem()
-    #    self.PopulateSettings()
-
-    def PopulateVariables(self, variables: dict):
+    def PopulateVariables(self, variables: list):
         """ Clears existing entries nad Populates the variables list based on the selected category """
         self.variables_table.setRowCount(0)
 
         # Populate the variables table with the provided data
-        for var_name, var_data in variables.items():
-            self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
-
-    def AddCategory(self, category: str = ""):
-        pass
-        #if not category:
-
-        #self.category_list.addItem(QtWidgets.QListWidgetItem(category))
-
-    def RemoveCategory(self):
-        pass
-
-    def GetData(self) -> dict:
-        """ Returns a dict of {'var_name': {'type: <var_type>, 'value': 'var_data'}} """
-        variables = {}
-        for row_index in range(0, self.variables_table.rowCount()):
-            var_name = self.variables_table.cellWidget(row_index, self.variables_table.name_column).Get()['value']
-            var_type = self.variables_table.cellWidget(row_index, self.variables_table.type_column).Get()['value']
-            var_input = self.variables_table.cellWidget(row_index, self.variables_table.input_column).Get()['value']
-            variables[var_name] = {'type': var_type, 'value': var_input}
-
-        return variables
+        for item in variables:
+            for var_name, var_data in item.items():
+                self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
 
 class VariablesTable(QtWidgets.QTableWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal()

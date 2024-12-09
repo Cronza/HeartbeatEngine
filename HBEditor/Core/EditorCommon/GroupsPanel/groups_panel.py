@@ -81,7 +81,7 @@ class GroupsPanel(QtWidgets.QWidget):
         self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.entry_list)
 
-    def CreateEntry(self, name, description, data: any = None, toggle: bool = False, skip_select: bool = False):
+    def CreateEntry(self, name, description, data: list = None, toggle: bool = False, skip_select: bool = False):
         """ Adds a new entry to the group list, and set its name and description using the given data """
         # Create the list item container. If this is the first element in the panel, lock it to prevent dragging
         list_item = QtWidgets.QListWidgetItem()
@@ -97,14 +97,18 @@ class GroupsPanel(QtWidgets.QWidget):
 
         self.entry_list.setItemWidget(list_item, new_entry)
         new_entry.Set((name, description))
-        new_entry.SetData(data)
+
+        if data:
+            new_entry.SetData(data)
 
         # Adjust the size hint of the item container to match the contents
         list_item.setSizeHint(new_entry.sizeHint())
 
         if not skip_select:
             # Select the new entry
+            print("Creating new entry", new_entry)
             self.entry_list.setCurrentItem(list_item)
+            self.active_entry = new_entry
 
     def AddEntry(self):
         """ Prompts the user for entry information, and creates an entry with that information """
@@ -202,14 +206,24 @@ class GroupsPanel(QtWidgets.QWidget):
         entry.setSizeHint(entry_data_obj.sizeHint())
 
     def ChangeEntry(self, new_entry_index: int = -1):
+        print("New Entry Index", new_entry_index)
         # Switch to the new item
         if new_entry_index > -1:
             self.entry_list.setCurrentRow(new_entry_index)
 
         # We use 'selectedIndexes' here as 'currentRow' and 'selectedItem' report the wrong index value
         selection = self.entry_list.itemWidget(self.entry_list.item(self.entry_list.selectedIndexes()[0].row()))
+        if self.active_entry:
+            print("Old Entry", self.active_entry.Get())
+            print("Old Entry Data", self.active_entry.data)
+        else:
+            print("Old Entry: <Not Set>")
+        print("New Entry", selection.Get())
+        print("New Entry Data", selection.data)
 
         self.SIG_USER_GROUP_CHANGE.emit(self.active_entry, selection)
+
+
         self.active_entry = selection
 
     def GetCount(self):
@@ -268,7 +282,7 @@ class GroupEntry(QtWidgets.QWidget):
         self.setObjectName("drag-source")
 
         # Store any necessary data associated with this entry (From another panel or otherwise)
-        self.data = None
+        self.data = []
 
         # ****** DISPLAY WIDGETS ******
         # Due to some size shenanigans with the widgets when they have a certain amount of text, force them to use

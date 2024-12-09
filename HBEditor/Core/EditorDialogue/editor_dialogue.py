@@ -31,7 +31,7 @@ class EditorDialogue(EditorBase):
             "This is the default, main branch\nConsider this the root of your dialogue tree",
             [],
             False,
-            True
+            False
         )
         logger.Log("Editor initialized")
 
@@ -55,7 +55,6 @@ class EditorDialogue(EditorBase):
         # Load any entries in the new branch (if applicable)
         if new_branch.data:
             for entry in new_branch.data:
-                print(entry)
                 action_name, action_data = next(iter(entry.items()))
                 self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
 
@@ -63,7 +62,6 @@ class EditorDialogue(EditorBase):
         """ Updates the active branch with the data from all active dialogue entries """
         # Clear the contents of the current branch since we're forcefully updating it
         cur_branch.data.clear()
-
         sequence_list = self.editor_ui.dialogue_sequence.sequence_list
         for entry_index in range(sequence_list.count()):
             sequence_entry = sequence_list.itemWidget(sequence_list.item(entry_index))
@@ -155,10 +153,6 @@ class EditorDialogue(EditorBase):
                     self.editor_ui.branches_panel.GetEntryItemWidget(0).SetData = branch_data
                 # The main branch is treated uniquely since we don't need to create it
                 else:
-                    #@TODO: CreateEntry causes the selection to change, which means StoreActiveData is reran every branch that is made.
-                    #@TODO: We need to check if this is this necessary, and if not, add a "SkipSelectionChange" function
-                    #@TODO: Additionally, it is very confusing to know how the dialogue import process updates the branch .data var.
-                    #@TODO: Is it worth restructuring things and putting an explicit call here to "SetData" for the branch?
                     self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"], branch_data['entries'], False, True)
 
                 for entry in branch_data["entries"]:
