@@ -31,7 +31,7 @@ class EditorDialogue(EditorBase):
             "This is the default, main branch\nConsider this the root of your dialogue tree",
             [],
             False,
-            False
+            True
         )
         logger.Log("Editor initialized")
 
@@ -56,7 +56,7 @@ class EditorDialogue(EditorBase):
         if new_branch.data:
             for entry in new_branch.data:
                 action_name, action_data = next(iter(entry.items()))
-                self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
+                self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, False)
 
     def StoreActiveData(self, cur_branch):
         """ Updates the active branch with the data from all active dialogue entries """
@@ -150,18 +150,13 @@ class EditorDialogue(EditorBase):
             converted_data = self.ConvertDialogueToEditorFormat(file_data["dialogue"])
             for branch_name, branch_data in converted_data.items():
                 if branch_name == "Main":
-                    self.editor_ui.branches_panel.GetEntryItemWidget(0).SetData = branch_data
+                    self.editor_ui.branches_panel.GetEntryItemWidget(0).SetData(branch_data['entries'])
                 # The main branch is treated uniquely since we don't need to create it
                 else:
                     self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"], branch_data['entries'], False, True)
 
-                for entry in branch_data["entries"]:
-                    action_name, action_data = next(iter(entry.items()))
-                    self.editor_ui.dialogue_sequence.AddEntry(action_name, action_data, None, True)
-
             # Select the main branch by default
             self.editor_ui.branches_panel.ChangeEntry(0)
-
             self.editor_ui.blockSignals(False)
 
     def ConvertDialogueToEngineFormat(self, action_data: dict):

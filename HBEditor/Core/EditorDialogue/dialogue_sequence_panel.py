@@ -96,7 +96,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         """ Deletes all data in the sequence """
         self.sequence_list.clear()
 
-    def AddEntry(self, action_name: str, action_data: dict = None, index: int = None, skip_select: bool = False) -> 'DialogueEntry':
+    def AddEntry(self, action_name: str, action_data: dict = None, index: int = None, report: bool = True) -> 'DialogueEntry':
         """
         Given an action name, create a new entry in the dialogue sequence populating with the ACTION_DATA for that
         action. If 'action_data' is provided, populate the entry using it instead
@@ -123,8 +123,9 @@ class DialogueSequencePanel(QtWidgets.QWidget):
             }
         new_item.setSizeHint(new_entry.sizeHint())
         self.sequence_list.setItemWidget(new_item, new_entry)
+        if report:
+            self.SIG_USER_UPDATE.emit()
 
-        self.SIG_USER_UPDATE.emit()
         return new_entry
 
     def RemoveEntry(self):
