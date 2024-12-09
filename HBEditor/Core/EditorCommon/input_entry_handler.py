@@ -21,7 +21,7 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
         parent: QTreeWidgetItem = None, excluded_properties: list = None,
         signal_func: callable = None, refresh_func: callable = None) -> QTreeWidgetItem:
     """
-    Adds a new InputEntry into the provided QTreeView, along with its name and global checkbox elements.
+    Adds a new InputEntry into the provided QTreeView, along with its name and connection input elements.
     If a parent is provided, the elements are added as a child to it instead. Returns the QTreeWidgetItem
     containing the elements
 
@@ -41,6 +41,9 @@ def Add(owner: QWidget, name: str, data: dict, view: QtWidgets.QTreeView,
     )
     view.setItemWidget(entry, 0, name_widget)
     view.setItemWidget(entry, 1, input_widget)
+
+    if connect_button:
+        view.setItemWidget(entry, 2, connect_button)
 
     if signal_func:
         signal_func(entry)
@@ -120,16 +123,14 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
 
     name_widget = QLabel(name)
 
-    # Set up the connection button if applicable
+    # Create the connection button if applicable
     connect_button = None
     if "flags" in data:
         if "connectable" in data['flags']:
             connect_button = ConnectionButton(data_type, owning_model_item)
-            owning_view.setItemWidget(owning_model_item, 2, connect_button)
-            if data['connection'] and data['connection'] != 'None':
+            if data['connection']:
                 input_widget.SetEditable(2)
             else:
-                data['connection'] = 'None'
                 input_widget.SetEditable(0)
 
             connect_button.Set(data['connection'])

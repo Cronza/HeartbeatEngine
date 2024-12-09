@@ -221,7 +221,7 @@ class remove_renderable(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "transition": {
@@ -330,19 +330,19 @@ class create_sprite(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite": {
             "type": "Asset_Image",
             "value": "None",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -353,13 +353,13 @@ class create_sprite(Action):
         "z_order": {
             "type": "Int",
             "value": 0,
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "flip": {
             "type": "Bool",
             "value": False,
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "transition": {
@@ -456,13 +456,13 @@ class create_background(Action):
         "key": {
             "type": "String",
             "value": "Background",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "sprite": {
             "type": "Asset_Image",
             "default": ["Default Variables - Sprites", "background_sprite"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"]
         },
         "position": {
@@ -476,7 +476,7 @@ class create_background(Action):
         "z_order": {
             "type": "Int",
             "default": ["Default Variables - Sprites", "background_z_order"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "flip": {
@@ -537,13 +537,13 @@ class create_interactable(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -554,25 +554,25 @@ class create_interactable(Action):
         "sprite": {
             "type": "Asset_Image",
             "value": "None",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
             "value": "None",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
             "value": "None",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "z_order": {
             "type": "Int",
             "value": 0,
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "events": {
@@ -664,13 +664,13 @@ class create_text(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -681,37 +681,37 @@ class create_text(Action):
         "text": {
             "type": "Paragraph",
             "value": "Default",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "text_size": {
             "type": "Int",
             "default": ["Default Variables - Text", "text_size"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "text_color": {
             "type": "Color",
             "default": ["Default Variables - Text", "text_color"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "font": {
             "type": "Asset_Font",
             "default": ["Default Variables - Text", "text_font"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
             "default": ["Default Variables - Text", "text_z_order"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "wrap_bounds": {
             "type": "Vector2",
             "default": ["Default Variables - Text", "text_wrap_bounds"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "transition": {
@@ -803,13 +803,13 @@ class create_button(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -820,25 +820,25 @@ class create_button(Action):
         "sprite": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "button_sprite"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "button_sprite_hover"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "button_sprite_clicked"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
             "default": ["Default Variables - Button", "button_z_order"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "button_text": {
@@ -848,7 +848,7 @@ class create_button(Action):
                 "position": {
                     "type": "Vector2",
                     "value": [0.5, 0.5],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable", "preview"],
                 },
                 "center_align": {
@@ -859,37 +859,37 @@ class create_button(Action):
                 "text": {
                     "type": "String",
                     "value": "Default",
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable", "preview"],
                 },
                 "text_size": {
                     "type": "Int",
                     "default": ["Default Variables - Text", "text_size"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
                     "default": ["Default Variables - Text", "text_color"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "text_color_hover": {
                     "type": "Color",
                     "default": ["Default Variables - Text", "text_color"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"]
                 },
                 "text_color_clicked": {
                     "type": "Color",
                     "default": ["Default Variables - Text", "text_color"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"]
                 },
                 "font": {
                     "type": "Asset_Font",
                     "default": ["Default Variables - Text", "text_font"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"]
                 },
                 "wrap_bounds": {
@@ -993,13 +993,13 @@ class create_text_button(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -1010,43 +1010,43 @@ class create_text_button(Action):
         "text": {
             "type": "String",
             "value": "Default",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "text_size": {
             "type": "Int",
             "default": ["Default Variables - Text", "text_size"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "text_color": {
             "type": "Color",
             "default": ["Default Variables - Text", "text_color"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "text_color_hover": {
             "type": "Color",
             "default": ["Default Variables - Text", "text_color_hover"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "text_color_clicked": {
             "type": "Color",
             "default": ["Default Variables - Text", "text_color_clicked"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"]
         },
         "font": {
             "type": "Asset_Font",
             "default": ["Default Variables - Text", "text_font"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
             "default": ["Default Variables - Button", "button_z_order"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "wrap_bounds": {
@@ -1141,13 +1141,13 @@ class create_checkbox(Action):
         "key": {
             "type": "String",
             "value": "",
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "center_align": {
@@ -1158,37 +1158,37 @@ class create_checkbox(Action):
         "sprite": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "checkbox_sprite"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "checkbox_sprite_hover"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "checkbox_sprite_clicked"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_icon": {
             "type": "Asset_Image",
             "default": ["Default Variables - Button", "checkbox_sprite_icon"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "z_order": {
             "type": "Int",
             "default": ["Default Variables - Button", "button_z_order"],
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable"],
         },
         "is_checked": {
             "type": "Bool",
             "value": False,
-            "connection": "",
+            "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "events": {
@@ -1328,7 +1328,7 @@ class dialogue(Action):
                 "position": {
                     "type": "Vector2",
                     "default": ["Default Variables - Dialogue", "speaker_text_position"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"]
                 },
                 "center_align": {
@@ -1339,31 +1339,31 @@ class dialogue(Action):
                 "text": {
                     "type": "String",
                     "value": "",
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable", "preview"],
                 },
                 "text_size": {
                     "type": "Int",
                     "default": ["Default Variables - Dialogue", "speaker_text_size"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
                     "default": ["Default Variables - Dialogue", "speaker_text_color"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "font": {
                     "type": "Asset_Font",
                     "default": ["Default Variables - Dialogue", "speaker_text_font"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "z_order": {
                     "type": "Int",
                     "default": ["Default Variables - Dialogue", "speaker_text_z_order"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["connectable"],
                 },
                 "transition": {
@@ -1401,7 +1401,7 @@ class dialogue(Action):
                 "position": {
                     "type": "Vector2",
                     "default": ["Default Variables - Dialogue", "dialogue_text_position"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "center_align": {
@@ -1417,19 +1417,19 @@ class dialogue(Action):
                 "text_size": {
                     "type": "Int",
                     "default": ["Default Variables - Dialogue", "dialogue_text_size"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "text_color": {
                     "type": "Color",
                     "default": ["Default Variables - Dialogue", "dialogue_text_color"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "font": {
                     "type": "Asset_Font",
                     "default": ["Default Variables - Dialogue", "dialogue_text_font"],
-                    "connection": "",
+                    "connection": None,
                     "flags": ["editable", "connectable"],
                 },
                 "z_order": {
@@ -1552,25 +1552,25 @@ class choice(Action):
                         "sprite": {
                             "type": "Asset_Image",
                             "default": ["Default Variables - Dialogue", "choice_button_sprite"],
-                            "connection": "",
+                            "connection": None,
                             "flags": ["editable", "connectable"],
                         },
                         "sprite_hover": {
                             "type": "Asset_Image",
                             "default": ["Default Variables - Dialogue", "choice_button_sprite_hover"],
-                            "connection": "",
+                            "connection": None,
                             "flags": ["editable", "connectable"],
                         },
                         "sprite_clicked": {
                             "type": "Asset_Image",
                             "default": ["Default Variables - Dialogue", "choice_button_sprite_clicked"],
-                            "connection": "",
+                            "connection": None,
                             "flags": ["editable", "connectable"],
                         },
                         "z_order": {
                             "type": "Int",
                             "default": ["Default Variables - Dialogue", "choice_button_text_size"],
-                            "connection": "",
+                            "connection": None,
                             "flags": ["global_active"],
                         },
                         "button_text": {
@@ -1595,31 +1595,31 @@ class choice(Action):
                                 "text_size": {
                                     "type": "Int",
                                     "default": ["Default Variables - Dialogue", "choice_button_text_size"],
-                                    "connection": "",
+                                    "connection": None,
                                     "flags": ["editable", "connectable"],
                                 },
                                 "text_color": {
                                     "type": "Color",
                                     "default": ["Default Variables - Dialogue", "choice_button_text_color"],
-                                    "connection": "",
+                                    "connection": None,
                                     "flags": ["editable", "connectable"],
                                 },
                                 "text_color_hover": {
                                     "type": "Color",
                                     "default": ["Default Variables - Dialogue", "choice_button_text_color_hover"],
-                                    "connection": "",
+                                    "connection": None,
                                     "flags": ["editable", "connectable"],
                                 },
                                 "text_color_clicked": {
                                     "type": "Color",
                                     "default": ["Default Variables - Dialogue", "choice_button_text_color_clicked"],
-                                    "connection": "",
+                                    "connection": None,
                                     "flags": ["editable", "connectable"],
                                 },
                                 "font": {
                                     "type": "Asset_Font",
                                     "default": ["Default Variables - Dialogue", "choice_button_font"],
-                                    "connection": "",
+                                    "connection": None,
                                     "flags": ["editable", "connectable"],
                                 },
                                 "z_order": {

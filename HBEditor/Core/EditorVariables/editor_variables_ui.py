@@ -120,8 +120,8 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.type_column = 2
         self.input_column = 3
 
-        self.hovered_column = -1 # TEST
-        self.hovered_row = -1 # TEST
+        self.hovered_column = -1
+        self.hovered_row = -1
         self.is_dragging = False
 
         #self.setObjectName('variables-table')
@@ -142,7 +142,6 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
         self.setDropIndicatorShown(False)
         self.setAcceptDrops(True)
-        self.itemEntered.connect(self.SetHoveredRow)
 
         # TODO: Investigate how to improve sizing calculations. It should be a percentage of the available space
         self.horizontalHeader().setDefaultSectionSize(self.horizontalHeader().defaultSectionSize() * 3)
@@ -241,11 +240,6 @@ class VariablesTable(QtWidgets.QTableWidget):
 
             self.SIG_USER_UPDATE.emit()
 
-    def SetHoveredRow(self, item):
-        self.hovered_column = item.column()
-        self.hovered_row = item.row()
-        self.viewport().update()
-
     def ValidateVariable(self, var_name_item: QtWidgets.QTableWidgetItem) -> bool:
         name = self.cellWidget(var_name_item.row(), var_name_item.column()).Get()['value']
         validation_failed = False
@@ -341,9 +335,28 @@ class VariablesTable(QtWidgets.QTableWidget):
         # Add the new item
         self.AddVariable(name, type_data, input_data, target_dest)
 
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        index = self.indexAt(event.pos())
+        if index.row() != self.hovered_row or index.column() != self.hovered_column:
+            self.hovered_row = index.row()
+
+            # Only the first column can be hovered
+            if index.column() == 0:
+                self.hovered_column = index.column()
+            else:
+                self.hovered_column = -1
+
+            self.viewport().update()
+
+    def leaveEvent(self, a0):
+        super().leaveEvent(a0)
+        self.hovered_row = -1
+        self.hovered_column = -1
+
 
 class VariablesItemDelegate(QtWidgets.QStyledItemDelegate):
-    """ A custom item delegate that enforces unique 'Name' column values """
+    """ A custom item delegate that enables certain highlight characteristics """
     def __init__(self, table_parent: VariablesTable):
         super().__init__()
 

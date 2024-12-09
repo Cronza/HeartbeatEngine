@@ -5,39 +5,58 @@ from HBEditor.Core.Logger import logger
 
 
 class ConnectionButton(QtWidgets.QComboBox):
-    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object)
+    SOURCE_OPTIONS  = ["Variables", "Settings"]
 
     def __init__(self, supported_type: ParameterType, owning_model_item: QtWidgets.QWidgetItem = None):
         super().__init__()
         self.owning_model_item = owning_model_item  # Track the owning widget so we can emit signals properly
         self.supported_type = supported_type
-        self.setToolTip("Connect this parameter to a project variable")
+        self.setToolTip("Connect this parameter to a User Variable or Project Setting")
+
+        # We can't store the category or the source in the dropdown, so store them here
+        self.category = ""
+        self.source = self.SOURCE_OPTIONS[0]
 
     def showPopup(self) -> None:
         result = self.ShowConnectionDialog()
-        if result == self.currentText() or result == '':
+        if result is None:
             logger.Log("Connection unchanged")
         else:
             self.Set(result)
-            self.SIG_USER_UPDATE.emit(self.owning_model_item, result)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item)
 
-    def Get(self) -> str:
-        return self.currentText()
+    def Get(self) -> tuple:
+        """ Return a tuple of (Category_Name, Variable_Name, Source) """
+        if self.currentText() == 'None':
+            return None
+        else:
+            return self.category, self.currentText(), self.source
 
-    def Set(self, new_value: str):
+    def Set(self, data: tuple):
+        """ Given a tuple of (Category_Name, Variable_Name, Source), update the selection """
         self.removeItem(0)
-        self.addItem(new_value)
 
-    def ShowConnectionDialog(self) -> str:
-        connect_dialog = DialogConnection(self.supported_type)
+        if data is None:
+            self.addItem('None')
+            self.category = ''
+            self.source = ''
+        else:
+            self.addItem(data[1])
+            self.category = data[0]
+            self.source = data[2]
+
+    def ShowConnectionDialog(self) -> tuple:
+        connect_dialog = DialogConnection(self.supported_type, self.SOURCE_OPTIONS)
         return connect_dialog.GetVariable()
 
 class DialogConnection(QtWidgets.QDialog):
-    def __init__(self, supported_type: ParameterType):
+    def __init__(self, supported_type: ParameterType, source_options: list):
         super().__init__()
 
-        # A list of 'FileType' that controls the available options in this browser
+        # Contols for filtering or limiting shown options
         self.supported_type = supported_type
+        self.source_options = source_options
 
         # Hide the OS header to lock its position
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
@@ -57,16 +76,16 @@ class DialogConnection(QtWidgets.QDialog):
         self.options_layout.addWidget(self.type_explanation, 1)
 
         self.var_source = QtWidgets.QComboBox(self)
-        self.var_source.addItems(["Variables", "Settings"])
+        self.var_source.addItems(self.source_options)
         self.var_source.currentIndexChanged.connect(lambda: self.Populate(self.var_source.currentText()))
         self.options_layout.addWidget(self.var_source, 1)
 
-        # Asset Tree
+        # Variable Tree
         self.variable_tree = QtWidgets.QTreeWidget(self)
         self.variable_tree.setColumnCount(1)
         self.variable_tree.header().hide()
         self.variable_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
-        self.variable_tree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.variable_tree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectItems)  # Disables cell selection
         self.variable_tree.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         """
         self.details_tree.setObjectName("no-top")
@@ -91,19 +110,16 @@ class DialogConnection(QtWidgets.QDialog):
 
         self.Populate()
 
-    def GetVariable(self) -> str:
+    def GetVariable(self) -> tuple:
         """
-        Activate the dialog, and return the name of the variable selected. If none were chosen, return 'None'
-        """
+        Activate the dialog, and return a tuple of (category_name, variable_name, source). If none were chosen, return 'None'
         """
         if self.exec():
-            selection = self.variable_list.selectedItems()
+            selection = self.variable_tree.selectedItems()
             if selection:
-                return selection[0].text()
-        """
-        if self.exec():
-            pass
-        return ""  # Since 'None' is a legitimate answer, use '' to represent a cancelled dialog
+                return selection[0].parent().text(0), selection[0].text(0), self.var_source.currentText()
+
+        return None
 
 
     def GetVariablesOfType(self, target_type: ParameterType, source: str = "Variables") -> dict:
@@ -138,17 +154,6 @@ class DialogConnection(QtWidgets.QDialog):
                 else:
                     var_item.setHidden(False)
 
-    def SwitchContentDirectories(self):
-        """
-        Reloads the variable tree based on what source was chosen in the var_source dropdown
-        """
-        if self.GetUsingEngineContent():
-            self.valid_assets = self.GetFilteredAssets(settings.engine_asset_registry)
-            self.GenerateAssetEntries()
-        else:
-            self.valid_assets = self.GetFilteredAssets(settings.asset_registry)
-            self.GenerateAssetEntries()
-
     def Populate(self, source: str = "Variables"):
         """
         Clear the variable tree, then create a entry for each category and a nested entry for each variable that
@@ -160,12 +165,13 @@ class DialogConnection(QtWidgets.QDialog):
         for cat_name, cat_data in applicable_vars.items():
             new_cat_item = QtWidgets.QTreeWidgetItem()
             new_cat_item.setText(0, cat_name)
-            new_cat_item.setFlags(new_cat_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEnabled)
+            new_cat_item.setFlags(new_cat_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsSelectable)
             self.variable_tree.addTopLevelItem(new_cat_item)
 
             for var_name in cat_data:
                 new_var_item = QtWidgets.QTreeWidgetItem()
                 new_var_item.setText(0, var_name)
+                new_var_item.setFlags(new_var_item.flags() | QtCore.Qt.ItemFlag.ItemIsSelectable)
                 new_cat_item.addChild(new_var_item)
 
         self.variable_tree.expandAll()

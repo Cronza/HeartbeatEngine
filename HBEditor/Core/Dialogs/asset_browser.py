@@ -30,33 +30,7 @@ class AssetBrowser(QtWidgets.QDialog):
         self.main_layout.addLayout(self.options_layout)
 
         # Asset List
-        self.asset_list = QtWidgets.QTableWidget(self)
-        self.asset_list.verticalHeader().setObjectName("vertical")
-        self.asset_list.setColumnCount(4)
-        self.asset_list.setShowGrid(False)
-        self.asset_list.setTextElideMode(QtCore.Qt.TextElideMode.ElideRight)
-        self.asset_list.setWordWrap(False)
-        self.asset_list.horizontalHeader().hide()
-        self.asset_list.verticalHeader().hide()
-        self.asset_list.hideColumn(0)  # Hide the thumbnail column by default
-        self.asset_list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Fixed)
-        self.asset_list.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.asset_list.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.asset_list.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.asset_list.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-
-        self.asset_list.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
-        self.asset_list.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
-        self.asset_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
-        self.asset_list.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.asset_list.setIconSize(QtCore.QSize(
-            settings.editor_data["Outliner"]["icon_size"][0],
-            settings.editor_data["Outliner"]["icon_size"][1]
-        ))
-
-        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
-        # focus border. Thus, we do it the slightly more tragic way
-        self.asset_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.asset_list = AssetBrowserTable(self)
         self.main_layout.addWidget(self.asset_list)
 
         # Confirmation Buttons
@@ -176,3 +150,74 @@ class AssetBrowser(QtWidgets.QDialog):
 
     def GetUsingEngineContent(self) -> bool:
         return self.content_dirs.currentText() == "Engine"
+
+class AssetBrowserTable(QtWidgets.QTableWidget):
+    def __init__(self, parent = None):
+        super().__init__(parent)
+
+        self.hovered_column = -1
+        self.hovered_row = -1
+
+        self.verticalHeader().setObjectName("vertical")
+        self.setColumnCount(4)
+        self.setShowGrid(False)
+        self.setTextElideMode(QtCore.Qt.TextElideMode.ElideRight)
+        self.setWordWrap(False)
+        self.horizontalHeader().hide()
+        self.verticalHeader().hide()
+        self.hideColumn(0)  # Hide the thumbnail column by default
+        self.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        self.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)  # Disable editing
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)  # Disables cell selection
+        self.verticalHeader().setDefaultAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setIconSize(QtCore.QSize(
+            settings.editor_data["Outliner"]["icon_size"][0],
+            settings.editor_data["Outliner"]["icon_size"][1]
+        ))
+
+        # 'outline: none;' doesn't work for table widgets seemingly, so I can't use CSS to disable the
+        # focus border. Thus, we do it the slightly more tragic way
+        self.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+
+        delegate = AssetBrowserItemDelegate(self)
+        self.setItemDelegate(delegate)
+
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        index = self.indexAt(event.pos())
+        if index.row() != self.hovered_row or index.column() != self.hovered_column:
+            self.hovered_row = index.row()
+            self.hovered_column = index.column()
+            self.viewport().update()
+
+    def leaveEvent(self, a0):
+        super().leaveEvent(a0)
+        self.hovered_row = -1
+        self.hovered_column = -1
+
+class AssetBrowserItemDelegate(QtWidgets.QStyledItemDelegate):
+    """ A custom item delegate that enables certain highlight characteristics """
+
+    def __init__(self, table_parent: AssetBrowserTable):
+        super().__init__()
+
+        self.table_parent = table_parent
+
+    def paint(self, painter, option, index):
+        if not index.isValid():
+            return
+
+        if index.row() == self.table_parent.hovered_row:
+            option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
+            option.state |= QtWidgets.QStyle.StateFlag.State_MouseOver  # Show
+
+        # Disable selection visual state as otherwise every cell would be individually outlined
+        option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
+
+        super().paint(painter, option, index)

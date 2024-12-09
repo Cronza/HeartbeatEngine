@@ -343,5 +343,4 @@ class GroupEntry(QtWidgets.QWidget):
 
     def SetData(self, data: list):
         """ Updates the data stored in this entry with the provided data """
-        print("Setting", data)
         self.data = data
