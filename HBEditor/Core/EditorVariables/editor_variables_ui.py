@@ -375,14 +375,8 @@ class VariablesItemDelegate(QtWidgets.QStyledItemDelegate):
                 option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
                 option.state |= QtWidgets.QStyle.StateFlag.State_Selected
 
-                # Disable hover visual state as otherwise cells would be individually outlined
-                option.state &= ~QtWidgets.QStyle.StateFlag.State_MouseOver
-
             elif index.row() == self.table_parent.hovered_row:
                 option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
                 option.state |= QtWidgets.QStyle.StateFlag.State_MouseOver  # Show
-
-                # Disable selection visual state as otherwise every cell would be individually outlined
-                option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
 
         super().paint(painter, option, index)
