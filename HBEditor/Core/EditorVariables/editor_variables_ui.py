@@ -206,12 +206,10 @@ class VariablesTable(QtWidgets.QTableWidget):
         input_item = QtWidgets.QTableWidgetItem()
         input_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
         self.setItem(index, self.input_column, input_item)
-        self.SwitchInputType(self.item(index, self.type_column), input_data)  # Populate the input colum based on the active type dropdown selection
-
+        self.SwitchInputType(self.item(index, self.type_column), input_data, False)  # Populate the input colum based on the active type dropdown selection
         self.resizeRowsToContents() #@TODO: Resize only the relevent row, not everything each time
-        self.SIG_USER_UPDATE.emit()
 
-    def SwitchInputType(self, table_item: QtWidgets.QTableWidgetItem, data: any = None):
+    def SwitchInputType(self, table_item: QtWidgets.QTableWidgetItem, data: any = None, report: bool = True):
         """ Creates and replaces the input entry type for the provided item """
         row = self.row(table_item)
         input_entry = ieh.Create(
@@ -231,7 +229,9 @@ class VariablesTable(QtWidgets.QTableWidget):
         self.setCellWidget(row, self.input_column, input_entry)
 
         self.resizeRowsToContents()
-        self.SIG_USER_UPDATE.emit()
+
+        if report:
+            self.SIG_USER_UPDATE.emit()
 
     def RemoveVariable(self):
         selected_rows = self.selectedIndexes()

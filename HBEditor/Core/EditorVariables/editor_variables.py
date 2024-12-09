@@ -33,7 +33,7 @@ class EditorVariables(EditorBase):
         logger.Log("Editor initialized")
 
     def SwitchCategories(self, cur_cat, new_cat):
-        """ Switches the active category, storing all existing variable entries in the old branch """
+        """ Switches the active category, storing all existing variable entries in the old category """
         # If there is no source category, then there is nothing to store
         if cur_cat:
             self.StoreActiveData(cur_cat)

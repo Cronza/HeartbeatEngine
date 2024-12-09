@@ -206,23 +206,13 @@ class GroupsPanel(QtWidgets.QWidget):
         entry.setSizeHint(entry_data_obj.sizeHint())
 
     def ChangeEntry(self, new_entry_index: int = -1):
-        print("New Entry Index", new_entry_index)
         # Switch to the new item
         if new_entry_index > -1:
             self.entry_list.setCurrentRow(new_entry_index)
 
         # We use 'selectedIndexes' here as 'currentRow' and 'selectedItem' report the wrong index value
         selection = self.entry_list.itemWidget(self.entry_list.item(self.entry_list.selectedIndexes()[0].row()))
-        if self.active_entry:
-            print("Old Entry", self.active_entry.Get())
-            print("Old Entry Data", self.active_entry.data)
-        else:
-            print("Old Entry: <Not Set>")
-        print("New Entry", selection.Get())
-        print("New Entry Data", selection.data)
-
         self.SIG_USER_GROUP_CHANGE.emit(self.active_entry, selection)
-
 
         self.active_entry = selection
 
