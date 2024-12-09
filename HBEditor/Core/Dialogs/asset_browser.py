@@ -213,11 +213,20 @@ class AssetBrowserItemDelegate(QtWidgets.QStyledItemDelegate):
         if not index.isValid():
             return
 
-        if index.row() == self.table_parent.hovered_row:
-            option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
+        selected_row = -1
+        if self.table_parent.selectedIndexes():
+            selected_row = self.table_parent.selectedIndexes()[0].row()
+
+        if index.row() == selected_row:
+            option.state |= QtWidgets.QStyle.StateFlag.State_Selected
+
+            # Disable hover visual state as otherwise cells would be individually outlined
+            option.state &= ~QtWidgets.QStyle.StateFlag.State_MouseOver
+
+        elif index.row() == self.table_parent.hovered_row:
             option.state |= QtWidgets.QStyle.StateFlag.State_MouseOver  # Show
 
-        # Disable selection visual state as otherwise every cell would be individually outlined
-        option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
+            # Disable selection visual state as otherwise every cell would be individually outlined
+            option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
 
         super().paint(painter, option, index)

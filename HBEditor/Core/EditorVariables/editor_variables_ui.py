@@ -366,13 +366,23 @@ class VariablesItemDelegate(QtWidgets.QStyledItemDelegate):
         if not index.isValid():
             return
 
-        if self.table_parent.hovered_column == 0:
-            if index.row() == self.table_parent.hovered_row:
+        if index.column() == 0 and self.table_parent.hovered_column == 0:
+            selected_row = -1
+            if self.table_parent.selectedIndexes():
+                selected_row = self.table_parent.selectedIndexes()[0].row()
+
+            if index.row() == selected_row:
+                option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
+                option.state |= QtWidgets.QStyle.StateFlag.State_Selected
+
+                # Disable hover visual state as otherwise cells would be individually outlined
+                option.state &= ~QtWidgets.QStyle.StateFlag.State_MouseOver
+
+            elif index.row() == self.table_parent.hovered_row:
                 option.state |= QtWidgets.QStyle.StateFlag.State_Enabled  # Allow the following updates
                 option.state |= QtWidgets.QStyle.StateFlag.State_MouseOver  # Show
 
-        # Disable selection visual state, otherwise the drag icons could be selected
-        # which would look strange (This can't be controlled per-cell in CSS)
-        option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
+                # Disable selection visual state as otherwise every cell would be individually outlined
+                option.state &= ~QtWidgets.QStyle.StateFlag.State_Selected
 
         super().paint(painter, option, index)
