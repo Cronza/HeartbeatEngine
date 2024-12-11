@@ -77,7 +77,7 @@ class DialogueSettings(QtCore.QObject, SourceEntry):
             "flags": ["editable"]
         },
         "description": {
-            "type": "Paragraph",
+            "type": "Text",
             "value": "",
             "flags": ["editable"]
         }

@@ -201,7 +201,10 @@ class Action:
                 #@TODO: Evaluate performance consequences and general implementation details here as it performs this type check for *every* parameter
                 # Evaluate any connections if applicable.
                 if isinstance(simplified_ad[param_name], Connection):
-                    simplified_ad[param_name] = settings.GetVariable(simplified_ad[param_name].variable)
+                    if simplified_ad[param_name].source == "Variables":
+                        simplified_ad[param_name] = settings.GetVariable(simplified_ad[param_name].category, simplified_ad[param_name].variable)
+                    else:
+                        simplified_ad[param_name] = settings.GetProjectSetting(simplified_ad[param_name].category, simplified_ad[param_name].variable)
 
 
 class SoundAction(Action):
@@ -679,7 +682,7 @@ class create_text(Action):
             "flags": ["editable"],
         },
         "text": {
-            "type": "Paragraph",
+            "type": "Text",
             "value": "Default",
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
@@ -1410,7 +1413,7 @@ class dialogue(Action):
                     "flags": ["editable"],
                 },
                 "text": {
-                    "type": "Paragraph",
+                    "type": "Text",
                     "value": "",
                     "flags": ["editable", "preview"],
                 },

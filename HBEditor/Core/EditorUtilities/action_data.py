@@ -51,8 +51,12 @@ def ConvertParamDataToEngineFormat(editor_param_data: dict, excluded_properties:
 
             # Alter the structure further to note the active connection
             if 'connectable' in param_data['flags']:
-                if param_data["connection"] and param_data["connection"] != 'None':
-                    conv_data[param_name] = Connection(variable=param_data["connection"])
+                if param_data["connection"]:
+                    conv_data[param_name] = Connection(
+                        category=param_data["connection"][0],
+                        variable=param_data["connection"][1],
+                        source=param_data["connection"][2]
+                    )
 
         if "children" in param_data:
             conv_data[param_name] = ConvertParamDataToEngineFormat(param_data["children"])
@@ -128,7 +132,11 @@ def ConvertActionDataToEditorFormat(action_data: dict, base_action_data: dict, e
             elif "children" not in base_param_data:
                 if base_param_name in action_data:
                     if isinstance(action_data[base_param_name], Connection):
-                        base_param_data['connection'] = action_data[base_param_name].variable
+                        base_param_data['connection'] = (
+                            action_data[base_param_name].category,
+                            action_data[base_param_name].variable,
+                            action_data[base_param_name].source
+                        )
 
                         # Since the connection is separate from the 'value' key, load the default if available.
                         # Otherwise, stick with the 'value' key from the base ACTION_DATA

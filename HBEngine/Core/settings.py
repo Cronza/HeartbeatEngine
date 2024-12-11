@@ -118,14 +118,14 @@ def SetVariable(variable_name: str, variable_data: str):
         connect_func(variable_name)
 
 
-def GetVariable(variable_name: str) -> any:
+def GetVariable(category_name: str, variable_name: str) -> any:
     """ Returns the project variable that matches the provided name """
     global variables
 
     try:
-        return variables[variable_name]['value']
+        return variables[category_name][variable_name]['value']
     except KeyError:
-        raise ValueError(f"Project Variable Not Found: '{variable_name}'")
+        raise ValueError(f"Project Variable Not Found: '{category_name}' | '{variable_name}'")
 
 
 def ConvertPartialToAbsolutePath(partial_path):

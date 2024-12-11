@@ -5,7 +5,7 @@ from HBEditor.Core.Logger import logger
 
 
 class ConnectionButton(QtWidgets.QComboBox):
-    SIG_USER_UPDATE = QtCore.pyqtSignal(object)
+    SIG_USER_UPDATE = QtCore.pyqtSignal(object, str)
     SOURCE_OPTIONS  = ["Variables", "Settings"]
 
     def __init__(self, supported_type: ParameterType, owning_model_item: QtWidgets.QWidgetItem = None):
@@ -24,7 +24,7 @@ class ConnectionButton(QtWidgets.QComboBox):
             logger.Log("Connection unchanged")
         else:
             self.Set(result)
-            self.SIG_USER_UPDATE.emit(self.owning_model_item)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item, self.currentText())
 
     def Get(self) -> tuple:
         """ Return a tuple of (Category_Name, Variable_Name, Source) """

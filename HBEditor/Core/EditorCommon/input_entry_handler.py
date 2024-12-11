@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
+from PyQt6 import QtCore
 from PyQt6.QtWidgets import QWidget, QTreeWidgetItem, QLabel
 from HBEditor.Core.EditorCommon.connection_button import ConnectionButton
 from HBEditor.Core.EditorCommon.input_entries import *
@@ -65,9 +66,9 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
 
     input_widget = None
     if data_type == ParameterType.String:
+        input_widget = InputEntryString(data)
+    elif data_type == ParameterType.Text:
         input_widget = InputEntryText(data)
-    elif data_type == ParameterType.Paragraph:
-        input_widget = InputEntryParagraph(data)
     elif data_type == ParameterType.Vector2:
         input_widget = InputEntryTuple(data)
     elif data_type == ParameterType.Bool:
@@ -122,6 +123,7 @@ def Create(owner: QWidget, name: str, data: dict, owning_model_item,
         input_widget.SetDefaultValue()
 
     name_widget = QLabel(name)
+    name_widget.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
 
     # Create the connection button if applicable
     connect_button = None

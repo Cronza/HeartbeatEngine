@@ -15,7 +15,7 @@
 from PyQt6 import QtWidgets, QtGui, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.DataTypes.parameter_types import ParameterType
-from HBEditor.Core.EditorCommon.input_entries import InputEntryText
+from HBEditor.Core.EditorCommon.input_entries import InputEntryString
 from HBEditor.Core.EditorCommon import input_entry_handler as ieh
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
 
@@ -100,7 +100,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         ParameterType.Int,
         ParameterType.Float,
         ParameterType.Vector2,
-        ParameterType.Paragraph,
+        ParameterType.Text,
         ParameterType.Color,
         ParameterType.Scene,
         ParameterType.Dialogue,
@@ -169,12 +169,14 @@ class VariablesTable(QtWidgets.QTableWidget):
         name_item = QtWidgets.QTableWidgetItem()
         name_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
         self.setItem(index, self.name_column, name_item)
-        name_input = InputEntryText({})
+
+        name_input = InputEntryString({})
         name_input.owning_model_item = name_item
         self.setCellWidget(index, self.name_column, name_input)
         if name:
             name_input.Set(name)
         else:
+            # Generate a temp name based on other existing names
             var_names = {}
             for row_index in range(0, self.rowCount()):
                 var_names[self.cellWidget(row_index, self.name_column).Get()['value']] = ''
@@ -187,6 +189,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         type_item = QtWidgets.QTableWidgetItem()
         type_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
         self.setItem(index, self.type_column, type_item)
+
         type_input = ieh.Create(
             owner=self,
             name="",
@@ -205,7 +208,9 @@ class VariablesTable(QtWidgets.QTableWidget):
         input_item = QtWidgets.QTableWidgetItem()
         input_item.setFlags(QtCore.Qt.ItemFlag.NoItemFlags)
         self.setItem(index, self.input_column, input_item)
-        self.SwitchInputType(self.item(index, self.type_column), input_data, False)  # Populate the input colum based on the active type dropdown selection
+
+        # Populate the input colum based on the active type dropdown selection
+        self.SwitchInputType(self.item(index, self.type_column), input_data, False)
         self.resizeRowsToContents() #@TODO: Resize only the relevent row, not everything each time
 
     def SwitchInputType(self, table_item: QtWidgets.QTableWidgetItem, data: any = None, report: bool = True):
@@ -334,6 +339,7 @@ class VariablesTable(QtWidgets.QTableWidget):
 
         # Add the new item
         self.AddVariable(name, type_data, input_data, target_dest)
+        self.clearSelection()
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
@@ -353,6 +359,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         super().leaveEvent(a0)
         self.hovered_row = -1
         self.hovered_column = -1
+
 
 
 class VariablesItemDelegate(QtWidgets.QStyledItemDelegate):

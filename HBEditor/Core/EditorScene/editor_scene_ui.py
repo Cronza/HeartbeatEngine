@@ -84,7 +84,7 @@ class SceneSettings(QtCore.QObject, SourceEntry):
             "flags": ["editable"]
         },
         "description": {
-            "type": "Paragraph",
+            "type": "String",
             "value": "",
             "flags": ["editable"]
         },

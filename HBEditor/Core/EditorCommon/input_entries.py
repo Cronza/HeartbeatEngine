@@ -24,13 +24,13 @@ from HBEditor.Core.Dialogs.asset_browser import AssetBrowser
 
 """
 List of available entries:
+    - InputEntryString
     - InputEntryBool
     - InputEntryColor
     - InputEntryDropdown
     - InputEntryAssetSelector
     - InputEntryFloat
     - InputEntryInt
-    - InputEntryParagraph
     - InputEntryText
     - InputEntryTuple
     - InputEntryArray
@@ -57,6 +57,9 @@ class InputEntryBase(QtWidgets.QWidget):
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(1, 0, 1, 0)
 
+        # Set the default alignment to a better default state
+        self.SetAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+
     def Get(self):
         return self.data
 
@@ -77,6 +80,10 @@ class InputEntryBase(QtWidgets.QWidget):
 
     def SetDefaultValue(self):
         pass
+
+    def SetAlignment(self, alignment: QtCore.Qt.AlignmentFlag = QtCore.Qt.AlignmentFlag.AlignTop):
+        """ Sets the alignment of the main entry layout """
+        self.main_layout.setAlignment(alignment)
 
 
 class InputEntryBool(InputEntryBase):
@@ -363,10 +370,10 @@ class InputEntryInt(InputEntryBase):
         self.Set(self.data['value'])
 
 
-class InputEntryParagraph(InputEntryBase):
+class InputEntryText(InputEntryBase):
     def __init__(self,data):
         super().__init__(data)
-        self.input_type = ParameterType.Paragraph
+        self.input_type = ParameterType.Text
 
         self.input_widget = QtWidgets.QPlainTextEdit()
         self.input_widget.setMaximumHeight(100)
@@ -398,7 +405,7 @@ class InputEntryParagraph(InputEntryBase):
         self.Set(self.data['value'])
 
 
-class InputEntryText(InputEntryBase):
+class InputEntryString(InputEntryBase):
     SIG_USER_COMMIT = QtCore.pyqtSignal(object)
     def __init__(self, data):
         super().__init__(data)

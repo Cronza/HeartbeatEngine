@@ -21,7 +21,7 @@ class ParameterType(Enum):
     Int = 3
     Float = 4
     Vector2 = 5
-    Paragraph = 6
+    Text = 6
     Color = 7
     Scene = 8
     Dialogue = 9
