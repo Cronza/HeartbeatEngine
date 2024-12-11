@@ -33,7 +33,7 @@ class EditorInterface(EditorBase):
             "This is the default, main view",
             [],
             True,
-            True
+            False
         )
         logger.Log("Editor initialized")
 
@@ -63,11 +63,18 @@ class EditorInterface(EditorBase):
 
     def RegisterItemToPage(self, item: RootItem, page: GroupEntry = None, emit_signal: bool = True):
         """
-        Sets the owner ID of the provided item to the active page ID. If 'page' is provided, make it the owner instead
+        Sets the owner ID of the provided item to the active page ID. If 'page' is provided, make it the owner instead.
+        Additionally, ensure the item state is reflective of the page (IE. Visible if the page is visible
         """
         if not page:
             page = self.editor_ui.pages_panel.active_entry
         item.owner_id = page.Get()[0]
+
+        # Ensure the new item is appropriately disabled if the group isn't active
+        item.setVisible(True if page.GetToggle() else False)
+
+        # Lock items for unselected pages
+        item.setEnabled(True if page == self.editor_ui.pages_panel.active_entry else False)
 
         if emit_signal:
             self.editor_ui.SIG_USER_UPDATE.emit()
@@ -154,17 +161,13 @@ class EditorInterface(EditorBase):
                 if page_name.lower() != "persistent":
                     self.editor_ui.pages_panel.CreateEntry(page_name, page_data["description"], page_data['items'], False, True)
 
-                # Mark the new entry as the active one, but don't select it to avoid redundant processing
-                self.editor_ui.pages_panel.active_entry = self.editor_ui.pages_panel.GetEntryItemWidget(
-                    self.editor_ui.pages_panel.GetCount() - 1
-                )
-
                 # Populate the page entry
+                tar_page = self.editor_ui.pages_panel.GetEntryItemWidget(self.editor_ui.pages_panel.GetCount() - 1)
                 conv_page_items = self.ConvertInterfaceItemsToEditorFormat(page_data["items"])
                 for item in conv_page_items:
                     action_name, action_data = next(iter(item.items()))
                     new_item = self.editor_ui.scene_viewer.AddRenderable(action_name, action_data, True)
-                    self.RegisterItemToPage(new_item, self.editor_ui.pages_panel.active_entry, False)
+                    self.RegisterItemToPage(new_item, tar_page, False)
 
                     # Apply any imported editor-specific properties
                     if "editor_properties" in item[ad.GetActionName(item)]:
@@ -172,13 +175,9 @@ class EditorInterface(EditorBase):
                         if "locked" in editor_properties:
                             new_item.SetLocked(editor_properties["locked"])
 
-                    # Hide non-persistent page items by default, as pages themselves are inactive by default
-                    if page_name.lower() != "persistent":
-                        new_item.setVisible(False)
-
         # Select the persistent layer
-        self.editor_ui.UnfreezeSignals()
         self.editor_ui.pages_panel.ChangeEntry(0)
+        self.editor_ui.UnfreezeSignals()
 
     def ConvertInterfaceItemsToEngineFormat(self, scene_items: dict) -> dict:
         """ Build and return a dict of data from all active view items converted to engine format, organized by page """

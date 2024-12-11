@@ -332,6 +332,10 @@ class GroupEntry(QtWidgets.QWidget):
         self.name_widget.setText(data[0])
         self.subtext_widget.setText(data[1])
 
+    def GetToggle(self) -> bool:
+        """ Returns whether this entry is toggled """
+        return self.toggle_button.Get()
+
     def SetToggle(self, newState: bool):
         """ Sets the state of the toggle button """
         if self.toggle_button:
