@@ -26,8 +26,7 @@ class Scene:
         # Read in the active scene data
         self.scene_data = Reader.ReadAll(scene_data_file)
 
-        # All renderable elements, including module and interface items. Only top-most parents objects will be present
-        # here, as children are recursively drawn
+        # All renderable elements, including module and interface items.
         self.active_renderables = RenderableGroup()
 
         # All interface objects. This dict is only for access, not for updating or drawing. References are kept separate
@@ -67,18 +66,6 @@ class Scene:
                 if item.visible:
                     settings.window.blit(item.GetSurface(), (item.rect.x, item.rect.y))
 
-                #@TODO: Review if this causes redundant drawing
-                # Draw any child renderables after drawing the parent
-                if item.children:
-                    children = sorted(item.children, key=lambda child_item: child_item.z_order)
-                    for child in children:
-                        if child.visible:
-                            settings.window.blit(child.GetSurface(), (child.rect.x, child.rect.y))
-
-                            # Recurse if this child has children
-                            if child.children:
-                                self.Draw(child.children, True)
-
     def SwitchScene(self, scene_file):
         """ Clears all renderables, and requests a scene change """
         action_manager.Clear()  # Clear actions
@@ -91,7 +78,6 @@ class Scene:
 
         from HBEngine import hb_engine
         hb_engine.LoadScene(scene_file)
-
 
     def LoadSceneData(self):
         """ Read the scene yaml file, and prepare the scene by spawning object classes, storing scene values, etc """
@@ -118,11 +104,10 @@ class Scene:
         if interface_file:
             interface = interface_class(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)))
 
-            # Add to the scene or to a parent if applicable
+            # Add to the scene and to a parent if applicable
+            self.active_renderables.Add(interface)
             if parent:
                 parent.children.append(interface)
-            else:
-                self.active_renderables.Add(interface)
             self.active_interfaces[interface.key] = interface
 
             return interface

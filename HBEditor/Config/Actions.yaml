@@ -32,13 +32,8 @@ Interactables:
       applicable_editors:
         - Scene
         - Interface
-    - name: "create_button"
-      display_name: "Create Button"
-      applicable_editors:
-        - Scene
-        - Interface
-    - name: "create_text_button"
-      display_name: "Create Button (Text Only)"
+    - name: "create_interactable_text"
+      display_name: "Create Interactable Text"
       applicable_editors:
         - Scene
         - Interface

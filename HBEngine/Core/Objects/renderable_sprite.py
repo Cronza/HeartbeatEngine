@@ -15,6 +15,7 @@
 import pygame
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 class SpriteRenderable(Renderable):
@@ -24,25 +25,32 @@ class SpriteRenderable(Renderable):
         - Non-Interactables
         - Backgrounds
         - etc
-    """
-    def __init__(self, renderable_data: dict, initial_rescale: bool = True, parent: Renderable = None,
-                 use_placeholder: bool = True):
-        super().__init__(renderable_data, parent)
 
+    This class has the following (additional) Renderable Data requirements:
+    - sprite (String)
+    """
+    def __init__(self, renderable_data: dict, parent: Renderable = None, process_data: bool = True):
+        # Parameters
+        self.sprite = ""
+
+        # Run parent implementation which will perform recalculations with the aforementioned parameters
+        super().__init__(renderable_data, parent, process_data)
+
+    def ApplyRenderableData(self):
         if "sprite" in self.renderable_data:
             if self.renderable_data['sprite'] != "None" and self.renderable_data['sprite'] != "":
-                sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
+                if isinstance(self.renderable_data['sprite'], Connection):
+                    self.sprite = settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['sprite']))
+                else:
+                    self.sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
 
+                # Attempt to load the sprite
                 try:
-                    self.surface = pygame.image.load(sprite).convert_alpha()
+                    self.surface = pygame.image.load(self.sprite).convert_alpha()
                     self.rect = self.surface.get_rect()
                 except Exception as exc:
-                    raise ValueError(f"Failed to load sprite: '{sprite}' - Either the file was not found, or it is not a "
-                          f"supported file type\n Exception: {exc}") from None  # PEP 409: Suppressing exception context
+                    raise ValueError(f"Failed to load sprite: '{self.sprite}' - Either the file was not found, or it is not a "
+                                     f"supported file type\n Exception: {exc}") from None  # PEP 409: Suppressing exception context
 
-                # For new objects, resize initially in case we're already using a scaled resolution. Allow descendents
-                # to defer this though if they need to do any additional work beforehand
-                if initial_rescale:
-                    self.RecalculateSize(settings.resolution_multiplier)
-
-
+        # Run the parent implementation to ensure all changes are considered, and the surfaces are recalculated
+        super().ApplyRenderableData()

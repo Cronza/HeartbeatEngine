@@ -33,6 +33,11 @@ class Interface(Renderable):
         self.interface_data = renderable_data
         super().__init__(renderable_data['settings'], parent)
 
+        # Interface objects always use full screen surfaces as they are not seen
+        self.center_align = False
+        self.surface = pygame.Surface(settings.resolution, pygame.SRCALPHA)  # The active surface
+        self.RecalculateSize(settings.resolution_multiplier)
+
         if "Persistent" in self.interface_data["pages"]:
             for item in self.interface_data["pages"]["Persistent"]["items"]:
                 action_name, action_data = next(iter(item.items()))
@@ -65,3 +70,7 @@ class Interface(Renderable):
         for renderable in self.page_renderables:
             self.children.remove(renderable)
         self.page_renderables.clear()
+
+    def Destroy(self):
+        super().Destroy()
+        print("Destroy Interface!")

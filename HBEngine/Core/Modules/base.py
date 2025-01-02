@@ -38,17 +38,9 @@ class BaseModule:
     def Shutdown(self):
         """" Shut down the module, cleaning up spawned renderables and objects"""
         if self.root_renderable:
-            # This may fail if a user targetted a module renderable, or if a scene changed as that wipes the
-            # renderable list. Since this is difficult to control and we're going to delete the root anyways, handle
-            # this situation gracefully
-            settings.scene.active_renderables.Remove(self.root_renderable.key)
-
+            self.root_renderable.Destroy()
             self.root_renderable = None
             self.interface = None
-        #if self.interface:
-        #    settings.scene.active_renderables.Remove(self.interface.key)
-        #    del settings.scene.active_interfaces[self.interface.key]
-        #    self.interface = None
 
     def Update(self, events):
         # Update the AM and all child renderables (if applicable) since we reserve the thread with this module
@@ -70,6 +62,5 @@ class BaseModule:
 
         # Add the interface to the scene so actions can still target it, but leave it out of the renderables list so
         # it's drawn as a group with other module-specific renderables
-        print("Setting active interface under key ", self.interface.key, " | ", self)
         settings.scene.active_interfaces[self.interface.key] = self.interface
 

@@ -20,7 +20,7 @@ pages:
           conditions: { }
 
       # Main Menu Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_DIALOGUE_Main_Menu_Button&!"
           position:
             - 0.3
@@ -49,7 +49,7 @@ pages:
           conditions: { }
 
       # Quick Save Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_DIALOGUE_Quick_Save_Button&!"
           position:
             - 0.375
@@ -73,7 +73,7 @@ pages:
           conditions: { }
 
       # Quick Load Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_DIALOGUE_Quick_Load_Button&!"
           position:
             - 0.45

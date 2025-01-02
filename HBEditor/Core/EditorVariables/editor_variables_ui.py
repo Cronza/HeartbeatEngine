@@ -87,7 +87,7 @@ class EditorVariablesUI(EditorBaseUI):
         # Populate the variables table with the provided data
         for item in variables:
             for var_name, var_data in item.items():
-                self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'])
+                self.variables_table.AddVariable(var_name, var_data['type'], var_data['value'], False)
 
 class VariablesTable(QtWidgets.QTableWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
@@ -150,7 +150,7 @@ class VariablesTable(QtWidgets.QTableWidget):
         variables_delegate = VariablesItemDelegate(self)
         self.setItemDelegate(variables_delegate)
 
-    def AddVariable(self, name: str = '', type_data: str = '', input_data: any = None, index: int = -1):
+    def AddVariable(self, name: str = '', type_data: str = '', input_data: any = None, index: int = -1, report: bool = True):
         """ Adds a new row, populating each column with the provided data if applicable """
         if index == -1:
             index = self.rowCount()
@@ -212,6 +212,9 @@ class VariablesTable(QtWidgets.QTableWidget):
         # Populate the input colum based on the active type dropdown selection
         self.SwitchInputType(self.item(index, self.type_column), input_data, False)
         self.resizeRowsToContents() #@TODO: Resize only the relevent row, not everything each time
+
+        if report:
+            self.SIG_USER_UPDATE.emit()
 
     def SwitchInputType(self, table_item: QtWidgets.QTableWidgetItem, data: any = None, report: bool = True):
         """ Creates and replaces the input entry type for the provided item """

@@ -73,17 +73,8 @@ Default Variables - Sprites:
     type: "Int"
     value: -9999
 
-Default Variables - Button:
-  button_sprite:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Normal.png
-  button_sprite_hover:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Hover.png
-  button_sprite_clicked:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Menu_Button_Clicked.png
-  button_z_order:
+Default Variables - Interactable:
+  interactable_z_order:
     type: "Int"
     value: 10001
   checkbox_sprite:
@@ -165,15 +156,6 @@ Default Variables - Dialogue:
     value:
       - 0.8
       - 0.16
-  choice_button_sprite:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Normal.png
-  choice_button_sprite_hover:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Hover.png
-  choice_button_sprite_clicked:
-    type: "Asset_Image"
-    value: HBEngine/Content/Sprites/Interface/Buttons/Choice_Button_Clicked.png
   choice_button_z_order:
     type: "Int"
     value: 10001
@@ -183,21 +165,21 @@ Default Variables - Dialogue:
   choice_button_text_color:
     type: "Vector2"
     value:
-      - 204
+      - 255
       - 255
       - 255
   choice_button_text_color_hover:
     type: "Color"
     value:
-      - 204
-      - 255
-      - 255
+      - 200
+      - 200
+      - 200
   choice_button_text_color_clicked:
     type: "Color"
     value:
-      - 204
-      - 255
-      - 255
+      - 150
+      - 150
+      - 150
   choice_button_font:
     type: "Asset_Font"
     value: HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf

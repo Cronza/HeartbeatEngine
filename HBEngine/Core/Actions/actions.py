@@ -14,16 +14,15 @@
 """
 import pygame.mixer
 import copy, operator, os
+import uuid
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
 from HBEngine.Core.Objects.interactable import Interactable
-from HBEngine.Core.Objects.button import Button
-from HBEngine.Core.Objects.choice import Choice
+from HBEngine.Core.Objects.interactable_text import InteractableText
 from HBEngine.Core.Objects.checkbox import Checkbox
 from HBEngine.Core.Objects.audio import Sound, Music
-from HBEngine.Core.Objects.renderable_container import Container
 from HBEngine.Core.Modules import dialogue as m_dialogue
 from Tools.HBYaml.hb_yaml import Reader
 from Tools.HBYaml.CustomTags.connection import Connection
@@ -34,7 +33,7 @@ from Tools.HBYaml.CustomTags.connection import Connection
 ----------------
 
 This file contains every action available to a user when building their games. These actions range from creating
-renderables such as sprites (create_sprite) and buttons (create_button), to affecting state such as with
+renderables such as sprites (create_sprite) and interactables (create_interactable), to affecting state such as with
 pausing (pause) and muting (set_mute).
 
 Due to the open-ended nature of what actions do, they use a specialized Dictionary structure to house their
@@ -115,7 +114,7 @@ class Action:
         self.parent: Renderable = parent  # Who should be the parent of new renderables created by this action. If blank, defaults to the scene
         self.simplified_ad = simplified_ad  # User-provided action data using the simplified structure
         self.active_transition = None
-        self.speed = 500
+        self.speed = 500 #@TODO: Is this needed / is this the right place for this?
         self.skippable = True
         self.complete = False
         self.completion_callback = None  # Called by the action manager before it deletes the action
@@ -134,38 +133,34 @@ class Action:
     def Complete(self):
         self.complete = True
 
-    def AddToScene(self, new_renderable):
-        """ Adds the provided renderable either to the scene's draw stack, or to 'self.parent' as a child """
-        if self.parent:
-            # If an object with the matching key already exists, delete it first
-            item_to_delete = None
-            for child in self.parent.children:
-                if child.key == new_renderable.key:
-                    item_to_delete = child
-                    break
-            if item_to_delete:
-                self.parent.children.remove(item_to_delete)
-            self.parent.children.append(new_renderable)
-        else:
-            settings.scene.active_renderables.Add(new_renderable)
+    def AddToScene(self, new_renderable: Renderable, parent: Renderable = None):
+        """ Adds the provided renderable to the scene's draw stack and adds it as a child to 'parent' if provided. If
+        not, add it as a child to the parent of this action if applicable """
+        # If a renderable exists with a matching key, delete it first
+        if settings.scene.active_renderables.Exists(new_renderable.key):
+            settings.scene.active_renderables.GetFromKey(new_renderable.key).Destroy()
+
+        settings.scene.active_renderables.Add(new_renderable)
+        if not parent:
+            parent = self.parent
+
+        if parent:
+            parent.children.append(new_renderable)
+            new_renderable.parent = parent
 
     def ValidateActionData(self, extended_ad: dict, simplified_ad: dict = None):
         """
-        Recursively compares the action's 'simplified_ad' against the provided 'ext_ad', updating the former when
+        Recursively compares the action's 'simplified_ad' against the provided 'extended_ad', updating the former when
         it is missing data found in the latter
 
         This update performs the following adjustments:
-        - Adds parameters that are missing from the Simplified format using the unedited data from the Expanded format
-        - Replaces values with global values if a parameter is using a global setting
+        - Adds parameters that are missing from the Simplified format using the unedited data from the Extended format
+        - Replaces values with defaults if applicable
+        - Registers actions as listeners if any connections are active
         """
 
         for param_name, param_data in extended_ad.items():
-            if "children" in param_data:
-                if param_name in simplified_ad:
-                    # Param found in simplified data. Recursively update the children as well
-                    self.ValidateActionData(param_data["children"], simplified_ad[param_name])
-
-            elif "template" in param_data:
+            if "template" in param_data:
                 # Parameters that use templates have a unique data structure in that each child is
                 # generated from the template instead of being a part of the data to begin with. Due to this,
                 # we must compare the simplified data against the template specifically
@@ -185,6 +180,13 @@ class Action:
                     # Skip a level as this is the "ArrayElement" container
                     self.ValidateActionData(template_data["children"], element_data)
 
+            elif "children" in param_data:
+                if param_name not in simplified_ad:
+                    # Param not found - Add it
+                    self.simplified_ad[param_name] = {}
+
+                self.ValidateActionData(param_data["children"], simplified_ad[param_name])
+
             elif param_name not in simplified_ad:
                 # Param was not edited by the user. Let's try to infer *why* it wasn't
                 #
@@ -197,14 +199,6 @@ class Action:
                 else:
                     # Fallback to the default from the ACTION_DATA
                     simplified_ad[param_name] = settings.GetProjectSetting(param_data["default"][0], param_data["default"][1])
-            else:
-                #@TODO: Evaluate performance consequences and general implementation details here as it performs this type check for *every* parameter
-                # Evaluate any connections if applicable.
-                if isinstance(simplified_ad[param_name], Connection):
-                    if simplified_ad[param_name].source == "Variables":
-                        simplified_ad[param_name] = settings.GetVariable(simplified_ad[param_name].category, simplified_ad[param_name].variable)
-                    else:
-                        simplified_ad[param_name] = settings.GetProjectSetting(simplified_ad[param_name].category, simplified_ad[param_name].variable)
 
 
 class SoundAction(Action):
@@ -278,38 +272,39 @@ class remove_renderable(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        renderable = settings.scene.active_renderables.renderables[self.simplified_ad['key']]
-        children = []
+        # Resolve connectable parameters
+        if isinstance(self.simplified_ad['key'], Connection):
+            self.simplified_ad['key'] = settings.GetConnectionData(self.simplified_ad['key'])
 
-        if isinstance(renderable, Container):
-            # Collect a flattened list of all children in this container
-            children = renderable.GetAllChildren()
+        tar_renderable = None
+        if settings.scene.active_renderables.Exists(self.simplified_ad['key']):
+            tar_renderable = settings.scene.active_renderables.GetFromKey(self.simplified_ad['key'])
+        else:
+            raise ValueError("'remove_renderable' action Failed - Renderable can not be found")
+            self.Complete()
+            return
 
-        # Any transitions are applied to the sprite pre-unload
+        # Apply any transitions if applicable
         if "None" not in self.simplified_ad["transition"]["type"]:
-            if children:
+            if tar_renderable.children:
                 # In order to apply the transition to each and every child of the container, we merge the surfaces
-                # and combine them into the container surface. That way, the rendering only manages a single
-                # surface. This causes containers to be non-functional once a transition starts, as the underlying
-                # children are destroyed before the transition begins
+                # and merge them into the tar_renderable surface. That way, the rendering only manages a single
+                # surface. This causes containers to be non-functional once a transition starts, as the
+                # underlying children are destroyed before the transition begins
 
-                # Merge the surfaces, then delete the child (Grim, I know)
-                for child in children:
-                    renderable.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
-                    settings.scene.active_renderables.Remove(child.key)
-
-                renderable.visible = True
+                # Merge the surfaces, then delete all of the children (Look, Anakin did it first, he set the precedent)
+                for child in tar_renderable.children:
+                    tar_renderable.surface.blit(child.GetSurface(), (child.rect.x, child.rect.y))
+                    child.Destroy()
+                tar_renderable.visible = True
 
             from HBEngine.Core import action_manager
-            self.active_transition = action_manager.CreateTransition(self.simplified_ad["transition"], renderable)
+            self.active_transition = action_manager.CreateTransition(self.simplified_ad["transition"], tar_renderable)
             self.active_transition.Start()
         else:
-            if children:
-                # Remove all children first
-                for child in children:
-                    settings.scene.active_renderables.Remove(child.key)
+            # No transition active - Just delete the renderable
+            tar_renderable.Destroy()
 
-            settings.scene.active_renderables.Remove(self.simplified_ad["key"])
             settings.scene.Draw()
             self.Complete()
 
@@ -334,7 +329,7 @@ class create_sprite(Action):
             "type": "String",
             "value": "",
             "connection": None,
-            "flags": ["editable", "connectable", "preview"],
+            "flags": ["editable", "preview"],
         },
         "sprite": {
             "type": "Asset_Image",
@@ -460,7 +455,7 @@ class create_background(Action):
             "type": "String",
             "value": "Background",
             "connection": None,
-            "flags": ["editable", "connectable"]
+            "flags": ["editable"]
         },
         "sprite": {
             "type": "Asset_Image",
@@ -668,7 +663,7 @@ class create_text(Action):
             "type": "String",
             "value": "",
             "connection": None,
-            "flags": ["editable", "connectable", "preview"],
+            "flags": ["editable", "preview"],
         },
         "position": {
             "type": "Vector2",
@@ -796,12 +791,11 @@ class create_text(Action):
             self.active_transition.Skip()
         self.Complete()
 
-
-class create_button(Action):
+class create_interactable_text(Action):
     """
-    Creates a button interactable, and adds it to the renderable stack. Returns a 'Button'
+    Creates a text interactable, and adds it to the renderable stack. Returns an 'InteractableText'
     """
-    DISPLAY_NAME = "Create Button"
+    DISPLAY_NAME = "Create Interactable text"
     ACTION_DATA = {
         "key": {
             "type": "String",
@@ -811,7 +805,7 @@ class create_button(Action):
         },
         "position": {
             "type": "Vector2",
-            "value": [0.5, 0.5],
+            "value": [0.0, 0.0],
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
@@ -819,196 +813,12 @@ class create_button(Action):
             "type": "Bool",
             "value": True,
             "flags": ["editable"],
-        },
-        "sprite": {
-            "type": "Asset_Image",
-            "default": ["Default Variables - Button", "button_sprite"],
-            "connection": None,
-            "flags": ["editable", "connectable", "preview"],
-        },
-        "sprite_hover": {
-            "type": "Asset_Image",
-            "default": ["Default Variables - Button", "button_sprite_hover"],
-            "connection": None,
-            "flags": ["editable", "connectable"],
-        },
-        "sprite_clicked": {
-            "type": "Asset_Image",
-            "default": ["Default Variables - Button", "button_sprite_clicked"],
-            "connection": None,
-            "flags": ["editable", "connectable"],
         },
         "z_order": {
             "type": "Int",
-            "default": ["Default Variables - Button", "button_z_order"],
+            "default": ["Default Variables - Interactable", "interactable_z_order"],
             "connection": None,
             "flags": ["editable", "connectable"],
-        },
-        "button_text": {
-            "type": "Container",
-            "flags": ["editable", "preview"],
-            "children": {
-                "position": {
-                    "type": "Vector2",
-                    "value": [0.5, 0.5],
-                    "connection": None,
-                    "flags": ["editable", "connectable", "preview"],
-                },
-                "center_align": {
-                    "type": "Bool",
-                    "value": True,
-                    "flags": ["editable"],
-                },
-                "text": {
-                    "type": "String",
-                    "value": "Default",
-                    "connection": None,
-                    "flags": ["editable", "connectable", "preview"],
-                },
-                "text_size": {
-                    "type": "Int",
-                    "default": ["Default Variables - Text", "text_size"],
-                    "connection": None,
-                    "flags": ["editable", "connectable"],
-                },
-                "text_color": {
-                    "type": "Color",
-                    "default": ["Default Variables - Text", "text_color"],
-                    "connection": None,
-                    "flags": ["editable", "connectable"],
-                },
-                "text_color_hover": {
-                    "type": "Color",
-                    "default": ["Default Variables - Text", "text_color"],
-                    "connection": None,
-                    "flags": ["editable", "connectable"]
-                },
-                "text_color_clicked": {
-                    "type": "Color",
-                    "default": ["Default Variables - Text", "text_color"],
-                    "connection": None,
-                    "flags": ["editable", "connectable"]
-                },
-                "font": {
-                    "type": "Asset_Font",
-                    "default": ["Default Variables - Text", "text_font"],
-                    "connection": None,
-                    "flags": ["editable", "connectable"]
-                },
-                "wrap_bounds": {
-                    "type": "Vector2",
-                    "value": [0.2, 0.2],
-                    "flags": ["editable"],
-                },
-                "z_order": {  # Not editable as controlled by the Button object
-                    "type": "Int",
-                    "value": 10002,
-                }
-            },
-        },
-        "events": {
-            "type": "Array",
-            "flags": ["editable", "no_exclusion"],
-            "children": {},
-            "template": {
-                "event": {
-                    "type": "Array_Element",
-                    "flags": ["editable"],
-                    "children": {
-                        "action": {
-                            "type": "Event",
-                            "value": "None",
-                            "options": [
-                                "None",
-                                "load_scene",
-                                "quit_game",
-                                "scene_fade_out",
-                                "scene_fade_in",
-                                "play_sfx",
-                                "set_mute",
-                                "set_value",
-                                "start_dialogue",
-                                "remove_renderable",
-                                "pause",
-                                "unpause",
-                                "switch_page"
-                            ],
-                            "flags": ["editable"],
-                        }
-                    },
-                }
-            },
-        },
-        "conditions": {
-            "type": "Array",
-            "flags": ["editable"],
-            "children": {},
-            "template": {
-                "condition": {
-                    "type": "Array_Element",
-                    "flags": ["editable"],
-                    "children": {
-                        "variable": {
-                            "type": "String",
-                            "value": "",
-                            "flags": ["editable"],
-                        },
-                        "operator": {
-                            "type": "Dropdown",
-                            "value": "equal",
-                            "options": ["equal", "not_equal", "less", "greater", "greater-or-equal", "lesser-or-equal"],
-                            "flags": ["editable"],
-                        },
-                        "goal": {
-                            "type": "String",
-                            "value": "",
-                            "flags": ["editable"],
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    def Start(self):
-        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-        self.skippable = False
-
-        # System defined overrides
-        self.simplified_ad["button_text"]["z_order"] = self.simplified_ad["z_order"] + 1
-
-        new_renderable = Button(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_renderable)
-        if not self.no_draw:
-            settings.scene.Draw()
-
-        self.Complete()
-        return new_renderable
-
-
-class create_text_button(Action):
-    """
-    Creates a text-only button interactable, and adds it to the renderable stack. Returns a 'Button'
-    """
-    DISPLAY_NAME = "Create Button (Text Only)"
-    ACTION_DATA = {
-        "key": {
-            "type": "String",
-            "value": "",
-            "connection": None,
-            "flags": ["editable", "connectable", "preview"],
-        },
-        "position": {
-            "type": "Vector2",
-            "value": [0.5, 0.5],
-            "connection": None,
-            "flags": ["editable", "connectable", "preview"],
-        },
-        "center_align": {
-            "type": "Bool",
-            "value": True,
-            "flags": ["editable"],
         },
         "text": {
             "type": "String",
@@ -1026,7 +836,7 @@ class create_text_button(Action):
             "type": "Color",
             "default": ["Default Variables - Text", "text_color"],
             "connection": None,
-            "flags": ["editable", "connectable"]
+            "flags": ["editable", "connectable"],
         },
         "text_color_hover": {
             "type": "Color",
@@ -1044,13 +854,7 @@ class create_text_button(Action):
             "type": "Asset_Font",
             "default": ["Default Variables - Text", "text_font"],
             "connection": None,
-            "flags": ["editable", "connectable"],
-        },
-        "z_order": {
-            "type": "Int",
-            "default": ["Default Variables - Button", "button_z_order"],
-            "connection": None,
-            "flags": ["editable", "connectable", "preview"],
+            "flags": ["editable", "connectable"]
         },
         "wrap_bounds": {
             "type": "Vector2",
@@ -1088,7 +892,7 @@ class create_text_button(Action):
                         }
                     },
                 }
-            }
+            },
         },
         "conditions": {
             "type": "Array",
@@ -1117,7 +921,7 @@ class create_text_button(Action):
                         }
                     }
                 }
-            },
+            }
         }
     }
 
@@ -1125,7 +929,7 @@ class create_text_button(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Button(renderable_data=self.simplified_ad)
+        new_renderable = InteractableText(renderable_data=self.simplified_ad)
 
         self.AddToScene(new_renderable)
         if not self.no_draw:
@@ -1137,7 +941,7 @@ class create_text_button(Action):
 
 class create_checkbox(Action):
     """
-    Creates a checkbox button interactable, and adds it to the renderable stack. Returns a 'Checkbox'
+    Creates a checkbox interactable, and adds it to the renderable stack. Returns a 'Checkbox'
     """
     DISPLAY_NAME = "Create Checkbox"
     ACTION_DATA = {
@@ -1551,90 +1355,53 @@ class choice(Action):
                         "center_align": {
                             "type": "Bool",
                             "value": True,
-                        },
-                        "sprite": {
-                            "type": "Asset_Image",
-                            "default": ["Default Variables - Dialogue", "choice_button_sprite"],
-                            "connection": None,
-                            "flags": ["editable", "connectable"],
-                        },
-                        "sprite_hover": {
-                            "type": "Asset_Image",
-                            "default": ["Default Variables - Dialogue", "choice_button_sprite_hover"],
-                            "connection": None,
-                            "flags": ["editable", "connectable"],
-                        },
-                        "sprite_clicked": {
-                            "type": "Asset_Image",
-                            "default": ["Default Variables - Dialogue", "choice_button_sprite_clicked"],
-                            "connection": None,
-                            "flags": ["editable", "connectable"],
+                            "flags": []
                         },
                         "z_order": {
                             "type": "Int",
+                            "default": ["Default Variables - Dialogue", "choice_button_z_order"],
+                            "connection": None,
+                            "flags": [""],
+                        },
+                        "text": {
+                            "type": "String",
+                            "value": "Default",
+                            "flags": ["editable", "preview"],
+                        },
+                        "text_size": {
+                            "type": "Int",
                             "default": ["Default Variables - Dialogue", "choice_button_text_size"],
                             "connection": None,
-                            "flags": ["global_active"],
+                            "flags": ["editable", "connectable"],
                         },
-                        "button_text": {
-                            "type": "Container",
-                            "flags": ["editable", "preview"],
-                            "children": {
-                                "position": {
-                                    "type": "Vector2",
-                                    "value": [0.5, 0.5],
-                                    "flags": ["editable"],
-                                },
-                                "center_align": {
-                                    "type": "Bool",
-                                    "value": True,
-                                    "flags": ["editable"],
-                                },
-                                "text": {
-                                    "type": "String",
-                                    "value": "Default",
-                                    "flags": ["editable", "preview"],
-                                },
-                                "text_size": {
-                                    "type": "Int",
-                                    "default": ["Default Variables - Dialogue", "choice_button_text_size"],
-                                    "connection": None,
-                                    "flags": ["editable", "connectable"],
-                                },
-                                "text_color": {
-                                    "type": "Color",
-                                    "default": ["Default Variables - Dialogue", "choice_button_text_color"],
-                                    "connection": None,
-                                    "flags": ["editable", "connectable"],
-                                },
-                                "text_color_hover": {
-                                    "type": "Color",
-                                    "default": ["Default Variables - Dialogue", "choice_button_text_color_hover"],
-                                    "connection": None,
-                                    "flags": ["editable", "connectable"],
-                                },
-                                "text_color_clicked": {
-                                    "type": "Color",
-                                    "default": ["Default Variables - Dialogue", "choice_button_text_color_clicked"],
-                                    "connection": None,
-                                    "flags": ["editable", "connectable"],
-                                },
-                                "font": {
-                                    "type": "Asset_Font",
-                                    "default": ["Default Variables - Dialogue", "choice_button_font"],
-                                    "connection": None,
-                                    "flags": ["editable", "connectable"],
-                                },
-                                "z_order": {
-                                    "type": "Int",
-                                    "value": 10002,
-                                },
-                                "wrap_bounds": {
-                                    "type": "Vector2",
-                                    "value": [0.25, 0.25],
-                                    "flags": ["editable"],
-                                }
-                            }
+                        "text_color": {
+                            "type": "Color",
+                            "default": ["Default Variables - Dialogue", "choice_button_text_color"],
+                            "connection": None,
+                            "flags": ["editable", "connectable"],
+                        },
+                        "text_color_hover": {
+                            "type": "Color",
+                            "default": ["Default Variables - Dialogue", "choice_button_text_color_hover"],
+                            "connection": None,
+                            "flags": ["editable", "connectable"],
+                        },
+                        "text_color_clicked": {
+                            "type": "Color",
+                            "default": ["Default Variables - Dialogue", "choice_button_text_color_clicked"],
+                            "connection": None,
+                            "flags": ["editable", "connectable"],
+                        },
+                        "font": {
+                            "type": "Asset_Font",
+                            "default": ["Default Variables - Dialogue", "choice_button_font"],
+                            "connection": None,
+                            "flags": ["editable", "connectable"],
+                        },
+                        "wrap_bounds": {
+                            "type": "Vector2",
+                            "value": [0.25, 0.25],
+                            "flags": ["editable"],
                         }
                     }
                 }
@@ -1681,7 +1448,8 @@ class choice(Action):
         self.simplified_ad["z_order"] = 0
         self.simplified_ad["center_align"] = False
         self.simplified_ad["key"] = "Choice"
-        new_renderable = Choice(renderable_data=self.simplified_ad)
+        new_renderable = Renderable(renderable_data=self.simplified_ad)
+        self.AddToScene(new_renderable)
 
         # Generate a button for each choice, adding them to the active renderables group for access to updates
         # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
@@ -1689,20 +1457,28 @@ class choice(Action):
         # Because we the data comes from the 'template' key, we don't have a mechanism to load from the action
         for choice_name, choice_data in self.simplified_ad["choices"].items():
             # Define what the button does when clicked
-            choice_data["event"] = {
-                "action": "switch_branch",
-                "branch": choice_data["branch"]
+            choice_data["events"] = {
+                "event_01": {
+                    "action": {
+                        "action": "switch_branch",
+                        "branch": choice_data["branch"],
+                        "conditions": {}
+                    }
+                },
+                "event_02": {
+                    "action": {
+                        "action": "remove_renderable",
+                        "key": "Choice",
+                        "conditions": {}
+                    }
+                }
             }
 
-            # The key is generated dynamically instead of being provided by the file
-            choice_data["key"] = choice_name
+            choice_data["key"] = choice_name  # Use a dynamic key since this will be cleaned up after the choice is made
+            new_child = InteractableText(choice_data)
+            self.AddToScene(new_child, new_renderable)
 
-            new_child = Button(choice_data)
-            settings.scene.active_renderables.Add(new_child)
-            new_renderable.children.append(new_child)
-
-        # Add the choice parent object to the render stack
-        settings.scene.active_renderables.Add(new_renderable)
+            #self.AddToScene(new_child)
 
         settings.scene.Draw()
         self.Complete()
@@ -1752,17 +1528,11 @@ class switch_branch(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        # If a choice button lead to this, delete that whole choice container, otherwise it would persist
-        # into the new branch
-        if settings.scene.active_renderables.Exists("Choice"):
-            from HBEngine.Core import action_manager
-            action_manager.PerformAction(
-                {"key": "Choice", "transition": {"type": "None"}},
-                "remove_renderable"
-            )
-
         # Request that the Dialogue module load the given branch
-        settings.modules[m_dialogue.Dialogue.MODULE_NAME].SwitchDialogueBranch(self.simplified_ad['branch'])
+        if m_dialogue.Dialogue.MODULE_NAME in settings.modules:
+            settings.modules[m_dialogue.Dialogue.MODULE_NAME].SwitchDialogueBranch(self.simplified_ad['branch'])
+        else:
+            raise ValueError("'switch_branch' action Failed - Dialogue Module not Active")
 
         settings.scene.Draw()
         self.Complete()

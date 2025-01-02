@@ -27,11 +27,14 @@ class RenderableGroup:
     def Add(self, *r_to_add):
         """
         Add the given renderables to the rend dict using the renderable key as the key, and the actual
-        renderable as the value
+        renderable as the value. If a matching key already exists, destroy the existing renderable before adding
         """
         for renderable in r_to_add:
             if renderable.key is None:
                 print(f"Renderable has no key assigned - Removal will be impossible: {renderable}")
+            elif renderable.key in self.renderables:
+                self.renderables[renderable.key].Destroy()
+
             self.renderables[renderable.key] = renderable
 
     def Remove(self, *key_to_remove) -> bool:

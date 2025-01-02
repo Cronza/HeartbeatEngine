@@ -30,7 +30,7 @@ pages:
           conditions: { }
 
       # Resume Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_PAUSE_Resume_Button&!"
           position:
             - 0.15
@@ -53,7 +53,7 @@ pages:
           conditions: { }
 
       # Options Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_PAUSE_Options_Button&!"
           position:
             - 0.15
@@ -79,7 +79,7 @@ pages:
           conditions: { }
 
       # Save Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_PAUSE_Save_Button&!"
           position:
             - 0.15
@@ -105,7 +105,7 @@ pages:
           conditions: { }
 
       # Main Menu Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_PAUSE_Main_Menu_Button&!"
           position:
             - 0.15
@@ -130,7 +130,7 @@ pages:
           conditions: { }
 
       # Quit Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_PAUSE_Quit_Button&!"
           position:
             - 0.15

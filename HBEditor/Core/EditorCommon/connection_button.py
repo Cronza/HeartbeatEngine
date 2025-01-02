@@ -22,6 +22,9 @@ class ConnectionButton(QtWidgets.QComboBox):
         result = self.ShowConnectionDialog()
         if result is None:
             logger.Log("Connection unchanged")
+        elif result == ():
+            self.Set(None)
+            self.SIG_USER_UPDATE.emit(self.owning_model_item, 'None')
         else:
             self.Set(result)
             self.SIG_USER_UPDATE.emit(self.owning_model_item, self.currentText())
@@ -54,7 +57,7 @@ class DialogConnection(QtWidgets.QDialog):
     def __init__(self, supported_type: ParameterType, source_options: list):
         super().__init__()
 
-        # Contols for filtering or limiting shown options
+        # Controls for filtering or limiting shown options
         self.supported_type = supported_type
         self.source_options = source_options
 
@@ -87,37 +90,40 @@ class DialogConnection(QtWidgets.QDialog):
         self.variable_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)  # Disable multi-selection
         self.variable_tree.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectItems)  # Disables cell selection
         self.variable_tree.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        """
-        self.details_tree.setObjectName("no-top")
-        self.details_tree.setColumnCount(3)
-        self.details_tree.setHeaderLabels(['Name', 'Input', 'Connection'])
-        self.details_tree.setAutoScroll(False)
-        self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
-        self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
-        self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
-        self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.details_tree.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.NoSelection)
-        """
-
         self.main_layout.addWidget(self.variable_tree)
 
         # Confirmation Buttons
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        self.button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok |
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel |
+            QtWidgets.QDialogButtonBox.StandardButton.Reset
+        )
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
+        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Reset).clicked.connect(self.Reset)
         self.main_layout.addWidget(self.button_box)
 
+        # Allow the user to clear the assignment
+        self.clear_assignment = False
+
         self.Populate()
+
+    def Reset(self):
+        """ Signal function for the reset button. Enables exiting with 'None' """
+        self.clear_assignment = True
+        self.accept()
 
     def GetVariable(self) -> tuple:
         """
         Activate the dialog, and return a tuple of (category_name, variable_name, source). If none were chosen, return 'None'
         """
         if self.exec():
-            selection = self.variable_tree.selectedItems()
-            if selection:
-                return selection[0].parent().text(0), selection[0].text(0), self.var_source.currentText()
+            if not self.clear_assignment:
+                selection = self.variable_tree.selectedItems()
+                if selection:
+                    return selection[0].parent().text(0), selection[0].text(0), self.var_source.currentText()
+            else:
+                return ()
 
         return None
 

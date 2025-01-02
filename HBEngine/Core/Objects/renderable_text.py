@@ -16,6 +16,7 @@ import pygame
 import pygame.freetype
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core import settings
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 class TextRenderable(Renderable):
@@ -26,47 +27,73 @@ class TextRenderable(Renderable):
         - Actions text
         - Pop-up text
         - etc
+
+    This class has the following (additional) Renderable Data requirements:
+    - text (String)
+    - text_size (Int)
+    - text_color (Vector3)
+    - font (String)
+    - wrap_bounds (Vector2)
     """
-    def __init__(self, renderable_data: dict, parent: Renderable = None):
-        super().__init__(renderable_data, parent)
+    def __init__(self, renderable_data: dict, parent: Renderable = None, process_data: bool = True):
+        # Parameters
+        self.text = ""
+        self.text_color = (0, 0, 0)
+        self.text_size = 12
+        self.font = pygame.font.Font("HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf", self.text_size)
+        self.wrap_bounds = (0, 1)
 
-        font = settings.ConvertPartialToAbsolutePath(self.renderable_data['font'])
-        self.text = self.renderable_data["text"]
-        self.text_color = self.renderable_data["text_color"]
-        text_size = self.renderable_data["text_size"]
-        self.font_obj = pygame.font.Font(font, text_size)
+        # Run parent implementation which will perform recalculations with the aforementioned parameters
+        super().__init__(renderable_data, parent, process_data)
 
-        if "wrap_bounds" not in self.renderable_data:
-            raise ValueError(f"No 'wrap_bounds' value assigned to '{self}' - This makes for an impossible action!")
+    def ApplyRenderableData(self):
+        if 'text' in self.renderable_data:
+            if isinstance(self.renderable_data['text'], Connection):
+                self.text = settings.GetConnectionData(self.renderable_data['text'])
+            else:
+                self.text = self.renderable_data['text']
 
-        # Build a surface using the wrap bounds as the containing area. The values are expected to be normalized so that
-        # we avoid resolution-dependent positioning (IE. 0.2 works for 16/9 and 4/3)
-        #
-        # If text spills outside these bounds, it's automatically wrapped until the maximum Y
-        size = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
-        self.surface = pygame.Surface(
-            (
-                int(size[0]),
-                int(size[1])
-            ),
-            pygame.SRCALPHA
-        )
-        self.rect = self.surface.get_rect()
+        if 'text_size' in self.renderable_data:
+            if isinstance(self.renderable_data['text_size'], Connection):
+                self.text_size = settings.GetConnectionData(self.renderable_data['text_size'])
+            else:
+                self.text_size = self.renderable_data['text_size']
 
-        # For new objects, resize initially in case we're already using a scaled resolution
+        if 'text_color' in self.renderable_data:
+            if isinstance(self.renderable_data['text_color'], Connection):
+                self.text_color = settings.GetConnectionData(self.renderable_data['text_color'])
+            else:
+                self.text_color = self.renderable_data['text_color']
+
+        if 'font' in self.renderable_data:
+            if isinstance(self.renderable_data['font'], Connection):
+                self.font = pygame.font.Font(
+                    settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['font'])),
+                    self.text_size
+                )
+            else:
+                self.font = pygame.font.Font(
+                    settings.ConvertPartialToAbsolutePath(self.renderable_data['font']),
+                    self.text_size
+                )
+
+        if 'wrap_bounds' in self.renderable_data:
+            if isinstance(self.renderable_data['wrap_bounds'], Connection):
+                self.wrap_bounds = settings.GetConnectionData(self.renderable_data['wrap_bounds'])
+            else:
+                self.wrap_bounds = self.renderable_data['wrap_bounds']
+
+        # Run the parent implementation to ensure all changes are considered, and the surfaces are recalculated
+        super().ApplyRenderableData()
+
+        # Rebuild the surface
         self.WrapText()
         self.RecalculateSize(settings.resolution_multiplier)
 
-        # Setup Connections
-        if "connect_project_setting" in self.renderable_data:
-            if not self.ConnectProjectSetting(self.renderable_data["connect_project_setting"]):
-                print(f"Unable to setup project setting connection for '{self.key}'. Please review the connection settings")
-
     def WrapText(self):
         """ Clears the surface and redraws / re-wraps the text """
-
         # Reset the surface back to the full size of wrap_bounds in order to wrap properly
-        size = self.ConvertNormToScreen(self.renderable_data["wrap_bounds"])
+        size = self.ConvertNormToScreen(self.wrap_bounds)
         self.surface = pygame.Surface(
             (
                 int(size[0]),
@@ -78,7 +105,7 @@ class TextRenderable(Renderable):
 
         base_top = rect.top
         line_spacing = 0
-        font_height = self.font_obj.size("Tg")[1]
+        font_height = self.font.size("Tg")[1]
         largest_width = 0  # The size of the largest line
         total_height = 0  # The height of all lines including between-line spacing
 
@@ -104,7 +131,7 @@ class TextRenderable(Renderable):
                     break
 
                 # Parse the text until we've exceeded horizontal bounds, or we reached the end of the string
-                while self.font_obj.size(line[:i])[0] < rect.width and i < len(line):
+                while self.font.size(line[:i])[0] < rect.width and i < len(line):
                     i += 1
 
                 # If we didn't reach the end of the string, grab the last occurrence of a whitespace
@@ -112,11 +139,11 @@ class TextRenderable(Renderable):
                     i = line.rfind(" ", 0, i) + 1
 
                 # Prior to blitting, measure the length of the string and record it if it's the largest so far
-                if self.font_obj.size(line[:i])[0] > largest_width:
-                    largest_width = self.font_obj.size(line[:i])[0]
+                if self.font.size(line[:i])[0] > largest_width:
+                    largest_width = self.font.size(line[:i])[0]
 
                 # Render the line and blit it to the surface
-                image = self.font_obj.render(line[:i], True, self.text_color)
+                image = self.font.render(line[:i], True, self.text_color)
 
                 # If applicable, center align the line based on its unique size
                 if self.center_align:

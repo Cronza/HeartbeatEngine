@@ -106,7 +106,6 @@ class GroupsPanel(QtWidgets.QWidget):
 
         if not skip_select:
             # Select the new entry
-            print("Creating new entry", new_entry)
             self.entry_list.setCurrentItem(list_item)
             self.active_entry = new_entry
 

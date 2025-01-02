@@ -55,7 +55,6 @@ class Pause(BaseModule):
         # Disable the global 'Pause' state
         settings.paused = False
 
-
     def Update(self, events):
         for event in events:
             if event.type == pygame.KEYUP:

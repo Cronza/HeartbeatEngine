@@ -90,9 +90,8 @@ class Dialogue(BaseModule):
                 self.dialogue_index += 1
                 self.LoadAction()
         else:
-            #print("End of Dialogue Sequence - The game will not proceed past this point.")
-            from HBEngine import hb_engine
-            hb_engine.UnloadModule(self.MODULE_NAME)
+            # User needs to end the dialogue using the appropriate action
+            pass
 
     def SwitchDialogueBranch(self, branch):
         """ Given a branch name within the active dialogue file, switch to using it """

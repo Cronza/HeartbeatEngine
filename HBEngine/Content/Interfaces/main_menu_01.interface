@@ -12,7 +12,7 @@ pages:
       - create_background:
           key: "!&INTERFACE_MAIN_MENU_Background&!"
           sprite: HBEngine/Content/Sprites/Backgrounds/Basic_Dark_1280x720.png
-          z_order: 100000
+          z_order: -100000
           conditions: { }
 
       # Title
@@ -34,7 +34,7 @@ pages:
           conditions: { }
 
       # Play Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_Play_Button&!"
           position:
             - 0.5
@@ -75,7 +75,7 @@ pages:
           conditions: { }
 
       # Options Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_Options_Button&!"
           position:
             - 0.5
@@ -101,7 +101,7 @@ pages:
           conditions: { }
 
       # Load Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_Load_Button&!"
           position:
             - 0.5
@@ -127,7 +127,7 @@ pages:
           conditions: { }
 
       # About Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_About_Button&!"
           position:
             - 0.5
@@ -153,7 +153,7 @@ pages:
           conditions: { }
 
       # Quit Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_Quit_Button&!"
           position:
             - 0.5
@@ -218,7 +218,7 @@ pages:
           conditions: { }
 
       # Back Button
-      - create_text_button:
+      - create_interactable_text:
           key: "!&INTERFACE_MAIN_MENU_pageAbout_Back_Button&!"
           position:
             - 0.5

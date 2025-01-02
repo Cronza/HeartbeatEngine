@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import Union
 import pygame
 from HBEngine.Core import settings
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 class Renderable(pygame.sprite.Sprite):
@@ -26,9 +27,14 @@ class Renderable(pygame.sprite.Sprite):
         - Motion graphics
         - Etc
 
-    This class is not meant to be used directly, but to be subclassed into more specialized objects
+    This class has the following Renderable Data requirements:
+    - key (String)
+    - position (Tuple)
+    - center_align (Boolean)
+    - z_order (Float)
+    - flip (Boolean)
     """
-    def __init__(self, renderable_data: dict, parent: Renderable = None):
+    def __init__(self, renderable_data: dict, parent: Renderable = None, process_data: bool = True):
         super().__init__()
         self.parent = parent
         self.children = []
@@ -40,16 +46,67 @@ class Renderable(pygame.sprite.Sprite):
         self.surface = pygame.Surface((0, 0), pygame.SRCALPHA)  # The active surface
         self.scaled_surface = None  # The active surface used in resolutions different from the main resolution
 
-        # YAML Parameters
+        # Parameters
         self.renderable_data = renderable_data
-        self.position = (0, 0) if "position" not in self.renderable_data else self.renderable_data['position']
-        self.center_align = True if "center_align" not in self.renderable_data else self.renderable_data['center_align']
-        self.z_order = 0 if "z_order" not in self.renderable_data else self.renderable_data['z_order']
+        self.key = ''
+        self.position = (0, 0)
+        self.center_align = True
+        self.z_order = 0
+        self.flip = False
 
-        # For indentification in the rendering stack, all renderables require a unique identifier
-        if 'key' not in self.renderable_data:
+        if process_data:
+            self.ApplyRenderableData()
+
+    def Destroy(self):
+        """ Recursively remove all references to children to allow for GC for this object """
+        for child in self.children:
+            child.Destroy()
+
+        self.children.clear()
+        self.parent = None
+        settings.scene.active_renderables.Remove(self.key)
+
+    def ApplyRenderableData(self):
+        # Since parameters may either be of the associated type or a 'Connection' type, we need to check whether any
+        # parameter is a connection. If so, load the associated connected value
+
+        # For identification in the rendering stack, all renderables require a unique identifier
+        if 'key' in self.renderable_data:
+            if isinstance(self.renderable_data['key'], Connection):
+                self.key = settings.GetConnectionData(self.renderable_data['key'])
+            else:
+                self.key = self.renderable_data['key']
+        else:
             raise ValueError(f"No key assigned to {self}. The 'key' property is mandatory for all renderables")
-        self.key = self.renderable_data['key']
+
+        if "position" in self.renderable_data:
+            if isinstance(self.renderable_data['position'], Connection):
+                self.position = settings.GetConnectionData(self.renderable_data['position'])
+            else:
+                self.position = self.renderable_data['position']
+
+        if "center_align" in self.renderable_data:
+            if isinstance(self.renderable_data['center_align'], Connection):
+                self.center_align = settings.GetConnectionData(self.renderable_data['center_align'])
+            else:
+                self.center_align = self.renderable_data['center_align']
+
+        if "z_order" in self.renderable_data:
+            if isinstance(self.renderable_data['z_order'], Connection):
+                self.z_order = settings.GetConnectionData(self.renderable_data['z_order'])
+            else:
+                self.z_order = self.renderable_data['z_order']
+
+        # Recalculate the surface given the above changes before we consider transformational changes
+        self.RecalculateSize(settings.resolution_multiplier)
+
+        if "flip" in self.renderable_data:
+            if isinstance(self.renderable_data['flip'], Connection):
+                self.flip = settings.GetConnectionData(self.renderable_data['flip'])
+            else:
+                self.flip = self.renderable_data['flip']
+
+            self.Flip()
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and its surfaces based on the provided size multiplier """
@@ -64,14 +121,16 @@ class Renderable(pygame.sprite.Sprite):
 
     def RecalculateSurfacePosition(self, surface: pygame.Surface) -> tuple:
         new_position = 0,0
+
         if self.parent:
-            # Since normalized values can be viewed as a percentage of a range (IE. 0.7 = 70/100),
-            # use this to get our position in the parent's coordinate system by multiplying our parent's size
-            # by our position (Ex. Size of 50 * 0.5 = 25, or center), then adding this to the parent's position
-            new_position = (
-                (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
-                (self.parent.rect.height * self.position[1]) + self.parent.rect.y
-            )
+            # If the parent has a surface but it is unused (IE. 0,0), fallback to screen space
+            if self.parent.surface.get_width() == 0 and self.parent.surface.get_height() == 0:
+                new_position = self.ConvertNormToScreen(tuple(self.position))
+            else:
+                new_position = (
+                    (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
+                    (self.parent.rect.height * self.position[1]) + self.parent.rect.y
+                )
         else:
             new_position = self.ConvertNormToScreen(tuple(self.position))
 

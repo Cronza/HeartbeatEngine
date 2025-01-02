@@ -14,6 +14,7 @@
 """
 import os, pathlib
 from Tools.HBYaml.hb_yaml import Reader, Writer
+from Tools.HBYaml.CustomTags.connection import Connection
 
 
 def SetProjectRoot(new_root: str):
@@ -38,20 +39,22 @@ def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
     global project_settings
     global resolution
     global resolution_options
-    global project_setting_listeners
+    global connection_listeners
 
+    # Load project settings
     file_path = ConvertPartialToAbsolutePath(partial_file_path)
     project_settings = Reader.ReadAll(file_path)
 
-    # Initialize the listener dict with keys for each available settings
+    # Initialize the 'Setting' side of the listener dict with keys for each available settings
     for cat, settings in project_settings.items():
-        project_setting_listeners[cat] = {}
+        connection_listeners["Settings"][cat] = {}
         for name, val in settings.items():
-            project_setting_listeners[cat][name] = {}
+            connection_listeners["Settings"][cat][name] = {}
 
     # Apply the effects of various project settings
     resolution = tuple(map(int, project_settings['Graphics']['resolution']['value'].split('x')))
     resolution_options = project_settings['Graphics']['resolution']['options']
+
 
 def SaveProjectSettings(file_path: str = "Config/Game.yaml"):
     """ Saves the project settings to the provided file path. Defaults to 'Config/Game.yaml' if no path is provided """
@@ -64,13 +67,13 @@ def SaveProjectSettings(file_path: str = "Config/Game.yaml"):
 def SetProjectSetting(category: str, setting: str, value: any):
     """ Sets the corresponding project settings, then save it to disk"""
     global project_settings
-    global project_setting_listeners
+    global connection_listeners
 
     project_settings[category][setting]['value'] = value
 
     # Inform any applicable listeners
-    for listener_name, connect_func in project_setting_listeners[category][setting].items():
-        connect_func(value)
+    for listener, notify_func in connection_listeners["Settings"][category][setting].items():
+        notify_func(value)
 
     # Save changes to ensure persistence for all changes
     SaveProjectSettings()
@@ -89,33 +92,41 @@ def GetProjectSetting(category: str, key: str):
 def LoadVariables(partial_file_path: str = "Config/Variables.yaml"):
     """ Reads in the project values file path. Defaults to 'Config/Variables.yaml' if no path is provided """
     global variables
+    global connection_listeners
 
+    # Load user variables
     file_path = ConvertPartialToAbsolutePath(partial_file_path)
     variables = Reader.ReadAll(file_path)
+
+    # Initialize the 'Variable' side of the listener dict with keys for each available variables
+    for cat, variable in variables.items():
+        connection_listeners["Variables"][cat] = {}
+        for name, val in variable.items():
+            connection_listeners["Variables"][cat][name] = {}
 
 
 def SaveVariables(file_path: str = "Config/Variables.yaml"):
     """ Saves the project variables to the provided file path. Defaults to 'Config/Variables.yaml' if no path is provided """
-    global project_settings
+    global variables
 
     file_path = ConvertPartialToAbsolutePath(file_path)
-    Writer.WriteFile(project_settings, file_path)
+    Writer.WriteFile(variables, file_path)
 
 
-def SetVariable(variable_name: str, variable_data: str):
+def SetVariable(category: str, variable: str, value: str):
     """
     Set the corresponding project variable
 
     Note: This change will not persist between runs of the game unless the user saves the game
     """
     global variables
-    global variable_listeners
+    global connection_listeners
 
-    variables[variable_name] = variable_data
+    variables[category][variable]['value'] = value
 
     # Inform any applicable listeners
-    for listener_name, connect_func in variable_listeners[variable_name].items():
-        connect_func(variable_name)
+    for listener, notify_func in connection_listeners["Variables"][category][variable].items():
+        notify_func(value)
 
 
 def GetVariable(category_name: str, variable_name: str) -> any:
@@ -146,6 +157,40 @@ def ConvertPartialToAbsolutePath(partial_path):
         return project_root + "/" + partial_path
 
 
+def GetConnectionData(connection_obj: Connection) -> any:
+    """ Returns the value from the target of the given connection object """
+    if connection_obj.source == "Variables":
+        return GetVariable(connection_obj.category, connection_obj.variable)
+    else:
+        return GetProjectSetting(connection_obj.category, connection_obj.variable)
+
+
+def RegisterConnectionListener(connection_obj: Connection, registeree: object, notify_func: callable) -> bool:
+    """
+    Registers a connection listener for the given connection data. When the target var or setting is changed,
+    invoke "notify_func". Registree is used to identify 'who' the connection is for.
+
+    Returns whether the registration was successfully made
+    """
+    global connection_listeners
+
+    if connection_obj.category == "" or connection_obj.variable == "" or connection_obj.source == "":
+        print(f"Unable to Register Connection for '{registeree}'. Please review the connection settings")
+        return False
+
+    # Add the object as a listener (This stomps any previous connection)
+    connection_listeners[connection_obj.category][connection_obj.variable][registeree] = notify_func
+
+
+def DeregisterConnectionListener(connection_obj: Connection, registeree: object):
+    """ Removes a registered connection listener based on the given connection data """
+    global connection_listeners
+
+    # Remove the registration if it exists
+    if registeree in connection_listeners[connection_obj.category][connection_obj.variable]:
+        del connection_listeners[connection_obj.category][connection_obj.variable][registeree]
+
+
 # --- Core engine references managed by 'hb_engine.py' ---
 modules = {}
 clock = None
@@ -165,10 +210,16 @@ resolution = (1280, 720)
 resolution_options = None
 resolution_multiplier = 1
 
-# When objects need to be aware of changes to settings (IE. "mute" checkbox renderable needs
-# to change based on the mute setting), we need a way of tracking who needs to be informed. These dicts
-# represents that tracking
-project_setting_listeners = {}  # Structure: {"<category>": {"<setting>": {"<object_ref>": "<connect_func>"}}}
-variable_listeners = {}  # Structure: {"<var_name">: {"<object_ref>": "<connect_func>"}}
+# When objects need to be aware of changes to variables or settings (IE. "mute" checkbox renderable needs
+# to change based on the mute setting), we need a way of tracking who needs to be informed. Any class may add
+# themselves as listeners
+#
+# Structure of dict: {"<category>": {"<var_or_setting_name>": {}}}}
+# Expected way of adding new entries: connection_listeners['registree_object'] = 'notify_func'
+connection_listeners = {
+    "Variables" : {},
+    "Settings" : {}
+}
+
 
 

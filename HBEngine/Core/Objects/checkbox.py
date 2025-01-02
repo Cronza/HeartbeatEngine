@@ -10,7 +10,7 @@ class Checkbox(Interactable):
 
         self.check_icon_renderable = SpriteRenderable(
             renderable_data={
-                "key": f"{self.renderable_data['key']}_Text",
+                "key": f"{self.renderable_data['key']}_Icon",
                 "position": [0.5, 0.5],
                 "sprite": self.renderable_data["sprite_icon"],
                 "z_order": self.renderable_data["z_order"] + 1
