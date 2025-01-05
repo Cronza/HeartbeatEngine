@@ -192,7 +192,10 @@ pages:
           sprite_hover: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Hover.png
           sprite_clicked: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Clicked.png
           sprite_icon: HBEngine/Content/Sprites/Interface/Buttons/Checkbox_Icon.png
-
+          is_checked: !Connection
+            category: Audio
+            variable: mute
+          source: Settings
           events:
             event_0:
               action:

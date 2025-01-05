@@ -38,11 +38,10 @@ class Pause(BaseModule):
         settings.paused = True
 
     def Start(self):
-        pause_interface = settings.GetProjectSetting('Default Variables - UI', 'pause_menu_interface')
+        # @TODO: Replace this with a generic empty pause menu with the word "Pause" written on it. Maybe a 'quit' button
+        # @TODO: That, or update this when we have a starting project where 'Play' doesn't lead to a FileNotFound error
+        pause_interface = settings.GetProjectSetting('Game', 'pause_menu_interface')
         if pause_interface == "None" or not pause_interface:
-            # Use fallback interface
-            # @TODO: Replace this with a generic empty pause menu with the word "Pause" written on it. Maybe a 'quit' button
-            # @TODO: That, or update this when we have a starting project where 'Play' doesn't lead to a FileNotFound error
             pause_interface = "HBEngine/Content/Interfaces/pause_menu_01.interface"
 
         self.LoadInterface(pause_interface)

@@ -41,6 +41,7 @@ class SpriteRenderable(Renderable):
             if self.renderable_data['sprite'] != "None" and self.renderable_data['sprite'] != "":
                 if isinstance(self.renderable_data['sprite'], Connection):
                     self.sprite = settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['sprite']))
+                    self.RegisterConnectionListener(self.renderable_data['sprite'])
                 else:
                     self.sprite = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite'])
 

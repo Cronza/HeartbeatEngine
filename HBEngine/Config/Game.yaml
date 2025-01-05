@@ -8,6 +8,9 @@ Game:
   starting_scene:
     type: "Scene"
     value: ""
+  pause_menu_interface:
+    type: "Interface"
+    value: 'HBEngine/Content/Interfaces/pause_menu_01.interface'
 Graphics:
   resolution:
     type: "Dropdown"
@@ -24,10 +27,6 @@ Audio:
   volume_sfx:
     type: "Int"
     value: 100
-Default Variables - UI:
-  pause_menu_interface:
-    type: "Interface"
-    value: ''
 Default Variables - Text:
   text_size:
     type: "Int"

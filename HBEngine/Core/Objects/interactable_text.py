@@ -54,15 +54,15 @@ class InteractableText(TextRenderable):
     def ApplyRenderableData(self):
         if 'text_color_hover' in self.renderable_data:
             if isinstance(self.renderable_data['text_color_hover'], Connection):
-                self.text_color_hover = settings.GetConnectionData(
-                    self.renderable_data['text_color_hover'])
+                self.text_color_hover = settings.GetConnectionData(self.renderable_data['text_color_hover'])
+                self.RegisterConnectionListener(self.renderable_data['text_color_hover'])
             else:
                 self.text_color_hover = self.renderable_data['text_color_hover']
 
         if 'text_color_clicked' in self.renderable_data:
             if isinstance(self.renderable_data['text_color_clicked'], Connection):
-                self.text_color_clicked = settings.GetConnectionData(
-                    self.renderable_data['text_color_clicked'])
+                self.text_color_clicked = settings.GetConnectionData(self.renderable_data['text_color_clicked'])
+                self.RegisterConnectionListener(self.renderable_data['text_color_clicked'])
             else:
                 self.text_color_clicked = self.renderable_data['text_color_clicked']
 

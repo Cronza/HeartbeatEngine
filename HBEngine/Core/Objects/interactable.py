@@ -39,9 +39,6 @@ class Interactable(SpriteRenderable):
         self.sprite_clicked = ''
         self.events = {}
 
-        # Run parent implementation which will perform recalculations with the aforementioned parameters
-        super().__init__(renderable_data, parent, process_data)
-
         self.state = State.normal
 
         # Track whether the previous input frame was clicking to determine whether this interactable was clicked
@@ -56,17 +53,26 @@ class Interactable(SpriteRenderable):
         self.scaled_hover_surface = None
         self.scaled_clicked_surface = None
 
+        # Run parent implementation which will perform surface calculations and apply all renderable data
+        super().__init__(renderable_data, parent, process_data)
+
         # Due to interactables being functionally capable of overriding the active surface (Hover, clicked, etc), we
         # need a place to cache the original, unscaled surface so we don't have to reload it from scratch each time
         self.original_surface = self.surface
         self.scaled_original_surface = None
 
 
+
     def ApplyRenderableData(self):
+        # Run the parent implementation to ensure all changes are considered, and the surfaces are recalculated. This
+        # is needed as otherwise the new surfaces would reset to an empty 'self.surface' if not provided
+        super().ApplyRenderableData()
+
         if "sprite_hover" in self.renderable_data:
             if self.renderable_data['sprite_hover'] != "None" and self.renderable_data['sprite_hover'] != "":
                 if isinstance(self.renderable_data['sprite_hover'], Connection):
                     self.sprite_hover = settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['sprite_hover']))
+                    self.RegisterConnectionListener(self.renderable_data['sprite_hover'])
                 else:
                     self.sprite_hover = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite_hover'])
 
@@ -81,6 +87,7 @@ class Interactable(SpriteRenderable):
             if self.renderable_data['sprite_clicked'] != "None" and self.renderable_data['sprite_clicked'] != "":
                 if isinstance(self.renderable_data['sprite_clicked'], Connection):
                     self.sprite_clicked = settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['sprite_clicked']))
+                    self.RegisterConnectionListener(self.renderable_data['sprite_clickedq'])
                 else:
                     self.sprite_clicked = settings.ConvertPartialToAbsolutePath(self.renderable_data['sprite_clicked'])
 
@@ -94,9 +101,6 @@ class Interactable(SpriteRenderable):
         if "events" in self.renderable_data:
             self.events = self.renderable_data['events']
 
-        # Run the parent implementation to ensure all changes are considered, and the surfaces are recalculated
-        super().ApplyRenderableData()
-
 
     def update(self, *args):
         super().update()
@@ -105,7 +109,6 @@ class Interactable(SpriteRenderable):
             if self.rect.collidepoint(pygame.mouse.get_pos()):
                 # If not already in the hover state...
                 if self.state is State.normal:
-                    print("HOVERING")
                     self.ChangeState(State.hover)
                 else:  # Track whether the user has released their cursor over the sprite
                     if pygame.mouse.get_pressed()[0] == 1:
@@ -218,7 +221,6 @@ class Interactable(SpriteRenderable):
 
     def ChangeState(self, new_state: State):
         """ Updates the active interact state with the provided state, refreshing the active surface """
-        self.SetActiveSurface(self.GetStateSurface(new_state))
         self.state = new_state
         settings.scene.Draw()
 

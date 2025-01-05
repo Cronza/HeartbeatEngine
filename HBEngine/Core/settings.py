@@ -73,7 +73,7 @@ def SetProjectSetting(category: str, setting: str, value: any):
 
     # Inform any applicable listeners
     for listener, notify_func in connection_listeners["Settings"][category][setting].items():
-        notify_func(value)
+        notify_func()
 
     # Save changes to ensure persistence for all changes
     SaveProjectSettings()
@@ -103,6 +103,8 @@ def LoadVariables(partial_file_path: str = "Config/Variables.yaml"):
         connection_listeners["Variables"][cat] = {}
         for name, val in variable.items():
             connection_listeners["Variables"][cat][name] = {}
+
+    print("Variable Registry", connection_listeners['Variables'])
 
 
 def SaveVariables(file_path: str = "Config/Variables.yaml"):
@@ -165,30 +167,29 @@ def GetConnectionData(connection_obj: Connection) -> any:
         return GetProjectSetting(connection_obj.category, connection_obj.variable)
 
 
-def RegisterConnectionListener(connection_obj: Connection, registeree: object, notify_func: callable) -> bool:
+def RegisterConnectionListener(connection_obj: Connection, registeree_id: str, notify_func: callable):
     """
     Registers a connection listener for the given connection data. When the target var or setting is changed,
-    invoke "notify_func". Registree is used to identify 'who' the connection is for.
-
-    Returns whether the registration was successfully made
+    invoke "notify_func". Registree_id is used to identify 'who' the connection is for.
     """
     global connection_listeners
 
     if connection_obj.category == "" or connection_obj.variable == "" or connection_obj.source == "":
-        print(f"Unable to Register Connection for '{registeree}'. Please review the connection settings")
-        return False
+        raise ValueError(f"Unable to Register Connection for '{registeree_id}'. Please review the connection settings")
 
     # Add the object as a listener (This stomps any previous connection)
-    connection_listeners[connection_obj.category][connection_obj.variable][registeree] = notify_func
+    connection_listeners[connection_obj.source][connection_obj.category][connection_obj.variable][registeree_id] = notify_func
+
+    return True
 
 
-def DeregisterConnectionListener(connection_obj: Connection, registeree: object):
-    """ Removes a registered connection listener based on the given connection data """
+def DeregisterConnectionListener(connection_obj: Connection, registeree_id: str):
+    """ Removes a registered connection listener based on the given data """
     global connection_listeners
 
     # Remove the registration if it exists
-    if registeree in connection_listeners[connection_obj.category][connection_obj.variable]:
-        del connection_listeners[connection_obj.category][connection_obj.variable][registeree]
+    if registeree_id in connection_listeners[connection_obj.source][connection_obj.category][connection_obj.variable]:
+        del connection_listeners[connection_obj.source][connection_obj.category][connection_obj.variable][registeree_id]
 
 
 # --- Core engine references managed by 'hb_engine.py' ---
@@ -214,8 +215,7 @@ resolution_multiplier = 1
 # to change based on the mute setting), we need a way of tracking who needs to be informed. Any class may add
 # themselves as listeners
 #
-# Structure of dict: {"<category>": {"<var_or_setting_name>": {}}}}
-# Expected way of adding new entries: connection_listeners['registree_object'] = 'notify_func'
+# Structure of dict: {"<category>": {"<var_or_setting_name>": {<registree_obj>: <notify_func>}}}}
 connection_listeners = {
     "Variables" : {},
     "Settings" : {}

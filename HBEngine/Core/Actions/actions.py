@@ -14,7 +14,6 @@
 """
 import pygame.mixer
 import copy, operator, os
-import uuid
 from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
@@ -413,10 +412,6 @@ class create_sprite(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
 
-        if "flip" in self.simplified_ad:
-            if self.simplified_ad["flip"]:
-                new_sprite.Flip()
-
         self.AddToScene(new_sprite)
         if not self.no_draw:
             # Any transitions are applied to the sprite post-load
@@ -593,7 +588,7 @@ class create_interactable(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
-                                "set_value",
+                                "set_variable",
                                 "start_dialogue",
                                 "remove_renderable"
                             ],
@@ -639,11 +634,6 @@ class create_interactable(Action):
         self.skippable = False
 
         new_renderable = Interactable(renderable_data=self.simplified_ad)
-
-        # If the user requested a flip action, do so
-        if 'flip' in self.simplified_ad:
-            if self.simplified_ad['flip']:
-                new_renderable.Flip()
 
         self.AddToScene(new_renderable)
         if not self.no_draw:
@@ -881,7 +871,7 @@ class create_interactable_text(Action):
                                 "scene_fade_in",
                                 "play_sfx",
                                 "set_mute",
-                                "set_value",
+                                "set_variable",
                                 "start_dialogue",
                                 "remove_renderable",
                                 "pause",
@@ -964,31 +954,31 @@ class create_checkbox(Action):
         },
         "sprite": {
             "type": "Asset_Image",
-            "default": ["Default Variables - Button", "checkbox_sprite"],
+            "default": ["Default Variables - Interactable", "checkbox_sprite"],
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_hover": {
             "type": "Asset_Image",
-            "default": ["Default Variables - Button", "checkbox_sprite_hover"],
+            "default": ["Default Variables - Interactable", "checkbox_sprite_hover"],
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_clicked": {
             "type": "Asset_Image",
-            "default": ["Default Variables - Button", "checkbox_sprite_clicked"],
+            "default": ["Default Variables - Interactable", "checkbox_sprite_clicked"],
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "sprite_icon": {
             "type": "Asset_Image",
-            "default": ["Default Variables - Button", "checkbox_sprite_icon"],
+            "default": ["Default Variables - Interactable", "checkbox_sprite_icon"],
             "connection": None,
             "flags": ["editable", "connectable", "preview"],
         },
         "z_order": {
             "type": "Int",
-            "default": ["Default Variables - Button", "button_z_order"],
+            "default": ["Default Variables - Interactable", "interactable_z_order"],
             "connection": None,
             "flags": ["editable", "connectable"],
         },
@@ -1014,7 +1004,7 @@ class create_checkbox(Action):
                                 "None",
                                 "play_sfx",
                                 "set_mute",
-                                "set_value"
+                                "set_variable"
                             ],
                             "flags": ["editable"],
                         }
@@ -1300,6 +1290,7 @@ class dialogue(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
+        # @TODO: Add parent object similar to how the choice action works to make removing dialogue easier
         new_speaker_text = TextRenderable(self.simplified_ad["speaker"])
         new_dialogue_text = TextRenderable(self.simplified_ad["dialogue"])
 

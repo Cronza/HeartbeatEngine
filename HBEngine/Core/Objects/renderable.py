@@ -13,7 +13,7 @@
     along with the Heartbeat Engine. If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
-from typing import Union
+import uuid
 import pygame
 from HBEngine.Core import settings
 from Tools.HBYaml.CustomTags.connection import Connection
@@ -36,10 +36,13 @@ class Renderable(pygame.sprite.Sprite):
     """
     def __init__(self, renderable_data: dict, parent: Renderable = None, process_data: bool = True):
         super().__init__()
+        self.id = str(uuid.uuid4())  # Generate a unique ID for tracking purposes
         self.parent = parent
         self.children = []
 
-        self.connected = False  # Control whether state is determined by an external source
+        # Track which registrations are active to make removal easier.
+        # Structure: {'<connection_obj>: ''}
+        self.registered_connections = {}
 
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.visible = True  # Allow objects to skip the draw step, but remain in the render stack
@@ -59,6 +62,12 @@ class Renderable(pygame.sprite.Sprite):
 
     def Destroy(self):
         """ Recursively remove all references to children to allow for GC for this object """
+        # Remove all connections
+        for connection in self.registered_connections:
+            settings.DeregisterConnectionListener(connection, self.id)
+        self.registered_connections.clear()
+
+        # Destroy all children
         for child in self.children:
             child.Destroy()
 
@@ -68,12 +77,14 @@ class Renderable(pygame.sprite.Sprite):
 
     def ApplyRenderableData(self):
         # Since parameters may either be of the associated type or a 'Connection' type, we need to check whether any
-        # parameter is a connection. If so, load the associated connected value
+        # parameter is a connection. If so, load the associated connected value and register the connection so we can
+        # respond to changes
 
         # For identification in the rendering stack, all renderables require a unique identifier
         if 'key' in self.renderable_data:
             if isinstance(self.renderable_data['key'], Connection):
                 self.key = settings.GetConnectionData(self.renderable_data['key'])
+                self.RegisterConnectionListener(self.renderable_data['key'])
             else:
                 self.key = self.renderable_data['key']
         else:
@@ -82,18 +93,21 @@ class Renderable(pygame.sprite.Sprite):
         if "position" in self.renderable_data:
             if isinstance(self.renderable_data['position'], Connection):
                 self.position = settings.GetConnectionData(self.renderable_data['position'])
+                self.RegisterConnectionListener(self.renderable_data['position'])
             else:
                 self.position = self.renderable_data['position']
 
         if "center_align" in self.renderable_data:
             if isinstance(self.renderable_data['center_align'], Connection):
                 self.center_align = settings.GetConnectionData(self.renderable_data['center_align'])
+                self.RegisterConnectionListener(self.renderable_data['center_align'])
             else:
                 self.center_align = self.renderable_data['center_align']
 
         if "z_order" in self.renderable_data:
             if isinstance(self.renderable_data['z_order'], Connection):
                 self.z_order = settings.GetConnectionData(self.renderable_data['z_order'])
+                self.RegisterConnectionListener(self.renderable_data['z_order'])
             else:
                 self.z_order = self.renderable_data['z_order']
 
@@ -103,6 +117,7 @@ class Renderable(pygame.sprite.Sprite):
         if "flip" in self.renderable_data:
             if isinstance(self.renderable_data['flip'], Connection):
                 self.flip = settings.GetConnectionData(self.renderable_data['flip'])
+                self.RegisterConnectionListener(self.renderable_data['flip'])
             else:
                 self.flip = self.renderable_data['flip']
 
@@ -175,22 +190,12 @@ class Renderable(pygame.sprite.Sprite):
         self.rect.w = new_size[0]
         self.rect.h = new_size[1]
 
-    def GetActiveSurface(self):
-        """
-        Return the active surface which is either the unscaled surface based on the main resolution,
-        or a scaled surface based on the current resolution
-        """
-        if self.scaled_surface:
-            return self.scaled_surface
-        else:
-            return self.surface
-
-    def SetActiveSurface(self, surface):
-        """ Updates the active surface using the provided surface """
-        if self.scaled_surface:
-            self.scaled_surface = surface
-        else:
-            self.surface = surface
+    #def SetActiveSurface(self, surface):
+    #    """ Updates the active surface using the provided surface """
+    #    if self.scaled_surface:
+    #        self.scaled_surface = surface
+    #    else:
+    #        self.surface = surface
 
     def ConvertNormToScreen(self, norm_value: tuple) -> tuple:
         """ Take the normalized pos and convert it to absolute screen space coordinates """
@@ -220,31 +225,10 @@ class Renderable(pygame.sprite.Sprite):
             round(pos[1] - size[1] / 2)
         )
 
-    def ConnectProjectSetting(self, connection_data: dict) -> bool:
-        if "category" in connection_data:
-            if connection_data["category"] == "":
-                return False
-        else:
-            return False
-
-        if "setting" in connection_data:
-            if connection_data["setting"] == "":
-                return False
-        else:
-            return False
-
-        # Add this object as a listener to the connected setting
-        if self not in settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]]:
-            settings.project_setting_listeners[connection_data["category"]][connection_data["setting"]][self] = self.ConnectionUpdate
-
-        self.connected = True
-
-        # Apply the initial state change
-        self.ConnectionUpdate(settings.project_settings[connection_data["category"]][connection_data["setting"]])
-        return True
-
-    def ConnectionUpdate(self, new_value):
-        pass
+    def RegisterConnectionListener(self, connection_obj: Connection):
+        if connection_obj not in self.registered_connections:
+            settings.RegisterConnectionListener(connection_obj, self.id, self.ApplyRenderableData)
+            self.registered_connections[connection_obj] = ''
 
     # ***************** TRANSFORM ACTIONS *******************
 

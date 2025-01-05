@@ -50,18 +50,21 @@ class TextRenderable(Renderable):
         if 'text' in self.renderable_data:
             if isinstance(self.renderable_data['text'], Connection):
                 self.text = settings.GetConnectionData(self.renderable_data['text'])
+                self.RegisterConnectionListener(self.renderable_data['text'])
             else:
                 self.text = self.renderable_data['text']
 
         if 'text_size' in self.renderable_data:
             if isinstance(self.renderable_data['text_size'], Connection):
                 self.text_size = settings.GetConnectionData(self.renderable_data['text_size'])
+                self.RegisterConnectionListener(self.renderable_data['text_size'])
             else:
                 self.text_size = self.renderable_data['text_size']
 
         if 'text_color' in self.renderable_data:
             if isinstance(self.renderable_data['text_color'], Connection):
                 self.text_color = settings.GetConnectionData(self.renderable_data['text_color'])
+                self.RegisterConnectionListener(self.renderable_data['text_color'])
             else:
                 self.text_color = self.renderable_data['text_color']
 
@@ -71,6 +74,7 @@ class TextRenderable(Renderable):
                     settings.ConvertPartialToAbsolutePath(settings.GetConnectionData(self.renderable_data['font'])),
                     self.text_size
                 )
+                self.RegisterConnectionListener(self.renderable_data['font'])
             else:
                 self.font = pygame.font.Font(
                     settings.ConvertPartialToAbsolutePath(self.renderable_data['font']),
@@ -80,6 +84,7 @@ class TextRenderable(Renderable):
         if 'wrap_bounds' in self.renderable_data:
             if isinstance(self.renderable_data['wrap_bounds'], Connection):
                 self.wrap_bounds = settings.GetConnectionData(self.renderable_data['wrap_bounds'])
+                self.RegisterConnectionListener(self.renderable_data['wrap_bounds'])
             else:
                 self.wrap_bounds = self.renderable_data['wrap_bounds']
 
