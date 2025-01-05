@@ -195,7 +195,7 @@ pages:
           is_checked: !Connection
             category: Audio
             variable: mute
-          source: Settings
+            source: Settings
           events:
             event_0:
               action:

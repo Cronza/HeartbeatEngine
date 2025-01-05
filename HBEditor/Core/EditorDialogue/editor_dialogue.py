@@ -155,9 +155,10 @@ class EditorDialogue(EditorBase):
                 else:
                     self.editor_ui.branches_panel.CreateEntry(branch_name, branch_data["description"], branch_data['entries'], False, True)
 
-            # Select the main branch by default
-            self.editor_ui.branches_panel.ChangeEntry(0)
             self.editor_ui.blockSignals(False)
+
+        # Select the main branch by default
+        self.editor_ui.branches_panel.ChangeEntry(0)
 
     def ConvertDialogueToEngineFormat(self, action_data: dict):
         """

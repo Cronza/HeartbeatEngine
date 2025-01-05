@@ -255,10 +255,10 @@ class HBEditor:
 
                         # Create the editor, then export to initially populate the new file. If the user chose to create
                         # using a template, import it instead and skip the initial export
+
+                        self.OpenEditor(full_path, FileType.Interface)
+
                         if selected_template_path:
-                            self.OpenEditor(full_path, FileType.Interface, True)
-                        else:
-                            self.OpenEditor(full_path, FileType.Interface)
                             self.active_editor.Export()
 
                         return file_name
@@ -497,7 +497,7 @@ class HBEditor:
                 logger.Log("File type does not have any interact functionality", 3)
                 return False
 
-            self.OpenEditor(full_path, file_type, True)
+            self.OpenEditor(full_path, file_type)
             return True
 
     def Import(self, partial_dest_path: str, import_target: str = "", batch_mode: bool = False) -> bool:
@@ -615,7 +615,7 @@ class HBEditor:
             if self.active_editor:
                 self.active_editor.Export()
 
-    def OpenEditor(self, target_file_path: str, editor_type: FileType, import_file: bool = False):
+    def OpenEditor(self, target_file_path: str, editor_type: FileType):
         """ Creates an editor tab based on the provided file information """
         editor_classes = {
             FileType.Scene: EditorScene,
@@ -640,8 +640,7 @@ class HBEditor:
             self.e_ui.AddMainTab(active_ui, os.path.basename(target_file_path), True)
             active_ui.AdjustSize()  # Adjust the UI size now that it has been added to the window
 
-            if import_file:
-                self.active_editor.Import()
+            self.active_editor.Import()
 
     def CloseEditor(self, target_file_path: str):
         """
@@ -672,7 +671,7 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            self.OpenEditor(settings.GetProjectSettingsPath(), FileType.Project_Settings, True)
+            self.OpenEditor(settings.GetProjectSettingsPath(), FileType.Project_Settings)
 
     def OpenVariables(self):
         """ Opens the 'Variables' editor """
@@ -681,7 +680,7 @@ class HBEditor:
         if not settings.user_project_name:
             self.ShowNoActiveProjectPrompt()
         else:
-            self.OpenEditor(settings.GetVariablesPath(), FileType.Variables, True)
+            self.OpenEditor(settings.GetVariablesPath(), FileType.Variables)
 
     def CheckForOpenFiles(self, root: str) -> list:
         """
