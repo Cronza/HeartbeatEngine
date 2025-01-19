@@ -20,6 +20,7 @@ from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
 from HBEngine.Core.Objects.interactable import Interactable
 from HBEngine.Core.Objects.interactable_text import InteractableText
+from HBEngine.Core.Objects.saves_list import SavesList
 from HBEngine.Core.Objects.checkbox import Checkbox
 from HBEngine.Core.Objects.audio import Sound, Music
 from HBEngine.Core.Modules import dialogue as m_dialogue
@@ -2443,3 +2444,37 @@ class remove_page(Action):
         settings.scene.Draw()
         self.Complete()
         return None
+
+
+class create_save_list(Action):
+    """
+    Creates a save list box containing a list of save slots that can be saved to, loaded and cleared.
+    Returns 'SavesList'
+    """
+    DISPLAY_NAME = "Create Save List"
+    ACTION_DATA = {
+        "position": {
+            "type": "Vector2",
+            "value": [0.5, 0.5],
+            "connection": None,
+            "flags": ["editable", "connectable", "preview"],
+        },
+        "bounds": {
+            "type": "Vector2",
+            "value": [0.2, 0.8],
+            "flags": ["editable"],
+        },
+        "z_order": {
+            "type": "Int",
+            "value": 0,
+            "flags": ["editable", "preview"],
+        },
+    }
+
+    def Start(self):
+        new_saves_list = SavesList(self.simplified_ad)
+        self.AddToScene(new_saves_list)
+
+        settings.scene.Draw()
+        self.Complete()
+        return new_saves_list

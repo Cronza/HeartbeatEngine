@@ -138,14 +138,10 @@ class Renderable(pygame.sprite.Sprite):
         new_position = 0,0
 
         if self.parent:
-            # If the parent has a surface but it is unused (IE. 0,0), fallback to screen space
-            if self.parent.surface.get_width() == 0 and self.parent.surface.get_height() == 0:
-                new_position = self.ConvertNormToScreen(tuple(self.position))
-            else:
-                new_position = (
-                    (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
-                    (self.parent.rect.height * self.position[1]) + self.parent.rect.y
-                )
+            new_position = (
+                (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
+                (self.parent.rect.height * self.position[1]) + self.parent.rect.y
+            )
         else:
             new_position = self.ConvertNormToScreen(tuple(self.position))
 

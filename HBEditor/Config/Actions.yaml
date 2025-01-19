@@ -116,3 +116,10 @@ Utils:
       display_name: "Conditional"
       applicable_editors:
         - Dialogue
+Special:
+  icon: "EditorContent:Icons/Information.png"
+  options:
+    - name: "create_save_list"
+      display_name: "Create Save List"
+      applicable_editors:
+        - Interface

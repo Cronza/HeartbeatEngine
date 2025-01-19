@@ -109,32 +109,44 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         # stomping issues
         new_item = None
 
-        for param_name, param_data in action_data.items():
-            if param_name == "sprite":
-                new_item = SpriteItem(
-                    action_data=action_data,  # Pass by ref
-                    pixmap=pixmap
-                )
-                new_item.setParentItem(parent)
-                new_item.root_item = self
+        # Do a preliminary scan to ensure at least one of the expected keys is present. If none are, skip scanning more
+        if "sprite" in action_data:
+            new_item = SpriteItem(
+                action_data=action_data,  # Pass by ref
+                pixmap=pixmap
+            )
+            new_item.setParentItem(parent)
+            new_item.root_item = self
 
-            elif param_name == "text":
-                new_item = TextItem(
-                    action_data=action_data,  # Pass by ref
-                    text=text
-                )
-                new_item.setParentItem(parent)
-                new_item.root_item = self
+        elif "text" in action_data:
+            new_item = TextItem(
+                action_data=action_data,  # Pass by ref
+                text=text
+            )
+            new_item.setParentItem(parent)
+            new_item.root_item = self
 
-            if "children" in param_data:
-                if param_data['children']:
-                    self.GenerateChildren(
-                        parent=new_item,
-                        action_data=param_data["children"],
-                        pixmap=pixmap,
-                        text=text,
-                        init_iter=False
-                    )
+        elif "bounds" in action_data:
+            new_item = FrameItem(
+                action_data=action_data,  # Pass by ref
+            )
+            new_item.setParentItem(parent)
+            new_item.root_item = self
+        else:
+            # No expected items found. Don't attempt any further processing
+            return
+
+        if new_item:
+            for param_name, param_data in action_data.items():
+                if "children" in param_data:
+                    if param_data['children']:
+                        self.GenerateChildren(
+                            parent=new_item,
+                            action_data=param_data["children"],
+                            pixmap=pixmap,
+                            text=text,
+                            init_iter=False
+                        )
 
         if init_iter:
             self.Refresh()
@@ -446,3 +458,82 @@ class TextItem(QtWidgets.QGraphicsTextItem, BaseItem):
             self.is_centered = True
         else:
             self.is_centered = False
+
+
+class FrameItem(QtWidgets.QGraphicsRectItem, BaseItem):
+    """
+    A specialized item that represents an area, but does not have any renderable data. Portrays a bounding box
+    that only appears in the editor.
+    """
+    def __init__(self, action_data: dict):
+        super().__init__()
+        self.action_data = action_data
+
+        self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, False)
+        self.setFlag(self.GraphicsItemFlag.ItemSendsGeometryChanges, True)
+        self.setAcceptDrops(True)
+
+    def Refresh(self, changed_entry_name: str = ""):
+        if changed_entry_name == "position"or changed_entry_name == "":
+            self.UpdatePosition()
+        if changed_entry_name == "bounds" or changed_entry_name == "":
+            self.UpdateBounds()
+        if changed_entry_name == "z_order" or changed_entry_name == "":
+            self.UpdateZOrder()
+
+    def UpdatePosition(self):
+        # In order to properly update the position, we need to do a number of conversions as 'setPos' is based on the
+        # parent's coordinate system, and we typically store position data as scene coordinates. So, we need to:
+        #
+        # - Take the normalize (0-1) position, and de-normalize it so we have 'scene coordinates'
+        # - Convert the scene coordinates to the equivalent position in this item's coordinates
+        # - Convert the item coordinates to the equivalent position in this item's parent's coordinates
+        #
+        # Additionally, the engine renders child objects based on their parent's coordinate system (IE. 0.5, 0.5 is
+        # centered in the parent). For this, we change the calculation to use the parent's bounding rect as the bounds
+        if self.action_data["position"]["value"] is not None:
+            if self.parentItem() == self.root_item:
+                scene_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * self.scene().width(),
+                    float(self.action_data["position"]["value"][1]) * self.scene().height()
+                )
+                item_pos = self.mapFromScene(scene_pos)
+                parent_pos = self.mapToParent(item_pos)
+                self.setPos(parent_pos)
+            else:
+                parent_bounds = self.parentItem().boundingRect()
+                parent_pos = QtCore.QPointF(
+                    float(self.action_data["position"]["value"][0]) * parent_bounds.width(),
+                    float(self.action_data["position"]["value"][1]) * parent_bounds.height()
+                )
+                self.setPos(parent_pos)
+
+    def UpdateBounds(self):
+        # Convert the normalized bounds to ensure the size is calculated correctly
+        converted_bounds = None
+        if self.parentItem() == self.root_item:
+            converted_bounds = [
+                float(self.action_data["bounds"]["value"][0]) * self.scene().width(),
+                float(self.action_data["bounds"]["value"][1]) * self.scene().height(),
+            ]
+        else:
+            parent_bounds = self.parentItem().boundingRect()
+            converted_bounds = [
+                float(self.action_data["bounds"]["value"][0]) * parent_bounds.width(),
+                float(self.action_data["bounds"]["value"][1]) * parent_bounds.height(),
+            ]
+
+        # Update the rect
+        self.setRect(
+            QtCore.QRectF(
+                QtCore.QPointF(0,0),
+                QtCore.QSizeF(
+                    converted_bounds[0],
+                    converted_bounds[1]
+                )
+            )
+        )
+
+    def UpdateZOrder(self):
+        self.setZValue(float(self.action_data["z_order"]["value"]))
+

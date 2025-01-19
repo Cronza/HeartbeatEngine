@@ -28,6 +28,8 @@ Content:
         Dialogue_Frame.png: Asset_Image
       Backgrounds:
         Dark_Transparent_1280x720.png: Asset_Image
+      Saves:
+        Save_Slot_Thumbnail_Empty.png: Asset_Image
     Placeholder.png: Asset_Image
     Backgrounds:
       Orientation_Lines_1280x720.jpg: Asset_Image
