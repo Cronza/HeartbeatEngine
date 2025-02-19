@@ -143,7 +143,7 @@ class DialogueSequencePanel(QtWidgets.QWidget):
         if selection:
             # Get the selected index so we can place the clone next to it
             selected_index = self.sequence_list.selectedIndexes()[0].row()
-            self.AddEntry(selection.action_name, selection.action_data, selected_index)
+            self.AddEntry(selection.action_name, copy.deepcopy(selection.action_data), selected_index)
             self.SIG_USER_UPDATE.emit()
 
     def GetSelectedEntry(self):

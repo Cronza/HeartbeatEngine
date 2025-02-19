@@ -133,20 +133,28 @@ class Action:
     def Complete(self):
         self.complete = True
 
-    def AddToScene(self, new_renderable: Renderable, parent: Renderable = None):
-        """ Adds the provided renderable to the scene's draw stack and adds it as a child to 'parent' if provided. If
-        not, add it as a child to the parent of this action if applicable """
+    def CreateRenderable(self, renderable_class: callable, renderable_data: dict, parent: Renderable = None) -> Renderable:
+        """
+        Spawns a Renderable object of the provided type with the given data, and adds it to the scene. If 'parent'
+        is not supplied and this action has a parent, it will be used instead. Otherwise, no parent will be assigned
+        """
         # If a renderable exists with a matching key, delete it first
-        if settings.scene.active_renderables.Exists(new_renderable.key):
-            settings.scene.active_renderables.GetFromKey(new_renderable.key).Destroy()
+        if 'key' in renderable_data:
+            if settings.scene.active_renderables.Exists(renderable_data['key']):
+                settings.scene.active_renderables.GetFromKey(renderable_data['key']).Destroy()
 
-        settings.scene.active_renderables.Add(new_renderable)
+        # Determine if there is a valid parent to assign
         if not parent:
             parent = self.parent
 
+        # Instantiate the renderable
+        new_renderable = renderable_class(renderable_data, parent=parent)
         if parent:
             parent.children.append(new_renderable)
             new_renderable.parent = parent
+        settings.scene.active_renderables.Add(new_renderable)
+
+        return new_renderable
 
     def ValidateActionData(self, extended_ad: dict, simplified_ad: dict = None):
         """
@@ -411,9 +419,7 @@ class create_sprite(Action):
 
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
-        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_sprite)
+        new_sprite = self.CreateRenderable(SpriteRenderable, self.simplified_ad)
         if not self.no_draw:
             # Any transitions are applied to the sprite post-load
             if "None" not in self.simplified_ad["transition"]["type"]:
@@ -514,9 +520,7 @@ class create_background(Action):
 
         self.skippable = False
 
-        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_sprite)
+        new_sprite = self.CreateRenderable(SpriteRenderable, self.simplified_ad)
         if not self.no_draw:
             settings.scene.Draw()
 
@@ -634,9 +638,7 @@ class create_interactable(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Interactable(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_renderable)
+        new_renderable = self.CreateRenderable(Interactable, self.simplified_ad)
         if not self.no_draw:
             settings.scene.Draw()
 
@@ -755,9 +757,7 @@ class create_text(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
-        new_text_renderable = TextRenderable(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_text_renderable)
+        new_text_renderable = self.CreateRenderable(TextRenderable, self.simplified_ad)
         if not self.no_draw:
             if "None" not in self.simplified_ad["transition"]["type"]:
                 from HBEngine.Core import action_manager
@@ -920,9 +920,7 @@ class create_interactable_text(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = InteractableText(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_renderable)
+        new_renderable = self.CreateRenderable(InteractableText, self.simplified_ad)
         if not self.no_draw:
             settings.scene.Draw()
 
@@ -1048,9 +1046,7 @@ class create_checkbox(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
 
-        new_renderable = Checkbox(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_renderable)
+        new_renderable = self.CreateRenderable(Checkbox, self.simplified_ad)
         if not self.no_draw:
             settings.scene.Draw()
 
@@ -1292,12 +1288,9 @@ class dialogue(Action):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
 
         # @TODO: Add parent object similar to how the choice action works to make removing dialogue easier
-        new_speaker_text = TextRenderable(self.simplified_ad["speaker"])
-        new_dialogue_text = TextRenderable(self.simplified_ad["dialogue"])
-
-        self.AddToScene(new_speaker_text)
-        self.AddToScene(new_dialogue_text)
-
+        new_speaker_text = self.CreateRenderable(TextRenderable, self.simplified_ad["speaker"])
+        new_dialogue_text = self.CreateRenderable(TextRenderable, self.simplified_ad["dialogue"])
+        print(self.parent.surface)
         # Note: Speaker text does not support transitions currently
         if self.simplified_ad["dialogue"]["transition"]["type"] != "None":
             from HBEngine.Core import action_manager
@@ -1440,8 +1433,7 @@ class choice(Action):
         self.simplified_ad["z_order"] = 0
         self.simplified_ad["center_align"] = False
         self.simplified_ad["key"] = "Choice"
-        new_renderable = Renderable(renderable_data=self.simplified_ad)
-        self.AddToScene(new_renderable)
+        new_renderable = self.CreateRenderable(Renderable, self.simplified_ad)
 
         # Generate a button for each choice, adding them to the active renderables group for access to updates
         # and rendering. Then, add them as a child to the choice object so they're destroyed as a collective
@@ -1467,10 +1459,9 @@ class choice(Action):
             }
 
             choice_data["key"] = choice_name  # Use a dynamic key since this will be cleaned up after the choice is made
-            new_child = InteractableText(choice_data)
-            self.AddToScene(new_child, new_renderable)
 
-            #self.AddToScene(new_child)
+            # Spawn the button
+            self.CreateRenderable(InteractableText, self.simplified_ad, new_renderable)
 
         settings.scene.Draw()
         self.Complete()
@@ -2154,9 +2145,7 @@ class scene_fade_in(Action):
         if 'speed' in self.simplified_ad:
             self.speed = self.simplified_ad['speed']
 
-        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
-
-        self.AddToScene(new_sprite)
+        new_sprite = self.CreateRenderable(SpriteRenderable, self.simplified_ad)
         settings.scene.Draw()
 
         self.renderable = new_sprite
@@ -2247,10 +2236,8 @@ class scene_fade_out(Action):
         if 'speed' in self.simplified_ad:
             self.speed = self.simplified_ad['speed']
 
-        new_sprite = SpriteRenderable(renderable_data=self.simplified_ad)
+        new_sprite = self.CreateRenderable(SpriteRenderable, self.simplified_ad)
         new_sprite.GetSurface().set_alpha(0)
-
-        self.AddToScene(new_sprite)
         settings.scene.Draw()
 
         self.renderable = new_sprite
@@ -2456,8 +2443,7 @@ class create_save_list(Action):
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],
-            "connection": None,
-            "flags": ["editable", "connectable", "preview"],
+            "flags": ["editable", "preview"],
         },
         "bounds": {
             "type": "Vector2",
@@ -2472,8 +2458,7 @@ class create_save_list(Action):
     }
 
     def Start(self):
-        new_saves_list = SavesList(self.simplified_ad)
-        self.AddToScene(new_saves_list)
+        new_saves_list = self.CreateRenderable(SavesList, self.simplified_ad)
 
         settings.scene.Draw()
         self.Complete()

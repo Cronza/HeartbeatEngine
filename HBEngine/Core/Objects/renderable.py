@@ -53,7 +53,7 @@ class Renderable(pygame.sprite.Sprite):
         self.renderable_data = renderable_data
         self.key = ''
         self.position = (0, 0)
-        self.center_align = True
+        self.center_align = False
         self.z_order = 0
         self.flip = False
 
@@ -68,11 +68,19 @@ class Renderable(pygame.sprite.Sprite):
         self.registered_connections.clear()
 
         # Destroy all children
-        for child in self.children:
-            child.Destroy()
+        for child_index in range(0, len(self.children)):
+            # The children will alter self.children while we're iterating, so always use the first index as the list
+            # length will shrink as the children are removed
+            self.children[0].Destroy()
 
         self.children.clear()
+
+        # Clear any references that a parent may have, otherwise GC won't kick in properly
+        if self.parent:
+            self.parent.children.remove(self)
         self.parent = None
+
+        # Clear from the draw stack
         settings.scene.active_renderables.Remove(self.key)
 
     def ApplyRenderableData(self):
@@ -121,7 +129,8 @@ class Renderable(pygame.sprite.Sprite):
             else:
                 self.flip = self.renderable_data['flip']
 
-            self.Flip()
+            if self.flip:
+                self.Flip()
 
     def RecalculateSize(self, multiplier):
         """ Resize the renderable and its surfaces based on the provided size multiplier """
@@ -136,7 +145,6 @@ class Renderable(pygame.sprite.Sprite):
 
     def RecalculateSurfacePosition(self, surface: pygame.Surface) -> tuple:
         new_position = 0,0
-
         if self.parent:
             new_position = (
                 (self.parent.rect.width * self.position[0]) + self.parent.rect.x,
@@ -185,13 +193,6 @@ class Renderable(pygame.sprite.Sprite):
         self.rect.y = new_pos[1]
         self.rect.w = new_size[0]
         self.rect.h = new_size[1]
-
-    #def SetActiveSurface(self, surface):
-    #    """ Updates the active surface using the provided surface """
-    #    if self.scaled_surface:
-    #        self.scaled_surface = surface
-    #    else:
-    #        self.surface = surface
 
     def ConvertNormToScreen(self, norm_value: tuple) -> tuple:
         """ Take the normalized pos and convert it to absolute screen space coordinates """

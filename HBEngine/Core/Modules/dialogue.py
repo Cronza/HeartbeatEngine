@@ -35,6 +35,8 @@ class Dialogue(BaseModule):
         # Keep track of all spawned renderables by adding them as children to a root object. When removing this module,
         # instead of tracking each instance down, we can just delete the root and all children will go with it
         self.root_renderable = Renderable({'key': '!&MODULE_DIALOGUE_ROOT&!', 'z_order': 99999})
+        self.root_renderable.surface = pygame.Surface(settings.resolution, pygame.SRCALPHA)  # The active surface
+        self.root_renderable.RecalculateSize(settings.resolution_multiplier)
         self.root_renderable.visible = False
         settings.scene.active_renderables.Add(self.root_renderable)
 

@@ -70,7 +70,3 @@ class Interface(Renderable):
         for renderable in self.page_renderables:
             self.children.remove(renderable)
         self.page_renderables.clear()
-
-    def Destroy(self):
-        super().Destroy()
-        print("Destroy Interface!")

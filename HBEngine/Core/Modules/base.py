@@ -57,7 +57,7 @@ class BaseModule:
 
     def LoadInterface(self, interface_file: str):
         """ Load the module interface, adding it as a child to the root renderable and registering it with the scene """
-        self.interface = Interface(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)))
+        self.interface = Interface(Reader.ReadAll(settings.ConvertPartialToAbsolutePath(interface_file)), self.root_renderable)
         self.root_renderable.children.append(self.interface)
 
         # Add the interface to the scene so actions can still target it, but leave it out of the renderables list so
