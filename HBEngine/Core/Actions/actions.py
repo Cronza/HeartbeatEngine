@@ -2447,7 +2447,7 @@ class create_save_list(Action):
         },
         "bounds": {
             "type": "Vector2",
-            "value": [0.2, 0.8],
+            "value": [0.6, 0.8],
             "flags": ["editable"],
         },
         "z_order": {

@@ -30,6 +30,7 @@ Content:
         Dark_Transparent_1280x720.png: Asset_Image
       Saves:
         Save_Slot_Thumbnail_Empty.png: Asset_Image
+        Save_Slot_Background.png: Asset_Image
     Placeholder.png: Asset_Image
     Backgrounds:
       Orientation_Lines_1280x720.jpg: Asset_Image

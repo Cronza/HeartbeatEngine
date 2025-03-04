@@ -18,26 +18,38 @@ class SavesList(Renderable):
         super().__init__(renderable_data, parent, process_data)
         self.visible = False
 
+        # Create the Slot Background Renderable
+        self.background_renderable = SpriteRenderable(
+            {
+                'key': '!&SAVE_SLOT_BACKGROUND&!',
+                'sprite': 'HBEngine/Content/Sprites/Interface/Saves/Save_Slot_Background.png',
+                'position': [0, 0],
+                'center_align': False,
+                'z_order': self.renderable_data['z_order'] + 2
+            },
+            parent=self
+        )
+
         # Create the Thumbnail Renderable
         self.thumbnail_renderable = SpriteRenderable(
             {
                 'key': '!&SAVE_SLOT_THUMBNAIL&!',
                 'sprite': 'HBEngine/Content/Sprites/Interface/Saves/Save_Slot_Thumbnail_Empty.png',
-                'position': [0.07, 0.1],
+                'position': [0.010, 0.012],
                 'center_align': False,
-                'z_order': self.renderable_data['z_order'] + 1
+                'z_order': self.renderable_data['z_order'] + 2
             },
             parent=self
         )
 
-        # Create the save name text renderable
+        # Create the Save Name Renderable
         self.name_renderable = TextRenderable(
             {
                 'key': '!&SAVE_SLOT_NAME&!',
-                'text': 'Default Save Name',
-                'text_size': 24,
+                'text': 'Empty Save',
+                'text_size': 18,
                 'text_color': [255, 255, 255],
-                'position': [0, 0],
+                'position': [0.25, 0.025],
                 'center_align': False,
                 'z_order': self.renderable_data['z_order'] + 2,
                 'wrap_bounds': [0.8, 0.4]
@@ -45,11 +57,81 @@ class SavesList(Renderable):
             parent=self
         )
 
+        # Create the Save Date Renderable
+        self.date_renderable = TextRenderable(
+            {
+                'key': '!&SAVE_SLOT_DATE&!',
+                'text': '2/19/2025',
+                'text_size': 18,
+                'text_color': [255, 255, 255],
+                'position': [0.87, 0.025],
+                'center_align': False,
+                'z_order': self.renderable_data['z_order'] + 2,
+                'wrap_bounds': [0.8, 0.4]
+            },
+            parent=self
+        )
+
+        # Create the Save Button Renderable
+        self.save_button_renderable = TextRenderable(
+            {
+                'key': '!&SAVE_SLOT_SAVE_BUTTON&!',
+                'text': 'Save',
+                'text_size': 18,
+                'text_color': [255, 255, 255],
+                'position': [0.7, 0.24],
+                'center_align': False,
+                'z_order': self.renderable_data['z_order'] + 2,
+                'wrap_bounds': [0.8, 0.4]
+            },
+            parent=self
+        )
+
+        # Create the Load Button Renderable
+        self.load_button_renderable = TextRenderable(
+            {
+                'key': '!&SAVE_SLOT_LOAD_BUTTON&!',
+                'text': 'Load',
+                'text_size': 18,
+                'text_color': [255, 255, 255],
+                'position': [0.8, 0.24],
+                'center_align': False,
+                'z_order': self.renderable_data['z_order'] + 2,
+                'wrap_bounds': [0.8, 0.4]
+            },
+            parent=self
+        )
+
+        # Create the Load Button Renderable
+        self.delete_button_renderable = TextRenderable(
+            {
+                'key': '!&SAVE_SLOT_DELETE_BUTTON&!',
+                'text': 'Delete',
+                'text_size': 18,
+                'text_color': [255, 255, 255],
+                'position': [0.9, 0.24],
+                'center_align': False,
+                'z_order': self.renderable_data['z_order'] + 2,
+                'wrap_bounds': [0.8, 0.4]
+            },
+            parent=self
+        )
+
+        self.children.append(self.background_renderable)
         self.children.append(self.thumbnail_renderable)
         self.children.append(self.name_renderable)
+        self.children.append(self.date_renderable)
+        self.children.append(self.save_button_renderable)
+        self.children.append(self.load_button_renderable)
+        self.children.append(self.delete_button_renderable)
 
+        settings.scene.active_renderables.Add(self.background_renderable)
         settings.scene.active_renderables.Add(self.thumbnail_renderable)
         settings.scene.active_renderables.Add(self.name_renderable)
+        settings.scene.active_renderables.Add(self.date_renderable)
+        settings.scene.active_renderables.Add(self.save_button_renderable)
+        settings.scene.active_renderables.Add(self.load_button_renderable)
+        settings.scene.active_renderables.Add(self.delete_button_renderable)
 
     def ApplyRenderableData(self):
         if 'bounds' in self.renderable_data:
@@ -59,19 +141,12 @@ class SavesList(Renderable):
         # Run the parent implementation to ensure all changes are considered, and the surfaces are recalculated
         super().ApplyRenderableData()
 
-        print("Saves List ***")
-        print(self.rect)
-        print(self.position)
-        #print(self.parent.rect) #@TODO: Due to the way we create reenderables in the actions file, 'parent' isn't available
-        #@TODO: during initial position and size calculations since we initialize objects, then call 'AddToScene'
-
-        print("*********")
-
     def Destroy(self):
         self.thumbnail_renderable.Destroy()
         self.thumbnail_renderable = None
-
         self.name_renderable.Destroy()
         self.name_renderable = None
+
+        super().Destroy()
         
     

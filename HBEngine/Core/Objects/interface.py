@@ -68,5 +68,5 @@ class Interface(Renderable):
         """ Removes all active page renderables """
         # Wipe existing page renderables if there are any
         for renderable in self.page_renderables:
-            self.children.remove(renderable)
+            renderable.Destroy()
         self.page_renderables.clear()

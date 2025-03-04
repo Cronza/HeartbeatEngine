@@ -35,12 +35,13 @@ class TextRenderable(Renderable):
     - font (String)
     - wrap_bounds (Vector2)
     """
+    DEFAULT_FONT = "HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf"
     def __init__(self, renderable_data: dict, parent: Renderable = None, process_data: bool = True):
         # Parameters
         self.text = ""
         self.text_color = (0, 0, 0)
         self.text_size = 12
-        self.font = pygame.font.Font("HBEngine/Content/Fonts/Comfortaa/Comfortaa-Regular.ttf", self.text_size)
+        self.font = pygame.font.Font(self.DEFAULT_FONT, self.text_size)
         self.wrap_bounds = (0, 1)
 
         # Run parent implementation which will perform recalculations with the aforementioned parameters
@@ -60,6 +61,12 @@ class TextRenderable(Renderable):
                 self.RegisterConnectionListener(self.renderable_data['text_size'])
             else:
                 self.text_size = self.renderable_data['text_size']
+
+            # The initial font is loaded during the init function, which is when the starting 'text_size' value is used.
+            # Only when 'font' is provided does the font object get regenerated. If 'font' is not passed, then
+            # 'text_size' is never used. As such, do a special check here to ensure 'text_size' changes are always used
+            if 'font' not in self.renderable_data:
+                self.font = pygame.font.Font(self.DEFAULT_FONT, self.text_size)
 
         if 'text_color' in self.renderable_data:
             if isinstance(self.renderable_data['text_color'], Connection):
