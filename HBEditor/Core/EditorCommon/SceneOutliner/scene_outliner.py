@@ -19,20 +19,15 @@ from HBEditor.Core.Logger import logger
 from HBEditor.Core.Dialogs.dialog_edit_entry import EditEntryPrompt
 
 
-class GroupsPanel(QtWidgets.QWidget):
+class SceneOutliner(QtWidgets.QWidget):
     SIG_USER_UPDATE = QtCore.pyqtSignal()
-    SIG_USER_GROUP_TOGGLE = QtCore.pyqtSignal(bool, str)  # Emits when the user toggles an entry. Returns <toggle_state>, <group_name>
-    SIG_USER_GROUP_CHANGE = QtCore.pyqtSignal(object, object) # Emits when the user selects a different entry than the active one
+    SIG_USER_ENTITY_CHANGE = QtCore.pyqtSignal(object, object) # Emits when the user selects a different entry than the active one
 
-    def __init__(self, enable_togglable_entries: bool = False, use_descriptions: bool = True):
+    def __init__(self):
         super().__init__()
 
         # Simplify the reference to the active group
         self.active_entry = None
-
-        # Configurable properties
-        self.enable_togglable_entries = enable_togglable_entries
-        self.use_descriptions = use_descriptions
 
         ### U.I ###
 
@@ -42,7 +37,6 @@ class GroupsPanel(QtWidgets.QWidget):
 
         # Create the toolbar
         self.toolbar = QtWidgets.QToolBar(self)
-        self.toolbar.setObjectName("vertical")
 
         # Add Group Button
         self.toolbar.addAction(
@@ -50,6 +44,7 @@ class GroupsPanel(QtWidgets.QWidget):
             "Add Entry",
             self.AddEntry
         )
+        self.toolbar.setObjectName("vertical")
 
         # Remove Entry Button
         self.toolbar.addAction(
@@ -57,6 +52,7 @@ class GroupsPanel(QtWidgets.QWidget):
             "Remove Entry",
             self.RemoveEntry
         )
+        self.main_layout.addWidget(self.toolbar)
 
         # Create search filter
         #self.groups_filter = QtWidgets.QLineEdit(self.toolbar)
@@ -71,9 +67,6 @@ class GroupsPanel(QtWidgets.QWidget):
         # 'outline: none;' doesn't work for list widgets seemingly, so I can't use CSS to disable the
         # focus border. Thus, we do it the slightly worse way
         self.entry_list.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-
-        # ********** Add All Major Pieces to details layout **********
-        self.main_layout.addWidget(self.toolbar)
         self.main_layout.addWidget(self.entry_list)
 
     def CreateEntry(self, name, description, data: list = None, toggle: bool = False, skip_select: bool = False):

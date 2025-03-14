@@ -18,6 +18,7 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
+from HBEditor.Core.EditorCommon.SceneOutliner.scene_outliner import SceneOutliner
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
@@ -34,10 +35,13 @@ class EditorInterfaceUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.pages_panel = GroupsPanel(title="Pages", enable_togglable_entries=True)
+        self.pages_panel = GroupsPanel(enable_togglable_entries=True)
         self.pages_panel.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.pages_panel.SIG_USER_GROUP_CHANGE.connect(self.core.EnablePageItems)
         self.pages_panel.SIG_USER_GROUP_TOGGLE.connect(self.core.ShowPageItems)
+
+        self.scene_outliner = SceneOutliner()
+        #self.entity_browser.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
         self.scene_viewer = SceneViewer(FileType.Interface)
         self.scene_viewer.SIG_USER_ADDED_ITEM.connect(self.core.RegisterItemToPage)
@@ -56,17 +60,23 @@ class EditorInterfaceUI(EditorBaseUI):
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
-        # Add a sub tab widget for details, settings, etc
-        self.sub_tab_widget = QtWidgets.QTabWidget(self)
-        self.sub_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
-        self.sub_tab_widget.addTab(self.details, "Details")
-        self.sub_tab_widget.addTab(self.interface_settings, "Settings")
+        # Add a (left) sub tab widget for pages, entities, etc
+        self.sub_left_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_left_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_left_tab_widget.addTab(self.pages_panel, "Pages")
+        self.sub_left_tab_widget.addTab(self.scene_outliner, "Scene Outliner")
+
+        # Add a (right) sub tab widget for details, settings, etc
+        self.sub_right_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_right_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_right_tab_widget.addTab(self.details, "Details")
+        self.sub_right_tab_widget.addTab(self.interface_settings, "Settings")
 
         # Assign everything to the main widget
         self.main_layout.addWidget(self.main_resize_container)
-        self.main_resize_container.addWidget(self.pages_panel)
+        self.main_resize_container.addWidget(self.sub_left_tab_widget)
         self.main_resize_container.addWidget(self.scene_viewer)
-        self.main_resize_container.addWidget(self.sub_tab_widget)
+        self.main_resize_container.addWidget(self.sub_right_tab_widget)
 
         # Adjust the main view so it's consuming as much space as possible
         self.main_resize_container.setStretchFactor(0, 6)

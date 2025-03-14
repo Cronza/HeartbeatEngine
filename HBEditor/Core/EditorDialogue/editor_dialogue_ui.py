@@ -30,11 +30,13 @@ class EditorDialogueUI(EditorBaseUI):
         self.central_grid_layout.setContentsMargins(0, 0, 0, 0)
         self.central_grid_layout.setSpacing(0)
 
-        self.branches_panel = GroupsPanel(title="Branches")
+        self.branches_panel = GroupsPanel()
         self.branches_panel.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
         self.branches_panel.SIG_USER_GROUP_CHANGE.connect(self.core.SwitchBranches)
+
         self.dialogue_sequence = DialogueSequencePanel(self.core)
         self.dialogue_sequence.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
+
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
@@ -50,17 +52,22 @@ class EditorDialogueUI(EditorBaseUI):
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
+        # Add a (left) sub tab widget for pages, entities, etc
+        self.sub_left_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_left_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_left_tab_widget.addTab(self.branches_panel, "Branches")
+
         # Add a sub tab widget for details, settings, etc
-        self.sub_tab_widget = QtWidgets.QTabWidget(self)
-        self.sub_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
-        self.sub_tab_widget.addTab(self.details, "Details")
-        self.sub_tab_widget.addTab(self.dialogue_settings, "Dialogue Settings")
+        self.sub_right_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_right_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_right_tab_widget.addTab(self.details, "Details")
+        self.sub_right_tab_widget.addTab(self.dialogue_settings, "Dialogue Settings")
 
         # Add everything to the editor interface
         self.central_grid_layout.addWidget(self.main_resize_container, 0, 0)
-        self.main_resize_container.addWidget(self.branches_panel)
+        self.main_resize_container.addWidget(self.sub_left_tab_widget)
         self.main_resize_container.addWidget(self.dialogue_sequence)
-        self.main_resize_container.addWidget(self.sub_tab_widget)
+        self.main_resize_container.addWidget(self.sub_right_tab_widget)
 
     def AdjustSize(self):
         # Adjust the main view so it's consuming as much space as possible
