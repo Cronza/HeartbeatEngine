@@ -51,7 +51,6 @@ class DetailsPanel(QtWidgets.QWidget):
         self.details_tree.setHeaderLabels(['Name', 'Input', 'Connection'])
         self.details_tree.setAutoScroll(False)
         self.details_tree.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
-        self.details_tree.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.details_tree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.details_tree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.details_tree.header().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)

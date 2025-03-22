@@ -17,6 +17,7 @@ from PyQt6 import QtWidgets, QtCore
 from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
+from HBEditor.Core.EditorCommon.ViewOutliner.view_outliner import ViewOutliner
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
@@ -39,6 +40,8 @@ class EditorSceneUI(EditorBaseUI):
         self.scene_viewer.SIG_USER_MOVED_ITEMS.connect(self.OnItemMove)
         self.scene_viewer.SIG_SELECTION_CHANGED.connect(self.core.UpdateActiveSceneItem)
 
+        self.view_outliner = ViewOutliner(self.scene_viewer)
+
         self.details = DetailsPanel(self.core.excluded_properties)
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
 
@@ -50,24 +53,31 @@ class EditorSceneUI(EditorBaseUI):
         # Allow the user to resize each column
         self.main_resize_container = QtWidgets.QSplitter(self)
 
-        # Add a sub tab widget for details, settings, etc
-        self.sub_tab_widget = QtWidgets.QTabWidget(self)
-        self.sub_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
-        self.sub_tab_widget.addTab(self.details, "Details")
-        self.sub_tab_widget.addTab(self.scene_settings, "Scene Settings")
+        # Add a (left) sub tab widget for entities, etc
+        self.sub_left_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_left_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_left_tab_widget.addTab(self.view_outliner, "View Outliner")
+
+        # Add a (right) sub tab widget for details, settings, etc
+        self.sub_right_tab_widget = QtWidgets.QTabWidget(self)
+        self.sub_right_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
+        self.sub_right_tab_widget.addTab(self.details, "Details")
+        self.sub_right_tab_widget.addTab(self.scene_settings, "Scene Settings")
 
         # Assign everything to the main widget
         self.main_layout.addWidget(self.main_resize_container)
+        self.main_resize_container.addWidget(self.sub_left_tab_widget)
         self.main_resize_container.addWidget(self.scene_viewer)
-        self.main_resize_container.addWidget(self.sub_tab_widget)
+        self.main_resize_container.addWidget(self.sub_right_tab_widget)
 
-        # Adjust the space allocation to favor the settings section
-        self.main_resize_container.setStretchFactor(0, 10)
-        self.main_resize_container.setStretchFactor(1, 8)  # Increase details panel size to accomodate connection column
+        # Adjust the main view so it's consuming as much space as possible
+        self.main_resize_container.setStretchFactor(0, 6)
+        self.main_resize_container.setStretchFactor(1, 8)
+        self.main_resize_container.setStretchFactor(2,8)  # Increase details panel size to accommodate connection column
 
     def AdjustSize(self):
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setSizes([round((self.width() / 4) * 3), round(self.width() / 4)])
+        self.main_resize_container.setSizes([round(self.width() / 4), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
         self.details.AdjustSize()
 
     def OnItemMove(self, selected_items: list = None):

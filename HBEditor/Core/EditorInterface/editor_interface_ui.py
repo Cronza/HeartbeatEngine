@@ -18,7 +18,7 @@ from HBEditor.Core.base_editor_ui import EditorBaseUI
 from HBEditor.Core.EditorCommon.DetailsPanel.details_panel import DetailsPanel
 from HBEditor.Core.EditorCommon.SceneViewer.scene_viewer import SceneViewer
 from HBEditor.Core.EditorCommon.GroupsPanel.groups_panel import GroupsPanel
-from HBEditor.Core.EditorCommon.SceneOutliner.scene_outliner import SceneOutliner
+from HBEditor.Core.EditorCommon.ViewOutliner.view_outliner import ViewOutliner
 from HBEditor.Core.DataTypes.file_types import FileType
 from HBEditor.Core.EditorCommon.DetailsPanel.base_source_entry import SourceEntry
 
@@ -40,14 +40,13 @@ class EditorInterfaceUI(EditorBaseUI):
         self.pages_panel.SIG_USER_GROUP_CHANGE.connect(self.core.EnablePageItems)
         self.pages_panel.SIG_USER_GROUP_TOGGLE.connect(self.core.ShowPageItems)
 
-        self.scene_outliner = SceneOutliner()
-        #self.entity_browser.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
-
         self.scene_viewer = SceneViewer(FileType.Interface)
         self.scene_viewer.SIG_USER_ADDED_ITEM.connect(self.core.RegisterItemToPage)
         self.scene_viewer.SIG_USER_DELETED_ITEMS.connect(self.SIG_USER_UPDATE.emit)
         self.scene_viewer.SIG_USER_MOVED_ITEMS.connect(self.OnItemMove)
         self.scene_viewer.SIG_SELECTION_CHANGED.connect(self.core.UpdateActiveSceneItem)
+
+        self.view_outliner = ViewOutliner(self.scene_viewer)
 
         self.details = DetailsPanel()
         self.details.SIG_USER_UPDATE.connect(self.SIG_USER_UPDATE.emit)
@@ -64,7 +63,7 @@ class EditorInterfaceUI(EditorBaseUI):
         self.sub_left_tab_widget = QtWidgets.QTabWidget(self)
         self.sub_left_tab_widget.setElideMode(QtCore.Qt.TextElideMode.ElideLeft)
         self.sub_left_tab_widget.addTab(self.pages_panel, "Pages")
-        self.sub_left_tab_widget.addTab(self.scene_outliner, "Scene Outliner")
+        self.sub_left_tab_widget.addTab(self.view_outliner, "View Outliner")
 
         # Add a (right) sub tab widget for details, settings, etc
         self.sub_right_tab_widget = QtWidgets.QTabWidget(self)
@@ -79,13 +78,13 @@ class EditorInterfaceUI(EditorBaseUI):
         self.main_resize_container.addWidget(self.sub_right_tab_widget)
 
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setStretchFactor(0, 6)
+        self.main_resize_container.setStretchFactor(0, 8)
         self.main_resize_container.setStretchFactor(1, 8)
-        self.main_resize_container.setStretchFactor(2, 8)  # Increase details panel size to accomodate connection column
+        self.main_resize_container.setStretchFactor(2, 8)  # Increase details panel size to accommodate connection column
 
     def AdjustSize(self):
         # Adjust the main view so it's consuming as much space as possible
-        self.main_resize_container.setSizes([round(self.width() / 5), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
+        self.main_resize_container.setSizes([round(self.width() / 4), round((self.width() / 2) + self.width() / 5), round(self.width() / 4)])
         self.details.AdjustSize()
 
     def OnItemMove(self, selected_items: list = None):

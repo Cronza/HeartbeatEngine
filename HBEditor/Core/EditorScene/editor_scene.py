@@ -118,6 +118,9 @@ class EditorScene(EditorBase):
 
             self.editor_ui.blockSignals(False)
 
+            # Resync the view outliner to pick up the imported items
+            self.editor_ui.view_outliner.Sync()
+
     def ConvertSceneItemsToEngineFormat(self, scene_items: list):
         """ Build and return a list of the data from all active scene items converted to engine format """
         conv_entries = []

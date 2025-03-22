@@ -179,6 +179,9 @@ class EditorInterface(EditorBase):
         self.editor_ui.pages_panel.ChangeEntry(0)
         self.editor_ui.UnfreezeSignals()
 
+        # Resync the view outliner to pick up the imported items
+        self.editor_ui.view_outliner.Sync()
+
     def ConvertInterfaceItemsToEngineFormat(self, scene_items: dict) -> dict:
         """ Build and return a dict of data from all active view items converted to engine format, organized by page """
         conv_pages = {}

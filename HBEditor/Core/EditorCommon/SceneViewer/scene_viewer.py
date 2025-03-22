@@ -212,13 +212,14 @@ class SceneViewer(QtWidgets.QWidget):
 
     def UpdateSelectionChanged(self):
         """ SLOT: Called when the selected item has changed """
-        selected_items = self.scene.selectedItems()
-        lock = False
-        if selected_items:
-            for item in selected_items:
-                if item.GetLocked():
-                    lock = True
-                    break
+        if self.scene:
+            selected_items = self.scene.selectedItems()
+            lock = False
+            if selected_items:
+                for item in selected_items:
+                    if item.GetLocked():
+                        lock = True
+                        break
 
         self.lock_button.Toggle(lock)
         self.SIG_SELECTION_CHANGED.emit(selected_items)

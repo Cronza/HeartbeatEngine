@@ -14,6 +14,7 @@ class BaseItem:
 class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
     """
     A basic GraphicsItem that acts as the root of a scene_item and its descendants. It serves a few purposes:
+
     - It is the 'active_entry' for the details panel
     - It can easily be found when using scene.items(), which returns a 1-dimensional array of items (There is no known
     way of just getting the top-most items, so this is workaround)
@@ -27,6 +28,10 @@ class RootItem(QtWidgets.QGraphicsObject, SourceEntry):
         super().__init__(None)
         self.action_name = action_name
         self.action_data = copy.deepcopy(action_data)  # Copy to avoid changes bubbling to the origin
+
+        if "key" not in self.action_data:
+            raise KeyError("Action data does not contain a 'key' value. This is required by all actions rendered in the viewer'")
+        self.key = self.action_data['key']['value']
 
         self.setFlag(self.GraphicsItemFlag.ItemIsMovable, True)
         self.setFlag(self.GraphicsItemFlag.ItemIsSelectable, True)
