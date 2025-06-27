@@ -199,6 +199,14 @@ QAbstractItemView {
     alternate-background-color: $col_view_item_alt;
     border: $size_border solid $col_secondary;
     outline: none;
+    &:drop-down{
+        color: $col_view_item_hover;
+        background-color: $col_view_item_hover;
+        background-color:transparent;
+        selection-background-color:transparent;
+        color:transparent;
+        selection-color:transparent;
+    }
     &:item{
         border: 0px solid transparent;
         outline: none;
@@ -216,7 +224,6 @@ QAbstractItemView {
                 border: $size_border solid $col_view_item_hover;
             }
         }
-
     }
     &#variables-table{ /* The variables table doesn't have the typical surrounding U.I elements, which requires border changes */
         border-left: $size_border solid $col_secondary;

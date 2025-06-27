@@ -149,6 +149,7 @@ class InputEntryColor(InputEntryBase):
         return self.data
 
     def Set(self, data):
+        # @TODO: Can this be moved to the theme?
         css = f"border: 1px solid rgb(122,122,122); background-color: rgb({','.join(map(str, data))})"
         self.input_widget.setStyleSheet(css)
 

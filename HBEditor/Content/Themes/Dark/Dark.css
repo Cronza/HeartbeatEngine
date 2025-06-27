@@ -179,6 +179,12 @@ QTreeView {
   background-color: #2A2A2B;
   outline: none;
   qproperty-indentation: 10; }
+  QTreeView:indicator {
+    border: 10px solid #2A2A2B;
+    border-top: 0px solid transparent;
+    border-left: 0px solid transparent;
+    background-color: #3F4245;
+    padding: 0px; }
   QTreeView#add-top-border {
     border-top: 1px solid #2A2A2B; }
   QTreeView:item {

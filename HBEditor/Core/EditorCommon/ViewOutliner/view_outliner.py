@@ -28,21 +28,49 @@ class OutlinerItem(QtWidgets.QTreeWidgetItem):
         self.view_item = None
 
 
+class MyStyle(QtWidgets.QProxyStyle):
+
+    def drawPrimitive(self, element, option, painter, widget=None):
+        """
+        Original code sourced from: https://web.archive.org/web/20240911111746/https://apocalyptech.com/linux/qt/qtableview/
+
+        Draw a line across the entire row rather than just the column
+        we're hovering over. This may not always work depending on global
+        style - for instance I think it won't work on OSX.
+        """
+        if element == self.PrimitiveElement.PE_IndicatorItemViewItemDrop and not option.rect.isNull():
+            option_new = QtWidgets.QStyleOption(option)
+            if widget:
+                option_new.rect.setLeft(0)
+                option_new.rect.setRight(widget.width()) # Create a rect the entire width of the widget only using the right side (Effectively creates a line)
+                option = option_new
+
+            # @TODO: Investigate whether there really is no css option for stylizing the drop indicator
+            # The painter defaults to black. We need it to use a color from the theme to keep it thematically inline
+            painter_new = QtGui.QPen(painter.pen())
+            painter_new.setColor(QtCore.Qt.GlobalColor.red)
+            painter.setPen(painter_new)
+
+
+
+        super().drawPrimitive(element, option, painter, widget)
+
+
 class OutlinerTree(QtWidgets.QTreeWidget):
     """ A custom QTreeWidget with improved drag & drop functionality """
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setStyle(MyStyle())
         self.setDragEnabled(True)
         self.setDragDropMode(QtWidgets.QTableWidget.DragDropMode.InternalMove)
         self.setDefaultDropAction(QtCore.Qt.DropAction.MoveAction)
-        self.setDropIndicatorShown(False)
         self.setAcceptDrops(True)
-
         self.setColumnCount(2)
         self.setHeaderLabels(['Name', ''])
         self.setAutoScroll(False)
         self.setDragEnabled(True)
         self.setDragDropMode(QtWidgets.QTreeView.DragDropMode.InternalMove)
+        self.setDropIndicatorShown(True)
         self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.header().setStretchLastSection(False)  # Disable to allow custom sizing
         self.header().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
@@ -51,18 +79,16 @@ class OutlinerTree(QtWidgets.QTreeWidget):
     def startDrag(self, supportedActions: QtCore.Qt.DropAction) -> None:
         if supportedActions.MoveAction:
             new_drag = QtGui.QDrag(self)
-            item_data: OutlinerItem = self.itemFromIndex(self.selectedIndexes()[0])
-            #entry_widget = self.itemWidget(self.item(self.selectedIndexes()[0].row()))
-            #drag_image = QtGui.QPixmap(entry_widget.size())
-            #entry_widget.render(drag_image)  # Render the entry widget to a Pixmap
-            #new_drag.setPixmap(drag_image)
-            new_drag.setMimeData(self.mimeData([item_data.view_item]))
+            item_data = self.itemFromIndex(self.selectedIndexes()[0])
+            new_drag.setMimeData(self.mimeData([item_data]))
             new_drag.exec(supportedActions)
         else:
             super().startDrag(supportedActions)
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         super().dropEvent(event)
+
+
 
 
 class ViewOutliner(QtWidgets.QWidget):
