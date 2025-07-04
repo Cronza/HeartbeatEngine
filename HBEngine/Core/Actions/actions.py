@@ -2450,6 +2450,11 @@ class create_save_list(Action):
             "value": [0.6, 0.8],
             "flags": ["editable"],
         },
+        "slot_spacing": {
+            "type": "Int",
+            "value": 0.35,
+            "flags": ["editable"],
+        },
         "z_order": {
             "type": "Int",
             "value": 0,
@@ -2458,6 +2463,8 @@ class create_save_list(Action):
     }
 
     def Start(self):
+        self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
+
         new_saves_list = self.CreateRenderable(SavesList, self.simplified_ad)
 
         settings.scene.Draw()

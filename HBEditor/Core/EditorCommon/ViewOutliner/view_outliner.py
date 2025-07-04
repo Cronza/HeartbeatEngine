@@ -90,7 +90,6 @@ class OutlinerTree(QtWidgets.QTreeWidget):
 
 
 
-
 class ViewOutliner(QtWidgets.QWidget):
     """ This class functions as a secondary way of visualizing entities within a View / Viewer """
     SIG_USER_UPDATE = QtCore.pyqtSignal()
@@ -103,6 +102,7 @@ class ViewOutliner(QtWidgets.QWidget):
         self.viewer = viewer
         self.viewer.SIG_USER_ADDED_ITEM.connect(self.AddItem)
         self.viewer.SIG_SELECTION_CHANGED.connect(self.OnViewerSelectionChanged)
+        self.viewer.SIG_USER_DELETED_ITEMS.connect(self.Sync)
 
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)

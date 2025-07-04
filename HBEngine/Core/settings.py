@@ -211,6 +211,8 @@ resolution = (1280, 720)
 resolution_options = None
 resolution_multiplier = 1
 
+save_slots = 3
+
 # When objects need to be aware of changes to variables or settings (IE. "mute" checkbox renderable needs
 # to change based on the mute setting), we need a way of tracking who needs to be informed. Any class may add
 # themselves as listeners
