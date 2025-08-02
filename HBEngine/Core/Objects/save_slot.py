@@ -4,6 +4,7 @@ from HBEngine.Core import settings
 from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.renderable_sprite import SpriteRenderable
 from HBEngine.Core.Objects.renderable_text import TextRenderable
+from HBEngine.Core.Objects.interactable_text import InteractableText
 
 
 class SaveSlot(Renderable):
@@ -68,7 +69,7 @@ class SaveSlot(Renderable):
         )
 
         # Create the Save Button Renderable
-        self.save_button_renderable = TextRenderable(
+        self.save_button_renderable = InteractableText(
             {
                 'key': f"!&SAVE_SLOT_{slot_id}_SAVE_BUTTON&!",
                 'text': 'Save',
@@ -77,13 +78,21 @@ class SaveSlot(Renderable):
                 'position': [0.41, 0.135],
                 'center_align': False,
                 'z_order': self.renderable_data['z_order'] + 2,
-                'wrap_bounds': [0.8, 0.4]
+                'wrap_bounds': [0.8, 0.4],
+                'events': {
+                    'event_0': {
+                        'action': {
+                            'action': 'save',
+                            'slot_id': slot_id
+                        }
+                    }
+                }
             },
             parent=self
         )
 
         # Create the Load Button Renderable
-        self.load_button_renderable = TextRenderable(
+        self.load_button_renderable = InteractableText(
             {
                 'key': f"!&SAVE_SLOT_{slot_id}_LOAD_BUTTON&!",
                 'text': 'Load',
@@ -98,7 +107,7 @@ class SaveSlot(Renderable):
         )
 
         # Create the Load Button Renderable
-        self.delete_button_renderable = TextRenderable(
+        self.delete_button_renderable = InteractableText(
             {
                 'key': f"!&SAVE_SLOT_{slot_id}_DELETE_BUTTON&!",
                 'text':      'Delete',

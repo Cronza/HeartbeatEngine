@@ -2042,7 +2042,7 @@ class save(Action):
     """
     DISPLAY_NAME = "Quit Game"
     ACTION_DATA = {
-        "id": {
+        "slot_id": {
             "type": "Int",
             "value": "",
             "flags": ["editable", "preview"],
@@ -2062,14 +2062,20 @@ class save(Action):
     def Start(self):
         self.ValidateActionData(self.ACTION_DATA, self.simplified_ad)
         self.skippable = False
+        print("Saving!")
 
-        #settings.variables
+        save_file_name = f"Save{self.simplified_ad['slot_id']}.hbsave"
+        full_save_path = settings.saves_dir + "/" + save_file_name
+        print("Full save path", full_save_path)
 
         # Confirm whether a save already exists in the provided slot id
-        os.path.exists()
+        if os.path.exists(full_save_path):
+            print("Hey user, your save already exists bro. We gotta ask your permission to override it")
+        else:
+            print(f"Creating save file for ID '{self.simplified_ad['slot_id']}'...")
+            with open(full_save_path, 'w') as f:
+                f.writelines(['<Empty Save File>'])
 
-
-        exit()
 
 # -------------- TRANSITION ACTIONS --------------
 """ 
