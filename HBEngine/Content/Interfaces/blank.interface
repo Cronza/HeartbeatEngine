@@ -1,0 +1,10 @@
+# Created by Cronza
+class: None
+settings:
+  description: ''
+  key: ""
+  z_order: 10000
+pages:
+  Persistent:
+    description: ''
+    items: {}

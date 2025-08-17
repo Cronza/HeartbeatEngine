@@ -2446,6 +2446,12 @@ class create_save_list(Action):
     """
     DISPLAY_NAME = "Create Save List"
     ACTION_DATA = {
+        "key": {
+            "type": "String",
+            "value": "",
+            "connection": None,
+            "flags": ["editable", "connectable", "preview"],
+        },
         "position": {
             "type": "Vector2",
             "value": [0.5, 0.5],

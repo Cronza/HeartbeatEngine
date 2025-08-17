@@ -24,14 +24,20 @@ def SetProjectRoot(new_root: str):
 
     if new_root:
         project_root = new_root
+        saves_dir = project_root + "/" + "Saves"
     else:
-        packaged_root = os.path.join(root_dir, "_internal")
+        # Packaged builds have a different structure
+        packaged_root = root_dir + "/" + "_internal"
         if os.path.exists(packaged_root):
             print(f"Packaged path found - Setting root to '{packaged_root}'")
             project_root = packaged_root
-            saves_dir = os.path.join(project_root, "saves")
+            saves_dir = project_root + "/" + "Saves"
         else:
             raise ValueError("No project root provided, and this does not seem to be a packaged build")
+
+    # Create necessary roots if they don't already exist
+    if not os.path.exists(saves_dir):
+        os.mkdir(saves_dir)
 
 
 def LoadProjectSettings(partial_file_path: str = "Config/Game.yaml"):
@@ -205,13 +211,14 @@ project_root = ""
 project_settings = {}
 variables = {}
 saves_dir = ""  # Set by 'SetProjectRoot'
+save_slots = 3
 
 # Graphics
 resolution = (1280, 720)
 resolution_options = None
 resolution_multiplier = 1
 
-save_slots = 3
+
 
 # When objects need to be aware of changes to variables or settings (IE. "mute" checkbox renderable needs
 # to change based on the mute setting), we need a way of tracking who needs to be informed. Any class may add

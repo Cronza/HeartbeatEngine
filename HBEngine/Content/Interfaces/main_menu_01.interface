@@ -1,5 +1,5 @@
 # Created by Cronza
-type: Interface
+class: FrontEnd
 settings:
   description: ''
   key: "!&INTERFACE_MAIN_MENU&!"

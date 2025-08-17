@@ -33,7 +33,7 @@ class DialogNewInterface(DialogNewFileFromTemplate):
 
         FileOption(
             "None",
-            "Create a blank interface. Perfect if you want to start from scratch.",
+            "Create a blank interface. Perfect if you want a generic interface.",
             "",
             "EditorContent:Images/Thumbnails/Template_Blank.jpg",
             self.options_list

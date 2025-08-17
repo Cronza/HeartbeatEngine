@@ -11,7 +11,7 @@ class SavesList(Renderable):
 
         # Override certain keys
         renderable_data['center_align'] = False
-        renderable_data['key'] = '!&SAVES_LIST&!'  # Create a unique key as nothing should attempt to reference it
+        #renderable_data['key'] = '!&SAVES_LIST&!'  # Create a unique key as nothing should attempt to reference it
 
         # Run parent implementation which will perform recalculations with the aforementioned parameters
         super().__init__(renderable_data, parent, process_data)
@@ -22,7 +22,7 @@ class SavesList(Renderable):
             new_slot = SaveSlot(
                 {
                     'key': f"!&SAVE_SLOT_{slot_id}&!",
-                    'position': [0.1, self.renderable_data['slot_spacing'] * slot_id],
+                    'position': [0, self.renderable_data['slot_spacing'] * slot_id],
                     'center_align': False,
                     'z_order': self.renderable_data['z_order'] + 2,
                     'bounds': [1.0, 1.0]  # Always use the full space of the list
