@@ -2071,10 +2071,19 @@ class save(Action):
         # Confirm whether a save already exists in the provided slot id
         if os.path.exists(full_save_path):
             print("Hey user, your save already exists bro. We gotta ask your permission to override it")
+            new_interface = settings.scene.LoadInterface(
+                interface_file=self.simplified_ad["interface_file"],
+                parent=self.parent
+            )
         else:
             print(f"Creating save file for ID '{self.simplified_ad['slot_id']}'...")
             with open(full_save_path, 'w') as f:
                 f.writelines(['<Empty Save File>'])
+                self.Complete()
+
+    def Update(self, events):
+        pass
+
 
 
 # -------------- TRANSITION ACTIONS --------------
@@ -2270,12 +2279,20 @@ class scene_fade_out(Action):
 # -------------- INTERFACE ACTIONS --------------
 
 class load_interface(Action):
-    """ Loads the provided interface. Returns 'Interface' """
+    """
+    Loads the provided interface. If 'pause' is provided, disable interaction and controls with all
+    other objects or interfaces for as long as this interface is loaded. Returns 'Interface'
+    """
     DISPLAY_NAME = "Load Interface"
     ACTION_DATA = {
         "interface_file": {
             "type": "Interface",
             "value": "None",
+            "flags": ["editable", "preview"],
+        },
+        "pause": {
+            "type": "Bool",
+            "value": False,
             "flags": ["editable", "preview"],
         }
     }
@@ -2482,3 +2499,33 @@ class create_save_list(Action):
         settings.scene.Draw()
         self.Complete()
         return new_saves_list
+
+
+class create_prompt(Action):
+    DISPLAY_NAME = "Create Prompt"
+    ACTION_DATA = {
+        "interface_file": {
+            "type": "Interface",
+            "value": "None",
+            "flags": ["editable", "preview"],
+        },
+    }
+
+    def Start(self):
+        new_interface = settings.scene.LoadInterface(
+            interface_file=self.simplified_ad["interface_file"],
+            parent=self.parent
+        )
+        settings.scene.Draw()
+        self.Complete()
+        return new_interface
+
+class close_prompt(Action):
+    DISPLAY_NAME = "Create Prompt"
+    ACTION_DATA = {
+        "interface_file": {
+            "type": "Interface",
+            "value": "None",
+            "flags": ["editable", "preview"],
+        },
+    }

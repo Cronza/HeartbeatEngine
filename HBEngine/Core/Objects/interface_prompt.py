@@ -18,13 +18,19 @@ from HBEngine.Core.Objects.renderable import Renderable
 from HBEngine.Core.Objects.interface import Interface
 
 
-class InterfaceConfirmPrompt(Interface):
+class InterfacePrompt(Interface):
     """
-    An interface subclass dedicated to confirmation prompts. This class requires renderables with specifc keys
-    that it edits to supply text unique to each instance
+    An interface subclass dedicated to prompts which function as temporary interfaces meant to return information.
+    To ensure the invoking party is informed correctly, a callback is expected that accepts an 'any' type argument
     """
-    def __init__(self, renderable_data: dict, parent: Renderable = None):
-        renderable_data["key"] = "!&HBENGINE_INTERNAL_CONFIRM_PROMPT_INTERFACE!&"
+    def __init__(self, renderable_data: dict, parent: Renderable = None, close_callback: callable = None):
+
+        self.result = None
+
+        # The structure is: <key>: <callback>
+        self.close_callback = close_callback
+
+        #renderable_data["key"] = "!&HBENGINE_INTERNAL_CONFIRM_PROMPT_INTERFACE!&"
         renderable_data["z_order"] = 10000000001
         super().__init__(renderable_data, parent)
 
@@ -41,3 +47,8 @@ class InterfaceConfirmPrompt(Interface):
         self.renderable_data['Body'].renderable_data["text"] = text
         self.renderable_data['Body'].WrapText()
 
+    def Destroy(self):
+        super().Destroy()
+
+        # If applicable, pass the result of the prompt to whomever created the prompt
+        self.close_callback(self.result)
